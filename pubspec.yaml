@@ -35,6 +35,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # json
+  json_annotation: ^4.9.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -46,8 +49,17 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
 
+  # json
+  build_runner: ^2.4.8
+  json_serializable: ^6.8.0
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+dependency_overrides:
+  # A version known to work with json_serializable 6.9.4
+  # unpin after https://github.com/google/json_serializable.dart/issues/1485
+  analyzer: "7.3.0"
 
 # The following section is specific to Flutter packages.
 flutter:
