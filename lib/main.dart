@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
-void main() {
+import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/nikke.dart';
+
+Future<void> main() async {
+  await gameData.loadData();
+  print('Data Length: ${gameData.characterData.length}');
+  print('Data Length: ${gameData.characterNameTranslation.length}');
   runApp(const MyApp());
 }
 
@@ -30,7 +36,58 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const NikkeList(),
+    );
+  }
+}
+
+class NikkeList extends StatelessWidget {
+  const NikkeList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Nikke List')),
+      body: CustomScrollView(
+        slivers: [
+          SliverGrid.extent(
+            maxCrossAxisExtent: 144,
+            children:
+                gameData.characterResourceGardeTable.entries
+                    .map((entry) => _buildGrid(entry.key, entry.value))
+                    .toList(),
+          ),
+        ],
+        physics: const AlwaysScrollableScrollPhysics(),
+      ),
+    );
+  }
+
+  Widget _buildGrid(int resourceId, Map<int, NikkeCharacterData> gradeToData) {
+    final characterData = gradeToData.values.last;
+    final name = gameData.characterNameTranslation[resourceId]?.zhCN ?? resourceId;
+    return Container(
+      width: 100,
+      height: 150,
+      margin: const EdgeInsets.all(5.0),
+      padding: const EdgeInsets.all(3.0),
+      decoration: BoxDecoration(border: Border.all(color: Colors.black), borderRadius: BorderRadius.circular(5)),
+      child: Center(
+        child: Tooltip(
+          message:
+              'id: ${characterData.id}\n'
+              'resourceId: ${characterData.resourceId}\n'
+              'rarity: ${characterData.originalRare}\n'
+              'class: ${characterData.characterClass}\n'
+              'corp: ${characterData.corporation}\n'
+              'burstStep: ${characterData.useBurstSkill} => ${characterData.changeBurstStep}\n'
+              'shotId: ${characterData.shotId}',
+          child: Text(
+            '$name',
+            style: TextStyle(color: characterData.hasUnknownEnum ? Colors.red : Colors.black, fontSize: 15),
+          ),
+        ),
+      ),
     );
   }
 }

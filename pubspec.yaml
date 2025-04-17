@@ -38,6 +38,8 @@ dependencies:
   # json
   json_annotation: ^4.9.0
 
+  path: ^1.8.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -99,3 +101,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+  fonts:
+    - family: RobotoMono
+      fonts:
+        - asset: fonts/RobotoMono-VariableFont_wght.ttf
+        - asset: fonts/RobotoMono-Italic-VariableFont_wght.ttf
+          style: italic

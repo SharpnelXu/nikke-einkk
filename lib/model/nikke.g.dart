@@ -14,19 +14,25 @@ NikkeCharacterData _$NikkeCharacterDataFromJson(Map<String, dynamic> json) => Ni
   additionalSkins: (json['additional_skins'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
   nameCode: (json['name_code'] as num?)?.toInt() ?? 0,
   order: (json['order'] as num?)?.toInt() ?? 0,
-  originalRare: $enumDecodeNullable(_$RarityEnumMap, json['original_rare']) ?? Rarity.unknown,
+  originalRare:
+      $enumDecodeNullable(_$RarityEnumMap, json['original_rare'], unknownValue: Rarity.unknown) ?? Rarity.unknown,
   gradeCoreId: (json['grade_core_id'] as num?)?.toInt() ?? 0,
   growGrade: (json['grow_grade'] as num?)?.toInt() ?? 0,
   statEnhanceId: (json['stat_enhance_id'] as num?)?.toInt() ?? 0,
-  characterClass: $enumDecodeNullable(_$NikkeClassEnumMap, json['class']) ?? NikkeClass.unknown,
+  characterClass:
+      $enumDecodeNullable(_$NikkeClassEnumMap, json['class'], unknownValue: NikkeClass.unknown) ?? NikkeClass.unknown,
   elementId: (json['element_id'] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList() ?? const [],
   criticalRatio: (json['critical_ratio'] as num?)?.toInt() ?? 0,
   criticalDamage: (json['critical_damage'] as num?)?.toInt() ?? 0,
   shotId: (json['shot_id'] as num?)?.toInt() ?? 0,
   bonusRangeMin: (json['bonusrange_min'] as num?)?.toInt() ?? 0,
   bonusRangeMax: (json['bonusrange_max'] as num?)?.toInt() ?? 0,
-  useBurstSkill: $enumDecodeNullable(_$BurstStepEnumMap, json['use_burst_skill']) ?? BurstStep.unknown,
-  changeBurstStep: $enumDecodeNullable(_$BurstStepEnumMap, json['change_burst_step']) ?? BurstStep.unknown,
+  useBurstSkill:
+      $enumDecodeNullable(_$BurstStepEnumMap, json['use_burst_skill'], unknownValue: BurstStep.unknown) ??
+      BurstStep.unknown,
+  changeBurstStep:
+      $enumDecodeNullable(_$BurstStepEnumMap, json['change_burst_step'], unknownValue: BurstStep.unknown) ??
+      BurstStep.unknown,
   burstApplyDelay: (json['burst_apply_delay'] as num?)?.toInt() ?? 0,
   burstDuration: (json['burst_duration'] as num?)?.toInt() ?? 0,
   ultiSkillId: (json['ulti_skill_id'] as num?)?.toInt() ?? 0,
@@ -39,7 +45,9 @@ NikkeCharacterData _$NikkeCharacterDataFromJson(Map<String, dynamic> json) => Ni
   categoryType1: json['category_type_1'] as String? ?? '',
   categoryType2: json['category_type_2'] as String? ?? '',
   categoryType3: json['category_type_3'] as String? ?? '',
-  corporation: $enumDecodeNullable(_$CorporationEnumMap, json['corporation']) ?? Corporation.unknown,
+  corporation:
+      $enumDecodeNullable(_$CorporationEnumMap, json['corporation'], unknownValue: Corporation.unknown) ??
+      Corporation.unknown,
   cvLocalkey: json['cv_localkey'] as String? ?? '',
   squad: json['squad'] as String? ?? '',
   pieceId: (json['piece_id'] as num?)?.toInt() ?? 0,
@@ -107,6 +115,7 @@ const _$BurstStepEnumMap = {
   BurstStep.stepFull: 'StepFull',
   BurstStep.allStep: 'AllStep',
   BurstStep.nextStep: 'NextStep',
+  BurstStep.none: 'None',
 };
 
 const _$CorporationEnumMap = {

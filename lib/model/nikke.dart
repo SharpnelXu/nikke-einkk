@@ -66,7 +66,7 @@ class NikkeCharacterData {
   // doesn't know what this means
   final int order;
   // valid values are "SSR", "SR", "R"
-  @JsonKey(name: 'original_rare')
+  @JsonKey(name: 'original_rare', unknownEnumValue: Rarity.unknown)
   final Rarity originalRare;
   // valid values are [1, 11], use `limitBreak` for more readable format
   @JsonKey(name: 'grade_core_id')
@@ -78,7 +78,7 @@ class NikkeCharacterData {
   @JsonKey(name: 'stat_enhance_id')
   final int statEnhanceId;
   // "Attacker", "Defender", "Supporter"
-  @JsonKey(name: 'class')
+  @JsonKey(name: 'class', unknownEnumValue: NikkeClass.unknown)
   final NikkeClass characterClass;
   @JsonKey(name: 'element_id')
   final List<int> elementId;
@@ -96,10 +96,10 @@ class NikkeCharacterData {
   @JsonKey(name: 'bonusrange_max')
   final int bonusRangeMax;
   // "AllStep", "Step1", "Step2", "Step3"
-  @JsonKey(name: 'use_burst_skill')
+  @JsonKey(name: 'use_burst_skill', unknownEnumValue: BurstStep.unknown)
   final BurstStep useBurstSkill;
   // "NextStep", "Step1", "Step2", "Step3", "StepFull"
-  @JsonKey(name: 'change_burst_step')
+  @JsonKey(name: 'change_burst_step', unknownEnumValue: BurstStep.unknown)
   final BurstStep changeBurstStep;
   @JsonKey(name: 'burst_apply_delay')
   final int burstApplyDelay;
@@ -138,6 +138,7 @@ class NikkeCharacterData {
   // doesn't know what this means
   @JsonKey(name: 'category_type_3')
   final String categoryType3;
+  @JsonKey(unknownEnumValue: Corporation.unknown)
   final Corporation corporation;
   @JsonKey(name: 'cv_localkey')
   final String cvLocalkey;
@@ -199,6 +200,14 @@ class NikkeCharacterData {
   factory NikkeCharacterData.fromJson(Map<String, dynamic> json) => _$NikkeCharacterDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$NikkeCharacterDataToJson(this);
+
+  bool get hasUnknownEnum {
+    return originalRare == Rarity.unknown ||
+        corporation == Corporation.unknown ||
+        useBurstSkill == BurstStep.unknown ||
+        changeBurstStep == BurstStep.unknown ||
+        characterClass == NikkeClass.unknown;
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
@@ -238,6 +247,9 @@ enum BurstStep {
   // red hood
   allStep,
   nextStep,
+
+  // marian
+  none,
 }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
