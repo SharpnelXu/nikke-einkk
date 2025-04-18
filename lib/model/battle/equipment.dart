@@ -15,7 +15,7 @@ class BattleEquipmentData {
     final equipStat = equipData.stat.firstWhereOrNull((stat) => stat.statType == statType);
     if (equipStat == null) return 0;
 
-    final sameCorpFactor = ownerCorp == corporation ? 3 : 0;
+    final sameCorpFactor = corporation != Corporation.none && ownerCorp == corporation ? 3 : 0;
     return equipStat.statValue * (10 + level + sameCorpFactor) ~/ 10;
   }
 }
