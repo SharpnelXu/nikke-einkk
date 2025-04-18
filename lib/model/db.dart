@@ -23,12 +23,19 @@ class NikkeDatabase {
   final Map<String, Translation> localeCharacterTable = {};
   final Map<int, WeaponSkillData> characterShotTable = {};
 
+  // character stats
+  // grouped by group/level
+  final Map<int, Map<int, CharacterStatData>> groupedCharacterStatTable = {};
+  final Map<int, CharacterStatEnhanceData> characterStatEnhanceTable = {};
+
   Future<bool> loadData() async {
     bool result = true;
 
     result &= await loadCharacterData();
     result &= await loadTranslationData();
     result &= await loadCharacterShotData();
+    result &= await loadCharacterStatData();
+    result &= await loadCharacterStatEnhanceData();
 
     return result;
   }
@@ -73,6 +80,33 @@ class NikkeDatabase {
       for (final record in json['records']) {
         final weapon = WeaponSkillData.fromJson(record);
         characterShotTable[weapon.id] = weapon;
+      }
+    }
+    return exists;
+  }
+
+  Future<bool> loadCharacterStatData() async {
+    final table = File(characterStatTableFilePath);
+    final bool exists = await table.exists();
+    if (exists) {
+      final json = jsonDecode(await table.readAsString());
+      for (final record in json['records']) {
+        final stat = CharacterStatData.fromJson(record);
+        groupedCharacterStatTable.putIfAbsent(stat.group, () => <int, CharacterStatData>{});
+        groupedCharacterStatTable[stat.group]![stat.level] = stat;
+      }
+    }
+    return exists;
+  }
+
+  Future<bool> loadCharacterStatEnhanceData() async {
+    final table = File(characterStatEnhanceTableFilePath);
+    final bool exists = await table.exists();
+    if (exists) {
+      final json = jsonDecode(await table.readAsString());
+      for (final record in json['records']) {
+        final statEnhance = CharacterStatEnhanceData.fromJson(record);
+        characterStatEnhanceTable[statEnhance.id] = statEnhance;
       }
     }
     return exists;

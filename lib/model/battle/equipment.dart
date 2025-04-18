@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/items.dart';
 
 class BattleEquipmentData {
   // equipment stat formula: baseStat * (100% + 10% * (level (0~5) + sameCorpFactor (3)))

@@ -18,15 +18,14 @@ Translation _$TranslationFromJson(Map<String, dynamic> json) => Translation(
   isSmart: (json['IsSmart'] as num?)?.toInt() ?? 0,
 );
 
-Map<String, dynamic> _$TranslationToJson(Translation instance) =>
-    <String, dynamic>{
-      'Key': instance.key,
-      'ko': instance.ko,
-      'en': instance.en,
-      'ja': instance.ja,
-      'zh-TW': instance.zhTW,
-      'zh-CN': instance.zhCN,
-      'th': instance.th,
-      'fr': instance.fr,
-      'IsSmart': instance.isSmart,
-    };
+Map<String, dynamic> _$TranslationToJson(Translation instance) => <String, dynamic>{
+  'Key': instance.key,
+  'ko': instance.ko,
+  'en': instance.en,
+  'ja': instance.ja,
+  'zh-TW': instance.zhTW,
+  'zh-CN': instance.zhCN,
+  'th': instance.th,
+  'fr': instance.fr,
+  'IsSmart': instance.isSmart,
+};
