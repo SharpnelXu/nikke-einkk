@@ -15,5 +15,5 @@ class BattleNikkeData {
   // cube
   // doll
 
-  BattleNikkeData({required this.characterData, this.equips = [],});
+  BattleNikkeData({required this.characterData, this.equips = const []});
 }
