@@ -15,5 +15,12 @@ class BattleNikkeData {
   // cube
   // doll
 
+  // coverBaseHp
+  // coverCurrentHp
+
+  // hp
+  // atk
+  // def
+
   BattleNikkeData({required this.characterData, this.equips = const []});
 }

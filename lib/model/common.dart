@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'common.g.dart';
+part '../generated/model/common.g.dart';
 
 // sample data
 // {
@@ -67,7 +67,7 @@ class NikkeCharacterData {
   // doesn't know what this means
   final int order;
   // valid values are "SSR", "SR", "R"
-  @JsonKey(name: 'original_rare', unknownEnumValue: Rarity.unknown)
+  @JsonKey(name: 'original_rare')
   final Rarity originalRare;
   // valid values are [1, 11], use `limitBreak` for more readable format
   @JsonKey(name: 'grade_core_id')
@@ -87,7 +87,7 @@ class NikkeCharacterData {
   @JsonKey(name: 'stat_enhance_id')
   final int statEnhanceId;
   // "Attacker", "Defender", "Supporter"
-  @JsonKey(name: 'class', unknownEnumValue: NikkeClass.unknown)
+  @JsonKey(name: 'class')
   final NikkeClass characterClass;
   @JsonKey(name: 'element_id')
   final List<int> elementId;
@@ -105,10 +105,10 @@ class NikkeCharacterData {
   @JsonKey(name: 'bonusrange_max')
   final int bonusRangeMax;
   // "AllStep", "Step1", "Step2", "Step3"
-  @JsonKey(name: 'use_burst_skill', unknownEnumValue: BurstStep.unknown)
+  @JsonKey(name: 'use_burst_skill')
   final BurstStep useBurstSkill;
   // "NextStep", "Step1", "Step2", "Step3", "StepFull"
-  @JsonKey(name: 'change_burst_step', unknownEnumValue: BurstStep.unknown)
+  @JsonKey(name: 'change_burst_step')
   final BurstStep changeBurstStep;
   @JsonKey(name: 'burst_apply_delay')
   final int burstApplyDelay;
@@ -407,9 +407,9 @@ class EquipmentItemData {
   final ItemType itemType;
   @JsonKey(name: 'item_sub_type')
   final EquipType itemSubType;
-  @JsonKey(name: 'class', defaultValue: NikkeClass.unknown)
+  @JsonKey(name: 'class')
   final NikkeClass characterClass;
-  @JsonKey(name: 'item_rare', defaultValue: EquipRarity.unknown)
+  @JsonKey(name: 'item_rare')
   final EquipRarity itemRarity;
   @JsonKey(name: 'grade_core_id')
   final int gradeCoreId;

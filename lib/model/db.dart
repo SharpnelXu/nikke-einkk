@@ -13,8 +13,10 @@ class NikkeDatabase {
 
   String get dataPath => join(appPath, 'data');
   String get characterTableFilePath => join(dataPath, 'CharacterTable.json');
-  String get characterTranslationTableFilePath => join(dataPath, 'CharacterTranslationTable.json');
   String get characterShotTableFilePath => join(dataPath, 'CharacterShotTable.json');
+  String get characterStatTableFilePath => join(dataPath, 'CharacterStatTable.json');
+  String get characterStatEnhanceTableFilePath => join(dataPath, 'CharacterStatEnhanceTable.json');
+  String get localeCharacterTableFilePath => join(dataPath, 'LocaleCharacterTable.json');
 
   final Map<int, NikkeCharacterData> characterData = {};
   final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
@@ -47,7 +49,7 @@ class NikkeDatabase {
   }
 
   Future<bool> loadTranslationData() async {
-    final characterTranslationTableFile = File(characterTranslationTableFilePath);
+    final characterTranslationTableFile = File(localeCharacterTableFilePath);
     final bool exists = await characterTranslationTableFile.exists();
     if (exists) {
       final jsonList = jsonDecode(await characterTranslationTableFile.readAsString());

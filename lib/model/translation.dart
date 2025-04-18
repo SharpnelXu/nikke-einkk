@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'translation.g.dart';
+part '../generated/model/translation.g.dart';
 
 @JsonSerializable()
 class Translation {
