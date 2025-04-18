@@ -14,16 +14,19 @@ class NikkeDatabase {
   String get dataPath => join(appPath, 'data');
   String get characterTableFilePath => join(dataPath, 'CharacterTable.json');
   String get characterTranslationTableFilePath => join(dataPath, 'CharacterTranslationTable.json');
+  String get characterShotTableFilePath => join(dataPath, 'CharacterShotTable.json');
 
   final Map<int, NikkeCharacterData> characterData = {};
   final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
-  final Map<int, Translation> characterNameTranslation = {};
+  final Map<String, Translation> localeCharacterTable = {};
+  final Map<int, WeaponSkillData> characterShotTable = {};
 
   Future<bool> loadData() async {
     bool result = true;
 
     result &= await loadCharacterData();
     result &= await loadTranslationData();
+    result &= await loadCharacterShotData();
 
     return result;
   }
@@ -53,11 +56,34 @@ class NikkeDatabase {
         final translation = Translation.fromJson(record);
         final match = regex.hasMatch(translation.key);
         if (match) {
-          final resourceId = translation.key.split('_')[0];
-          characterNameTranslation[int.parse(resourceId)] = translation;
+          localeCharacterTable[translation.key] = translation;
         }
       }
     }
     return exists;
+  }
+
+  Future<bool> loadCharacterShotData() async {
+    final table = File(characterShotTableFilePath);
+    final bool exists = await table.exists();
+    if (exists) {
+      final json = jsonDecode(await table.readAsString());
+      for (final record in json['records']) {
+        final weapon = WeaponSkillData.fromJson(record);
+        characterShotTable[weapon.id] = weapon;
+      }
+    }
+    return exists;
+  }
+
+  Translation? getTranslation(String joinedKey) {
+    final splits = joinedKey.split(':');
+    final tableType = splits[0];
+    final key = splits[1];
+    if (tableType == 'Locale_Character') {
+      return localeCharacterTable[key];
+    }
+
+    return null;
   }
 }

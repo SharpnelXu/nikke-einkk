@@ -220,6 +220,181 @@ class NikkeCharacterData {
 }
 
 @JsonSerializable()
+class WeaponSkillData {
+  final int id;
+  @JsonKey(name: 'name_localkey')
+  final String nameLocalkey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionLocalkey;
+  final String cameraWork;
+  @JsonKey(name: 'weapon_type')
+  final WeaponType weaponType;
+  @JsonKey(name: 'attack_type')
+  final String attackType;
+  @JsonKey(name: 'counter_enermy')
+  final String counterEnemy;
+  @JsonKey(name: 'prefer_target')
+  final String preferTarget;
+  @JsonKey(name: 'prefer_target_condition')
+  final String preferTargetCondition;
+  @JsonKey(name: 'shot_timing')
+  final String shotTiming;
+  @JsonKey(name: 'fire_type')
+  final String fireType;
+  @JsonKey(name: 'input_type')
+  final String inputType;
+  @JsonKey(name: 'is_targeting')
+  final bool isTargeting;
+  final int damage;
+  @JsonKey(name: 'shot_count')
+  final int shotCount;
+  @JsonKey(name: 'muzzle_count')
+  final int muzzleCount;
+  @JsonKey(name: 'multi_target_count')
+  final int multiTargetCount;
+  @JsonKey(name: 'center_shot_count')
+  final int centerShotCount;
+  @JsonKey(name: 'max_ammo')
+  final int maxAmmo;
+  @JsonKey(name: 'maintain_fire_stance')
+  final int maintainFireStance;
+  @JsonKey(name: 'uptype_fire_timing')
+  final int upTypeFireTiming;
+  @JsonKey(name: 'reload_time')
+  final int reloadTime;
+  @JsonKey(name: 'reload_bullet')
+  final int reloadBullet;
+  @JsonKey(name: 'reload_start_ammo')
+  final int reloadStartAmmo;
+  @JsonKey(name: 'rate_of_fire_reset_time')
+  final int rateOfFireResetTime;
+  @JsonKey(name: 'rate_of_fire')
+  final int rateOfFire;
+  @JsonKey(name: 'end_rate_of_fire')
+  final int endRateOfFire;
+  @JsonKey(name: 'rate_of_fire_change_pershot')
+  final int rateOfFireChangePerShot;
+  @JsonKey(name: 'burst_energy_pershot')
+  final int burstEnergyPerShot;
+  @JsonKey(name: 'target_burst_energy_pershot')
+  final int targetBurstEnergyPerShot;
+  @JsonKey(name: 'spot_first_delay')
+  final int spotFirstDelay;
+  @JsonKey(name: 'spot_last_delay')
+  final int spotLastDelay;
+  @JsonKey(name: 'start_accuracy_circle_scale')
+  final int startAccuracyCircleScale;
+  @JsonKey(name: 'end_accuracy_circle_scale')
+  final int endAccuracyCircleScale;
+  @JsonKey(name: 'accuracy_change_pershot')
+  final int accuracyChangePerShot;
+  @JsonKey(name: 'accuracy_change_speed')
+  final int accuracyChangeSpeed;
+  @JsonKey(name: 'auto_start_accuracy_circle_scale')
+  final int autoStartAccuracyCircleScale;
+  @JsonKey(name: 'auto_end_accuracy_circle_scale')
+  final int autoEndAccuracyCircleScale;
+  @JsonKey(name: 'auto_accuracy_change_pershot')
+  final int autoAccuracyChangePerShot;
+  @JsonKey(name: 'auto_accuracy_change_speed')
+  final int autoAccuracyChangeSpeed;
+  @JsonKey(name: 'zoom_rate')
+  final int zoomRate;
+  @JsonKey(name: 'multi_aim_range')
+  final int multiAimRange;
+  @JsonKey(name: 'spot_projectile_speed')
+  final int spotProjectileSpeed;
+  @JsonKey(name: 'charge_time')
+  final int chargeTime;
+  @JsonKey(name: 'full_charge_damage')
+  final int fullChargeDamage;
+  @JsonKey(name: 'full_charge_burst_energy')
+  final int fullChargeBurstEnergy;
+  @JsonKey(name: 'spot_radius_object')
+  final int spotRadiusObject;
+  @JsonKey(name: 'spot_radius')
+  final int spotRadius;
+  @JsonKey(name: 'spot_explosion_range')
+  final int spotExplosionRange;
+  @JsonKey(name: 'core_damage_rate')
+  final int coreDamageRate;
+  final int penetration;
+  @JsonKey(name: 'use_function_id_list')
+  final List<int> useFunctionIdList;
+  @JsonKey(name: 'hurt_function_id_list')
+  final List<int> hurtFunctionIdList;
+  @JsonKey(name: 'shake_id')
+  final int shakeId;
+  @JsonKey(name: 'ShakeType')
+  final String shakeType;
+  @JsonKey(name: 'ShakeWeight')
+  final int shakeWeight;
+
+  WeaponSkillData({
+    this.id = 0,
+    this.nameLocalkey = '',
+    this.descriptionLocalkey = '',
+    this.cameraWork = '',
+    this.weaponType = WeaponType.unknown,
+    this.attackType = '',
+    this.counterEnemy = '',
+    this.preferTarget = '',
+    this.preferTargetCondition = '',
+    this.shotTiming = '',
+    this.fireType = '',
+    this.inputType = '',
+    this.isTargeting = false,
+    this.damage = 0,
+    this.shotCount = 0,
+    this.muzzleCount = 0,
+    this.multiTargetCount = 0,
+    this.centerShotCount = 0,
+    this.maxAmmo = 0,
+    this.maintainFireStance = 0,
+    this.upTypeFireTiming = 0,
+    this.reloadTime = 0,
+    this.reloadBullet = 0,
+    this.reloadStartAmmo = 0,
+    this.rateOfFireResetTime = 0,
+    this.rateOfFire = 0,
+    this.endRateOfFire = 0,
+    this.rateOfFireChangePerShot = 0,
+    this.burstEnergyPerShot = 0,
+    this.targetBurstEnergyPerShot = 0,
+    this.spotFirstDelay = 0,
+    this.spotLastDelay = 0,
+    this.startAccuracyCircleScale = 0,
+    this.endAccuracyCircleScale = 0,
+    this.accuracyChangePerShot = 0,
+    this.accuracyChangeSpeed = 0,
+    this.autoStartAccuracyCircleScale = 0,
+    this.autoEndAccuracyCircleScale = 0,
+    this.autoAccuracyChangePerShot = 0,
+    this.autoAccuracyChangeSpeed = 0,
+    this.zoomRate = 0,
+    this.multiAimRange = 0,
+    this.spotProjectileSpeed = 0,
+    this.chargeTime = 0,
+    this.fullChargeDamage = 0,
+    this.fullChargeBurstEnergy = 0,
+    this.spotRadiusObject = 0,
+    this.spotRadius = 0,
+    this.spotExplosionRange = 0,
+    this.coreDamageRate = 0,
+    this.penetration = 0,
+    this.useFunctionIdList = const [],
+    this.hurtFunctionIdList = const [],
+    this.shakeId = 0,
+    this.shakeType = '',
+    this.shakeWeight = 0,
+  });
+
+  factory WeaponSkillData.fromJson(Map<String, dynamic> json) => _$WeaponSkillDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$WeaponSkillDataToJson(this);
+}
+
+@JsonSerializable()
 class EquipmentItemData {
   final int id;
   @JsonKey(name: 'name_localkey')
@@ -228,7 +403,7 @@ class EquipmentItemData {
   final String descriptionLocalkey;
   @JsonKey(name: 'resource_id')
   final String resourceId;
-  @JsonKey(name: 'item_type', defaultValue: ItemType.equip)
+  @JsonKey(name: 'item_type')
   final ItemType itemType;
   @JsonKey(name: 'item_sub_type')
   final EquipType itemSubType;
@@ -301,6 +476,29 @@ enum Rarity { unknown, ssr, sr, r }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum StatType { atk, defence, hp, none, unknown }
+
+enum WeaponType {
+  unknown,
+  @JsonValue('None')
+  none,
+  @JsonValue('AR')
+  ar,
+  @JsonValue('MG')
+  mg,
+  @JsonValue('RL')
+  rl,
+  @JsonValue('SG')
+  sg,
+  @JsonValue('SMG')
+  smg,
+  @JsonValue('SR')
+  sr;
+
+  @override
+  String toString() {
+    return name.toUpperCase();
+  }
+}
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum ItemType { unknown, equip }

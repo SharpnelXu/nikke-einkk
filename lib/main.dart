@@ -5,8 +5,6 @@ import 'package:nikke_einkk/model/common.dart';
 
 Future<void> main() async {
   await gameData.loadData();
-  print('Data Length: ${gameData.characterData.length}');
-  print('Data Length: ${gameData.characterNameTranslation.length}');
   runApp(const MyApp());
 }
 
@@ -53,9 +51,7 @@ class NikkeList extends StatelessWidget {
           SliverGrid.extent(
             maxCrossAxisExtent: 144,
             children:
-                gameData.characterResourceGardeTable.entries
-                    .map((entry) => _buildGrid(entry.key, entry.value))
-                    .toList(),
+                gameData.characterResourceGardeTable.values.map((characterData) => _buildGrid(characterData)).toList(),
           ),
         ],
         physics: const AlwaysScrollableScrollPhysics(),
@@ -63,9 +59,10 @@ class NikkeList extends StatelessWidget {
     );
   }
 
-  Widget _buildGrid(int resourceId, Map<int, NikkeCharacterData> gradeToData) {
+  Widget _buildGrid(Map<int, NikkeCharacterData> gradeToData) {
     final characterData = gradeToData.values.last;
-    final name = gameData.characterNameTranslation[resourceId]?.zhCN ?? resourceId;
+    final name = gameData.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId;
+    final weaponType = gameData.characterShotTable[characterData.shotId]?.weaponType ?? WeaponType.unknown;
     return Container(
       width: 100,
       height: 150,
@@ -83,7 +80,7 @@ class NikkeList extends StatelessWidget {
               'burstStep: ${characterData.useBurstSkill} => ${characterData.changeBurstStep}\n'
               'shotId: ${characterData.shotId}',
           child: Text(
-            '$name',
+            '$name / $weaponType',
             style: TextStyle(color: characterData.hasUnknownEnum ? Colors.red : Colors.black, fontSize: 15),
           ),
         ),
