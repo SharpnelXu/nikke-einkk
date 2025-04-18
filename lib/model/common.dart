@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'nikke.g.dart';
+part 'common.g.dart';
 
 // sample data
 // {
@@ -55,6 +55,7 @@ class NikkeCharacterData {
   final String nameLocalkey;
   @JsonKey(name: 'description_localkey')
   final String descriptionLocalkey;
+  // might be problematic to treat resourceId as characterId in the future
   @JsonKey(name: 'resource_id')
   final int resourceId;
   // values observed in list are "acc", "bg". Yet to know what this refers to, but probably doesn't matter
@@ -74,7 +75,15 @@ class NikkeCharacterData {
   // denote if there's next grade, 0 means no next grade
   @JsonKey(name: 'grow_grade')
   final int growGrade;
-  // CharacterStatEnhanceTable
+  // CharacterStatEnhanceTable & CharacterStatTable
+  // CharacterStatTable[statEnhanceId = groupId][lv] to get baseStat
+  // CharacterStateEnhanceTable[statEnhanceId = id] to get gradeEnhanceStat
+  // grade is [1, 4]
+  // gradeStat = baseStat * gradeRatio (usually 2%) * (grade - 1) + gradeStat * (grade - 1)
+  // MLBStat = baseStat + gradeStat
+  // core is [1, 7]
+  // coreStat = (MLBStat (which is gradeStat + baseStat) + bond stat + console stat) * coreRatio (2%)
+  // finalStat = baseStat + gradeStat + coreStat + bondStat + consoleStat + cubeStat + gearStat + dollStat
   @JsonKey(name: 'stat_enhance_id')
   final int statEnhanceId;
   // "Attacker", "Defender", "Supporter"
@@ -210,8 +219,106 @@ class NikkeCharacterData {
   }
 }
 
+@JsonSerializable()
+class EquipmentItemData {
+  final int id;
+  @JsonKey(name: 'name_localkey')
+  final String nameLocalkey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionLocalkey;
+  @JsonKey(name: 'resource_id')
+  final String resourceId;
+  @JsonKey(name: 'item_type', defaultValue: ItemType.equip)
+  final ItemType itemType;
+  @JsonKey(name: 'item_sub_type')
+  final EquipType itemSubType;
+  @JsonKey(name: 'class', defaultValue: NikkeClass.unknown)
+  final NikkeClass characterClass;
+  @JsonKey(name: 'item_rare', defaultValue: EquipRarity.unknown)
+  final EquipRarity itemRarity;
+  @JsonKey(name: 'grade_core_id')
+  final int gradeCoreId;
+  @JsonKey(name: 'grow_grade')
+  final int growGrade;
+  final List<EquipmentStat> stat;
+  @JsonKey(name: 'option_slot')
+  final List<OptionSlot> optionSlots;
+  @JsonKey(name: 'option_cost')
+  final int optionCost;
+  @JsonKey(name: 'option_change_cost')
+  final int optionChangeCost;
+  @JsonKey(name: 'option_lock_cost')
+  final int optionLockCost;
+
+  EquipmentItemData({
+    this.id = 0,
+    this.nameLocalkey = '',
+    this.descriptionLocalkey = '',
+    this.resourceId = '',
+    this.itemType = ItemType.equip,
+    this.itemSubType = EquipType.unknown,
+    this.characterClass = NikkeClass.unknown,
+    this.itemRarity = EquipRarity.unknown,
+    this.gradeCoreId = 0,
+    this.growGrade = 0,
+    this.stat = const [],
+    this.optionSlots = const [],
+    this.optionCost = 0,
+    this.optionChangeCost = 0,
+    this.optionLockCost = 0,
+  });
+
+  factory EquipmentItemData.fromJson(Map<String, dynamic> json) => _$EquipmentItemDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$EquipmentItemDataToJson(this);
+}
+
+@JsonSerializable()
+class EquipmentStat {
+  final StatType statType;
+  final int statValue;
+
+  EquipmentStat({this.statType = StatType.none, this.statValue = 0});
+
+  factory EquipmentStat.fromJson(Map<String, dynamic> json) => _$EquipmentStatFromJson(json);
+
+  Map<String, dynamic> toJson() => _$EquipmentStatToJson(this);
+}
+
+@JsonSerializable()
+class OptionSlot {
+  final int optionSlot;
+  final int optionSlotSuccessRatio;
+
+  OptionSlot({this.optionSlot = 0, this.optionSlotSuccessRatio = 0});
+
+  factory OptionSlot.fromJson(Map<String, dynamic> json) => _$OptionSlotFromJson(json);
+  Map<String, dynamic> toJson() => _$OptionSlotToJson(this);
+}
+
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
 enum Rarity { unknown, ssr, sr, r }
+
+@JsonEnum(fieldRename: FieldRename.pascal)
+enum StatType { atk, defence, hp, none, unknown }
+
+@JsonEnum(fieldRename: FieldRename.pascal)
+enum ItemType { unknown, equip }
+
+@JsonEnum(fieldRename: FieldRename.screamingSnake)
+enum EquipRarity { unknown, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 }
+
+enum EquipType {
+  unknown,
+  @JsonValue('Module_A')
+  head,
+  @JsonValue('Module_B')
+  body,
+  @JsonValue('Module_C')
+  arm,
+  @JsonValue('Module_D')
+  leg,
+}
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum NikkeClass { unknown, attacker, defender, supporter }
@@ -255,6 +362,7 @@ enum BurstStep {
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
 enum Corporation {
   unknown(-1),
+  none(0),
   missilis(1),
   elysion(2),
   tetra(3),
@@ -264,4 +372,18 @@ enum Corporation {
   final int id;
 
   const Corporation(this.id);
+}
+
+enum RecycleStat {
+  /// hardcoding values here since they won't change anytime soon.
+  /// if needed to read data, table is RecycleResearchStatTable
+  personal(hp: 450, atk: 0, def: 0),
+  nikkeClass(hp: 750, atk: 0, def: 5),
+  corporation(hp: 0, atk: 25, def: 5);
+
+  final int hp;
+  final int atk;
+  final int def;
+
+  const RecycleStat({required this.hp, required this.atk, required this.def});
 }

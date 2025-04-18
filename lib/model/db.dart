@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:nikke_einkk/model/nikke.dart';
+import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/translation.dart';
 import 'package:path/path.dart';
 

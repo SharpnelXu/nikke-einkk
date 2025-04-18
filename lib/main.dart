@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:nikke_einkk/model/db.dart';
-import 'package:nikke_einkk/model/nikke.dart';
+import 'package:nikke_einkk/model/common.dart';
 
 Future<void> main() async {
   await gameData.loadData();
