@@ -4,6 +4,7 @@ import 'common.dart';
 
 part '../generated/model/items.g.dart';
 
+// ItemEquipTable
 @JsonSerializable()
 class EquipmentItemData {
   final int id;

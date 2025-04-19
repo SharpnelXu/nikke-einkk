@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:logger/logger.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/translation.dart';
 import 'package:path/path.dart';
@@ -30,7 +31,12 @@ class NikkeDatabase {
   final Map<int, CharacterStatEnhanceData> characterStatEnhanceTable = {};
   final Map<int, AttractiveStatData> attractiveStatTable = {};
 
+  static final Logger logger = Logger();
+  bool dataLoaded = false;
+
   Future<bool> loadData() async {
+    logger.i('Loading Database......');
+
     bool result = true;
 
     result &= await loadCharacterData();
@@ -40,6 +46,8 @@ class NikkeDatabase {
     result &= await loadCharacterStatEnhanceData();
     result &= await loadAttractiveStatData();
 
+    dataLoaded = result;
+    logger.i('Loading completed, result: $dataLoaded');
     return result;
   }
 
