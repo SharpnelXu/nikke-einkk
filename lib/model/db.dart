@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:logger/logger.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/translation.dart';
 import 'package:path/path.dart';
 
@@ -19,8 +20,9 @@ class NikkeDatabase {
   String get characterStatEnhanceTableFilePath => join(dataPath, 'CharacterStatEnhanceTable.json');
   String get attractiveLevelTableFilePath => join(dataPath, 'AttractiveLevelTable.json');
   String get localeCharacterTableFilePath => join(dataPath, 'LocaleCharacterTable.json');
+  String get itemEquipTableFilePath => join(dataPath, 'ItemEquipTable.json');
 
-  final Map<int, NikkeCharacterData> characterData = {};
+  final Map<int, NikkeCharacterData> characterData = {}; // maybe not needed
   final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
   final Map<String, Translation> localeCharacterTable = {};
   final Map<int, WeaponSkillData> characterShotTable = {};
@@ -30,6 +32,9 @@ class NikkeDatabase {
   final Map<int, Map<int, CharacterStatData>> groupedCharacterStatTable = {};
   final Map<int, CharacterStatEnhanceData> characterStatEnhanceTable = {};
   final Map<int, AttractiveStatData> attractiveStatTable = {};
+
+  // equips
+  final Map<EquipType, Map<NikkeClass, Map<EquipRarity, EquipmentItemData>>> groupedEquipTable = {};
 
   static final Logger logger = Logger();
   bool dataLoaded = false;
@@ -45,6 +50,7 @@ class NikkeDatabase {
     result &= await loadCharacterStatData();
     result &= await loadCharacterStatEnhanceData();
     result &= await loadAttractiveStatData();
+    result &= await loadEquipData();
 
     dataLoaded = result;
     logger.i('Loading completed, result: $dataLoaded');
@@ -131,6 +137,26 @@ class NikkeDatabase {
       for (final record in json['records']) {
         final attractiveStat = AttractiveStatData.fromJson(record);
         attractiveStatTable[attractiveStat.attractiveLevel] = attractiveStat;
+      }
+    }
+    return exists;
+  }
+
+  Future<bool> loadEquipData() async {
+    final table = File(itemEquipTableFilePath);
+    final bool exists = await table.exists();
+    if (exists) {
+      final json = jsonDecode(await table.readAsString());
+      for (final record in json['records']) {
+        final equip = EquipmentItemData.fromJson(record);
+        if (equip.characterClass == NikkeClass.unknown) continue;
+
+        groupedEquipTable.putIfAbsent(equip.itemSubType, () => <NikkeClass, Map<EquipRarity, EquipmentItemData>>{});
+        groupedEquipTable[equip.itemSubType]!.putIfAbsent(
+          equip.characterClass,
+          () => <EquipRarity, EquipmentItemData>{},
+        );
+        groupedEquipTable[equip.itemSubType]![equip.characterClass]![equip.itemRarity] = equip;
       }
     }
     return exists;

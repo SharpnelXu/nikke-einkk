@@ -18,7 +18,7 @@ class EquipmentItemData {
   final ItemType itemType;
   @JsonKey(name: 'item_sub_type')
   final EquipType itemSubType;
-  @JsonKey(name: 'class')
+  @JsonKey(name: 'class', unknownEnumValue: NikkeClass.unknown)
   final NikkeClass characterClass;
   @JsonKey(name: 'item_rare')
   final EquipRarity itemRarity;
@@ -61,7 +61,9 @@ class EquipmentItemData {
 
 @JsonSerializable()
 class EquipmentStat {
+  @JsonKey(name: 'stat_type')
   final StatType statType;
+  @JsonKey(name: 'stat_value')
   final int statValue;
 
   EquipmentStat({this.statType = StatType.none, this.statValue = 0});
@@ -73,7 +75,9 @@ class EquipmentStat {
 
 @JsonSerializable()
 class OptionSlot {
+  @JsonKey(name: 'option_slot')
   final int optionSlot;
+  @JsonKey(name: 'option_slot_success_ratio')
   final int optionSlotSuccessRatio;
 
   OptionSlot({this.optionSlot = 0, this.optionSlotSuccessRatio = 0});
@@ -86,7 +90,32 @@ class OptionSlot {
 enum ItemType { unknown, equip }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
-enum EquipRarity { unknown, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 }
+enum EquipRarity {
+  unknown,
+  t1,
+  t2,
+  t3,
+  t4,
+  t5,
+  t6,
+  t7,
+  t8,
+  t9,
+  t10;
+
+  int get maxLevel => switch (this) {
+    EquipRarity.unknown => -1,
+    EquipRarity.t1 || EquipRarity.t2 => 0,
+    EquipRarity.t3 || EquipRarity.t4 => 3,
+    EquipRarity.t5 || EquipRarity.t6 => 4,
+    EquipRarity.t7 || EquipRarity.t8 || EquipRarity.t9 || EquipRarity.t10 => 5,
+  };
+
+  bool get canHaveCorp => switch (this) {
+    EquipRarity.unknown || EquipRarity.t1 || EquipRarity.t2 || EquipRarity.t3 || EquipRarity.t10 => false,
+    EquipRarity.t4 || EquipRarity.t5 || EquipRarity.t6 || EquipRarity.t7 || EquipRarity.t8 || EquipRarity.t9 => true,
+  };
+}
 
 enum EquipType {
   unknown,

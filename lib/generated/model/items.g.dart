@@ -13,7 +13,8 @@ EquipmentItemData _$EquipmentItemDataFromJson(Map<String, dynamic> json) => Equi
   resourceId: json['resource_id'] as String? ?? '',
   itemType: $enumDecodeNullable(_$ItemTypeEnumMap, json['item_type']) ?? ItemType.equip,
   itemSubType: $enumDecodeNullable(_$EquipTypeEnumMap, json['item_sub_type']) ?? EquipType.unknown,
-  characterClass: $enumDecodeNullable(_$NikkeClassEnumMap, json['class']) ?? NikkeClass.unknown,
+  characterClass:
+      $enumDecodeNullable(_$NikkeClassEnumMap, json['class'], unknownValue: NikkeClass.unknown) ?? NikkeClass.unknown,
   itemRarity: $enumDecodeNullable(_$EquipRarityEnumMap, json['item_rare']) ?? EquipRarity.unknown,
   gradeCoreId: (json['grade_core_id'] as num?)?.toInt() ?? 0,
   growGrade: (json['grow_grade'] as num?)?.toInt() ?? 0,
@@ -78,13 +79,13 @@ const _$EquipRarityEnumMap = {
 };
 
 EquipmentStat _$EquipmentStatFromJson(Map<String, dynamic> json) => EquipmentStat(
-  statType: $enumDecodeNullable(_$StatTypeEnumMap, json['statType']) ?? StatType.none,
-  statValue: (json['statValue'] as num?)?.toInt() ?? 0,
+  statType: $enumDecodeNullable(_$StatTypeEnumMap, json['stat_type']) ?? StatType.none,
+  statValue: (json['stat_value'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$EquipmentStatToJson(EquipmentStat instance) => <String, dynamic>{
-  'statType': _$StatTypeEnumMap[instance.statType]!,
-  'statValue': instance.statValue,
+  'stat_type': _$StatTypeEnumMap[instance.statType]!,
+  'stat_value': instance.statValue,
 };
 
 const _$StatTypeEnumMap = {
@@ -96,11 +97,11 @@ const _$StatTypeEnumMap = {
 };
 
 OptionSlot _$OptionSlotFromJson(Map<String, dynamic> json) => OptionSlot(
-  optionSlot: (json['optionSlot'] as num?)?.toInt() ?? 0,
-  optionSlotSuccessRatio: (json['optionSlotSuccessRatio'] as num?)?.toInt() ?? 0,
+  optionSlot: (json['option_slot'] as num?)?.toInt() ?? 0,
+  optionSlotSuccessRatio: (json['option_slot_success_ratio'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$OptionSlotToJson(OptionSlot instance) => <String, dynamic>{
-  'optionSlot': instance.optionSlot,
-  'optionSlotSuccessRatio': instance.optionSlotSuccessRatio,
+  'option_slot': instance.optionSlot,
+  'option_slot_success_ratio': instance.optionSlotSuccessRatio,
 };

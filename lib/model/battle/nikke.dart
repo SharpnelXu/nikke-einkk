@@ -98,21 +98,19 @@ class BattleNikkeData {
     required int coreEnhanceBaseRatio,
     required int consoleStat,
     required int bondStat,
-    required int equipStat,
+    required num equipStat,
   }) {
     final gradeLevel = min(4, coreLevel) - 1;
     final gradeStat =
-        (baseStat * gradeLevel * BattleUtils.toModifier(statEnhanceData.gradeRatio)).floor() +
-        gradeLevel * gradeEnhanceBase;
+        baseStat * gradeLevel * BattleUtils.toModifier(statEnhanceData.gradeRatio) + gradeLevel * gradeEnhanceBase;
 
     final coreStat =
         coreLevel > 4
-            ? ((baseStat + gradeStat + consoleStat + bondStat) *
-                    (coreLevel - 4) *
-                    BattleUtils.toModifier(coreEnhanceBaseRatio))
-                .floor()
+            ? (baseStat + gradeStat + consoleStat + bondStat) *
+                (coreLevel - 4) *
+                BattleUtils.toModifier(coreEnhanceBaseRatio)
             : 0;
 
-    return baseStat + gradeStat + coreStat + consoleStat + bondStat + equipStat;
+    return (baseStat + gradeStat + coreStat + consoleStat + bondStat + equipStat).floor();
   }
 }
