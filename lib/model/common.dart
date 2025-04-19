@@ -427,6 +427,8 @@ class CharacterStatData {
   factory CharacterStatData.fromJson(Map<String, dynamic> json) => _$CharacterStatDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$CharacterStatDataToJson(this);
+
+  static final emptyData = CharacterStatData();
 }
 
 @JsonSerializable()
@@ -479,6 +481,146 @@ class CharacterStatEnhanceData {
   factory CharacterStatEnhanceData.fromJson(Map<String, dynamic> json) => _$CharacterStatEnhanceDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$CharacterStatEnhanceDataToJson(this);
+
+  static final emptyData = CharacterStatEnhanceData();
+}
+
+class ClassAttractiveStatData {
+  final int hpRate;
+  final int attackRate;
+  final int defenceRate;
+  final int energyResistRate;
+  final int metalResistRate;
+  final int bioResistRate;
+
+  ClassAttractiveStatData({
+    this.hpRate = 0,
+    this.attackRate = 0,
+    this.defenceRate = 0,
+    this.energyResistRate = 0,
+    this.metalResistRate = 0,
+    this.bioResistRate = 0,
+  });
+
+  static final emptyData = ClassAttractiveStatData();
+}
+
+@JsonSerializable()
+class AttractiveStatData {
+  final int id;
+  @JsonKey(name: 'attractive_level')
+  final int attractiveLevel;
+  @JsonKey(name: 'attractive_point')
+  final int attractivePoint;
+
+  // Attacker rates
+  @JsonKey(name: 'attacker_hp_rate')
+  final int attackerHpRate;
+  @JsonKey(name: 'attacker_attack_rate')
+  final int attackerAttackRate;
+  @JsonKey(name: 'attacker_defence_rate')
+  final int attackerDefenceRate;
+  @JsonKey(name: 'attacker_energy_resist_rate')
+  final int attackerEnergyResistRate;
+  @JsonKey(name: 'attacker_metal_resist_rate')
+  final int attackerMetalResistRate;
+  @JsonKey(name: 'attacker_bio_resist_rate')
+  final int attackerBioResistRate;
+
+  // Defender rates
+  @JsonKey(name: 'defender_hp_rate')
+  final int defenderHpRate;
+  @JsonKey(name: 'defender_attack_rate')
+  final int defenderAttackRate;
+  @JsonKey(name: 'defender_defence_rate')
+  final int defenderDefenceRate;
+  @JsonKey(name: 'defender_energy_resist_rate')
+  final int defenderEnergyResistRate;
+  @JsonKey(name: 'defender_metal_resist_rate')
+  final int defenderMetalResistRate;
+  @JsonKey(name: 'defender_bio_resist_rate')
+  final int defenderBioResistRate;
+
+  // Supporter rates
+  @JsonKey(name: 'supporter_hp_rate')
+  final int supporterHpRate;
+  @JsonKey(name: 'supporter_attack_rate')
+  final int supporterAttackRate;
+  @JsonKey(name: 'supporter_defence_rate')
+  final int supporterDefenceRate;
+  @JsonKey(name: 'supporter_energy_resist_rate')
+  final int supporterEnergyResistRate;
+  @JsonKey(name: 'supporter_metal_resist_rate')
+  final int supporterMetalResistRate;
+  @JsonKey(name: 'supporter_bio_resist_rate')
+  final int supporterBioResistRate;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final ClassAttractiveStatData attackerStatData;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final ClassAttractiveStatData defenderStatData;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final ClassAttractiveStatData supporterStatData;
+
+  AttractiveStatData({
+    this.id = 0,
+    this.attractiveLevel = 0,
+    this.attractivePoint = 0,
+    this.attackerHpRate = 0,
+    this.attackerAttackRate = 0,
+    this.attackerDefenceRate = 0,
+    this.attackerEnergyResistRate = 0,
+    this.attackerMetalResistRate = 0,
+    this.attackerBioResistRate = 0,
+    this.defenderHpRate = 0,
+    this.defenderAttackRate = 0,
+    this.defenderDefenceRate = 0,
+    this.defenderEnergyResistRate = 0,
+    this.defenderMetalResistRate = 0,
+    this.defenderBioResistRate = 0,
+    this.supporterHpRate = 0,
+    this.supporterAttackRate = 0,
+    this.supporterDefenceRate = 0,
+    this.supporterEnergyResistRate = 0,
+    this.supporterMetalResistRate = 0,
+    this.supporterBioResistRate = 0,
+  }) : attackerStatData = ClassAttractiveStatData(
+         hpRate: attackerHpRate,
+         attackRate: attackerAttackRate,
+         defenceRate: attackerDefenceRate,
+         energyResistRate: attackerEnergyResistRate,
+         metalResistRate: attackerMetalResistRate,
+         bioResistRate: attackerBioResistRate,
+       ),
+       defenderStatData = ClassAttractiveStatData(
+         hpRate: defenderHpRate,
+         attackRate: defenderAttackRate,
+         defenceRate: defenderDefenceRate,
+         energyResistRate: defenderEnergyResistRate,
+         metalResistRate: defenderMetalResistRate,
+         bioResistRate: defenderBioResistRate,
+       ),
+       supporterStatData = ClassAttractiveStatData(
+         hpRate: supporterHpRate,
+         attackRate: supporterAttackRate,
+         defenceRate: supporterDefenceRate,
+         energyResistRate: supporterEnergyResistRate,
+         metalResistRate: supporterMetalResistRate,
+         bioResistRate: supporterBioResistRate,
+       );
+
+  factory AttractiveStatData.fromJson(Map<String, dynamic> json) => _$AttractiveStatDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AttractiveStatDataToJson(this);
+
+  ClassAttractiveStatData getStatData(NikkeClass nikkeClass) {
+    return switch (nikkeClass) {
+      NikkeClass.unknown => ClassAttractiveStatData.emptyData,
+      NikkeClass.attacker => attackerStatData,
+      NikkeClass.defender => defenderStatData,
+      NikkeClass.supporter => supporterStatData,
+    };
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)

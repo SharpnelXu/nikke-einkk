@@ -16,6 +16,7 @@ class NikkeDatabase {
   String get characterShotTableFilePath => join(dataPath, 'CharacterShotTable.json');
   String get characterStatTableFilePath => join(dataPath, 'CharacterStatTable.json');
   String get characterStatEnhanceTableFilePath => join(dataPath, 'CharacterStatEnhanceTable.json');
+  String get attractiveLevelTableFilePath => join(dataPath, 'AttractiveLevelTable.json');
   String get localeCharacterTableFilePath => join(dataPath, 'LocaleCharacterTable.json');
 
   final Map<int, NikkeCharacterData> characterData = {};
@@ -27,6 +28,7 @@ class NikkeDatabase {
   // grouped by group/level
   final Map<int, Map<int, CharacterStatData>> groupedCharacterStatTable = {};
   final Map<int, CharacterStatEnhanceData> characterStatEnhanceTable = {};
+  final Map<int, AttractiveStatData> attractiveStatTable = {};
 
   Future<bool> loadData() async {
     bool result = true;
@@ -36,6 +38,7 @@ class NikkeDatabase {
     result &= await loadCharacterShotData();
     result &= await loadCharacterStatData();
     result &= await loadCharacterStatEnhanceData();
+    result &= await loadAttractiveStatData();
 
     return result;
   }
@@ -107,6 +110,19 @@ class NikkeDatabase {
       for (final record in json['records']) {
         final statEnhance = CharacterStatEnhanceData.fromJson(record);
         characterStatEnhanceTable[statEnhance.id] = statEnhance;
+      }
+    }
+    return exists;
+  }
+
+  Future<bool> loadAttractiveStatData() async {
+    final table = File(attractiveLevelTableFilePath);
+    final bool exists = await table.exists();
+    if (exists) {
+      final json = jsonDecode(await table.readAsString());
+      for (final record in json['records']) {
+        final attractiveStat = AttractiveStatData.fromJson(record);
+        attractiveStatTable[attractiveStat.attractiveLevel] = attractiveStat;
       }
     }
     return exists;
