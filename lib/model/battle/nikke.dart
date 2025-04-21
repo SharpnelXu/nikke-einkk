@@ -8,6 +8,8 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/translation.dart';
 
 class BattleNikkeOptions {
+  int nikkeResourceId;
+  int coreLevel;
   int syncLevel;
   int attractLevel;
   BattlePlayerOptions? battlePlayerOptions;
@@ -17,6 +19,8 @@ class BattleNikkeOptions {
   // doll
 
   BattleNikkeOptions({
+    required this.nikkeResourceId,
+    this.coreLevel = 1,
     this.syncLevel = 1,
     this.attractLevel = 1,
     this.battlePlayerOptions,
@@ -26,10 +30,9 @@ class BattleNikkeOptions {
 }
 
 class BattleNikkeData {
-  NikkeCharacterData characterData;
-  WeaponSkillData weaponSkillData;
-  // skill data
   BattleNikkeOptions options;
+
+  int position = 0;
 
   // coverBaseHp
   // coverCurrentHp
@@ -38,9 +41,12 @@ class BattleNikkeData {
   // atk
   // def
 
-  BattleNikkeData({required this.characterData, required this.options})
-    : weaponSkillData = gameData.characterShotTable[characterData.shotId]!;
+  BattleNikkeData({required this.options});
 
+  NikkeCharacterData get characterData =>
+      gameData.characterResourceGardeTable[options.nikkeResourceId]![options.coreLevel]!;
+  WeaponSkillData get weaponSkillData => gameData.characterShotTable[characterData.shotId]!;
+  // skill data
   Translation? get name => gameData.getTranslation(characterData.nameLocalkey);
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
@@ -111,6 +117,10 @@ class BattleNikkeData {
                 BattleUtils.toModifier(coreEnhanceBaseRatio)
             : 0;
 
-    return (baseStat + gradeStat + coreStat + consoleStat + bondStat + equipStat).floor();
+    return (baseStat + gradeStat + coreStat + consoleStat + bondStat + equipStat).round();
+  }
+
+  void attack(BattleSimulationData simulation) {
+    
   }
 }

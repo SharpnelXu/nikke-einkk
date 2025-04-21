@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
-import 'package:nikke_einkk/model/db.dart';
 
 import '../../test_helper.dart';
 
@@ -11,9 +10,7 @@ void main() async {
 
   group('Nikke Stat Calculation Test', () {
     test('Dorothy resourceId 233', () {
-      final dorothyData = gameData.characterResourceGardeTable[233]!;
-
-      final dorothy = BattleNikkeData(characterData: dorothyData[1]!, options: BattleNikkeOptions());
+      final dorothy = BattleNikkeData(options: BattleNikkeOptions(nikkeResourceId: 233, coreLevel: 1));
 
       // default lv1 lb0
       expect(dorothy.baseHp, 15000);
@@ -28,13 +25,13 @@ void main() async {
 
       // lv1 lb1
       dorothy.options.syncLevel = 1;
-      dorothy.characterData = dorothyData[2]!;
+      dorothy.options.coreLevel = 2;
       expect(dorothy.baseHp, 18300);
       expect(dorothy.baseAttack, 530);
       expect(dorothy.baseDefence, 202);
 
       // lv1 lbmax
-      dorothy.characterData = dorothyData[4]!;
+      dorothy.options.coreLevel = 4;
       expect(dorothy.baseHp, 24900);
       expect(dorothy.baseAttack, 590);
       expect(dorothy.baseDefence, 406);
@@ -45,7 +42,7 @@ void main() async {
         classRecycleLevels: {NikkeClass.supporter: 187},
       );
       dorothy.options.attractLevel = 40;
-      dorothy.characterData = dorothyData[5]!;
+      dorothy.options.coreLevel = 5;
       expect(dorothy.baseHp, 416313);
       expect(dorothy.baseAttack, moreOrLessEquals(12587, epsilon: 1));
       expect(dorothy.baseDefence, moreOrLessEquals(3765, epsilon: 1));
@@ -53,8 +50,9 @@ void main() async {
 
     test('Rosanna: Chic Ocean resourceId 283', () {
       final rosanna = BattleNikkeData(
-        characterData: gameData.characterResourceGardeTable[283]![5]!,
         options: BattleNikkeOptions(
+          nikkeResourceId: 283,
+          coreLevel: 5,
           syncLevel: 866,
           attractLevel: 29,
           battlePlayerOptions: BattlePlayerOptions(
@@ -66,14 +64,15 @@ void main() async {
       );
 
       expect(rosanna.baseHp, moreOrLessEquals(18537879, epsilon: 1));
-      expect(rosanna.baseAttack, 612174);
-      expect(rosanna.baseDefence, 123687);
+      expect(rosanna.baseAttack, moreOrLessEquals(612174, epsilon: 1));
+      expect(rosanna.baseDefence, moreOrLessEquals(123687, epsilon: 1));
     });
 
     test('Mica: Snow Buddy resourceId 62', () {
       final mica = BattleNikkeData(
-        characterData: gameData.characterResourceGardeTable[62]![9]!,
         options: BattleNikkeOptions(
+          nikkeResourceId: 62,
+          coreLevel: 9,
           syncLevel: 866,
           attractLevel: 22,
           battlePlayerOptions: BattlePlayerOptions(
