@@ -12,7 +12,6 @@ class BattleNikkeOptions {
   int coreLevel;
   int syncLevel;
   int attractLevel;
-  BattlePlayerOptions? battlePlayerOptions;
   List<BattleEquipmentData> equips;
   List<int> skillLevels;
   // cube
@@ -23,34 +22,40 @@ class BattleNikkeOptions {
     this.coreLevel = 1,
     this.syncLevel = 1,
     this.attractLevel = 1,
-    this.battlePlayerOptions,
     this.equips = const [],
     this.skillLevels = const [],
   });
 }
 
+enum BattleNikkeStatus { behindCover, reloading, forceReloading, shooting }
+
 class BattleNikkeData {
+  BattleSimulationData simulation;
   BattleNikkeOptions options;
 
   int position = 0;
+  int currentHp = 0;
+  int currentAmmo = 0;
+
+  BattleNikkeStatus status = BattleNikkeStatus.behindCover;
+
+  // unclear if this can be a simple get or has to be a proper method call that requires battleSimulationData
+  int get maxAmmo => max(1, baseWeaponData.maxAmmo);
+  WeaponType get currentWeaponType => baseWeaponData.weaponType;
+  WeaponSkillData get currentWeaponData => baseWeaponData;
 
   // coverBaseHp
   // coverCurrentHp
 
-  // hp
-  // atk
-  // def
-
-  BattleNikkeData({required this.options});
+  BattleNikkeData({required this.simulation, required this.options});
 
   NikkeCharacterData get characterData =>
       gameData.characterResourceGardeTable[options.nikkeResourceId]![options.coreLevel]!;
-  WeaponSkillData get weaponSkillData => gameData.characterShotTable[characterData.shotId]!;
+  WeaponSkillData get baseWeaponData => gameData.characterShotTable[characterData.shotId]!;
   // skill data
   Translation? get name => gameData.getTranslation(characterData.nameLocalkey);
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
-  WeaponType get weaponType => weaponSkillData.weaponType;
 
   int get coreLevel => characterData.gradeCoreId;
 
@@ -66,7 +71,7 @@ class BattleNikkeData {
     baseStat: baseStat.hp,
     gradeEnhanceBase: statEnhanceData.gradeHp,
     coreEnhanceBaseRatio: statEnhanceData.coreHp,
-    consoleStat: options.battlePlayerOptions?.getRecycleHp(nikkeClass) ?? 0,
+    consoleStat: simulation.playerOptions.getRecycleHp(nikkeClass),
     bondStat: attractiveStat.hpRate,
     equipStat: options.equips.fold(0, (sum, equip) => sum + equip.getStat(StatType.hp, corporation)),
   );
@@ -75,7 +80,7 @@ class BattleNikkeData {
     baseStat: baseStat.attack,
     gradeEnhanceBase: statEnhanceData.gradeAttack,
     coreEnhanceBaseRatio: statEnhanceData.coreAttack,
-    consoleStat: options.battlePlayerOptions?.getRecycleAttack(corporation) ?? 0,
+    consoleStat: simulation.playerOptions.getRecycleAttack(corporation),
     bondStat: attractiveStat.attackRate,
     equipStat: options.equips.fold(0, (sum, equip) => sum + equip.getStat(StatType.atk, corporation)),
   );
@@ -84,7 +89,7 @@ class BattleNikkeData {
     baseStat: baseStat.defence,
     gradeEnhanceBase: statEnhanceData.gradeDefence,
     coreEnhanceBaseRatio: statEnhanceData.coreDefence,
-    consoleStat: options.battlePlayerOptions?.getRecycleDefence(nikkeClass, corporation) ?? 0,
+    consoleStat: simulation.playerOptions.getRecycleDefence(nikkeClass, corporation),
     bondStat: attractiveStat.defenceRate,
     equipStat: options.equips.fold(0, (sum, equip) => sum + equip.getStat(StatType.defence, corporation)),
   );
@@ -120,7 +125,57 @@ class BattleNikkeData {
     return (baseStat + gradeStat + coreStat + consoleStat + bondStat + equipStat).round();
   }
 
-  void attack(BattleSimulationData simulation) {
-    
+  void init(int position) {
+    this.position = position;
+    currentHp = baseHp;
+    currentAmmo = baseWeaponData.maxAmmo;
+  }
+
+  void normalAction(BattleSimulationData simulation) {
+    determineStatus(simulation);
+
+    switch (status) {
+      case BattleNikkeStatus.behindCover:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case BattleNikkeStatus.reloading:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case BattleNikkeStatus.forceReloading:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case BattleNikkeStatus.shooting:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+    }
+  }
+
+  void determineStatus(BattleSimulationData simulation) {
+    if (status == BattleNikkeStatus.forceReloading && currentAmmo != maxAmmo) return;
+
+    final target =
+        simulation.raptures
+            .where(
+              (raptures) =>
+                  raptures.canBeTargeted ||
+                  currentWeaponData.preferTargetCondition == PreferTargetCondition.includeNoneTargetNone,
+            )
+            .firstOrNull;
+
+    // forcing cover, or no autoAttack, or no target
+    if (simulation.useCover || (position == simulation.currentNikke && !simulation.autoAttack) || target == null) {
+      status = BattleNikkeStatus.behindCover;
+
+      if (currentAmmo < maxAmmo) {
+        // attempt to reload
+        status == BattleNikkeStatus.reloading;
+      }
+    } else {
+      status = BattleNikkeStatus.shooting;
+
+      if (currentAmmo == 0) {
+        status = BattleNikkeStatus.forceReloading;
+      }
+    }
   }
 }

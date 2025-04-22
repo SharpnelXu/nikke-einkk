@@ -64,6 +64,8 @@ class NikkeDatabase {
       final json = jsonDecode(await characterTableFile.readAsString());
       for (final record in json['records']) {
         final character = NikkeCharacterData.fromJson(record);
+        if (!character.isVisible) continue;
+
         characterData[character.id] = character;
         characterResourceGardeTable.putIfAbsent(character.resourceId, () => <int, NikkeCharacterData>{});
         characterResourceGardeTable[character.resourceId]![character.gradeCoreId] = character;

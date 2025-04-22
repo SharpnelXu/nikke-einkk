@@ -10,7 +10,14 @@ void main() async {
 
   group('Nikke Stat Calculation Test', () {
     test('Dorothy resourceId 233', () {
-      final dorothy = BattleNikkeData(options: BattleNikkeOptions(nikkeResourceId: 233, coreLevel: 1));
+      final simulation = BattleSimulationData(
+        playerOptions: BattlePlayerOptions(personalRecycleLevel: 0, corpRecycleLevels: {}, classRecycleLevels: {}),
+        nikkeOptions: [],
+      );
+      final dorothy = BattleNikkeData(
+        simulation: simulation,
+        options: BattleNikkeOptions(nikkeResourceId: 233, coreLevel: 1),
+      );
 
       // default lv1 lb0
       expect(dorothy.baseHp, 15000);
@@ -36,11 +43,9 @@ void main() async {
       expect(dorothy.baseAttack, 590);
       expect(dorothy.baseDefence, 406);
 
-      dorothy.options.battlePlayerOptions = BattlePlayerOptions(
-        personalRecycleLevel: 410,
-        corpRecycleLevels: {Corporation.pilgrim: 392},
-        classRecycleLevels: {NikkeClass.supporter: 187},
-      );
+      simulation.playerOptions.personalRecycleLevel = 410;
+      simulation.playerOptions.corpRecycleLevels[Corporation.pilgrim] = 392;
+      simulation.playerOptions.classRecycleLevels[NikkeClass.supporter] = 187;
       dorothy.options.attractLevel = 40;
       dorothy.options.coreLevel = 5;
       expect(dorothy.baseHp, 416313);
@@ -49,18 +54,18 @@ void main() async {
     });
 
     test('Rosanna: Chic Ocean resourceId 283', () {
-      final rosanna = BattleNikkeData(
-        options: BattleNikkeOptions(
-          nikkeResourceId: 283,
-          coreLevel: 5,
-          syncLevel: 866,
-          attractLevel: 29,
-          battlePlayerOptions: BattlePlayerOptions(
-            personalRecycleLevel: 410,
-            corpRecycleLevels: {Corporation.tetra: 217},
-            classRecycleLevels: {NikkeClass.supporter: 187},
-          ),
+      final simulation = BattleSimulationData(
+        playerOptions: BattlePlayerOptions(
+          personalRecycleLevel: 410,
+          corpRecycleLevels: {Corporation.tetra: 217},
+          classRecycleLevels: {NikkeClass.supporter: 187},
         ),
+        nikkeOptions: [],
+      );
+
+      final rosanna = BattleNikkeData(
+        simulation: simulation,
+        options: BattleNikkeOptions(nikkeResourceId: 283, coreLevel: 5, syncLevel: 866, attractLevel: 29),
       );
 
       expect(rosanna.baseHp, moreOrLessEquals(18537879, epsilon: 1));
@@ -69,18 +74,18 @@ void main() async {
     });
 
     test('Mica: Snow Buddy resourceId 62', () {
-      final mica = BattleNikkeData(
-        options: BattleNikkeOptions(
-          nikkeResourceId: 62,
-          coreLevel: 9,
-          syncLevel: 866,
-          attractLevel: 22,
-          battlePlayerOptions: BattlePlayerOptions(
-            personalRecycleLevel: 410,
-            corpRecycleLevels: {Corporation.tetra: 217},
-            classRecycleLevels: {NikkeClass.supporter: 187},
-          ),
+      final simulation = BattleSimulationData(
+        playerOptions: BattlePlayerOptions(
+          personalRecycleLevel: 410,
+          corpRecycleLevels: {Corporation.tetra: 217},
+          classRecycleLevels: {NikkeClass.supporter: 187},
         ),
+        nikkeOptions: [],
+      );
+
+      final mica = BattleNikkeData(
+        simulation: simulation,
+        options: BattleNikkeOptions(nikkeResourceId: 62, coreLevel: 9, syncLevel: 866, attractLevel: 22),
       );
 
       expect(mica.baseHp, moreOrLessEquals(19979208, epsilon: 1));

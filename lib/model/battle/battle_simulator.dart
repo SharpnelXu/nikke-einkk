@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
+import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
 
 class BattlePlayerOptions {
@@ -36,7 +37,7 @@ class BattleSimulationData {
   BattlePlayerOptions playerOptions;
 
   List<BattleNikkeData> nikkes = [];
-  // boss data, or rapture data?
+  List<BattleRaptureData> raptures = [];
   // timeline
   SplayTreeMap<int, BattleEvent> timeline = SplayTreeMap();
 
@@ -63,15 +64,8 @@ class BattleSimulationData {
 
     for (int frame = maxFrames; frame >= 0; frame -= 1) {
       for (final nikke in nikkes) {
-        if (!useCover) {
-          nikke.attack(this);
-        }
+        nikke.normalAction(this);
       }
     }
-  }
-
-  // for display
-  int frameToMilliSecond(int frame) {
-    return (frame * 1000 / fps).round();
   }
 }

@@ -226,23 +226,26 @@ class WeaponSkillData {
   final String nameLocalkey;
   @JsonKey(name: 'description_localkey')
   final String descriptionLocalkey;
+  @JsonKey(name: 'camera_work')
   final String cameraWork;
   @JsonKey(name: 'weapon_type')
   final WeaponType weaponType;
+  // Metal/Energy/Bio, probably not used
   @JsonKey(name: 'attack_type')
   final String attackType;
+  // Metal_Type/Energy_Type, probably not used
   @JsonKey(name: 'counter_enermy')
   final String counterEnemy;
   @JsonKey(name: 'prefer_target')
-  final String preferTarget;
+  final PreferTarget preferTarget;
   @JsonKey(name: 'prefer_target_condition')
-  final String preferTargetCondition;
+  final PreferTargetCondition preferTargetCondition;
   @JsonKey(name: 'shot_timing')
-  final String shotTiming;
+  final ShotTiming shotTiming;
   @JsonKey(name: 'fire_type')
-  final String fireType;
+  final FireType fireType;
   @JsonKey(name: 'input_type')
-  final String inputType;
+  final InputType inputType;
   @JsonKey(name: 'is_targeting')
   final bool isTargeting;
   final int damage;
@@ -323,6 +326,7 @@ class WeaponSkillData {
   final List<int> useFunctionIdList;
   @JsonKey(name: 'hurt_function_id_list')
   final List<int> hurtFunctionIdList;
+  // screen shake?
   @JsonKey(name: 'shake_id')
   final int shakeId;
   @JsonKey(name: 'ShakeType')
@@ -338,11 +342,11 @@ class WeaponSkillData {
     this.weaponType = WeaponType.unknown,
     this.attackType = '',
     this.counterEnemy = '',
-    this.preferTarget = '',
-    this.preferTargetCondition = '',
-    this.shotTiming = '',
-    this.fireType = '',
-    this.inputType = '',
+    this.preferTarget = PreferTarget.front,
+    this.preferTargetCondition = PreferTargetCondition.none,
+    this.shotTiming = ShotTiming.concurrence,
+    this.fireType = FireType.instant,
+    this.inputType = InputType.down,
     this.isTargeting = false,
     this.damage = 0,
     this.shotCount = 0,
@@ -718,4 +722,33 @@ enum RecycleStat {
   final int def;
 
   const RecycleStat({required this.hp, required this.atk, required this.def});
+}
+
+@JsonEnum(fieldRename: FieldRename.pascal)
+enum PreferTarget { unknown, targetAR, targetGL, targetPS, front, back, highHP }
+
+@JsonEnum(fieldRename: FieldRename.pascal)
+enum PreferTargetCondition { none, includeNoneTargetNone }
+
+@JsonEnum(fieldRename: FieldRename.pascal)
+enum ShotTiming { sequence, concurrence }
+
+@JsonEnum(fieldRename: FieldRename.pascal)
+enum FireType {
+  instant,
+  homingProjectile,
+  mechaShiftyShot,
+  multiTarget,
+  projectileCurve,
+  projectileDirect,
+  stickyProjectileDirect,
+}
+
+enum InputType {
+  @JsonValue('DOWN')
+  down,
+  @JsonValue('DOWN_Charge')
+  downCharge,
+  @JsonValue('UP')
+  up,
 }

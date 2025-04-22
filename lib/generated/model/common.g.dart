@@ -126,15 +126,17 @@ WeaponSkillData _$WeaponSkillDataFromJson(Map<String, dynamic> json) => WeaponSk
   id: (json['id'] as num?)?.toInt() ?? 0,
   nameLocalkey: json['name_localkey'] as String? ?? '',
   descriptionLocalkey: json['description_localkey'] as String? ?? '',
-  cameraWork: json['cameraWork'] as String? ?? '',
+  cameraWork: json['camera_work'] as String? ?? '',
   weaponType: $enumDecodeNullable(_$WeaponTypeEnumMap, json['weapon_type']) ?? WeaponType.unknown,
   attackType: json['attack_type'] as String? ?? '',
   counterEnemy: json['counter_enermy'] as String? ?? '',
-  preferTarget: json['prefer_target'] as String? ?? '',
-  preferTargetCondition: json['prefer_target_condition'] as String? ?? '',
-  shotTiming: json['shot_timing'] as String? ?? '',
-  fireType: json['fire_type'] as String? ?? '',
-  inputType: json['input_type'] as String? ?? '',
+  preferTarget: $enumDecodeNullable(_$PreferTargetEnumMap, json['prefer_target']) ?? PreferTarget.front,
+  preferTargetCondition:
+      $enumDecodeNullable(_$PreferTargetConditionEnumMap, json['prefer_target_condition']) ??
+      PreferTargetCondition.none,
+  shotTiming: $enumDecodeNullable(_$ShotTimingEnumMap, json['shot_timing']) ?? ShotTiming.concurrence,
+  fireType: $enumDecodeNullable(_$FireTypeEnumMap, json['fire_type']) ?? FireType.instant,
+  inputType: $enumDecodeNullable(_$InputTypeEnumMap, json['input_type']) ?? InputType.down,
   isTargeting: json['is_targeting'] as bool? ?? false,
   damage: (json['damage'] as num?)?.toInt() ?? 0,
   shotCount: (json['shot_count'] as num?)?.toInt() ?? 0,
@@ -187,15 +189,15 @@ Map<String, dynamic> _$WeaponSkillDataToJson(WeaponSkillData instance) => <Strin
   'id': instance.id,
   'name_localkey': instance.nameLocalkey,
   'description_localkey': instance.descriptionLocalkey,
-  'cameraWork': instance.cameraWork,
+  'camera_work': instance.cameraWork,
   'weapon_type': _$WeaponTypeEnumMap[instance.weaponType]!,
   'attack_type': instance.attackType,
   'counter_enermy': instance.counterEnemy,
-  'prefer_target': instance.preferTarget,
-  'prefer_target_condition': instance.preferTargetCondition,
-  'shot_timing': instance.shotTiming,
-  'fire_type': instance.fireType,
-  'input_type': instance.inputType,
+  'prefer_target': _$PreferTargetEnumMap[instance.preferTarget]!,
+  'prefer_target_condition': _$PreferTargetConditionEnumMap[instance.preferTargetCondition]!,
+  'shot_timing': _$ShotTimingEnumMap[instance.shotTiming]!,
+  'fire_type': _$FireTypeEnumMap[instance.fireType]!,
+  'input_type': _$InputTypeEnumMap[instance.inputType]!,
   'is_targeting': instance.isTargeting,
   'damage': instance.damage,
   'shot_count': instance.shotCount,
@@ -252,6 +254,35 @@ const _$WeaponTypeEnumMap = {
   WeaponType.smg: 'SMG',
   WeaponType.sr: 'SR',
 };
+
+const _$PreferTargetEnumMap = {
+  PreferTarget.unknown: 'Unknown',
+  PreferTarget.targetAR: 'TargetAR',
+  PreferTarget.targetGL: 'TargetGL',
+  PreferTarget.targetPS: 'TargetPS',
+  PreferTarget.front: 'Front',
+  PreferTarget.back: 'Back',
+  PreferTarget.highHP: 'HighHP',
+};
+
+const _$PreferTargetConditionEnumMap = {
+  PreferTargetCondition.none: 'None',
+  PreferTargetCondition.includeNoneTargetNone: 'IncludeNoneTargetNone',
+};
+
+const _$ShotTimingEnumMap = {ShotTiming.sequence: 'Sequence', ShotTiming.concurrence: 'Concurrence'};
+
+const _$FireTypeEnumMap = {
+  FireType.instant: 'Instant',
+  FireType.homingProjectile: 'HomingProjectile',
+  FireType.mechaShiftyShot: 'MechaShiftyShot',
+  FireType.multiTarget: 'MultiTarget',
+  FireType.projectileCurve: 'ProjectileCurve',
+  FireType.projectileDirect: 'ProjectileDirect',
+  FireType.stickyProjectileDirect: 'StickyProjectileDirect',
+};
+
+const _$InputTypeEnumMap = {InputType.down: 'DOWN', InputType.downCharge: 'DOWN_Charge', InputType.up: 'UP'};
 
 CharacterStatData _$CharacterStatDataFromJson(Map<String, dynamic> json) => CharacterStatData(
   id: (json['id'] as num?)?.toInt() ?? 0,
