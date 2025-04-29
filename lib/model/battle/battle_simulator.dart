@@ -39,7 +39,8 @@ class BattleSimulationData {
   List<BattleNikkeData> nikkes = [];
   List<BattleRaptureData> raptures = [];
   // timeline
-  SplayTreeMap<int, BattleEvent> timeline = SplayTreeMap();
+  SplayTreeMap<int, List<BattleEvent>> timeline = SplayTreeMap();
+  late int currentFrame;
 
   // maybe configurable in the future or put into a global option class
   int fps = 60;
@@ -62,10 +63,15 @@ class BattleSimulationData {
       nikkes[index].position = index + 1;
     }
 
-    for (int frame = maxFrames; frame >= 0; frame -= 1) {
+    for (currentFrame = maxFrames; currentFrame >= 0; currentFrame -= 1) {
       for (final nikke in nikkes) {
-        nikke.normalAction(this);
+        nikke.normalAction();
       }
     }
+  }
+
+  void registerEvent(int frame, BattleEvent event) {
+    timeline.putIfAbsent(frame, () => <BattleEvent>[]);
+    timeline[frame]!.add(event);
   }
 }

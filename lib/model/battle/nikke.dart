@@ -1,7 +1,9 @@
 import 'dart:math';
 
+import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/equipment.dart';
+import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
@@ -37,6 +39,12 @@ class BattleNikkeData {
   int currentHp = 0;
   int currentAmmo = 0;
 
+  int reloadingFrameCount = 0;
+  int fullReloadFrameCount = 0;
+
+  int spotFirstDelayFrameCount = 0;
+  int shootingFrameCount = 0;
+
   BattleNikkeStatus status = BattleNikkeStatus.behindCover;
 
   // unclear if this can be a simple get or has to be a proper method call that requires battleSimulationData
@@ -48,6 +56,8 @@ class BattleNikkeData {
   // coverCurrentHp
 
   BattleNikkeData({required this.simulation, required this.options});
+
+  int get fps => simulation.fps;
 
   NikkeCharacterData get characterData =>
       gameData.characterResourceGardeTable[options.nikkeResourceId]![options.coreLevel]!;
@@ -131,36 +141,90 @@ class BattleNikkeData {
     currentAmmo = baseWeaponData.maxAmmo;
   }
 
-  void normalAction(BattleSimulationData simulation) {
-    determineStatus(simulation);
+  void normalAction() {
+    determineStatus();
 
     switch (status) {
       case BattleNikkeStatus.behindCover:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return;
       case BattleNikkeStatus.reloading:
-        // TODO: Handle this case.
-        throw UnimplementedError();
       case BattleNikkeStatus.forceReloading:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        processReloadingStatus();
+        break;
       case BattleNikkeStatus.shooting:
         // TODO: Handle this case.
         throw UnimplementedError();
     }
   }
 
-  void determineStatus(BattleSimulationData simulation) {
+  void processReloadingStatus() {
+    // reset this when entering a non-shooting status
+    spotFirstDelayFrameCount = 0;
+
+    if (reloadingFrameCount == 0) {
+      // this means this is the first frame of reloading
+      // need to calculate how many frames needed to do one reload
+      // TODO: reloading buffs is % of currentWeaponData.reloadTime
+      fullReloadFrameCount = BattleUtils.timeDataToFrame(
+        currentWeaponData.reloadTime + currentWeaponData.spotLastDelay,
+        fps,
+      );
+    }
+
+    reloadingFrameCount += 1;
+    if (reloadingFrameCount >= fullReloadFrameCount) {
+      final reloadRatio = BattleUtils.toModifier(currentWeaponData.reloadBullet);
+      currentAmmo += (reloadRatio * maxAmmo).round();
+      reloadingFrameCount = 0;
+    }
+  }
+
+  bool canTarget(BattleRaptureData rapture) {
+    return rapture.canBeTargeted ||
+        currentWeaponData.preferTargetCondition == PreferTargetCondition.includeNoneTargetNone;
+  }
+
+  void processShootingStatus() {
+    // before shooting need to go outside cover first, not sure if this should be its own status tho
+    if (spotFirstDelayFrameCount < BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps)) {
+      spotFirstDelayFrameCount += 1;
+      return;
+    }
+
+    final target = simulation.raptures.where((rapture) => canTarget(rapture)).firstOrNull;
+
+    switch (currentWeaponType) {
+      case WeaponType.ar:
+      case WeaponType.smg:
+        if (shootingFrameCount == 0 && target != null) {
+          // ready to fire a bullet, register fire
+          simulation.registerEvent(simulation.currentFrame, NikkeFireEvent(ownerPosition: position));
+          if (currentWeaponData.fireType == FireType.instant) {
+            simulation.registerEvent(simulation.currentFrame, NikkeDamageEvent(nikke: this, rapture: target));
+          }
+        }
+        break;
+      case WeaponType.mg:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case WeaponType.sg:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case WeaponType.rl:
+      case WeaponType.sr:
+        // charging
+        throw UnimplementedError();
+      case WeaponType.unknown:
+      case WeaponType.none:
+        // TODO: probably log?
+        return;
+    }
+  }
+
+  void determineStatus() {
     if (status == BattleNikkeStatus.forceReloading && currentAmmo != maxAmmo) return;
 
-    final target =
-        simulation.raptures
-            .where(
-              (raptures) =>
-                  raptures.canBeTargeted ||
-                  currentWeaponData.preferTargetCondition == PreferTargetCondition.includeNoneTargetNone,
-            )
-            .firstOrNull;
+    final target = simulation.raptures.where((rapture) => canTarget(rapture)).firstOrNull;
 
     // forcing cover, or no autoAttack, or no target
     if (simulation.useCover || (position == simulation.currentNikke && !simulation.autoAttack) || target == null) {
