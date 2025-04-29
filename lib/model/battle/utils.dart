@@ -1,6 +1,9 @@
 import 'dart:math';
 
 class BattleUtils {
+  static const rangeCorrection = 3000;
+  static const fullBurstCorrection = 5000;
+
   BattleUtils._();
 
   static double toModifier(int ratio) {
@@ -20,37 +23,6 @@ class BattleUtils {
   static int timeDataToFrame(int timeData, int fps) {
     return (timeData * fps / 100).round();
   }
-
-  static int calculateDamage(NikkeDamageParameter params) {
-    final finalAttack = params.attack + params.attackBuff - params.defence - params.defenceBuff;
-    final finalRate = toModifier(params.damageRate + params.damageRateBuff);
-
-    final coreCorrection = correction(params.coreDamageRate);
-    final critCorrection = correction(params.criticalDamageRate);
-    final rangeCorrection = params.isBonusRange ? 3000 : 0; // didn't find data, hardcoding for now
-    final fullBurstCorrection = params.isFullBurst ? 5000 : 0;
-    final finalCorrection = toModifier(10000 + coreCorrection + critCorrection + rangeCorrection + fullBurstCorrection);
-
-    final elementRate = toModifier(params.isStrongElement ? 11000 + params.elementDamageBuff : 10000);
-
-    final chargeRate = toModifier(params.chargeDamageRate);
-
-    final addDamageRate = toModifier(
-      10000 +
-          params.addDamageBuff +
-          params.partDamageBuff +
-          params.interruptionPartDamageBuff +
-          params.sustainedDamageBuff +
-          params.pierceDamageBuff,
-    );
-
-    final receiveDamage = toModifier(10000 + params.receiveDamageBuff + params.distributedDamageBuff);
-
-    final totalDamage =
-        finalAttack * finalRate * finalCorrection * elementRate * chargeRate * addDamageRate * receiveDamage;
-
-    return max(totalDamage.round(), 1);
-  }
 }
 
 class NikkeDamageParameter {
@@ -63,7 +35,9 @@ class NikkeDamageParameter {
   int damageRateBuff = 0;
 
   // correction
+  int coreHitRate = 0;
   int coreDamageRate = 10000; // 100%
+  int criticalRate = 1500; // 15%
   int criticalDamageRate = 10000;
   bool isBonusRange = false;
   bool isFullBurst = false;
@@ -93,7 +67,9 @@ class NikkeDamageParameter {
     this.defenceBuff = 0,
     this.damageRate = 10000,
     this.damageRateBuff = 0,
+    this.coreHitRate = 0,
     this.coreDamageRate = 10000,
+    this.criticalRate = 1500,
     this.criticalDamageRate = 10000,
     this.isBonusRange = false,
     this.isFullBurst = false,
@@ -118,7 +94,9 @@ class NikkeDamageParameter {
         'defenceBuff: $defenceBuff, '
         'damageRate: $damageRate, '
         'damageRateBuff: $damageRateBuff, '
+        'coreHitRate: $coreHitRate, '
         'coreDamageRate: $coreDamageRate, '
+        'criticalRate: $criticalRate, '
         'criticalDamageRate: $criticalDamageRate, '
         'isBonusRange: $isBonusRange, '
         'isFullBurst: $isFullBurst, '
@@ -143,7 +121,9 @@ class NikkeDamageParameter {
       defenceBuff: defenceBuff,
       damageRate: damageRate,
       damageRateBuff: damageRateBuff,
+      coreHitRate: coreHitRate,
       coreDamageRate: coreDamageRate,
+      criticalRate: criticalRate,
       criticalDamageRate: criticalDamageRate,
       isBonusRange: isBonusRange,
       isFullBurst: isFullBurst,
@@ -158,5 +138,53 @@ class NikkeDamageParameter {
       receiveDamageBuff: receiveDamageBuff,
       distributedDamageBuff: distributedDamageBuff,
     );
+  }
+
+  int calculateExpectedDamage() {
+    final baseDamage = calculateDamage();
+    final critDamage = calculateDamage(critical: true);
+    final coreDamage = calculateDamage(core: true);
+    final critCoreDamage = calculateDamage(critical: true, core: true);
+
+    final criticalPercent = BattleUtils.toModifier(criticalRate);
+    final corePercent = BattleUtils.toModifier(coreHitRate);
+    final nonCriticalPercent = 1 - criticalPercent;
+    final nonCorePercent = 1 - corePercent;
+
+    final result =
+        baseDamage * nonCriticalPercent * nonCorePercent +
+        critDamage * criticalPercent * nonCorePercent +
+        coreDamage * corePercent * nonCriticalPercent +
+        critCoreDamage * corePercent * criticalPercent;
+
+    return result.round();
+  }
+
+  int calculateDamage({bool critical = false, bool core = false}) {
+    final finalAttack = attack + attackBuff - defence - defenceBuff;
+    final finalRate = BattleUtils.toModifier(damageRate + damageRateBuff);
+
+    final coreCorrection = core ? BattleUtils.correction(coreDamageRate) : 0;
+    final critCorrection = critical ? BattleUtils.correction(criticalDamageRate) : 0;
+    final rangeCorrection = isBonusRange ? BattleUtils.rangeCorrection : 0;
+    final fullBurstCorrection = isFullBurst ? BattleUtils.fullBurstCorrection : 0;
+    final finalCorrection = BattleUtils.toModifier(
+      10000 + coreCorrection + critCorrection + rangeCorrection + fullBurstCorrection,
+    );
+
+    final elementRate = BattleUtils.toModifier(isStrongElement ? 11000 + elementDamageBuff : 10000);
+
+    final chargeRate = BattleUtils.toModifier(chargeDamageRate);
+
+    final addDamageRate = BattleUtils.toModifier(
+      10000 + addDamageBuff + partDamageBuff + interruptionPartDamageBuff + sustainedDamageBuff + pierceDamageBuff,
+    );
+
+    final receiveDamage = BattleUtils.toModifier(10000 + receiveDamageBuff + distributedDamageBuff);
+
+    final totalDamage =
+        finalAttack * finalRate * finalCorrection * elementRate * chargeRate * addDamageRate * receiveDamage;
+
+    return max(totalDamage.round(), 1);
   }
 }
