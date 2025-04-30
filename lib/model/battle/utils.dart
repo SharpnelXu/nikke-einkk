@@ -20,7 +20,7 @@ class BattleUtils {
   }
 
   // 230 = 2.3 seconds
-  static int timeDataToFrame(int timeData, int fps) {
+  static int timeDataToFrame(num timeData, int fps) {
     return (timeData * fps / 100).round();
   }
 }
@@ -37,8 +37,10 @@ class NikkeDamageParameter {
   // correction
   int coreHitRate = 0;
   int coreDamageRate = 10000; // 100%
+  int coreDamageBuff = 0;
   int criticalRate = 1500; // 15%
   int criticalDamageRate = 10000;
+  int criticalDamageBuff = 0;
   bool isBonusRange = false;
   bool isFullBurst = false;
 
@@ -48,6 +50,7 @@ class NikkeDamageParameter {
 
   // full charge
   int chargeDamageRate = 10000;
+  int chargeDamageBuff = 0;
 
   // add damage, parts, sustain, pierce
   int addDamageBuff = 0;
@@ -69,13 +72,16 @@ class NikkeDamageParameter {
     this.damageRateBuff = 0,
     this.coreHitRate = 0,
     this.coreDamageRate = 10000,
+    this.coreDamageBuff = 0,
     this.criticalRate = 1500,
     this.criticalDamageRate = 10000,
+    this.criticalDamageBuff = 0,
     this.isBonusRange = false,
     this.isFullBurst = false,
     this.isStrongElement = false,
     this.elementDamageBuff = 0,
     this.chargeDamageRate = 10000,
+    this.chargeDamageBuff = 0,
     this.addDamageBuff = 0,
     this.partDamageBuff = 0,
     this.interruptionPartDamageBuff = 0,
@@ -96,13 +102,16 @@ class NikkeDamageParameter {
         'damageRateBuff: $damageRateBuff, '
         'coreHitRate: $coreHitRate, '
         'coreDamageRate: $coreDamageRate, '
+        'coreDamageBuff: $coreDamageBuff, '
         'criticalRate: $criticalRate, '
         'criticalDamageRate: $criticalDamageRate, '
+        'criticalDamageBuff: $criticalDamageBuff, '
         'isBonusRange: $isBonusRange, '
         'isFullBurst: $isFullBurst, '
         'isStrongElement: $isStrongElement, '
         'elementDamageBuff: $elementDamageBuff, '
         'chargeDamageRate: $chargeDamageRate, '
+        'chargeDamageBuff: $chargeDamageBuff, '
         'addDamageBuff: $addDamageBuff, '
         'partDamageBuff: $partDamageBuff, '
         'interruptionPartDamageBuff: $interruptionPartDamageBuff, '
@@ -123,13 +132,16 @@ class NikkeDamageParameter {
       damageRateBuff: damageRateBuff,
       coreHitRate: coreHitRate,
       coreDamageRate: coreDamageRate,
+      coreDamageBuff: coreDamageBuff,
       criticalRate: criticalRate,
       criticalDamageRate: criticalDamageRate,
+      criticalDamageBuff: criticalDamageBuff,
       isBonusRange: isBonusRange,
       isFullBurst: isFullBurst,
       isStrongElement: isStrongElement,
       elementDamageBuff: elementDamageBuff,
       chargeDamageRate: chargeDamageRate,
+      chargeDamageBuff: chargeDamageBuff,
       addDamageBuff: addDamageBuff,
       partDamageBuff: partDamageBuff,
       interruptionPartDamageBuff: interruptionPartDamageBuff,
@@ -146,8 +158,8 @@ class NikkeDamageParameter {
     final coreDamage = calculateDamage(core: true);
     final critCoreDamage = calculateDamage(critical: true, core: true);
 
-    final criticalPercent = BattleUtils.toModifier(criticalRate);
-    final corePercent = BattleUtils.toModifier(coreHitRate);
+    final criticalPercent = min(BattleUtils.toModifier(criticalRate), 1);
+    final corePercent = min(BattleUtils.toModifier(coreHitRate), 1);
     final nonCriticalPercent = 1 - criticalPercent;
     final nonCorePercent = 1 - corePercent;
 
@@ -164,8 +176,8 @@ class NikkeDamageParameter {
     final finalAttack = attack + attackBuff - defence - defenceBuff;
     final finalRate = BattleUtils.toModifier(damageRate + damageRateBuff);
 
-    final coreCorrection = core ? BattleUtils.correction(coreDamageRate) : 0;
-    final critCorrection = critical ? BattleUtils.correction(criticalDamageRate) : 0;
+    final coreCorrection = core ? BattleUtils.correction(coreDamageRate + coreDamageBuff) : 0;
+    final critCorrection = critical ? BattleUtils.correction(criticalDamageRate + criticalDamageBuff) : 0;
     final rangeCorrection = isBonusRange ? BattleUtils.rangeCorrection : 0;
     final fullBurstCorrection = isFullBurst ? BattleUtils.fullBurstCorrection : 0;
     final finalCorrection = BattleUtils.toModifier(
@@ -174,7 +186,7 @@ class NikkeDamageParameter {
 
     final elementRate = BattleUtils.toModifier(isStrongElement ? 11000 + elementDamageBuff : 10000);
 
-    final chargeRate = BattleUtils.toModifier(chargeDamageRate);
+    final chargeRate = BattleUtils.toModifier(chargeDamageRate + chargeDamageBuff);
 
     final addDamageRate = BattleUtils.toModifier(
       10000 + addDamageBuff + partDamageBuff + interruptionPartDamageBuff + sustainedDamageBuff + pierceDamageBuff,

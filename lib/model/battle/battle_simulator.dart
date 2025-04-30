@@ -39,7 +39,7 @@ class BattleSimulationData {
   List<BattleNikkeData> nikkes = [];
   List<BattleRaptureData> raptures = [];
   // timeline
-  SplayTreeMap<int, List<BattleEvent>> timeline = SplayTreeMap();
+  Map<int, List<BattleEvent>> timeline = {};
   late int currentFrame;
 
   // maybe configurable in the future or put into a global option class
@@ -47,20 +47,23 @@ class BattleSimulationData {
   int maxSeconds = 180;
   int get maxFrames => fps * maxSeconds;
 
-  // player actions
+  // player actions, maybe move to a dedicated object to represent current frame
   bool autoAttack = true;
   bool autoBurst = true;
   bool useCover = false;
+  bool fullBurst = false;
   int currentNikke = 3;
 
-  BattleSimulationData({required this.playerOptions, required List<BattleNikkeOptions?> nikkeOptions});
+  BattleSimulationData({required this.playerOptions, required List<BattleNikkeOptions?> nikkeOptions}) {
+    nikkes.addAll(nikkeOptions.nonNulls.map((option) => BattleNikkeData(simulation: this, option: option)));
+  }
 
   void simulate() {
     if (nikkes.isEmpty) return;
 
     currentNikke = min(nikkes.length, currentNikke);
     for (int index = 0; index < nikkes.length; index += 1) {
-      nikkes[index].position = index + 1;
+      nikkes[index].init(index + 1);
     }
 
     for (currentFrame = maxFrames; currentFrame >= 0; currentFrame -= 1) {

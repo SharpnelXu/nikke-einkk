@@ -677,6 +677,23 @@ enum Element {
       orElse: () => Element.unknown, // default value if not found
     );
   }
+
+  bool strongAgainst(Element other) {
+    switch (this) {
+      case Element.unknown:
+        return false;
+      case Element.fire:
+        return other == Element.wind;
+      case Element.water:
+        return other == Element.fire;
+      case Element.wind:
+        return other == Element.iron;
+      case Element.electric:
+        return other == Element.water;
+      case Element.iron:
+        return other == Element.electric;
+    }
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)

@@ -16,7 +16,7 @@ void main() async {
       );
       final dorothy = BattleNikkeData(
         simulation: simulation,
-        options: BattleNikkeOptions(nikkeResourceId: 233, coreLevel: 1),
+        option: BattleNikkeOptions(nikkeResourceId: 233, coreLevel: 1),
       );
 
       // default lv1 lb0
@@ -25,20 +25,20 @@ void main() async {
       expect(dorothy.baseDefence, 100);
 
       // lv2 lb0
-      dorothy.options.syncLevel = 2;
+      dorothy.option.syncLevel = 2;
       expect(dorothy.baseHp, 15750);
       expect(dorothy.baseAttack, 525);
       expect(dorothy.baseDefence, 105);
 
       // lv1 lb1
-      dorothy.options.syncLevel = 1;
-      dorothy.options.coreLevel = 2;
+      dorothy.option.syncLevel = 1;
+      dorothy.option.coreLevel = 2;
       expect(dorothy.baseHp, 18300);
       expect(dorothy.baseAttack, 530);
       expect(dorothy.baseDefence, 202);
 
       // lv1 lbmax
-      dorothy.options.coreLevel = 4;
+      dorothy.option.coreLevel = 4;
       expect(dorothy.baseHp, 24900);
       expect(dorothy.baseAttack, 590);
       expect(dorothy.baseDefence, 406);
@@ -46,8 +46,8 @@ void main() async {
       simulation.playerOptions.personalRecycleLevel = 410;
       simulation.playerOptions.corpRecycleLevels[Corporation.pilgrim] = 392;
       simulation.playerOptions.classRecycleLevels[NikkeClass.supporter] = 187;
-      dorothy.options.attractLevel = 40;
-      dorothy.options.coreLevel = 5;
+      dorothy.option.attractLevel = 40;
+      dorothy.option.coreLevel = 5;
       expect(dorothy.baseHp, 416313);
       expect(dorothy.baseAttack, moreOrLessEquals(12587, epsilon: 1));
       expect(dorothy.baseDefence, moreOrLessEquals(3765, epsilon: 1));
@@ -65,7 +65,7 @@ void main() async {
 
       final rosanna = BattleNikkeData(
         simulation: simulation,
-        options: BattleNikkeOptions(nikkeResourceId: 283, coreLevel: 5, syncLevel: 866, attractLevel: 29),
+        option: BattleNikkeOptions(nikkeResourceId: 283, coreLevel: 5, syncLevel: 866, attractLevel: 29),
       );
 
       expect(rosanna.baseHp, moreOrLessEquals(18537879, epsilon: 1));
@@ -85,7 +85,7 @@ void main() async {
 
       final mica = BattleNikkeData(
         simulation: simulation,
-        options: BattleNikkeOptions(nikkeResourceId: 62, coreLevel: 9, syncLevel: 866, attractLevel: 22),
+        option: BattleNikkeOptions(nikkeResourceId: 62, coreLevel: 9, syncLevel: 866, attractLevel: 22),
       );
 
       expect(mica.baseHp, moreOrLessEquals(19979208, epsilon: 1));
