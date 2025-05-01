@@ -89,9 +89,9 @@ class BattleNikkeData {
 
   NikkeCharacterData get characterData =>
       gameData.characterResourceGardeTable[option.nikkeResourceId]![option.coreLevel]!;
+  String get name => gameData.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId.toString();
   WeaponSkillData get baseWeaponData => gameData.characterShotTable[characterData.shotId]!;
   // skill data
-  Translation? get name => gameData.getTranslation(characterData.nameLocalkey);
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
   Element get element => Element.fromId(characterData.elementId.first);
@@ -99,8 +99,7 @@ class BattleNikkeData {
   int get coreLevel => characterData.gradeCoreId;
 
   CharacterStatData get baseStat =>
-      gameData.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ??
-      CharacterStatData.emptyData;
+      gameData.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ?? CharacterStatData.emptyData;
   CharacterStatEnhanceData get statEnhanceData =>
       gameData.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
   ClassAttractiveStatData get attractiveStat =>
@@ -198,7 +197,9 @@ class BattleNikkeData {
       accuracyCircleScale += (currentWeaponData.accuracyChangeSpeed / fps).round();
     }
     if (currentWeaponData.rateOfFireResetTime != 0) {
-      rateOfFire -= ((currentWeaponData.endRateOfFire - currentWeaponData.rateOfFire) / currentWeaponData.rateOfFireResetTime).round();
+      rateOfFire -=
+          ((currentWeaponData.endRateOfFire - currentWeaponData.rateOfFire) / currentWeaponData.rateOfFireResetTime)
+              .round();
     }
   }
 
@@ -207,13 +208,21 @@ class BattleNikkeData {
     spotFirstDelayFrameCount = 0;
 
     if (reloadingFrameCount == 0) {
-      simulation.registerEvent(simulation.currentFrame, NikkeReloadStartEvent(ownerPosition: position));
       // this means this is the first frame of reloading
       // need to calculate how many frames needed to do one reload
       // TODO: reloading buffs is % of currentWeaponData.reloadTime
       fullReloadFrameCount = BattleUtils.timeDataToFrame(
         currentWeaponData.reloadTime + currentWeaponData.spotLastDelay,
         fps,
+      );
+      simulation.registerEvent(
+        simulation.currentFrame,
+        NikkeReloadStartEvent(
+          name: name,
+          reloadTimeData: currentWeaponData.reloadTime + currentWeaponData.spotLastDelay,
+          reloadFrames: fullReloadFrameCount,
+          ownerPosition: position,
+        ),
       );
     }
 
@@ -230,7 +239,9 @@ class BattleNikkeData {
       accuracyCircleScale += (currentWeaponData.accuracyChangeSpeed / fps).round();
     }
     if (currentWeaponData.rateOfFireResetTime != 0) {
-      rateOfFire -= ((currentWeaponData.endRateOfFire - currentWeaponData.rateOfFire) / currentWeaponData.rateOfFireResetTime).round();
+      rateOfFire -=
+          ((currentWeaponData.endRateOfFire - currentWeaponData.rateOfFire) / currentWeaponData.rateOfFireResetTime)
+              .round();
     }
     // also reset shooting time well in reloading? or maybe for all possible status?
     shootingFrameCount -= 1;
@@ -252,9 +263,15 @@ class BattleNikkeData {
         if (shootingFrameCount <= 0 && target != null) {
           // ready to fire a bullet, register fire
           currentAmmo -= 1;
-          simulation.registerEvent(simulation.currentFrame, NikkeFireEvent(ownerPosition: position));
+          simulation.registerEvent(
+            simulation.currentFrame,
+            NikkeFireEvent(name: name, currentAmmo: currentAmmo, maxAmmo: maxAmmo, ownerPosition: position),
+          );
           if (currentWeaponData.fireType == FireType.instant) {
-            simulation.registerEvent(simulation.currentFrame, NikkeDamageEvent(nikke: this, rapture: target));
+            simulation.registerEvent(
+              simulation.currentFrame,
+              NikkeDamageEvent(nikke: this, rapture: target, type: NikkeDamageType.bullet),
+            );
           }
 
           // these two should probably be available for all weapon types

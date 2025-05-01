@@ -1,32 +1,60 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 
 import 'nikke.dart';
 
-class BattleEvent {}
+abstract class BattleEvent {
+  Widget buildDisplay();
+}
 
 // or replace these with an enum type if no real use case
 class NikkeFireEvent implements BattleEvent {
+  String name;
+  int currentAmmo;
+  int maxAmmo;
   int ownerPosition; // this is basically uniqueId
 
-  NikkeFireEvent({required this.ownerPosition});
+  NikkeFireEvent({required this.name, required this.currentAmmo, required this.maxAmmo, required this.ownerPosition});
+
+  @override
+  buildDisplay() {
+    return Text('$name (Pos $ownerPosition) attack (Ammo: $currentAmmo/$maxAmmo)');
+  }
 }
 
 class NikkeReloadStartEvent implements BattleEvent {
+  String name;
+  int reloadTimeData;
+  int reloadFrames;
   int ownerPosition; // this is basically uniqueId
 
-  NikkeReloadStartEvent({required this.ownerPosition});
+  NikkeReloadStartEvent({
+    required this.name,
+    required this.reloadTimeData,
+    required this.reloadFrames,
+    required this.ownerPosition,
+  });
+
+  @override
+  Widget buildDisplay() {
+    return Text('$name (Pos $ownerPosition) reloading: '
+        '${(reloadTimeData / 100).toStringAsFixed(2)}s ($reloadFrames frames)');
+  }
 }
 
 class NikkeDamageEvent implements BattleEvent {
+  NikkeDamageType type;
+  late String name;
   late int attackerPosition; // this is basically uniqueId for Nikke
   late int targetUniqueId;
 
   late NikkeDamageParameter damageParameter;
 
-  NikkeDamageEvent({required BattleNikkeData nikke, required BattleRaptureData rapture}) {
+  NikkeDamageEvent({required BattleNikkeData nikke, required BattleRaptureData rapture, required this.type}) {
+    name = nikke.name;
     attackerPosition = nikke.position;
     targetUniqueId = rapture.uniqueId;
 
@@ -50,4 +78,15 @@ class NikkeDamageEvent implements BattleEvent {
     // just a wild guess for now
     return (50 * rapture.coreSize / max(1, nikke.accuracyCircleScale * rapture.distance) * 10000).round();
   }
+
+  @override
+  Widget buildDisplay() {
+    return Text(
+      '$name (Pos $attackerPosition) ${type.name} damage: ${damageParameter.calculateExpectedDamage()} '
+      '(Core: ${(damageParameter.coreHitRate / 100).toStringAsFixed(2)}%, '
+      'Crit: ${(damageParameter.criticalRate / 100).toStringAsFixed(2)}%)',
+    );
+  }
 }
+
+enum NikkeDamageType { bullet }

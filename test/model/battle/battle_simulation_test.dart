@@ -17,14 +17,7 @@ void main() async {
           corpRecycleLevels: {Corporation.pilgrim: 400},
           classRecycleLevels: {NikkeClass.attacker: 400},
         ),
-        nikkeOptions: [
-          BattleNikkeOptions(
-            nikkeResourceId: 222,
-            coreLevel: 11,
-            syncLevel: 901,
-            attractLevel: 40,
-          )
-        ],
+        nikkeOptions: [BattleNikkeOptions(nikkeResourceId: 222, coreLevel: 11, syncLevel: 901, attractLevel: 40)],
       );
 
       simulation.raptures.add(BattleRaptureData());

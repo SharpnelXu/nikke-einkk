@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:nikke_einkk/model/db.dart';
-import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/module/battle_timeline.dart';
+
+import 'model/battle/battle_simulator.dart';
+import 'model/battle/nikke.dart';
+import 'model/battle/rapture.dart';
+import 'model/common.dart';
 
 Future<void> main() async {
   await gameData.loadData();
@@ -14,6 +19,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final simulation = BattleSimulationData(
+      playerOptions: BattlePlayerOptions(
+        personalRecycleLevel: 400,
+        corpRecycleLevels: {Corporation.pilgrim: 400},
+        classRecycleLevels: {NikkeClass.attacker: 400},
+      ),
+      nikkeOptions: [BattleNikkeOptions(nikkeResourceId: 222, coreLevel: 11, syncLevel: 901, attractLevel: 40)],
+    );
+
+    simulation.raptures.add(BattleRaptureData());
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -34,63 +50,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const NikkeList(),
-    );
-  }
-}
-
-class NikkeList extends StatelessWidget {
-  const NikkeList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Nikke List')),
-      body: CustomScrollView(
-        slivers: [
-          SliverGrid.extent(
-            maxCrossAxisExtent: 144,
-            children:
-                gameData.characterResourceGardeTable.values.map((characterData) => _buildGrid(characterData)).toList(),
-          ),
-        ],
-        physics: const AlwaysScrollableScrollPhysics(),
-      ),
-    );
-  }
-
-  Widget _buildGrid(Map<int, NikkeCharacterData> gradeToData) {
-    final characterData = gradeToData.values.last;
-    final name = gameData.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId;
-    final weapon = gameData.characterShotTable[characterData.shotId]!;
-
-    return Tooltip(
-      message:
-          'id: ${characterData.id}\n'
-          'resourceId: ${characterData.resourceId}\n'
-          'rarity: ${characterData.originalRare}\n'
-          'class: ${characterData.characterClass}\n'
-          'corp: ${characterData.corporation}\n'
-          'burstStep: ${characterData.useBurstSkill} => ${characterData.changeBurstStep}\n'
-          'shotId: ${characterData.shotId}\n'
-          'first/lastDelay: ${weapon.spotFirstDelay}/${weapon.spotLastDelay}',
-      child: Container(
-        width: 100,
-        height: 150,
-        margin: const EdgeInsets.all(5.0),
-        padding: const EdgeInsets.all(3.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black),
-          borderRadius: BorderRadius.circular(5),
-          color: weapon.spotFirstDelay != 20 || weapon.spotLastDelay != 20 ? Colors.red : null,
-        ),
-        child: Center(
-          child: Text(
-            '$name / ${weapon.weaponType}',
-            style: TextStyle(color: characterData.hasUnknownEnum ? Colors.red : Colors.black, fontSize: 15),
-          ),
-        ),
-      ),
+      home: BattleTimeline(simulation: simulation),
     );
   }
 }

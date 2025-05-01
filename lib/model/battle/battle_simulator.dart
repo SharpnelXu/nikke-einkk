@@ -39,7 +39,7 @@ class BattleSimulationData {
   List<BattleNikkeData> nikkes = [];
   List<BattleRaptureData> raptures = [];
   // timeline
-  Map<int, List<BattleEvent>> timeline = {};
+  SplayTreeMap<int, List<BattleEvent>> timeline = SplayTreeMap((a, b) => b.compareTo(a));
   late int currentFrame;
 
   // maybe configurable in the future or put into a global option class
@@ -61,6 +61,7 @@ class BattleSimulationData {
   void simulate() {
     if (nikkes.isEmpty) return;
 
+    timeline.clear();
     currentNikke = min(nikkes.length, currentNikke);
     for (int index = 0; index < nikkes.length; index += 1) {
       nikkes[index].init(index + 1);
