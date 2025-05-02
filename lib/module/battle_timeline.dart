@@ -54,15 +54,17 @@ class _BattleTimelineState extends State<BattleTimeline> {
             final events = simulation.timeline[frames[index]]!;
             return Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('${timeData ~/ 6000}:${(timeData % 6000 / 100).toStringAsFixed(2)} (Frame: $frame) ==>'),
-                  ...events.map((event) =>
-                      Padding(padding: const EdgeInsets.only(left: 8.0), child: event.buildDisplay(),
-                      )
-                  ),
-                ],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${timeData ~/ 6000}:${(timeData % 6000 / 100).toStringAsFixed(2)} (Frame: $frame) ==>'),
+                    ...events.map(
+                      (event) => Padding(padding: const EdgeInsets.only(left: 8.0), child: event.buildDisplay()),
+                    ),
+                  ],
+                ),
               ),
             );
           }, childCount: frames.length),

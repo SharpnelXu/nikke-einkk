@@ -752,13 +752,13 @@ enum ShotTiming { sequence, concurrence }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum FireType {
-  instant,
-  homingProjectile,
+  instant, // All AR, SG, SR, MG (except Modernia burst)
+  homingProjectile, // should be all other RLs
   mechaShiftyShot,
-  multiTarget,
-  projectileCurve,
-  projectileDirect,
-  stickyProjectileDirect,
+  multiTarget, // Modernia burst
+  projectileCurve, // Cindy
+  projectileDirect, // 5 RL occurrences (Laplace, Ynui Alt, Summer Neon burst, A2, SBS)
+  stickyProjectileDirect, // Rapi: Red Hood alt attack
 }
 
 enum InputType {

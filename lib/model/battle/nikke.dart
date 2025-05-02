@@ -7,7 +7,6 @@ import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
-import 'package:nikke_einkk/model/translation.dart';
 
 class BattleNikkeOptions {
   int nikkeResourceId;
@@ -54,7 +53,7 @@ class BattleNikkeData {
     //   highScale = endAccuracyCircleScale;
     //   lowScale = startAccuracyCircleScale;
     // }
-    _accuracyCircleScale = newScale.clamp(startAccuracyCircleScale, endAccuracyCircleScale);
+    _accuracyCircleScale = newScale.clamp(endAccuracyCircleScale, startAccuracyCircleScale);
   }
 
   int _rateOfFire = 0;
@@ -260,6 +259,7 @@ class BattleNikkeData {
     switch (currentWeaponType) {
       case WeaponType.ar:
       case WeaponType.smg:
+      case WeaponType.mg:
         if (shootingFrameCount <= 0 && target != null) {
           // ready to fire a bullet, register fire
           currentAmmo -= 1;
@@ -274,6 +274,10 @@ class BattleNikkeData {
             );
           }
 
+          // rateOfFire 90 = shoot 90 bullets per minute, so time data per bullet is 6000 / 90 = 66.66 (0.6666 second)
+          shootingFrameCount = BattleUtils.timeDataToFrame(60 * 100 / rateOfFire, fps);
+          shootingFrameCount = max(shootingFrameCount, 1); // minimum 1 frame cooldown
+
           // these two should probably be available for all weapon types
           if (currentWeaponData.accuracyChangePerShot > 0) {
             accuracyCircleScale -= currentWeaponData.accuracyChangePerShot;
@@ -281,15 +285,8 @@ class BattleNikkeData {
           if (currentWeaponData.rateOfFireChangePerShot > 0) {
             rateOfFire += currentWeaponData.rateOfFireChangePerShot;
           }
-
-          // rateOfFire 90 = shoot 90 bullets per minute, so time data per bullet is 6000 / 90 = 66.66 (0.6666 second)
-          shootingFrameCount = BattleUtils.timeDataToFrame(60 * 100 / currentWeaponData.rateOfFire, fps);
-          shootingFrameCount = max(shootingFrameCount, 1); // minimum 1 frame cooldown
         }
         break;
-      case WeaponType.mg:
-        // TODO: Handle this case.
-        throw UnimplementedError();
       case WeaponType.sg:
         // TODO: Handle this case.
         throw UnimplementedError();

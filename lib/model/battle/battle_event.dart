@@ -40,8 +40,10 @@ class NikkeReloadStartEvent implements BattleEvent {
 
   @override
   Widget buildDisplay() {
-    return Text('$name (Pos $ownerPosition) reloading: '
-        '${(reloadTimeData / 100).toStringAsFixed(2)}s ($reloadFrames frames)');
+    return Text(
+      '$name (Pos $ownerPosition) reloading: '
+      '${(reloadTimeData / 100).toStringAsFixed(2)}s ($reloadFrames frames)',
+    );
   }
 }
 

@@ -22,10 +22,16 @@ class MyApp extends StatelessWidget {
     final simulation = BattleSimulationData(
       playerOptions: BattlePlayerOptions(
         personalRecycleLevel: 400,
-        corpRecycleLevels: {Corporation.pilgrim: 400},
-        classRecycleLevels: {NikkeClass.attacker: 400},
+        corpRecycleLevels: {
+          Corporation.pilgrim: 400,
+          Corporation.missilis: 400,
+          Corporation.abnormal: 400,
+          Corporation.tetra: 400,
+          Corporation.elysion: 400,
+        },
+        classRecycleLevels: {NikkeClass.attacker: 400, NikkeClass.supporter: 400, NikkeClass.defender: 400},
       ),
-      nikkeOptions: [BattleNikkeOptions(nikkeResourceId: 222, coreLevel: 11, syncLevel: 901, attractLevel: 40)],
+      nikkeOptions: [BattleNikkeOptions(nikkeResourceId: 194, coreLevel: 11, syncLevel: 901, attractLevel: 30)],
     );
 
     simulation.raptures.add(BattleRaptureData());
