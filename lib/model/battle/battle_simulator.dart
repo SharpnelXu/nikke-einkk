@@ -74,6 +74,20 @@ class BattleSimulationData {
     }
   }
 
+  Map<int, int> getDamageMap() {
+    final Map<int, int> totalDamage = {};
+    for (final events in timeline.values) {
+      for (final event in events) {
+        if (event is NikkeDamageEvent) {
+          totalDamage.putIfAbsent(event.attackerPosition, () => 0);
+          totalDamage[event.attackerPosition] =
+              totalDamage[event.attackerPosition]! + event.damageParameter.calculateExpectedDamage();
+        }
+      }
+    }
+    return totalDamage;
+  }
+
   void registerEvent(int frame, BattleEvent event) {
     timeline.putIfAbsent(frame, () => <BattleEvent>[]);
     timeline[frame]!.add(event);

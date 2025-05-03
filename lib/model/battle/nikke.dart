@@ -260,6 +260,7 @@ class BattleNikkeData {
       case WeaponType.ar:
       case WeaponType.smg:
       case WeaponType.mg:
+      case WeaponType.sg:
         if (shootingFrameCount <= 0 && target != null) {
           // ready to fire a bullet, register fire
           currentAmmo -= 1;
@@ -287,9 +288,6 @@ class BattleNikkeData {
           }
         }
         break;
-      case WeaponType.sg:
-        // TODO: Handle this case.
-        throw UnimplementedError();
       case WeaponType.rl:
       case WeaponType.sr:
         // charging

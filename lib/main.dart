@@ -31,7 +31,10 @@ class MyApp extends StatelessWidget {
         },
         classRecycleLevels: {NikkeClass.attacker: 400, NikkeClass.supporter: 400, NikkeClass.defender: 400},
       ),
-      nikkeOptions: [BattleNikkeOptions(nikkeResourceId: 194, coreLevel: 11, syncLevel: 901, attractLevel: 30)],
+      nikkeOptions: [
+        BattleNikkeOptions(nikkeResourceId: 194, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+        BattleNikkeOptions(nikkeResourceId: 313, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+      ],
     );
 
     simulation.raptures.add(BattleRaptureData());

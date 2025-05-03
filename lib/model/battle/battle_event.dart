@@ -52,6 +52,7 @@ class NikkeDamageEvent implements BattleEvent {
   late String name;
   late int attackerPosition; // this is basically uniqueId for Nikke
   late int targetUniqueId;
+  late int shotCount;
 
   late NikkeDamageParameter damageParameter;
 
@@ -59,6 +60,7 @@ class NikkeDamageEvent implements BattleEvent {
     name = nikke.name;
     attackerPosition = nikke.position;
     targetUniqueId = rapture.uniqueId;
+    shotCount = nikke.currentWeaponData.shotCount;
 
     // TODO: fill in other buff params
     damageParameter = NikkeDamageParameter(
@@ -85,6 +87,7 @@ class NikkeDamageEvent implements BattleEvent {
   Widget buildDisplay() {
     return Text(
       '$name (Pos $attackerPosition) ${type.name} damage: ${damageParameter.calculateExpectedDamage()} '
+      '${shotCount > 1 ? '($shotCount Shots) ' : ''}'
       '(Core: ${(damageParameter.coreHitRate / 100).toStringAsFixed(2)}%, '
       'Crit: ${(damageParameter.criticalRate / 100).toStringAsFixed(2)}%)',
     );

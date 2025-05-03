@@ -16,6 +16,7 @@ class _BattleTimelineState extends State<BattleTimeline> {
 
   @override
   Widget build(BuildContext context) {
+    final damageMap = simulation.getDamageMap();
     return Scaffold(
       appBar: AppBar(title: const Text('Timeline')),
       body: Column(
@@ -28,12 +29,23 @@ class _BattleTimelineState extends State<BattleTimeline> {
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: FilledButton(
-                  onPressed: () {
-                    simulation.simulate();
-                    if (mounted) setState(() {});
-                  },
-                  child: const Text('Simulate'),
+                child: Row(
+                  spacing: 5,
+                  children: [
+                    ...damageMap.keys.map(
+                      (pos) => Text(
+                        '${simulation.nikkes.firstWhere((nikke) => nikke.position == pos).name} '
+                        'DPS: ${damageMap[pos]! ~/ simulation.maxSeconds}',
+                      ),
+                    ),
+                    FilledButton(
+                      onPressed: () {
+                        simulation.simulate();
+                        if (mounted) setState(() {});
+                      },
+                      child: const Text('Simulate'),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -60,8 +72,10 @@ class _BattleTimelineState extends State<BattleTimeline> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('${timeData ~/ 6000}:${(timeData % 6000 / 100).toStringAsFixed(2)} (Frame: $frame) ==>'),
-                    ...events.map(
-                      (event) => Padding(padding: const EdgeInsets.only(left: 8.0), child: event.buildDisplay()),
+                    Column(
+                      spacing: 8,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: events.map((event) => event.buildDisplay()).toList(),
                     ),
                   ],
                 ),
