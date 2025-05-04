@@ -34,7 +34,8 @@ class MyApp extends StatelessWidget {
       nikkeOptions: [
         // BattleNikkeOptions(nikkeResourceId: 194, coreLevel: 11, syncLevel: 901, attractLevel: 30),
         // BattleNikkeOptions(nikkeResourceId: 313, coreLevel: 11, syncLevel: 901, attractLevel: 30),
-        BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+        // BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+        BattleNikkeOptions(nikkeResourceId: 225, coreLevel: 11, syncLevel: 901, attractLevel: 40),
       ],
     );
 

@@ -67,7 +67,7 @@ class BattleSimulationData {
       nikkes[index].init(index + 1);
     }
 
-    for (currentFrame = maxFrames; currentFrame >= 0; currentFrame -= 1) {
+    for (currentFrame = maxFrames; currentFrame > 0; currentFrame -= 1) {
       for (final nikke in nikkes) {
         nikke.normalAction();
       }
@@ -89,6 +89,8 @@ class BattleSimulationData {
   }
 
   void registerEvent(int frame, BattleEvent event) {
+    if (frame <= 0) return;
+
     timeline.putIfAbsent(frame, () => <BattleEvent>[]);
     timeline[frame]!.add(event);
   }

@@ -64,16 +64,17 @@ class BattleNikkeData {
     _rateOfFire = value.clamp(currentWeaponData.rateOfFire, currentWeaponData.endRateOfFire);
   }
 
-  int reloadingFrameCount = 0;
   int fullReloadFrameCount = 0;
+  int get framesToFullCharge => BattleUtils.timeDataToFrame(currentWeaponData.chargeTime, fps);
+  // these start with 0 (+= 1 each frame)
+  int reloadingFrameCount = 0; // reason for += 1: fullReloadFrameCount is calculated as max at first reload frame
+  int chargeFrames = 0;
 
   // TODO: min value 0?
+  // these starts with max (-= 1 each frame)
   int spotFirstDelayFrameCount = 0;
   int spotLastDelayFrameCount = 0; // after charge attack force back to cover
   int shootingFrameCount = 0;
-
-  int chargeFrames = 0;
-  int get framesToFullCharge => BattleUtils.timeDataToFrame(currentWeaponData.chargeTime, fps);
 
   BattleNikkeStatus status = BattleNikkeStatus.behindCover;
 
@@ -172,8 +173,9 @@ class BattleNikkeData {
     accuracyCircleScale = baseWeaponData.startAccuracyCircleScale;
     rateOfFire = baseWeaponData.rateOfFire;
     chargeFrames = 0;
+    shootingFrameCount = 0;
     spotLastDelayFrameCount = 0;
-    spotFirstDelayFrameCount = 0;
+    spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(baseWeaponData.spotFirstDelay, fps);
     reloadingFrameCount = 0;
     fullReloadFrameCount = 0;
   }
@@ -197,7 +199,7 @@ class BattleNikkeData {
 
   void processBehindCoverStatus() {
     // reset this when entering a non-shooting status
-    spotFirstDelayFrameCount = 0;
+    spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
     chargeFrames = 0;
 
     spotLastDelayFrameCount -= 1;
@@ -215,7 +217,7 @@ class BattleNikkeData {
 
   void processReloadingStatus() {
     // reset this when entering a non-shooting status
-    spotFirstDelayFrameCount = 0;
+    spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
     chargeFrames = 0;
 
     spotLastDelayFrameCount -= 1;
@@ -263,8 +265,8 @@ class BattleNikkeData {
   void processShootingStatus() {
     shootingFrameCount -= 1;
     // before shooting need to go outside cover first, not sure if this should be its own status tho
-    if (spotFirstDelayFrameCount < BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps)) {
-      spotFirstDelayFrameCount += 1;
+    if (spotFirstDelayFrameCount > 0) {
+      spotFirstDelayFrameCount -= 1;
       return;
     }
 
@@ -307,23 +309,57 @@ class BattleNikkeData {
         return;
       case WeaponType.rl:
       case WeaponType.sr:
-        chargeFrames += 1;
         if (chargeFrames < framesToFullCharge) {
+          chargeFrames += 1;
           return;
         }
 
         // ready to fire a bullet, register fire
+        // TODO: for A2 & SBS ammo is deducted at fire (determined by uptype_fire_timing)
         currentAmmo -= 1;
         chargeFrames = 0;
         simulation.registerEvent(
           simulation.currentFrame,
           NikkeFireEvent(name: name, currentAmmo: currentAmmo, maxAmmo: maxAmmo, ownerPosition: position),
         );
+
         if (currentWeaponData.fireType == FireType.instant) {
           simulation.registerEvent(
             simulation.currentFrame,
             NikkeDamageEvent(nikke: this, rapture: target, type: NikkeDamageType.bullet),
           );
+        } else if ([
+          FireType.homingProjectile,
+          FireType.projectileCurve,
+          FireType.projectileDirect,
+        ].contains(currentWeaponData.fireType)) {
+          final projectileCreateFrame = BattleUtils.timeDataToFrame(
+            currentWeaponData.maintainFireStance * BattleUtils.toModifier(currentWeaponData.upTypeFireTiming),
+            fps,
+          );
+          // wild guess here
+          final projectileTravelFrame = target.distance * 100 / currentWeaponData.spotProjectileSpeed;
+          // + 1 since this is the first frame and frame counts down
+          final int damageFrame =
+              simulation.currentFrame + 1 - projectileTravelFrame.round() - max(projectileCreateFrame.round(), 1);
+
+          if (damageFrame > 0) {
+            // TODO: fill in defender buffs on hit rather now
+            simulation.registerEvent(
+              damageFrame,
+              NikkeDamageEvent(nikke: this, rapture: target, type: NikkeDamageType.bullet),
+            );
+          }
+        }
+
+        // this is essentially shooting frame for SR & RL
+        if (currentWeaponData.maintainFireStance > 0) {
+          spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(
+            currentWeaponData.spotFirstDelay + currentWeaponData.maintainFireStance,
+            fps,
+          );
+        } else {
+          spotLastDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotLastDelay, fps);
         }
 
         // these two should probably be available for all weapon types
@@ -333,9 +369,6 @@ class BattleNikkeData {
         if (currentWeaponData.rateOfFireChangePerShot > 0) {
           rateOfFire += currentWeaponData.rateOfFireChangePerShot;
         }
-
-        // this is essentially shooting frame for SR & RL
-        spotLastDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotLastDelay, fps);
 
         return;
       case WeaponType.unknown:
