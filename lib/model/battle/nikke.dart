@@ -67,10 +67,13 @@ class BattleNikkeData {
   int reloadingFrameCount = 0;
   int fullReloadFrameCount = 0;
 
+  // TODO: min value 0?
   int spotFirstDelayFrameCount = 0;
+  int spotLastDelayFrameCount = 0; // after charge attack force back to cover
   int shootingFrameCount = 0;
 
-  int chargeDamageRate = 10000;
+  int chargeFrames = 0;
+  int get framesToFullCharge => BattleUtils.timeDataToFrame(currentWeaponData.chargeTime, fps);
 
   BattleNikkeStatus status = BattleNikkeStatus.behindCover;
 
@@ -168,6 +171,11 @@ class BattleNikkeData {
     currentAmmo = baseWeaponData.maxAmmo;
     accuracyCircleScale = baseWeaponData.startAccuracyCircleScale;
     rateOfFire = baseWeaponData.rateOfFire;
+    chargeFrames = 0;
+    spotLastDelayFrameCount = 0;
+    spotFirstDelayFrameCount = 0;
+    reloadingFrameCount = 0;
+    fullReloadFrameCount = 0;
   }
 
   void normalAction() {
@@ -190,6 +198,9 @@ class BattleNikkeData {
   void processBehindCoverStatus() {
     // reset this when entering a non-shooting status
     spotFirstDelayFrameCount = 0;
+    chargeFrames = 0;
+
+    spotLastDelayFrameCount -= 1;
     shootingFrameCount -= 1;
     if (currentWeaponData.accuracyChangeSpeed != 0) {
       // reset accuracy
@@ -205,6 +216,9 @@ class BattleNikkeData {
   void processReloadingStatus() {
     // reset this when entering a non-shooting status
     spotFirstDelayFrameCount = 0;
+    chargeFrames = 0;
+
+    spotLastDelayFrameCount -= 1;
 
     if (reloadingFrameCount == 0) {
       // this means this is the first frame of reloading
@@ -255,43 +269,75 @@ class BattleNikkeData {
     }
 
     final target = simulation.raptures.where((rapture) => canTarget(rapture)).firstOrNull;
+    if (target == null) return;
 
     switch (currentWeaponType) {
       case WeaponType.ar:
       case WeaponType.smg:
       case WeaponType.mg:
       case WeaponType.sg:
-        if (shootingFrameCount <= 0 && target != null) {
-          // ready to fire a bullet, register fire
-          currentAmmo -= 1;
+        if (shootingFrameCount > 0) {
+          return;
+        }
+
+        // ready to fire a bullet, register fire
+        currentAmmo -= 1;
+        simulation.registerEvent(
+          simulation.currentFrame,
+          NikkeFireEvent(name: name, currentAmmo: currentAmmo, maxAmmo: maxAmmo, ownerPosition: position),
+        );
+        if (currentWeaponData.fireType == FireType.instant) {
           simulation.registerEvent(
             simulation.currentFrame,
-            NikkeFireEvent(name: name, currentAmmo: currentAmmo, maxAmmo: maxAmmo, ownerPosition: position),
+            NikkeDamageEvent(nikke: this, rapture: target, type: NikkeDamageType.bullet),
           );
-          if (currentWeaponData.fireType == FireType.instant) {
-            simulation.registerEvent(
-              simulation.currentFrame,
-              NikkeDamageEvent(nikke: this, rapture: target, type: NikkeDamageType.bullet),
-            );
-          }
-
-          // rateOfFire 90 = shoot 90 bullets per minute, so time data per bullet is 6000 / 90 = 66.66 (0.6666 second)
-          shootingFrameCount = BattleUtils.timeDataToFrame(60 * 100 / rateOfFire, fps);
-          shootingFrameCount = max(shootingFrameCount, 1); // minimum 1 frame cooldown
-
-          // these two should probably be available for all weapon types
-          if (currentWeaponData.accuracyChangePerShot > 0) {
-            accuracyCircleScale -= currentWeaponData.accuracyChangePerShot;
-          }
-          if (currentWeaponData.rateOfFireChangePerShot > 0) {
-            rateOfFire += currentWeaponData.rateOfFireChangePerShot;
-          }
         }
-        break;
+
+        // rateOfFire 90 = shoot 90 bullets per minute, so time data per bullet is 6000 / 90 = 66.66 (0.6666 second)
+        shootingFrameCount = BattleUtils.timeDataToFrame(60 * 100 / rateOfFire, fps);
+        shootingFrameCount = max(shootingFrameCount, 1); // minimum 1 frame cooldown
+
+        // these two should probably be available for all weapon types
+        if (currentWeaponData.accuracyChangePerShot > 0) {
+          accuracyCircleScale -= currentWeaponData.accuracyChangePerShot;
+        }
+        if (currentWeaponData.rateOfFireChangePerShot > 0) {
+          rateOfFire += currentWeaponData.rateOfFireChangePerShot;
+        }
+        return;
       case WeaponType.rl:
       case WeaponType.sr:
-        // charging
-        throw UnimplementedError();
+        chargeFrames += 1;
+        if (chargeFrames < framesToFullCharge) {
+          return;
+        }
+
+        // ready to fire a bullet, register fire
+        currentAmmo -= 1;
+        chargeFrames = 0;
+        simulation.registerEvent(
+          simulation.currentFrame,
+          NikkeFireEvent(name: name, currentAmmo: currentAmmo, maxAmmo: maxAmmo, ownerPosition: position),
+        );
+        if (currentWeaponData.fireType == FireType.instant) {
+          simulation.registerEvent(
+            simulation.currentFrame,
+            NikkeDamageEvent(nikke: this, rapture: target, type: NikkeDamageType.bullet),
+          );
+        }
+
+        // these two should probably be available for all weapon types
+        if (currentWeaponData.accuracyChangePerShot > 0) {
+          accuracyCircleScale -= currentWeaponData.accuracyChangePerShot;
+        }
+        if (currentWeaponData.rateOfFireChangePerShot > 0) {
+          rateOfFire += currentWeaponData.rateOfFireChangePerShot;
+        }
+
+        // this is essentially shooting frame for SR & RL
+        spotLastDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotLastDelay, fps);
+
+        return;
       case WeaponType.unknown:
       case WeaponType.none:
         // TODO: probably log?
@@ -317,6 +363,8 @@ class BattleNikkeData {
 
       if (currentAmmo == 0) {
         status = BattleNikkeStatus.forceReloading;
+      } else if (spotLastDelayFrameCount > 0) {
+        status = BattleNikkeStatus.behindCover;
       }
     }
   }
