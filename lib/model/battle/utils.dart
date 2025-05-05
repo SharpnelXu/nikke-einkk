@@ -3,6 +3,7 @@ import 'dart:math';
 class BattleUtils {
   static const rangeCorrection = 3000;
   static const fullBurstCorrection = 5000;
+  static const baseElementRate = 11000;
 
   BattleUtils._();
 
@@ -192,7 +193,7 @@ class NikkeDamageParameter {
       10000 + coreCorrection + critCorrection + rangeCorrection + fullBurstCorrection,
     );
 
-    final elementRate = BattleUtils.toModifier(isStrongElement ? 11000 + elementDamageBuff : 10000);
+    final elementRate = BattleUtils.toModifier(isStrongElement ? BattleUtils.baseElementRate + elementDamageBuff : 10000);
 
     final chargeDamageExtraRate = BattleUtils.toModifier(chargeDamageRateMultiplierIncrease) * chargeDamageRate;
     final fullChargeRate = chargeDamageRate + chargeDamageExtraRate.round() + chargeDamageBuff;

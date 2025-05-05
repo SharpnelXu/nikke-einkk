@@ -354,6 +354,7 @@ class BattleNikkeData {
 
         // this is essentially shooting frame for SR & RL
         if (currentWeaponData.maintainFireStance > 0) {
+          // TODO: A2 has 9 extra frames, maybe due to animation but not sure
           spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(
             currentWeaponData.spotFirstDelay + currentWeaponData.maintainFireStance,
             fps,
