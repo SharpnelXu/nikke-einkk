@@ -40,7 +40,7 @@ Receive Damage Rate = 100% + Receive Damage Buffs + Distributed Damage Buffs
   - Usually 0.2s (12 frames), exceptions are Tove 0.33s (20 frames) and Nero (she is faster than normal)
 - All weapons have `spotLastDelay` which specifies how long it takes for a nikke to retreat behind cover
   - Can be cancelled by user input
-  - This is factored into reoload time calculation, so techincally reload time buffs need to be 100%+ to achieve one frame relaod
+  - This is factored into reload time calculation, so technically reload time buffs need to be 100%+ to achieve one frame reload
 - After each shot, SRs & RLs will retreat to cover, so each sequential attack needs to wait an extra of `spotFirstDelay + spotLastDelay`
   - Except for nikkes with `maintainFireStance` (A2 & SBS)
 - SRs & RLs start charging at 100% (first frame of charging), and will fire after charging complete (since `inputType` is `UP`)
