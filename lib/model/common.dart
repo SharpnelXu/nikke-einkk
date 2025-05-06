@@ -124,14 +124,14 @@ class NikkeCharacterData {
   // value is "StateEffect", so use `skill1Id` and search in StateEffectTable
   // also has value "CharacterSkill", so search in CharacterSkillTable
   @JsonKey(name: 'skill1_table')
-  final String skill1Table;
+  final SkillTableType skill1Table;
   // CharacterSkillTable
   @JsonKey(name: 'skill2_id')
   final int skill2Id;
   // value is "StateEffect", so use `skill2Id` and search in StateEffectTable
   // also has value "CharacterSkill", so search in CharacterSkillTable
   @JsonKey(name: 'skill2_table')
-  final String skill2Table;
+  final SkillTableType skill2Table;
   // doesn't know what this means
   @JsonKey(name: 'eff_category_type')
   final String effCategoryType;
@@ -189,9 +189,9 @@ class NikkeCharacterData {
     this.burstDuration = 0,
     this.ultiSkillId = 0,
     this.skill1Id = 0,
-    this.skill1Table = '',
+    this.skill1Table = SkillTableType.unknown,
     this.skill2Id = 0,
-    this.skill2Table = '',
+    this.skill2Table = SkillTableType.unknown,
     this.effCategoryType = '',
     this.effCategoryValue = 0,
     this.categoryType1 = '',
@@ -232,7 +232,7 @@ class WeaponSkillData {
   final WeaponType weaponType;
   // Metal/Energy/Bio, probably not used
   @JsonKey(name: 'attack_type')
-  final String attackType;
+  final AttackType attackType;
   // Metal_Type/Energy_Type, probably not used
   @JsonKey(name: 'counter_enermy')
   final String counterEnemy;
@@ -340,7 +340,7 @@ class WeaponSkillData {
     this.descriptionLocalkey = '',
     this.cameraWork = '',
     this.weaponType = WeaponType.unknown,
-    this.attackType = '',
+    this.attackType = AttackType.unknown,
     this.counterEnemy = '',
     this.preferTarget = PreferTarget.front,
     this.preferTargetCondition = PreferTargetCondition.none,
@@ -741,14 +741,65 @@ enum RecycleStat {
   const RecycleStat({required this.hp, required this.atk, required this.def});
 }
 
+// from characterShotTable:
+// enum PreferTarget { unknown, targetAR, targetGL, targetPS, front, back, highHP }
+// from characterSkillTable
+// "preferTarget": "{HighAttack, HighDefence, HighAttackLastSelf, LowHP, Attacker, Random, LowHPLastSelf, LowHPRatio,
+// HighAttackFirstSelf, LowHPCover, NearAim, HighMaxHP, HaveDebuff, HighHP, Defender, LowDefence, Fire,
+// LongInitChargeTime, Electronic}"
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum PreferTarget { unknown, targetAR, targetGL, targetPS, front, back, highHP }
+enum PreferTarget {
+  unknown,
+
+  targetAR,
+  targetGL,
+  targetPS,
+
+  random,
+  back,
+  front,
+  haveDebuff,
+  longInitChargeTime,
+
+  highAttack,
+  highAttackFirstSelf,
+  highAttackLastSelf,
+  highDefence,
+  highHP,
+  highMaxHP,
+  lowDefence,
+  lowHP,
+  lowHPCover,
+  lowHPLastSelf,
+  lowHPRatio,
+  nearAim,
+
+  attacker,
+  defender,
+  supporter,
+
+  fire,
+  water,
+  electronic,
+  iron,
+  wind,
+}
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum PreferTargetCondition { none, includeNoneTargetNone }
+enum PreferTargetCondition {
+  unknown,
+  none,
+  includeNoneTargetLast,
+  includeNoneTargetNone,
+  excludeSelf,
+  destroyCover,
+  onlySG,
+  onlyRL,
+  onlyAR,
+}
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum ShotTiming { sequence, concurrence }
+enum ShotTiming { sequence, concurrence } // sequence only used for Vesti's Burst Skill
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum FireType {
@@ -769,3 +820,10 @@ enum InputType {
   @JsonValue('UP')
   up,
 }
+
+// "attackType": "{Fire, Energy, Water, Bio, Electronic, Wind, Iron}"
+@JsonEnum(fieldRename: FieldRename.pascal)
+enum AttackType { fire, water, electronic, iron, wind, energy, bio, metal, unknown }
+
+@JsonEnum(fieldRename: FieldRename.pascal)
+enum SkillTableType { none, stateEffect, characterSkill, unknown }

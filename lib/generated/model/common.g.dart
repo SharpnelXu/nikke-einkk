@@ -31,9 +31,9 @@ NikkeCharacterData _$NikkeCharacterDataFromJson(Map<String, dynamic> json) => Ni
   burstDuration: (json['burst_duration'] as num?)?.toInt() ?? 0,
   ultiSkillId: (json['ulti_skill_id'] as num?)?.toInt() ?? 0,
   skill1Id: (json['skill1_id'] as num?)?.toInt() ?? 0,
-  skill1Table: json['skill1_table'] as String? ?? '',
+  skill1Table: $enumDecodeNullable(_$SkillTableTypeEnumMap, json['skill1_table']) ?? SkillTableType.unknown,
   skill2Id: (json['skill2_id'] as num?)?.toInt() ?? 0,
-  skill2Table: json['skill2_table'] as String? ?? '',
+  skill2Table: $enumDecodeNullable(_$SkillTableTypeEnumMap, json['skill2_table']) ?? SkillTableType.unknown,
   effCategoryType: json['eff_category_type'] as String? ?? '',
   effCategoryValue: (json['eff_category_value'] as num?)?.toInt() ?? 0,
   categoryType1: json['category_type_1'] as String? ?? '',
@@ -75,9 +75,9 @@ Map<String, dynamic> _$NikkeCharacterDataToJson(NikkeCharacterData instance) => 
   'burst_duration': instance.burstDuration,
   'ulti_skill_id': instance.ultiSkillId,
   'skill1_id': instance.skill1Id,
-  'skill1_table': instance.skill1Table,
+  'skill1_table': _$SkillTableTypeEnumMap[instance.skill1Table]!,
   'skill2_id': instance.skill2Id,
-  'skill2_table': instance.skill2Table,
+  'skill2_table': _$SkillTableTypeEnumMap[instance.skill2Table]!,
   'eff_category_type': instance.effCategoryType,
   'eff_category_value': instance.effCategoryValue,
   'category_type_1': instance.categoryType1,
@@ -112,6 +112,13 @@ const _$BurstStepEnumMap = {
   BurstStep.none: 'None',
 };
 
+const _$SkillTableTypeEnumMap = {
+  SkillTableType.none: 'None',
+  SkillTableType.stateEffect: 'StateEffect',
+  SkillTableType.characterSkill: 'CharacterSkill',
+  SkillTableType.unknown: 'Unknown',
+};
+
 const _$CorporationEnumMap = {
   Corporation.unknown: 'UNKNOWN',
   Corporation.none: 'NONE',
@@ -128,7 +135,7 @@ WeaponSkillData _$WeaponSkillDataFromJson(Map<String, dynamic> json) => WeaponSk
   descriptionLocalkey: json['description_localkey'] as String? ?? '',
   cameraWork: json['camera_work'] as String? ?? '',
   weaponType: $enumDecodeNullable(_$WeaponTypeEnumMap, json['weapon_type']) ?? WeaponType.unknown,
-  attackType: json['attack_type'] as String? ?? '',
+  attackType: $enumDecodeNullable(_$AttackTypeEnumMap, json['attack_type']) ?? AttackType.unknown,
   counterEnemy: json['counter_enermy'] as String? ?? '',
   preferTarget: $enumDecodeNullable(_$PreferTargetEnumMap, json['prefer_target']) ?? PreferTarget.front,
   preferTargetCondition:
@@ -191,7 +198,7 @@ Map<String, dynamic> _$WeaponSkillDataToJson(WeaponSkillData instance) => <Strin
   'description_localkey': instance.descriptionLocalkey,
   'camera_work': instance.cameraWork,
   'weapon_type': _$WeaponTypeEnumMap[instance.weaponType]!,
-  'attack_type': instance.attackType,
+  'attack_type': _$AttackTypeEnumMap[instance.attackType]!,
   'counter_enermy': instance.counterEnemy,
   'prefer_target': _$PreferTargetEnumMap[instance.preferTarget]!,
   'prefer_target_condition': _$PreferTargetConditionEnumMap[instance.preferTargetCondition]!,
@@ -255,19 +262,60 @@ const _$WeaponTypeEnumMap = {
   WeaponType.sr: 'SR',
 };
 
+const _$AttackTypeEnumMap = {
+  AttackType.fire: 'Fire',
+  AttackType.water: 'Water',
+  AttackType.electronic: 'Electronic',
+  AttackType.iron: 'Iron',
+  AttackType.wind: 'Wind',
+  AttackType.energy: 'Energy',
+  AttackType.bio: 'Bio',
+  AttackType.metal: 'Metal',
+  AttackType.unknown: 'Unknown',
+};
+
 const _$PreferTargetEnumMap = {
   PreferTarget.unknown: 'Unknown',
   PreferTarget.targetAR: 'TargetAR',
   PreferTarget.targetGL: 'TargetGL',
   PreferTarget.targetPS: 'TargetPS',
-  PreferTarget.front: 'Front',
+  PreferTarget.random: 'Random',
   PreferTarget.back: 'Back',
+  PreferTarget.front: 'Front',
+  PreferTarget.haveDebuff: 'HaveDebuff',
+  PreferTarget.longInitChargeTime: 'LongInitChargeTime',
+  PreferTarget.highAttack: 'HighAttack',
+  PreferTarget.highAttackFirstSelf: 'HighAttackFirstSelf',
+  PreferTarget.highAttackLastSelf: 'HighAttackLastSelf',
+  PreferTarget.highDefence: 'HighDefence',
   PreferTarget.highHP: 'HighHP',
+  PreferTarget.highMaxHP: 'HighMaxHP',
+  PreferTarget.lowDefence: 'LowDefence',
+  PreferTarget.lowHP: 'LowHP',
+  PreferTarget.lowHPCover: 'LowHPCover',
+  PreferTarget.lowHPLastSelf: 'LowHPLastSelf',
+  PreferTarget.lowHPRatio: 'LowHPRatio',
+  PreferTarget.nearAim: 'NearAim',
+  PreferTarget.attacker: 'Attacker',
+  PreferTarget.defender: 'Defender',
+  PreferTarget.supporter: 'Supporter',
+  PreferTarget.fire: 'Fire',
+  PreferTarget.water: 'Water',
+  PreferTarget.electronic: 'Electronic',
+  PreferTarget.iron: 'Iron',
+  PreferTarget.wind: 'Wind',
 };
 
 const _$PreferTargetConditionEnumMap = {
+  PreferTargetCondition.unknown: 'Unknown',
   PreferTargetCondition.none: 'None',
+  PreferTargetCondition.includeNoneTargetLast: 'IncludeNoneTargetLast',
   PreferTargetCondition.includeNoneTargetNone: 'IncludeNoneTargetNone',
+  PreferTargetCondition.excludeSelf: 'ExcludeSelf',
+  PreferTargetCondition.destroyCover: 'DestroyCover',
+  PreferTargetCondition.onlySG: 'OnlySG',
+  PreferTargetCondition.onlyRL: 'OnlyRL',
+  PreferTargetCondition.onlyAR: 'OnlyAR',
 };
 
 const _$ShotTimingEnumMap = {ShotTiming.sequence: 'Sequence', ShotTiming.concurrence: 'Concurrence'};

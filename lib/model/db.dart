@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:logger/logger.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/model/translation.dart';
 import 'package:path/path.dart';
 
@@ -16,6 +17,9 @@ class NikkeDatabase {
   String get dataPath => join(appPath, 'data');
   String get characterTableFilePath => join(dataPath, 'CharacterTable.json');
   String get characterShotTableFilePath => join(dataPath, 'CharacterShotTable.json');
+  String get characterSkillTableFilePath => join(dataPath, 'CharacterSkillTable.json');
+  String get stateEffectTableFilePath => join(dataPath, 'StateEffectTable.json');
+  String get functionTableFilePath => join(dataPath, 'FunctionTable.json');
   String get characterStatTableFilePath => join(dataPath, 'CharacterStatTable.json');
   String get characterStatEnhanceTableFilePath => join(dataPath, 'CharacterStatEnhanceTable.json');
   String get attractiveLevelTableFilePath => join(dataPath, 'AttractiveLevelTable.json');
@@ -26,6 +30,9 @@ class NikkeDatabase {
   final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
   final Map<String, Translation> localeCharacterTable = {};
   final Map<int, WeaponSkillData> characterShotTable = {};
+  final Map<int, SkillData> characterSkillTable = {};
+  final Map<int, StateEffectData> stateEffectTable = {};
+  final Map<int, FunctionData> functionTable = {};
 
   // character stats
   // grouped by group/level
@@ -51,6 +58,9 @@ class NikkeDatabase {
     result &= await loadCharacterStatEnhanceData();
     result &= await loadAttractiveStatData();
     result &= await loadEquipData();
+    result &= await loadCharacterSkillData();
+    result &= await loadStateEffectData();
+    result &= await loadFunctionData();
 
     dataLoaded = result;
     logger.i('Loading completed, result: $dataLoaded');
@@ -159,6 +169,46 @@ class NikkeDatabase {
           () => <EquipRarity, EquipmentItemData>{},
         );
         groupedEquipTable[equip.itemSubType]![equip.characterClass]![equip.itemRarity] = equip;
+      }
+    }
+    return exists;
+  }
+
+  Future<bool> loadCharacterSkillData() async {
+    final table = File(characterSkillTableFilePath);
+    final bool exists = await table.exists();
+    if (exists) {
+      final json = jsonDecode(await table.readAsString());
+      for (final record in json['records']) {
+        final skill = SkillData.fromJson(record);
+
+        characterSkillTable[skill.id] = skill;
+      }
+    }
+    return exists;
+  }
+
+  Future<bool> loadStateEffectData() async {
+    final table = File(stateEffectTableFilePath);
+    final bool exists = await table.exists();
+    if (exists) {
+      final json = jsonDecode(await table.readAsString());
+      for (final record in json['records']) {
+        final stateEffect = StateEffectData.fromJson(record);
+        stateEffectTable[stateEffect.id] = stateEffect;
+      }
+    }
+    return exists;
+  }
+
+  Future<bool> loadFunctionData() async {
+    final table = File(functionTableFilePath);
+    final bool exists = await table.exists();
+    if (exists) {
+      final json = jsonDecode(await table.readAsString());
+      for (final record in json['records']) {
+        final function = FunctionData.fromJson(record);
+        functionTable[function.id] = function;
       }
     }
     return exists;
