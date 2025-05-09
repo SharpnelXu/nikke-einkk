@@ -5,6 +5,7 @@ import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
+import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 class BattleFunction {
@@ -22,10 +23,9 @@ class BattleFunction {
           final standard = getTimingTriggerStandardTarget(event, simulation);
           if (standard == null) return;
 
-          if (standard.totalBulletsFired > 0 && standard.totalBulletsFired % data.timingTriggerValue == 0) {
+          if (standard.totalBulletsHit > 0 && standard.totalBulletsHit % data.timingTriggerValue == 0) {
             executeFunction(event, simulation, standard);
           }
-          break;
         }
         break;
       case TimingTriggerType.none:
@@ -100,7 +100,10 @@ class BattleFunction {
         for (final nikke in functionTargets) {
           final existingBuff = nikke.buffs.firstWhereOrNull((buff) => buff.data.id == data.id);
           if (existingBuff != null) {
-            existingBuff.duration = data.durationValue;
+            existingBuff.duration =
+                data.durationType == DurationType.timeSec
+                    ? BattleUtils.timeDataToFrame(data.durationValue, simulation.fps)
+                    : data.durationValue;
             existingBuff.count = min(existingBuff.count + 1, data.fullCount);
           } else {
             nikke.buffs.add(BattleBuff(data, activator.position, nikke.position));

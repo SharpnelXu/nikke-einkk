@@ -3,6 +3,8 @@ import 'package:nikke_einkk/model/common.dart';
 class BattleRapture {
   bool canBeTargeted = true;
 
+  bool isStageTarget = true;
+
   int defence = 0;
 
   int uniqueId = 0;

@@ -35,6 +35,8 @@ class BattlePlayerOptions {
 }
 
 class BattleSimulation {
+  static const burstMeterCap = 1000000; // 9000 = 0.9%
+
   BattlePlayerOptions playerOptions;
 
   List<BattleNikke> nikkes = [];
@@ -47,6 +49,10 @@ class BattleSimulation {
   int fps = 60;
   int maxSeconds = 180;
   int get maxFrames => fps * maxSeconds;
+
+  int _burstMeter = 0;
+  int get burstMeter => _burstMeter;
+  set burstMeter(int value) => _burstMeter = value.clamp(0, burstMeterCap);
 
   // player actions, maybe move to a dedicated object to represent current frame
   bool autoAttack = true;
@@ -63,6 +69,7 @@ class BattleSimulation {
     if (nikkes.isEmpty) return;
 
     timeline.clear();
+    burstMeter = 0;
     currentNikke = min(nikkes.length, currentNikke);
     for (int index = 0; index < nikkes.length; index += 1) {
       nikkes[index].init(index + 1);
@@ -75,6 +82,11 @@ class BattleSimulation {
 
       // broadcast all events registered for this frame
       for (final event in timeline[currentFrame] ?? []) {
+        if (event is BurstGenerationEvent) {
+          event.currentMeter = burstMeter;
+          burstMeter += event.burst;
+        }
+
         for (final nikke in nikkes) {
           nikke.broadcast(event, this);
         }
@@ -84,6 +96,10 @@ class BattleSimulation {
 
   BattleNikke? getNikkeOnPosition(int position) {
     return nikkes.firstWhereOrNull((nikke) => nikke.position == position);
+  }
+
+  BattleRapture? getRaptureByUniqueId(int uniqueId) {
+    return raptures.firstWhereOrNull((rapture) => rapture.uniqueId == uniqueId);
   }
 
   Map<int, int> getDamageMap() {

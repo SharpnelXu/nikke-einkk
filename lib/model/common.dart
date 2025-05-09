@@ -650,6 +650,8 @@ enum WeaponType {
   @JsonValue('SR')
   sr;
 
+  static const List<WeaponType> chargeWeaponTypes = [WeaponType.rl, WeaponType.sr];
+
   @override
   String toString() {
     return name.toUpperCase();

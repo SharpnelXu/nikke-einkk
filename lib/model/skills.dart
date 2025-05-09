@@ -28,6 +28,9 @@ enum CharacterSkillType {
 
 // "durationType": "{TimeSec, None, Shots, Battles}"
 // from functionTable: hits, timeSecBattles
+//
+// Battles: Cindy's S2 E3 has duration value 1, not sure what it means for DurationType.battles
+// TimeSecBattles: Flora's S1 E1 has an absurdly large value, not sure why (1000000 = 10000 seconds?)
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum DurationType { none, timeSec, shots, battles, hits, timeSecBattles, unknown }
 

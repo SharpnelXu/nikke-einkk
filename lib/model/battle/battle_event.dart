@@ -63,10 +63,10 @@ class NikkeReloadStartEvent implements BattleEvent {
 
 class NikkeDamageEvent implements BattleEvent {
   NikkeDamageType type;
+  late WeaponSkillData weaponData;
   late String name;
   late int attackerPosition; // this is basically uniqueId for Nikke
   late int targetUniqueId;
-  late int shotCount;
   late int chargePercent;
 
   late NikkeDamageParameter damageParameter;
@@ -80,7 +80,7 @@ class NikkeDamageEvent implements BattleEvent {
     name = nikke.name;
     attackerPosition = nikke.position;
     targetUniqueId = rapture.uniqueId;
-    shotCount = nikke.currentWeaponData.shotCount;
+    weaponData = nikke.currentWeaponData;
     chargePercent = nikke.framesToFullCharge > 0 ? (10000 * nikke.chargeFrames / nikke.framesToFullCharge).round() : 0;
 
     // TODO: fill in other buff params
@@ -88,21 +88,21 @@ class NikkeDamageEvent implements BattleEvent {
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
       defence: rapture.defence,
-      damageRate: nikke.currentWeaponData.damage,
+      damageRate: weaponData.damage,
       coreHitRate: calculateCoreHitRate(nikke, rapture),
-      coreDamageRate: nikke.currentWeaponData.coreDamageRate,
+      coreDamageRate: weaponData.coreDamageRate,
       criticalRate: nikke.characterData.criticalRatio,
       criticalDamageRate: nikke.characterData.criticalDamage,
       isBonusRange: nikke.isBonusRange(rapture.distance),
-      isFullBurst: nikke.simulation.fullBurst,
+      isFullBurst: simulation.fullBurst,
       isStrongElement: nikke.element.strongAgainst(rapture.element),
-      chargeDamageRate: nikke.currentWeaponData.fullChargeDamage,
+      chargeDamageRate: weaponData.fullChargeDamage,
       chargePercent: chargePercent,
     );
   }
 
   int calculateCoreHitRate(BattleNikke nikke, BattleRapture rapture) {
-    if (nikke.currentWeaponType == WeaponType.sr || nikke.currentWeaponType == WeaponType.rl) return 10000;
+    if (WeaponType.chargeWeaponTypes.contains(weaponData.weaponType)) return 10000;
 
     // just a wild guess for now
     return (50 * rapture.coreSize / max(1, nikke.accuracyCircleScale * rapture.distance) * 10000).round();
@@ -116,13 +116,65 @@ class NikkeDamageEvent implements BattleEvent {
   @override
   Widget buildDisplay() {
     return Text(
-      '$name (Pos $attackerPosition) ${type.name} damage: ${damageParameter.calculateExpectedDamage()} '
-      '${shotCount > 1 ? '($shotCount Shots) ' : ''}'
-      '${chargePercent > 0 ? '${(chargePercent / 100).toStringAsFixed(2)}% ' : ''}'
-      '(Core: ${(damageParameter.coreHitRate / 100).toStringAsFixed(2)}%, '
-      'Crit: ${(damageParameter.criticalRate / 100).toStringAsFixed(2)}%)',
+      '$name (Pos $attackerPosition) ${type.name} damage: ${damageParameter.calculateExpectedDamage()}'
+      '${weaponData.shotCount > 1 ? ' (${weaponData.shotCount} Shots)' : ''}'
+      '${chargePercent > 0 ? ' Charge: ${(chargePercent / 100).toStringAsFixed(2)}%' : ''}'
+      ' (Core: ${(damageParameter.coreHitRate / 100).toStringAsFixed(2)}%,'
+      ' Crit: ${(damageParameter.criticalRate / 100).toStringAsFixed(2)}%)',
     );
   }
 }
 
 enum NikkeDamageType { bullet }
+
+class BurstGenerationEvent implements BattleEvent {
+  String name = '';
+  late WeaponSkillData weaponData;
+  late int attackerPosition; // this is basically uniqueId for Nikke
+  late int targetUniqueId;
+  int chargePercent = 0;
+  int currentMeter = 0;
+  int burst = 0;
+  int positionBurstBonus = 10000;
+
+  BurstGenerationEvent({
+    required BattleSimulation simulation,
+    required BattleNikke nikke,
+    required BattleRapture rapture,
+  }) {
+    name = nikke.name;
+    weaponData = nikke.currentWeaponData;
+    attackerPosition = nikke.position;
+    targetUniqueId = rapture.uniqueId;
+    chargePercent = nikke.framesToFullCharge > 0 ? (10000 * nikke.chargeFrames / nikke.framesToFullCharge).round() : 0;
+    currentMeter = simulation.burstMeter;
+    final bonusBurst =
+        simulation.currentNikke == nikke.position &&
+        WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponData.weaponType);
+
+    positionBurstBonus = bonusBurst ? 10000 + (15000 * BattleUtils.toModifier(chargePercent)).round() : 10000;
+
+    final baseBurst =
+        rapture.isStageTarget
+            ? nikke.currentWeaponData.targetBurstEnergyPerShot
+            : nikke.currentWeaponData.burstEnergyPerShot;
+
+    burst = (baseBurst * BattleUtils.toModifier(positionBurstBonus)).round();
+  }
+
+  @override
+  int getUserPosition() {
+    return attackerPosition;
+  }
+
+  @override
+  Widget buildDisplay() {
+    final updatedBurst = min(currentMeter + burst, BattleSimulation.burstMeterCap);
+
+    return Text(
+      '$name (Pos $attackerPosition) Burst Gen: ${(updatedBurst / 10000).toStringAsFixed(4)}%'
+      ' (+${(burst / 10000).toStringAsFixed(4)}%)'
+      '${positionBurstBonus > 10000 ? ' Bonus: ${(positionBurstBonus / 100).toStringAsFixed(2)}%' : ''}',
+    );
+  }
+}

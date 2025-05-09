@@ -124,6 +124,7 @@ class BattleNikke {
   int shootingFrameCount = 0;
 
   int totalBulletsFired = 0;
+  int totalBulletsHit = 0;
 
   BattleNikkeStatus status = BattleNikkeStatus.behindCover;
 
@@ -178,6 +179,7 @@ class BattleNikke {
     fullReloadFrameCount = 0;
 
     totalBulletsFired = 0;
+    totalBulletsHit = 0;
     functions.clear();
     buffs.clear();
     skills.clear();
@@ -197,14 +199,20 @@ class BattleNikke {
     switch (status) {
       case BattleNikkeStatus.behindCover:
         processBehindCoverStatus();
-        return;
+        break;
       case BattleNikkeStatus.reloading:
       case BattleNikkeStatus.forceReloading:
         processReloadingStatus();
-        return;
+        break;
       case BattleNikkeStatus.shooting:
         processShootingStatus();
-        return;
+        break;
+    }
+
+    for (final buff in buffs) {
+      if (buff.data.durationType == DurationType.timeSec && buff.isActive(simulation)) {
+        buff.duration -= 1;
+      }
     }
   }
 
@@ -310,6 +318,10 @@ class BattleNikke {
             simulation.currentFrame,
             NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
           );
+          simulation.registerEvent(
+            simulation.currentFrame,
+            BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
+          );
         }
 
         // rateOfFire 90 = shoot 90 bullets per minute, so time data per bullet is 6000 / 90 = 66.66 (0.6666 second)
@@ -331,14 +343,18 @@ class BattleNikke {
           return;
         }
 
-        // TODO: move to attackDoneEvent (end of fire animation) for A2 & SBS (end of uptype_fire_timing)
-        chargeFrames = 0;
-
         if (currentWeaponData.fireType == FireType.instant) {
           simulation.registerEvent(
             simulation.currentFrame,
             NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
           );
+          simulation.registerEvent(
+            simulation.currentFrame,
+            BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
+          );
+
+          // TODO: move to attackDoneEvent (end of fire animation) for A2 & SBS (end of uptype_fire_timing)
+          chargeFrames = 0;
         } else if ([
           FireType.homingProjectile,
           FireType.projectileCurve,
@@ -367,6 +383,10 @@ class BattleNikke {
             simulation.registerEvent(
               damageFrame,
               NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
+            );
+            simulation.registerEvent(
+              damageFrame,
+              BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
             );
           }
         }
@@ -435,11 +455,30 @@ class BattleNikke {
     if (event is NikkeFireEvent && event.ownerPosition == position) {
       currentAmmo -= 1;
       totalBulletsFired += 1;
+
+      for (final buff in buffs) {
+        if (buff.data.durationType == DurationType.shots && buff.isActive(simulation)) {
+          buff.duration -= 1;
+        }
+      }
+    }
+
+    if (event is NikkeDamageEvent && event.attackerPosition == position) {
+      processDamageEvent(event, simulation);
     }
 
     for (final function in functions) {
       function.broadcast(event, simulation);
     }
+  }
+
+  void processDamageEvent(NikkeDamageEvent event, BattleSimulation simulation) {
+    if (event.type != NikkeDamageType.bullet) return;
+
+    final rapture = simulation.getRaptureByUniqueId(event.targetUniqueId);
+    if (rapture == null) return;
+
+    totalBulletsHit += 1;
   }
 
   // maybe change to a dedicated return structure to show which nikke gives which buffs
