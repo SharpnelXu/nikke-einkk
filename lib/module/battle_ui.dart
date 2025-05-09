@@ -11,10 +11,7 @@ class BattleSimulationPage extends StatefulWidget {
 }
 
 class _BattleSimulationPageState extends State<BattleSimulationPage> {
-  late final BattleSimulationData simulationData = BattleSimulationData(
-    playerOptions: widget.playerOptions,
-    nikkeOptions: [],
-  );
+  late final BattleSimulation simulationData = BattleSimulation(playerOptions: widget.playerOptions, nikkeOptions: []);
 
   _BattleSimulationPageState();
 

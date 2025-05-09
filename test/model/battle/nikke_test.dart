@@ -10,11 +10,11 @@ void main() async {
 
   group('Nikke Stat Calculation Test', () {
     test('Dorothy resourceId 233', () {
-      final simulation = BattleSimulationData(
+      final simulation = BattleSimulation(
         playerOptions: BattlePlayerOptions(personalRecycleLevel: 0, corpRecycleLevels: {}, classRecycleLevels: {}),
         nikkeOptions: [],
       );
-      final dorothy = BattleNikkeData(
+      final dorothy = BattleNikke(
         simulation: simulation,
         option: BattleNikkeOptions(nikkeResourceId: 233, coreLevel: 1),
       );
@@ -54,7 +54,7 @@ void main() async {
     });
 
     test('Rosanna: Chic Ocean resourceId 283', () {
-      final simulation = BattleSimulationData(
+      final simulation = BattleSimulation(
         playerOptions: BattlePlayerOptions(
           personalRecycleLevel: 410,
           corpRecycleLevels: {Corporation.tetra: 217},
@@ -63,7 +63,7 @@ void main() async {
         nikkeOptions: [],
       );
 
-      final rosanna = BattleNikkeData(
+      final rosanna = BattleNikke(
         simulation: simulation,
         option: BattleNikkeOptions(nikkeResourceId: 283, coreLevel: 5, syncLevel: 866, attractLevel: 29),
       );
@@ -74,7 +74,7 @@ void main() async {
     });
 
     test('Mica: Snow Buddy resourceId 62', () {
-      final simulation = BattleSimulationData(
+      final simulation = BattleSimulation(
         playerOptions: BattlePlayerOptions(
           personalRecycleLevel: 410,
           corpRecycleLevels: {Corporation.tetra: 217},
@@ -83,7 +83,7 @@ void main() async {
         nikkeOptions: [],
       );
 
-      final mica = BattleNikkeData(
+      final mica = BattleNikke(
         simulation: simulation,
         option: BattleNikkeOptions(nikkeResourceId: 62, coreLevel: 9, syncLevel: 866, attractLevel: 22),
       );

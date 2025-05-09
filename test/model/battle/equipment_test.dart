@@ -11,7 +11,7 @@ void main() async {
 
   group('Equipment Stat Calculation Test', () {
     test('Attacker Head piece t10 lv5', () {
-      final equip = BattleEquipmentData(
+      final equip = BattleEquipment(
         equipData: gameData.groupedEquipTable[EquipType.head]![NikkeClass.attacker]![EquipRarity.t10]!,
         corporation: Corporation.none,
         level: 5,
@@ -22,7 +22,7 @@ void main() async {
     });
 
     test('Support leg piece t9 lv5', () {
-      final equip = BattleEquipmentData(
+      final equip = BattleEquipment(
         equipData: gameData.groupedEquipTable[EquipType.leg]![NikkeClass.supporter]![EquipRarity.t9]!,
         corporation: Corporation.tetra,
         level: 5,

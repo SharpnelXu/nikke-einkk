@@ -2,18 +2,22 @@ import 'dart:math';
 
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/battle_skill.dart';
+import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/equipment.dart';
+import 'package:nikke_einkk/model/battle/function.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/skills.dart';
 
 class BattleNikkeOptions {
   int nikkeResourceId;
   int coreLevel;
   int syncLevel;
   int attractLevel;
-  List<BattleEquipmentData> equips;
+  List<BattleEquipment> equips;
   List<int> skillLevels;
   // cube
   // doll
@@ -24,69 +28,15 @@ class BattleNikkeOptions {
     this.syncLevel = 1,
     this.attractLevel = 1,
     this.equips = const [],
-    this.skillLevels = const [],
+    this.skillLevels = const [10, 10, 10],
   });
 }
 
 enum BattleNikkeStatus { behindCover, reloading, forceReloading, shooting }
 
-class BattleNikkeData {
-  BattleSimulationData simulation;
+class BattleNikke {
+  BattleSimulation simulation;
   BattleNikkeOptions option;
-
-  int position = 0;
-  int currentHp = 0;
-  int currentAmmo = 0;
-
-  int get startAccuracyCircleScale => currentWeaponData.startAccuracyCircleScale;
-  int get endAccuracyCircleScale => currentWeaponData.endAccuracyCircleScale;
-  int _accuracyCircleScale = 0;
-  int get accuracyCircleScale => _accuracyCircleScale;
-  set accuracyCircleScale(int newScale) {
-    // just in case accuracy can actually get worse per shot
-    // int highScale;
-    // int lowScale;
-    // if (startAccuracyCircleScale > endAccuracyCircleScale) {
-    //   highScale = startAccuracyCircleScale;
-    //   lowScale = endAccuracyCircleScale;
-    // } else {
-    //   highScale = endAccuracyCircleScale;
-    //   lowScale = startAccuracyCircleScale;
-    // }
-    _accuracyCircleScale = newScale.clamp(endAccuracyCircleScale, startAccuracyCircleScale);
-  }
-
-  int _rateOfFire = 0;
-
-  int get rateOfFire => _rateOfFire;
-
-  set rateOfFire(int value) {
-    _rateOfFire = value.clamp(currentWeaponData.rateOfFire, currentWeaponData.endRateOfFire);
-  }
-
-  int fullReloadFrameCount = 0;
-  int get framesToFullCharge => BattleUtils.timeDataToFrame(currentWeaponData.chargeTime, fps);
-  // these start with 0 (+= 1 each frame)
-  int reloadingFrameCount = 0; // reason for += 1: fullReloadFrameCount is calculated as max at first reload frame
-  int chargeFrames = 0;
-
-  // TODO: min value 0?
-  // these starts with max (-= 1 each frame)
-  int spotFirstDelayFrameCount = 0;
-  int spotLastDelayFrameCount = 0; // after charge attack force back to cover
-  int shootingFrameCount = 0;
-
-  BattleNikkeStatus status = BattleNikkeStatus.behindCover;
-
-  // unclear if this can be a simple get or has to be a proper method call that requires battleSimulationData
-  int get maxAmmo => max(1, baseWeaponData.maxAmmo);
-  WeaponType get currentWeaponType => baseWeaponData.weaponType;
-  WeaponSkillData get currentWeaponData => baseWeaponData;
-
-  // coverBaseHp
-  // coverCurrentHp
-
-  BattleNikkeData({required this.simulation, required this.option});
 
   int get fps => simulation.fps;
 
@@ -135,6 +85,54 @@ class BattleNikkeData {
     equipStat: option.equips.fold(0, (sum, equip) => sum + equip.getStat(StatType.defence, corporation)),
   );
 
+  int position = 0;
+  int currentHp = 0;
+  // coverBaseHp
+  // coverCurrentHp
+  int currentAmmo = 0;
+
+  // unclear if this can be a simple get or has to be a proper method call that requires battleSimulationData
+  int get maxAmmo => max(1, baseWeaponData.maxAmmo);
+  WeaponType get currentWeaponType => baseWeaponData.weaponType;
+  WeaponSkillData get currentWeaponData => baseWeaponData;
+
+  // TODO: this encapsulates ranges so don't need to clamp on every change, but it's boiler plate ish
+  // a lot of frame counters have min value 0,
+  int _accuracyCircleScale = 0;
+  int get accuracyCircleScale => _accuracyCircleScale;
+  set accuracyCircleScale(int newScale) =>
+      _accuracyCircleScale = newScale.clamp(
+        currentWeaponData.endAccuracyCircleScale,
+        currentWeaponData.startAccuracyCircleScale,
+      );
+
+  int _rateOfFire = 0;
+  int get rateOfFire => _rateOfFire;
+  set rateOfFire(int value) => _rateOfFire = value.clamp(currentWeaponData.rateOfFire, currentWeaponData.endRateOfFire);
+
+  int fullReloadFrameCount = 0;
+  int get framesToFullCharge => BattleUtils.timeDataToFrame(currentWeaponData.chargeTime, fps);
+
+  // these start with 0 (+= 1 each frame)
+  int reloadingFrameCount = 0; // reason for += 1: fullReloadFrameCount is calculated as max at first reload frame
+  int chargeFrames = 0;
+
+  // TODO: min value 0?
+  // these starts with max (-= 1 each frame)
+  int spotFirstDelayFrameCount = 0;
+  int spotLastDelayFrameCount = 0; // after charge attack force back to cover
+  int shootingFrameCount = 0;
+
+  int totalBulletsFired = 0;
+
+  BattleNikkeStatus status = BattleNikkeStatus.behindCover;
+
+  List<BattleSkill> skills = [];
+  List<BattleFunction> functions = [];
+  List<BattleBuff> buffs = [];
+
+  BattleNikke({required this.simulation, required this.option});
+
   // CharacterStatTable[statEnhanceId = groupId][lv] to get baseStat
   // CharacterStateEnhanceTable[statEnhanceId = id] to get gradeEnhanceStat
   // grade is [1, 4]
@@ -169,7 +167,7 @@ class BattleNikkeData {
   void init(int position) {
     this.position = position;
     currentHp = baseHp;
-    currentAmmo = baseWeaponData.maxAmmo;
+    currentAmmo = maxAmmo;
     accuracyCircleScale = baseWeaponData.startAccuracyCircleScale;
     rateOfFire = baseWeaponData.rateOfFire;
     chargeFrames = 0;
@@ -178,6 +176,19 @@ class BattleNikkeData {
     spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(baseWeaponData.spotFirstDelay, fps);
     reloadingFrameCount = 0;
     fullReloadFrameCount = 0;
+
+    totalBulletsFired = 0;
+    functions.clear();
+    buffs.clear();
+    skills.clear();
+
+    skills.add(BattleSkill(characterData.skill1Id, characterData.skill1Table, option.skillLevels[0], false));
+    skills.add(BattleSkill(characterData.skill2Id, characterData.skill2Table, option.skillLevels[1], false));
+    skills.add(BattleSkill(characterData.ultiSkillId, SkillType.characterSkill, option.skillLevels[2], true));
+
+    for (final skill in skills) {
+      skill.init(simulation, this);
+    }
   }
 
   void normalAction() {
@@ -225,16 +236,19 @@ class BattleNikkeData {
     if (reloadingFrameCount == 0) {
       // this means this is the first frame of reloading
       // need to calculate how many frames needed to do one reload
-      // TODO: reloading buffs is % of currentWeaponData.reloadTime
-      fullReloadFrameCount = BattleUtils.timeDataToFrame(
-        currentWeaponData.reloadTime + currentWeaponData.spotLastDelay,
-        fps,
-      );
+      num baseReloadTimeData = currentWeaponData.reloadTime + currentWeaponData.spotLastDelay;
+      // if (position == 1) {
+      //   final savedTimeData = currentWeaponData.reloadTime * BattleUtils.toModifier(2969);
+      //   baseReloadTimeData -= savedTimeData;
+      // }
+
+      fullReloadFrameCount = BattleUtils.timeDataToFrame(baseReloadTimeData, fps);
+
       simulation.registerEvent(
         simulation.currentFrame,
         NikkeReloadStartEvent(
           name: name,
-          reloadTimeData: currentWeaponData.reloadTime + currentWeaponData.spotLastDelay,
+          reloadTimeData: baseReloadTimeData,
           reloadFrames: fullReloadFrameCount,
           ownerPosition: position,
         ),
@@ -282,8 +296,11 @@ class BattleNikkeData {
           return;
         }
 
-        // ready to fire a bullet, register fire
-        currentAmmo -= 1;
+        // if (totalBulletsFired % 10 == 0 && position == 2) {
+        //   currentAmmo += 3;
+        //   currentAmmo = min(maxAmmo, currentAmmo);
+        // }
+
         simulation.registerEvent(
           simulation.currentFrame,
           NikkeFireEvent(name: name, currentAmmo: currentAmmo, maxAmmo: maxAmmo, ownerPosition: position),
@@ -291,7 +308,7 @@ class BattleNikkeData {
         if (currentWeaponData.fireType == FireType.instant) {
           simulation.registerEvent(
             simulation.currentFrame,
-            NikkeDamageEvent(nikke: this, rapture: target, type: NikkeDamageType.bullet),
+            NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
           );
         }
 
@@ -314,19 +331,13 @@ class BattleNikkeData {
           return;
         }
 
-        // ready to fire a bullet, register fire
-        // TODO: for A2 & SBS ammo is deducted at fire (determined by uptype_fire_timing)
-        currentAmmo -= 1;
+        // TODO: move to attackDoneEvent (end of fire animation) for A2 & SBS (end of uptype_fire_timing)
         chargeFrames = 0;
-        simulation.registerEvent(
-          simulation.currentFrame,
-          NikkeFireEvent(name: name, currentAmmo: currentAmmo, maxAmmo: maxAmmo, ownerPosition: position),
-        );
 
         if (currentWeaponData.fireType == FireType.instant) {
           simulation.registerEvent(
             simulation.currentFrame,
-            NikkeDamageEvent(nikke: this, rapture: target, type: NikkeDamageType.bullet),
+            NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
           );
         } else if ([
           FireType.homingProjectile,
@@ -337,17 +348,25 @@ class BattleNikkeData {
             currentWeaponData.maintainFireStance * BattleUtils.toModifier(currentWeaponData.upTypeFireTiming),
             fps,
           );
+
+          final fireFrame = simulation.currentFrame - projectileCreateFrame.round();
+          if (fireFrame > 0) {
+            simulation.registerEvent(
+              fireFrame,
+              NikkeFireEvent(name: name, currentAmmo: currentAmmo, maxAmmo: maxAmmo, ownerPosition: position),
+            );
+          }
+
           // wild guess here
           final projectileTravelFrame = target.distance * 100 / currentWeaponData.spotProjectileSpeed;
           // + 1 since this is the first frame and frame counts down
-          final int damageFrame =
-              simulation.currentFrame + 1 - projectileTravelFrame.round() - max(projectileCreateFrame.round(), 1);
+          final damageFrame = fireFrame - projectileTravelFrame.round();
 
           if (damageFrame > 0) {
             // TODO: fill in defender buffs on hit rather now
             simulation.registerEvent(
               damageFrame,
-              NikkeDamageEvent(nikke: this, rapture: target, type: NikkeDamageType.bullet),
+              NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
             );
           }
         }
@@ -407,8 +426,37 @@ class BattleNikkeData {
     return distance >= characterData.bonusRangeMin && distance <= characterData.bonusRangeMax;
   }
 
-  bool canTarget(BattleRaptureData rapture) {
+  bool canTarget(BattleRapture rapture) {
     return rapture.canBeTargeted ||
         currentWeaponData.preferTargetCondition == PreferTargetCondition.includeNoneTargetNone;
+  }
+
+  void broadcast(BattleEvent event, BattleSimulation simulation) {
+    if (event is NikkeFireEvent && event.ownerPosition == position) {
+      currentAmmo -= 1;
+      totalBulletsFired += 1;
+    }
+
+    for (final function in functions) {
+      function.broadcast(event, simulation);
+    }
+  }
+
+  // maybe change to a dedicated return structure to show which nikke gives which buffs
+  int getAttackBuffValues(BattleSimulation simulation) {
+    int result = 0;
+    for (final buff in buffs) {
+      if (buff.data.functionType != FunctionType.statAtk || !buff.isActive(simulation)) continue;
+
+      if (buff.data.functionValueType == ValueType.percent) {
+        final percent = BattleUtils.toModifier(buff.data.functionValue);
+        final standard = buff.getFunctionStandardTarget(simulation);
+        if (standard != null) {
+          result += (standard.baseAttack * percent).round() * buff.count;
+        }
+      } // only one non nikke function has other functionValueType (integer)
+    }
+
+    return result;
   }
 }

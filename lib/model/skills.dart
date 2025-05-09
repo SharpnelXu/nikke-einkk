@@ -7,7 +7,7 @@ part '../generated/model/skills.g.dart';
 // "skillType": "{SetBuff, InstantNumber, InstantArea, InstallBarrier, InstantAll, InstantCircle, InstallDecoy,
 // ChangeWeapon, LaunchWeapon, LaserBeam, Stigma, InstantCircleSeparate, HitMonsterGetBuff, ExplosiveCircuit, InstantSequentialAttack}"
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum SkillType {
+enum CharacterSkillType {
   setBuff,
   instantAll,
   instantArea,
@@ -65,7 +65,7 @@ class SkillData {
   @JsonKey(name: 'prefer_target_condition')
   final PreferTargetCondition preferTargetCondition;
   @JsonKey(name: 'skill_type')
-  final SkillType skillType;
+  final CharacterSkillType skillType;
   @JsonKey(name: 'skill_value_data')
   final List<SkillValueData> skillValueData;
   @JsonKey(name: 'duration_type')
@@ -93,7 +93,7 @@ class SkillData {
     this.counterType = '',
     this.preferTarget = PreferTarget.unknown,
     this.preferTargetCondition = PreferTargetCondition.unknown,
-    this.skillType = SkillType.unknown,
+    this.skillType = CharacterSkillType.unknown,
     this.skillValueData = const [],
     this.durationType = DurationType.unknown,
     this.durationValue = 0,
@@ -122,11 +122,14 @@ class SkillFunction {
   Map<String, dynamic> toJson() => _$SkillFunctionToJson(this);
 }
 
+// State Effects directly call functions, probably add buffs?
 @JsonSerializable(explicitToJson: true)
 class StateEffectData {
   final int id;
+  // no state effects use this
   @JsonKey(name: 'use_function_id_list')
   final List<int> useFunctionIdList;
+  // no nikke state effects use this
   @JsonKey(name: 'hurt_function_id_list')
   final List<int> hurtFunctionIdList;
   final List<SkillFunction> functions;
@@ -441,7 +444,7 @@ enum StatusTriggerType {
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum KeepingType { unknown, on, off }
+enum FunctionStatus { on, off }
 
 @JsonSerializable(explicitToJson: true)
 class FunctionData {
@@ -451,6 +454,7 @@ class FunctionData {
   final int level;
   @JsonKey(name: 'name_localkey')
   final String nameLocalkey;
+  // equipment lines are BuffEtc
   final BuffType buff;
   @JsonKey(name: 'buff_remove')
   final BuffRemoveType buffRemove;
@@ -462,8 +466,14 @@ class FunctionData {
   final StandardType functionStandard;
   @JsonKey(name: 'function_value')
   final int functionValue;
+  // equipment lines have full_count 100, Grave S2 function 4 (stateEffect) has full_count 60
+  // this seems to be proc count on timing_trigger_type, e.g. Grave's S2 has full_count 30/60 for two funcs
+  // and those have OnHitNum for time_trigger_type
   @JsonKey(name: 'full_count')
   final int fullCount;
+  // from Grave S2, the buffs that get displayed have false, the misc counters have true
+  // need more research
+  // Phantom S1E2 is a displayed buff with is_cancel true
   @JsonKey(name: 'is_cancel')
   final bool isCancel;
   @JsonKey(name: 'delay_type')
@@ -478,6 +488,7 @@ class FunctionData {
   final int limitValue;
   @JsonKey(name: 'function_target')
   final FunctionTargetType functionTarget;
+  // might be possible that connected functions ignore this condition (from Phantom S1E2, which is linked to E1)
   @JsonKey(name: 'timing_trigger_type')
   final TimingTriggerType timingTriggerType;
   @JsonKey(name: 'timing_trigger_standard')
@@ -496,8 +507,9 @@ class FunctionData {
   final StandardType statusTrigger2Standard;
   @JsonKey(name: 'status_trigger2_value')
   final int statusTrigger2Value;
+  // best guess is whether to keep the function as on or off after trigger
   @JsonKey(name: 'keeping_type')
-  final KeepingType keepingType;
+  final FunctionStatus keepingType;
   @JsonKey(name: 'buff_icon')
   final String buffIcon;
 
@@ -583,7 +595,7 @@ class FunctionData {
     this.statusTrigger2Type = StatusTriggerType.unknown,
     this.statusTrigger2Standard = StandardType.unknown,
     this.statusTrigger2Value = 0,
-    this.keepingType = KeepingType.unknown,
+    this.keepingType = FunctionStatus.off,
     this.buffIcon = '',
     this.shotFxListType = '',
     this.fxPrefab01 = '',

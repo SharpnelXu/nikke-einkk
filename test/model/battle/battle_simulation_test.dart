@@ -11,7 +11,7 @@ void main() async {
 
   group('Nikke Simulation Test', () {
     test('Scarlet resourceId 222', () {
-      final simulation = BattleSimulationData(
+      final simulation = BattleSimulation(
         playerOptions: BattlePlayerOptions(
           personalRecycleLevel: 400,
           corpRecycleLevels: {Corporation.pilgrim: 400},
@@ -20,7 +20,7 @@ void main() async {
         nikkeOptions: [BattleNikkeOptions(nikkeResourceId: 222, coreLevel: 11, syncLevel: 901, attractLevel: 40)],
       );
 
-      simulation.raptures.add(BattleRaptureData());
+      simulation.raptures.add(BattleRapture());
       simulation.maxSeconds = 30;
       simulation.simulate();
 

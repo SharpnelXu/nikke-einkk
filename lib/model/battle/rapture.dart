@@ -1,6 +1,6 @@
 import 'package:nikke_einkk/model/common.dart';
 
-class BattleRaptureData {
+class BattleRapture {
   bool canBeTargeted = true;
 
   int defence = 0;

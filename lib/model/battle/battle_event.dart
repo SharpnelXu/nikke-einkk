@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
@@ -9,6 +10,8 @@ import 'nikke.dart';
 
 abstract class BattleEvent {
   Widget buildDisplay();
+
+  int getUserPosition();
 }
 
 // or replace these with an enum type if no real use case
@@ -24,11 +27,16 @@ class NikkeFireEvent implements BattleEvent {
   buildDisplay() {
     return Text('$name (Pos $ownerPosition) attack (Ammo: $currentAmmo/$maxAmmo)');
   }
+
+  @override
+  int getUserPosition() {
+    return ownerPosition;
+  }
 }
 
 class NikkeReloadStartEvent implements BattleEvent {
   String name;
-  int reloadTimeData;
+  num reloadTimeData;
   int reloadFrames;
   int ownerPosition; // this is basically uniqueId
 
@@ -38,6 +46,11 @@ class NikkeReloadStartEvent implements BattleEvent {
     required this.reloadFrames,
     required this.ownerPosition,
   });
+
+  @override
+  int getUserPosition() {
+    return ownerPosition;
+  }
 
   @override
   Widget buildDisplay() {
@@ -58,7 +71,12 @@ class NikkeDamageEvent implements BattleEvent {
 
   late NikkeDamageParameter damageParameter;
 
-  NikkeDamageEvent({required BattleNikkeData nikke, required BattleRaptureData rapture, required this.type}) {
+  NikkeDamageEvent({
+    required BattleSimulation simulation,
+    required BattleNikke nikke,
+    required BattleRapture rapture,
+    required this.type,
+  }) {
     name = nikke.name;
     attackerPosition = nikke.position;
     targetUniqueId = rapture.uniqueId;
@@ -68,6 +86,7 @@ class NikkeDamageEvent implements BattleEvent {
     // TODO: fill in other buff params
     damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
+      attackBuff: nikke.getAttackBuffValues(simulation),
       defence: rapture.defence,
       damageRate: nikke.currentWeaponData.damage,
       coreHitRate: calculateCoreHitRate(nikke, rapture),
@@ -82,11 +101,16 @@ class NikkeDamageEvent implements BattleEvent {
     );
   }
 
-  int calculateCoreHitRate(BattleNikkeData nikke, BattleRaptureData rapture) {
+  int calculateCoreHitRate(BattleNikke nikke, BattleRapture rapture) {
     if (nikke.currentWeaponType == WeaponType.sr || nikke.currentWeaponType == WeaponType.rl) return 10000;
 
     // just a wild guess for now
     return (50 * rapture.coreSize / max(1, nikke.accuracyCircleScale * rapture.distance) * 10000).round();
+  }
+
+  @override
+  int getUserPosition() {
+    return attackerPosition;
   }
 
   @override

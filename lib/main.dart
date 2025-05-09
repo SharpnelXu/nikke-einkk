@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final simulation = BattleSimulationData(
+    final simulation = BattleSimulation(
       playerOptions: BattlePlayerOptions(
         personalRecycleLevel: 400,
         corpRecycleLevels: {
@@ -32,14 +32,17 @@ class MyApp extends StatelessWidget {
         classRecycleLevels: {NikkeClass.attacker: 400, NikkeClass.supporter: 400, NikkeClass.defender: 400},
       ),
       nikkeOptions: [
-        BattleNikkeOptions(nikkeResourceId: 194, coreLevel: 11, syncLevel: 901, attractLevel: 30),
-        BattleNikkeOptions(nikkeResourceId: 313, coreLevel: 11, syncLevel: 901, attractLevel: 30),
-        BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30),
-        BattleNikkeOptions(nikkeResourceId: 225, coreLevel: 11, syncLevel: 901, attractLevel: 40),
+        // BattleNikkeOptions(nikkeResourceId: 810, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+        // BattleNikkeOptions(nikkeResourceId: 810, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+        // BattleNikkeOptions(nikkeResourceId: 194, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+        // BattleNikkeOptions(nikkeResourceId: 313, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+        // BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+        // BattleNikkeOptions(nikkeResourceId: 225, coreLevel: 11, syncLevel: 901, attractLevel: 40),
+        BattleNikkeOptions(nikkeResourceId: 222, coreLevel: 11, syncLevel: 901, attractLevel: 40),
       ],
     );
 
-    simulation.raptures.add(BattleRaptureData());
+    simulation.raptures.add(BattleRapture());
 
     return MaterialApp(
       title: 'Flutter Demo',

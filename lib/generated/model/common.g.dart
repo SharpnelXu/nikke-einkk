@@ -31,9 +31,9 @@ NikkeCharacterData _$NikkeCharacterDataFromJson(Map<String, dynamic> json) => Ni
   burstDuration: (json['burst_duration'] as num?)?.toInt() ?? 0,
   ultiSkillId: (json['ulti_skill_id'] as num?)?.toInt() ?? 0,
   skill1Id: (json['skill1_id'] as num?)?.toInt() ?? 0,
-  skill1Table: $enumDecodeNullable(_$SkillTableTypeEnumMap, json['skill1_table']) ?? SkillTableType.unknown,
+  skill1Table: $enumDecodeNullable(_$SkillTypeEnumMap, json['skill1_table']) ?? SkillType.unknown,
   skill2Id: (json['skill2_id'] as num?)?.toInt() ?? 0,
-  skill2Table: $enumDecodeNullable(_$SkillTableTypeEnumMap, json['skill2_table']) ?? SkillTableType.unknown,
+  skill2Table: $enumDecodeNullable(_$SkillTypeEnumMap, json['skill2_table']) ?? SkillType.unknown,
   effCategoryType: json['eff_category_type'] as String? ?? '',
   effCategoryValue: (json['eff_category_value'] as num?)?.toInt() ?? 0,
   categoryType1: json['category_type_1'] as String? ?? '',
@@ -75,9 +75,9 @@ Map<String, dynamic> _$NikkeCharacterDataToJson(NikkeCharacterData instance) => 
   'burst_duration': instance.burstDuration,
   'ulti_skill_id': instance.ultiSkillId,
   'skill1_id': instance.skill1Id,
-  'skill1_table': _$SkillTableTypeEnumMap[instance.skill1Table]!,
+  'skill1_table': _$SkillTypeEnumMap[instance.skill1Table]!,
   'skill2_id': instance.skill2Id,
-  'skill2_table': _$SkillTableTypeEnumMap[instance.skill2Table]!,
+  'skill2_table': _$SkillTypeEnumMap[instance.skill2Table]!,
   'eff_category_type': instance.effCategoryType,
   'eff_category_value': instance.effCategoryValue,
   'category_type_1': instance.categoryType1,
@@ -112,11 +112,11 @@ const _$BurstStepEnumMap = {
   BurstStep.none: 'None',
 };
 
-const _$SkillTableTypeEnumMap = {
-  SkillTableType.none: 'None',
-  SkillTableType.stateEffect: 'StateEffect',
-  SkillTableType.characterSkill: 'CharacterSkill',
-  SkillTableType.unknown: 'Unknown',
+const _$SkillTypeEnumMap = {
+  SkillType.none: 'None',
+  SkillType.stateEffect: 'StateEffect',
+  SkillType.characterSkill: 'CharacterSkill',
+  SkillType.unknown: 'Unknown',
 };
 
 const _$CorporationEnumMap = {

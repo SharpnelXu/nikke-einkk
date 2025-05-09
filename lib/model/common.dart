@@ -124,14 +124,14 @@ class NikkeCharacterData {
   // value is "StateEffect", so use `skill1Id` and search in StateEffectTable
   // also has value "CharacterSkill", so search in CharacterSkillTable
   @JsonKey(name: 'skill1_table')
-  final SkillTableType skill1Table;
+  final SkillType skill1Table;
   // CharacterSkillTable
   @JsonKey(name: 'skill2_id')
   final int skill2Id;
   // value is "StateEffect", so use `skill2Id` and search in StateEffectTable
   // also has value "CharacterSkill", so search in CharacterSkillTable
   @JsonKey(name: 'skill2_table')
-  final SkillTableType skill2Table;
+  final SkillType skill2Table;
   // doesn't know what this means
   @JsonKey(name: 'eff_category_type')
   final String effCategoryType;
@@ -189,9 +189,9 @@ class NikkeCharacterData {
     this.burstDuration = 0,
     this.ultiSkillId = 0,
     this.skill1Id = 0,
-    this.skill1Table = SkillTableType.unknown,
+    this.skill1Table = SkillType.unknown,
     this.skill2Id = 0,
-    this.skill2Table = SkillTableType.unknown,
+    this.skill2Table = SkillType.unknown,
     this.effCategoryType = '',
     this.effCategoryValue = 0,
     this.categoryType1 = '',
@@ -826,4 +826,4 @@ enum InputType {
 enum AttackType { fire, water, electronic, iron, wind, energy, bio, metal, unknown }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum SkillTableType { none, stateEffect, characterSkill, unknown }
+enum SkillType { none, stateEffect, characterSkill, unknown }

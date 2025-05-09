@@ -32,7 +32,7 @@ SkillData _$SkillDataFromJson(Map<String, dynamic> json) => SkillData(
   preferTargetCondition:
       $enumDecodeNullable(_$PreferTargetConditionEnumMap, json['prefer_target_condition']) ??
       PreferTargetCondition.unknown,
-  skillType: $enumDecodeNullable(_$SkillTypeEnumMap, json['skill_type']) ?? SkillType.unknown,
+  skillType: $enumDecodeNullable(_$CharacterSkillTypeEnumMap, json['skill_type']) ?? CharacterSkillType.unknown,
   skillValueData:
       (json['skill_value_data'] as List<dynamic>?)
           ?.map((e) => SkillValueData.fromJson(e as Map<String, dynamic>))
@@ -60,7 +60,7 @@ Map<String, dynamic> _$SkillDataToJson(SkillData instance) => <String, dynamic>{
   'counter_type': instance.counterType,
   'prefer_target': _$PreferTargetEnumMap[instance.preferTarget]!,
   'prefer_target_condition': _$PreferTargetConditionEnumMap[instance.preferTargetCondition]!,
-  'skill_type': _$SkillTypeEnumMap[instance.skillType]!,
+  'skill_type': _$CharacterSkillTypeEnumMap[instance.skillType]!,
   'skill_value_data': instance.skillValueData.map((e) => e.toJson()).toList(),
   'duration_type': _$DurationTypeEnumMap[instance.durationType]!,
   'duration_value': instance.durationValue,
@@ -129,23 +129,23 @@ const _$PreferTargetConditionEnumMap = {
   PreferTargetCondition.onlyAR: 'OnlyAR',
 };
 
-const _$SkillTypeEnumMap = {
-  SkillType.setBuff: 'SetBuff',
-  SkillType.instantAll: 'InstantAll',
-  SkillType.instantArea: 'InstantArea',
-  SkillType.instantCircle: 'InstantCircle',
-  SkillType.instantCircleSeparate: 'InstantCircleSeparate',
-  SkillType.instantNumber: 'InstantNumber',
-  SkillType.instantSequentialAttack: 'InstantSequentialAttack',
-  SkillType.installBarrier: 'InstallBarrier',
-  SkillType.installDecoy: 'InstallDecoy',
-  SkillType.changeWeapon: 'ChangeWeapon',
-  SkillType.launchWeapon: 'LaunchWeapon',
-  SkillType.laserBeam: 'LaserBeam',
-  SkillType.explosiveCircuit: 'ExplosiveCircuit',
-  SkillType.stigma: 'Stigma',
-  SkillType.hitMonsterGetBuff: 'HitMonsterGetBuff',
-  SkillType.unknown: 'Unknown',
+const _$CharacterSkillTypeEnumMap = {
+  CharacterSkillType.setBuff: 'SetBuff',
+  CharacterSkillType.instantAll: 'InstantAll',
+  CharacterSkillType.instantArea: 'InstantArea',
+  CharacterSkillType.instantCircle: 'InstantCircle',
+  CharacterSkillType.instantCircleSeparate: 'InstantCircleSeparate',
+  CharacterSkillType.instantNumber: 'InstantNumber',
+  CharacterSkillType.instantSequentialAttack: 'InstantSequentialAttack',
+  CharacterSkillType.installBarrier: 'InstallBarrier',
+  CharacterSkillType.installDecoy: 'InstallDecoy',
+  CharacterSkillType.changeWeapon: 'ChangeWeapon',
+  CharacterSkillType.launchWeapon: 'LaunchWeapon',
+  CharacterSkillType.laserBeam: 'LaserBeam',
+  CharacterSkillType.explosiveCircuit: 'ExplosiveCircuit',
+  CharacterSkillType.stigma: 'Stigma',
+  CharacterSkillType.hitMonsterGetBuff: 'HitMonsterGetBuff',
+  CharacterSkillType.unknown: 'Unknown',
 };
 
 const _$DurationTypeEnumMap = {
@@ -218,7 +218,7 @@ FunctionData _$FunctionDataFromJson(Map<String, dynamic> json) => FunctionData(
   statusTrigger2Standard:
       $enumDecodeNullable(_$StandardTypeEnumMap, json['status_trigger2_standard']) ?? StandardType.unknown,
   statusTrigger2Value: (json['status_trigger2_value'] as num?)?.toInt() ?? 0,
-  keepingType: $enumDecodeNullable(_$KeepingTypeEnumMap, json['keeping_type']) ?? KeepingType.unknown,
+  keepingType: $enumDecodeNullable(_$FunctionStatusEnumMap, json['keeping_type']) ?? FunctionStatus.off,
   buffIcon: json['buff_icon'] as String? ?? '',
   shotFxListType: json['shot_fx_list_type'] as String? ?? '',
   fxPrefab01: json['fx_prefab_01'] as String? ?? '',
@@ -274,7 +274,7 @@ Map<String, dynamic> _$FunctionDataToJson(FunctionData instance) => <String, dyn
   'status_trigger2_type': _$StatusTriggerTypeEnumMap[instance.statusTrigger2Type]!,
   'status_trigger2_standard': _$StandardTypeEnumMap[instance.statusTrigger2Standard]!,
   'status_trigger2_value': instance.statusTrigger2Value,
-  'keeping_type': _$KeepingTypeEnumMap[instance.keepingType]!,
+  'keeping_type': _$FunctionStatusEnumMap[instance.keepingType]!,
   'buff_icon': instance.buffIcon,
   'shot_fx_list_type': instance.shotFxListType,
   'fx_prefab_01': instance.fxPrefab01,
@@ -601,4 +601,4 @@ const _$StatusTriggerTypeEnumMap = {
   StatusTriggerType.isWeaponType: 'IsWeaponType',
 };
 
-const _$KeepingTypeEnumMap = {KeepingType.unknown: 'Unknown', KeepingType.on: 'On', KeepingType.off: 'Off'};
+const _$FunctionStatusEnumMap = {FunctionStatus.on: 'On', FunctionStatus.off: 'Off'};

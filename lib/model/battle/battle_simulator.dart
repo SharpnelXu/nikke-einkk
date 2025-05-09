@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
@@ -33,11 +34,11 @@ class BattlePlayerOptions {
   }
 }
 
-class BattleSimulationData {
+class BattleSimulation {
   BattlePlayerOptions playerOptions;
 
-  List<BattleNikkeData> nikkes = [];
-  List<BattleRaptureData> raptures = [];
+  List<BattleNikke> nikkes = [];
+  List<BattleRapture> raptures = [];
   // timeline
   SplayTreeMap<int, List<BattleEvent>> timeline = SplayTreeMap((a, b) => b.compareTo(a));
   late int currentFrame;
@@ -54,8 +55,8 @@ class BattleSimulationData {
   bool fullBurst = false;
   int currentNikke = 3;
 
-  BattleSimulationData({required this.playerOptions, required List<BattleNikkeOptions?> nikkeOptions}) {
-    nikkes.addAll(nikkeOptions.nonNulls.map((option) => BattleNikkeData(simulation: this, option: option)));
+  BattleSimulation({required this.playerOptions, required List<BattleNikkeOptions?> nikkeOptions}) {
+    nikkes.addAll(nikkeOptions.nonNulls.map((option) => BattleNikke(simulation: this, option: option)));
   }
 
   void simulate() {
@@ -71,7 +72,18 @@ class BattleSimulationData {
       for (final nikke in nikkes) {
         nikke.normalAction();
       }
+
+      // broadcast all events registered for this frame
+      for (final event in timeline[currentFrame] ?? []) {
+        for (final nikke in nikkes) {
+          nikke.broadcast(event, this);
+        }
+      }
     }
+  }
+
+  BattleNikke? getNikkeOnPosition(int position) {
+    return nikkes.firstWhereOrNull((nikke) => nikke.position == position);
   }
 
   Map<int, int> getDamageMap() {

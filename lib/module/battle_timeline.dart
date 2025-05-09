@@ -3,7 +3,7 @@ import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 
 class BattleTimeline extends StatefulWidget {
-  final BattleSimulationData simulation;
+  final BattleSimulation simulation;
 
   const BattleTimeline({super.key, required this.simulation});
 
@@ -12,7 +12,7 @@ class BattleTimeline extends StatefulWidget {
 }
 
 class _BattleTimelineState extends State<BattleTimeline> {
-  BattleSimulationData get simulation => widget.simulation;
+  BattleSimulation get simulation => widget.simulation;
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +32,13 @@ class _BattleTimelineState extends State<BattleTimeline> {
                 child: Row(
                   spacing: 5,
                   children: [
-                    ...damageMap.keys.map(
-                      (pos) => Text(
-                        '${simulation.nikkes.firstWhere((nikke) => nikke.position == pos).name} '
-                        'DPS: ${damageMap[pos]! ~/ simulation.maxSeconds}',
-                      ),
-                    ),
+                    ...damageMap.keys.map((pos) {
+                      final nikke = simulation.nikkes.firstWhere((nikke) => nikke.position == pos);
+                      return Text(
+                        '${nikke.name} (Pos $pos) Total bullets: ${nikke.totalBulletsFired} '
+                        'DPS: ${damageMap[pos]! ~/ simulation.maxSeconds} )',
+                      );
+                    }),
                     FilledButton(
                       onPressed: () {
                         simulation.simulate();

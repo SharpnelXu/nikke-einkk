@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/items.dart';
 
-class BattleEquipmentData {
+class BattleEquipment {
   // equipment stat formula: baseStat * (100% + 10% * (level (0~5) + sameCorpFactor (3)))
   // t10 does not have corp label
   EquipmentItemData equipData;
@@ -24,7 +24,7 @@ class BattleEquipmentData {
 
   EquipRarity get rarity => equipData.itemRarity;
 
-  BattleEquipmentData({required this.equipData, Corporation corporation = Corporation.none, int level = 0})
+  BattleEquipment({required this.equipData, Corporation corporation = Corporation.none, int level = 0})
     : _level = level,
       _corporation = corporation {
     validateLevel(level);
