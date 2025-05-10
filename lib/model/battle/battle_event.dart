@@ -81,7 +81,11 @@ class NikkeDamageEvent implements BattleEvent {
     attackerPosition = nikke.position;
     targetUniqueId = rapture.uniqueId;
     weaponData = nikke.currentWeaponData;
-    chargePercent = nikke.framesToFullCharge > 0 ? (10000 * nikke.chargeFrames / nikke.framesToFullCharge).round() : 0;
+    chargePercent =
+        WeaponType.chargeWeaponTypes.contains(weaponData.weaponType)
+            ? (10000 * nikke.chargeFrames / nikke.getFramesToFullCharge(simulation)).round()
+            : 0;
+    chargePercent = chargePercent.clamp(0, 10000);
 
     // TODO: fill in other buff params
     damageParameter = NikkeDamageParameter(
@@ -91,14 +95,15 @@ class NikkeDamageEvent implements BattleEvent {
       damageRate: weaponData.damage,
       coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
       coreDamageRate: weaponData.coreDamageRate,
-      criticalRate: nikke.characterData.criticalRatio,
+      criticalRate: nikke.getCriticalRate(simulation),
       criticalDamageRate: nikke.characterData.criticalDamage,
+      criticalDamageBuff: nikke.getChargeDamageBuffValues(simulation),
       isBonusRange: nikke.isBonusRange(rapture.distance),
       isFullBurst: simulation.fullBurst,
       isStrongElement: nikke.element.strongAgainst(rapture.element),
       elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
       chargeDamageRate: weaponData.fullChargeDamage,
-      chargeDamageBuff: nikke.getChargeDamageBuffs(simulation),
+      chargeDamageBuff: nikke.getChargeDamageBuffValues(simulation),
       chargePercent: chargePercent,
     );
   }
@@ -149,7 +154,11 @@ class BurstGenerationEvent implements BattleEvent {
     weaponData = nikke.currentWeaponData;
     attackerPosition = nikke.position;
     targetUniqueId = rapture.uniqueId;
-    chargePercent = nikke.framesToFullCharge > 0 ? (10000 * nikke.chargeFrames / nikke.framesToFullCharge).round() : 0;
+    chargePercent =
+        WeaponType.chargeWeaponTypes.contains(weaponData.weaponType)
+            ? (10000 * nikke.chargeFrames / nikke.getFramesToFullCharge(simulation)).round()
+            : 0;
+    chargePercent = chargePercent.clamp(0, 10000);
     currentMeter = simulation.burstMeter;
     final bonusBurst =
         simulation.currentNikke == nikke.position &&

@@ -103,6 +103,10 @@ class BattleFunction {
       case FunctionType.statAmmoLoad:
       case FunctionType.statAtk:
       case FunctionType.statChargeDamage:
+      case FunctionType.statChargeTime:
+      case FunctionType.statCritical:
+      case FunctionType.statCriticalDamage:
+      case FunctionType.statDef:
         for (final nikke in functionTargets) {
           final existingBuff = nikke.buffs.firstWhereOrNull((buff) => buff.data.id == data.id);
           if (existingBuff != null) {
@@ -117,11 +121,6 @@ class BattleFunction {
         }
         status = data.keepingType;
         break;
-      case FunctionType.statChargeTime:
-      case FunctionType.statCritical:
-      case FunctionType.statCriticalDamage:
-      case FunctionType.statDef:
-      // ^^^ implement
       case FunctionType.unknown:
       case FunctionType.addDamage:
       case FunctionType.addIncElementDmgType:

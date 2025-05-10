@@ -110,7 +110,6 @@ class BattleNikke {
   set rateOfFire(int value) => _rateOfFire = value.clamp(currentWeaponData.rateOfFire, currentWeaponData.endRateOfFire);
 
   int fullReloadFrameCount = 0;
-  int get framesToFullCharge => BattleUtils.timeDataToFrame(currentWeaponData.chargeTime, fps);
 
   // these start with 0 (+= 1 each frame)
   int reloadingFrameCount = 0; // reason for += 1: fullReloadFrameCount is calculated as max at first reload frame
@@ -346,7 +345,7 @@ class BattleNikke {
         return;
       case WeaponType.rl:
       case WeaponType.sr:
-        if (chargeFrames < framesToFullCharge) {
+        if (chargeFrames < getFramesToFullCharge(simulation)) {
           chargeFrames += 1;
           return;
         }
@@ -529,13 +528,49 @@ class BattleNikke {
     );
   }
 
-  int getChargeDamageBuffs(BattleSimulation simulation) {
+  int getChargeDamageBuffValues(BattleSimulation simulation) {
     return getBuffValue(
       simulation,
       FunctionType.statChargeDamage,
       0,
       (nikke) => nikke.currentWeaponData.fullChargeDamage,
     );
+  }
+
+  int getFramesToFullCharge(BattleSimulation simulation) {
+    final result = getBuffValue(
+      simulation,
+      FunctionType.statChargeTime,
+      currentWeaponData.chargeTime,
+      (nikke) => nikke.currentWeaponData.chargeTime,
+    );
+    return max(1, BattleUtils.timeDataToFrame(result, fps));
+  }
+
+  int getCriticalRate(BattleSimulation simulation) {
+    int result = characterData.criticalRatio;
+    for (final buff in buffs) {
+      if (buff.data.functionType != FunctionType.statCritical || !buff.isActive(simulation)) continue;
+      // all valueType is integer
+      result += buff.data.functionValue * buff.count;
+    }
+
+    return result;
+  }
+
+  int getCriticalDamageBuffValues(BattleSimulation simulation) {
+    int result = 0;
+    for (final buff in buffs) {
+      if (buff.data.functionType != FunctionType.statCriticalDamage || !buff.isActive(simulation)) continue;
+      // all valueType is integer
+      result += buff.data.functionValue * buff.count;
+    }
+
+    return result;
+  }
+
+  int getDefenceBuffValues(BattleSimulation simulation) {
+    return getBuffValue(simulation, FunctionType.statDef, 0, (nikke) => nikke.baseDefence);
   }
 
   int getBuffValue(
