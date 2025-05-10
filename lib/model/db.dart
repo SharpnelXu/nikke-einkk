@@ -224,4 +224,8 @@ class NikkeDatabase {
 
     return null;
   }
+
+  EquipmentItemData? getEquipData(EquipType equipType, NikkeClass nikkeClass, EquipRarity rarity) {
+    return groupedEquipTable[equipType]?[nikkeClass]?[rarity];
+  }
 }

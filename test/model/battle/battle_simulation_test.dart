@@ -24,11 +24,11 @@ void main() async {
       simulation.maxSeconds = 30;
       simulation.simulate();
 
-      expect(simulation.timeline[1788]!.length, 2); //  first bullet
-      expect(simulation.timeline[1783]!.length, 2); //  second bullet
-      expect(simulation.timeline[1693]!.length, 2); //  last (20th) bullet
+      expect(simulation.timeline[1788]!.length, 3); //  first bullet (fire, damage, burstGen)
+      expect(simulation.timeline[1783]!.length, 3); //  second bullet
+      expect(simulation.timeline[1693]!.length, 3); //  last (20th) bullet
       expect(simulation.timeline[1692]!.length, 1); //  reload start
-      expect(simulation.timeline[1530]!.length, 2); //  first bullet of second magazine
+      expect(simulation.timeline[1530]!.length, 3); //  first bullet of second magazine
     });
   });
 }

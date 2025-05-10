@@ -128,3 +128,36 @@ enum EquipType {
   @JsonValue('Module_D')
   leg,
 }
+
+/// from EquipmentOptionTable.json
+enum EquipLineType {
+  none(0),
+  increaseElementalDamage(7000500),
+  startAccuracyCircle(7000600),
+  statAmmo(7000700),
+  statAtk(7000800),
+  statChargeDamage(7000900),
+  statChargeTime(7001000),
+  statCriticalDamage(7001100),
+  statCritical(7001200),
+  statDef(7001300);
+
+  final int stateEffectIdBase;
+
+  const EquipLineType(this.stateEffectIdBase);
+}
+
+class EquipLine {
+  EquipLineType type;
+  int _level;
+  int get level => _level;
+  set level(int newLevel) => _level = newLevel.clamp(1, 15);
+
+  EquipLine(this.type, this._level);
+
+  EquipLine.none() : type = EquipLineType.none, _level = 1;
+
+  int getStateEffectId() {
+    return type == EquipLineType.none ? 0 : type.stateEffectIdBase + level;
+  }
+}

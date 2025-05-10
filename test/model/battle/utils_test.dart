@@ -51,5 +51,25 @@ void main() async {
       expect(literHelmBlancBurstParam.calculateDamage(core: true), 906820);
       expect(literHelmBlancBurstParam.calculateDamage(core: true, critical: true), 1068752);
     });
+
+    test('Blanc ele damage', () {
+      final param = NikkeDamageParameter(
+        attack: (596416 * 1.1181).round(),
+        defence: 100,
+        damageRate: 1365,
+        coreDamageRate: 20000 + 567,
+        criticalDamageRate: 15000 + 1644,
+        elementDamageBuff: 2356 * 2,
+        isBonusRange: false,
+      );
+
+      expect(param.calculateDamage(), 91012);
+      expect(param.calculateDamage(core: true), 187184);
+      expect(param.calculateDamage(core: true, critical: true), 247652);
+
+      final eleParam = param.copy()..isStrongElement = true;
+      expect(eleParam.calculateDamage(), 142998);
+      expect(eleParam.calculateDamage(core: true), 294103);
+    });
   });
 }

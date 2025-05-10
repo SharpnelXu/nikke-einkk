@@ -10,12 +10,8 @@ void main() async {
 
   group('Nikke Stat Calculation Test', () {
     test('Dorothy resourceId 233', () {
-      final simulation = BattleSimulation(
-        playerOptions: BattlePlayerOptions(personalRecycleLevel: 0, corpRecycleLevels: {}, classRecycleLevels: {}),
-        nikkeOptions: [],
-      );
       final dorothy = BattleNikke(
-        simulation: simulation,
+        playerOptions: BattlePlayerOptions(personalRecycleLevel: 0, corpRecycleLevels: {}, classRecycleLevels: {}),
         option: BattleNikkeOptions(nikkeResourceId: 233, coreLevel: 1),
       );
 
@@ -43,9 +39,9 @@ void main() async {
       expect(dorothy.baseAttack, 590);
       expect(dorothy.baseDefence, 406);
 
-      simulation.playerOptions.personalRecycleLevel = 410;
-      simulation.playerOptions.corpRecycleLevels[Corporation.pilgrim] = 392;
-      simulation.playerOptions.classRecycleLevels[NikkeClass.supporter] = 187;
+      dorothy.playerOptions.personalRecycleLevel = 410;
+      dorothy.playerOptions.corpRecycleLevels[Corporation.pilgrim] = 392;
+      dorothy.playerOptions.classRecycleLevels[NikkeClass.supporter] = 187;
       dorothy.option.attractLevel = 40;
       dorothy.option.coreLevel = 5;
       expect(dorothy.baseHp, 416313);
@@ -54,17 +50,12 @@ void main() async {
     });
 
     test('Rosanna: Chic Ocean resourceId 283', () {
-      final simulation = BattleSimulation(
+      final rosanna = BattleNikke(
         playerOptions: BattlePlayerOptions(
           personalRecycleLevel: 410,
           corpRecycleLevels: {Corporation.tetra: 217},
           classRecycleLevels: {NikkeClass.supporter: 187},
         ),
-        nikkeOptions: [],
-      );
-
-      final rosanna = BattleNikke(
-        simulation: simulation,
         option: BattleNikkeOptions(nikkeResourceId: 283, coreLevel: 5, syncLevel: 866, attractLevel: 29),
       );
 
@@ -74,17 +65,12 @@ void main() async {
     });
 
     test('Mica: Snow Buddy resourceId 62', () {
-      final simulation = BattleSimulation(
+      final mica = BattleNikke(
         playerOptions: BattlePlayerOptions(
           personalRecycleLevel: 410,
           corpRecycleLevels: {Corporation.tetra: 217},
           classRecycleLevels: {NikkeClass.supporter: 187},
         ),
-        nikkeOptions: [],
-      );
-
-      final mica = BattleNikke(
-        simulation: simulation,
         option: BattleNikkeOptions(nikkeResourceId: 62, coreLevel: 9, syncLevel: 866, attractLevel: 22),
       );
 

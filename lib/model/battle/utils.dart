@@ -52,7 +52,6 @@ class NikkeDamageParameter {
   // full charge
   int chargeDamageRate = 10000;
   int chargeDamageBuff = 0;
-  int chargeDamageRateMultiplierIncrease = 0;
   int chargePercent = 10000;
 
   // add damage, parts, sustain, pierce
@@ -85,7 +84,6 @@ class NikkeDamageParameter {
     this.elementDamageBuff = 0,
     this.chargeDamageRate = 10000,
     this.chargeDamageBuff = 0,
-    this.chargeDamageRateMultiplierIncrease = 0,
     this.chargePercent = 0,
     this.addDamageBuff = 0,
     this.partDamageBuff = 0,
@@ -117,7 +115,6 @@ class NikkeDamageParameter {
         'elementDamageBuff: $elementDamageBuff, '
         'chargeDamageRate: $chargeDamageRate, '
         'chargeDamageBuff: $chargeDamageBuff, '
-        'chargeDamageRateMultiplierIncrease: $chargeDamageRateMultiplierIncrease, '
         'chargePercent: $chargePercent, '
         'addDamageBuff: $addDamageBuff, '
         'partDamageBuff: $partDamageBuff, '
@@ -149,7 +146,6 @@ class NikkeDamageParameter {
       elementDamageBuff: elementDamageBuff,
       chargeDamageRate: chargeDamageRate,
       chargeDamageBuff: chargeDamageBuff,
-      chargeDamageRateMultiplierIncrease: chargeDamageRateMultiplierIncrease,
       chargePercent: chargePercent,
       addDamageBuff: addDamageBuff,
       partDamageBuff: partDamageBuff,
@@ -197,8 +193,7 @@ class NikkeDamageParameter {
       isStrongElement ? BattleUtils.baseElementRate + elementDamageBuff : 10000,
     );
 
-    final chargeDamageExtraRate = BattleUtils.toModifier(chargeDamageRateMultiplierIncrease) * chargeDamageRate;
-    final fullChargeRate = chargeDamageRate + chargeDamageExtraRate.round() + chargeDamageBuff;
+    final fullChargeRate = chargeDamageRate + chargeDamageBuff;
     final actualCharge = (fullChargeRate - 10000) * BattleUtils.toModifier(chargePercent);
     final chargeRate = BattleUtils.toModifier(10000 + actualCharge.round());
 

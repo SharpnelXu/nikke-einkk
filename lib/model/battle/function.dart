@@ -17,16 +17,18 @@ class BattleFunction {
 
   void broadcast(BattleEvent event, BattleSimulation simulation) {
     // the idea is that all data necessary for processing this broadcast should be available in the event
+    final standard = getTriggerStandardTarget(event, simulation)!;
     switch (data.timingTriggerType) {
       case TimingTriggerType.onHitNum:
-        if (event is NikkeDamageEvent) {
-          final standard = getTimingTriggerStandardTarget(event, simulation);
-          if (standard == null) return;
+        if (event is! NikkeDamageEvent) return;
 
-          if (standard.totalBulletsHit > 0 && standard.totalBulletsHit % data.timingTriggerValue == 0) {
-            executeFunction(event, simulation, standard);
-          }
+        if (standard.totalBulletsHit > 0 && standard.totalBulletsHit % data.timingTriggerValue == 0) {
+          executeFunction(event, simulation, standard);
         }
+        break;
+      case TimingTriggerType.onStart:
+        if (event is! BattleStartEvent) return;
+        executeFunction(event, simulation, standard);
         break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
@@ -81,7 +83,6 @@ class BattleFunction {
       case TimingTriggerType.onSpawnMonster:
       case TimingTriggerType.onSpawnTarget:
       case TimingTriggerType.onSquadHurtRatio:
-      case TimingTriggerType.onStart:
       case TimingTriggerType.onSummonMonster:
       case TimingTriggerType.onTeamHpRatioUnder:
       case TimingTriggerType.onTeamHpRatioUp:
@@ -93,10 +94,15 @@ class BattleFunction {
     }
   }
 
-  void executeFunction(BattleEvent event, BattleSimulation simulation, BattleNikke activator) {
-    final functionTargets = getFunctionTargets(event, simulation, activator);
+  void executeFunction(BattleEvent event, BattleSimulation simulation, BattleNikke triggerTarget) {
+    final activator = simulation.getNikkeOnPosition(event.getUserPosition())!;
+    final functionTargets = getFunctionTargets(event, simulation);
     switch (data.functionType) {
+      case FunctionType.incElementDmg:
+      case FunctionType.statAccuracyCircle:
+      case FunctionType.statAmmoLoad:
       case FunctionType.statAtk:
+      case FunctionType.statChargeDamage:
         for (final nikke in functionTargets) {
           final existingBuff = nikke.buffs.firstWhereOrNull((buff) => buff.data.id == data.id);
           if (existingBuff != null) {
@@ -106,11 +112,16 @@ class BattleFunction {
                     : data.durationValue;
             existingBuff.count = min(existingBuff.count + 1, data.fullCount);
           } else {
-            nikke.buffs.add(BattleBuff(data, activator.position, nikke.position));
+            nikke.buffs.add(BattleBuff(data, activator.position, triggerTarget.position, nikke.position));
           }
         }
         status = data.keepingType;
         break;
+      case FunctionType.statChargeTime:
+      case FunctionType.statCritical:
+      case FunctionType.statCriticalDamage:
+      case FunctionType.statDef:
+      // ^^^ implement
       case FunctionType.unknown:
       case FunctionType.addDamage:
       case FunctionType.addIncElementDmgType:
@@ -203,7 +214,6 @@ class BattleFunction {
       case FunctionType.immortal:
       case FunctionType.incBarrierHp:
       case FunctionType.incBurstDuration:
-      case FunctionType.incElementDmg:
       case FunctionType.infection:
       case FunctionType.instantAllBurstDamage:
       case FunctionType.instantDeath:
@@ -229,18 +239,11 @@ class BattleFunction {
       case FunctionType.shareDamageIncrease:
       case FunctionType.silence:
       case FunctionType.singleBurstDamage:
-      case FunctionType.statAccuracyCircle:
       case FunctionType.statAmmo:
-      case FunctionType.statAmmoLoad:
       case FunctionType.statBioResist:
       case FunctionType.statBonusRangeMax:
       case FunctionType.statBurstSkillCoolTime:
-      case FunctionType.statChargeDamage:
-      case FunctionType.statChargeTime:
       case FunctionType.statChargeTimeImmune:
-      case FunctionType.statCritical:
-      case FunctionType.statCriticalDamage:
-      case FunctionType.statDef:
       case FunctionType.statEndRateOfFire:
       case FunctionType.statEnergyResist:
       case FunctionType.statExplosion:
@@ -272,7 +275,7 @@ class BattleFunction {
     }
   }
 
-  BattleNikke? getTimingTriggerStandardTarget(BattleEvent event, BattleSimulation simulation) {
+  BattleNikke? getTriggerStandardTarget(BattleEvent event, BattleSimulation simulation) {
     switch (data.timingTriggerStandard) {
       case StandardType.user:
         return simulation.getNikkeOnPosition(event.getUserPosition());
@@ -284,12 +287,12 @@ class BattleFunction {
     }
   }
 
-  List<BattleNikke> getFunctionTargets(BattleEvent event, BattleSimulation simulation, BattleNikke activator) {
+  List<BattleNikke> getFunctionTargets(BattleEvent event, BattleSimulation simulation) {
     switch (data.functionTarget) {
       case FunctionTargetType.allCharacter:
         return simulation.nikkes;
       case FunctionTargetType.self:
-        return [activator];
+        return [simulation.getNikkeOnPosition(event.getUserPosition())!];
       case FunctionTargetType.unknown:
       case FunctionTargetType.none:
       case FunctionTargetType.target:

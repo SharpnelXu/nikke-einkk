@@ -89,23 +89,26 @@ class NikkeDamageEvent implements BattleEvent {
       attackBuff: nikke.getAttackBuffValues(simulation),
       defence: rapture.defence,
       damageRate: weaponData.damage,
-      coreHitRate: calculateCoreHitRate(nikke, rapture),
+      coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
       coreDamageRate: weaponData.coreDamageRate,
       criticalRate: nikke.characterData.criticalRatio,
       criticalDamageRate: nikke.characterData.criticalDamage,
       isBonusRange: nikke.isBonusRange(rapture.distance),
       isFullBurst: simulation.fullBurst,
       isStrongElement: nikke.element.strongAgainst(rapture.element),
+      elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
       chargeDamageRate: weaponData.fullChargeDamage,
+      chargeDamageBuff: nikke.getChargeDamageBuffs(simulation),
       chargePercent: chargePercent,
     );
   }
 
-  int calculateCoreHitRate(BattleNikke nikke, BattleRapture rapture) {
+  int calculateCoreHitRate(BattleSimulation simulation, BattleNikke nikke, BattleRapture rapture) {
     if (WeaponType.chargeWeaponTypes.contains(weaponData.weaponType)) return 10000;
 
     // just a wild guess for now
-    return (50 * rapture.coreSize / max(1, nikke.accuracyCircleScale * rapture.distance) * 10000).round();
+    return (50 * rapture.coreSize / max(1, nikke.getAccuracyCircleScale(simulation) * rapture.distance) * 10000)
+        .round();
   }
 
   @override
@@ -176,5 +179,21 @@ class BurstGenerationEvent implements BattleEvent {
       ' (+${(burst / 10000).toStringAsFixed(4)}%)'
       '${positionBurstBonus > 10000 ? ' Bonus: ${(positionBurstBonus / 100).toStringAsFixed(2)}%' : ''}',
     );
+  }
+}
+
+class BattleStartEvent implements BattleEvent {
+  final int userPosition;
+
+  BattleStartEvent(this.userPosition);
+
+  @override
+  Widget buildDisplay() {
+    return Text('Battle Start');
+  }
+
+  @override
+  int getUserPosition() {
+    return userPosition;
   }
 }

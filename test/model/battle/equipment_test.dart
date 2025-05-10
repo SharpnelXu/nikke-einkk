@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/equipment.dart';
 import 'package:nikke_einkk/model/common.dart';
-import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 
 import '../../test_helper.dart';
@@ -12,7 +11,9 @@ void main() async {
   group('Equipment Stat Calculation Test', () {
     test('Attacker Head piece t10 lv5', () {
       final equip = BattleEquipment(
-        equipData: gameData.groupedEquipTable[EquipType.head]![NikkeClass.attacker]![EquipRarity.t10]!,
+        type: EquipType.head,
+        equipClass: NikkeClass.attacker,
+        rarity: EquipRarity.t10,
         corporation: Corporation.none,
         level: 5,
       );
@@ -23,7 +24,9 @@ void main() async {
 
     test('Support leg piece t9 lv5', () {
       final equip = BattleEquipment(
-        equipData: gameData.groupedEquipTable[EquipType.leg]![NikkeClass.supporter]![EquipRarity.t9]!,
+        type: EquipType.leg,
+        equipClass: NikkeClass.supporter,
+        rarity: EquipRarity.t9,
         corporation: Corporation.tetra,
         level: 5,
       );

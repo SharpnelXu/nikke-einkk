@@ -62,7 +62,7 @@ class BattleSimulation {
   int currentNikke = 3;
 
   BattleSimulation({required this.playerOptions, required List<BattleNikkeOptions?> nikkeOptions}) {
-    nikkes.addAll(nikkeOptions.nonNulls.map((option) => BattleNikke(simulation: this, option: option)));
+    nikkes.addAll(nikkeOptions.nonNulls.map((option) => BattleNikke(playerOptions: playerOptions, option: option)));
   }
 
   void simulate() {
@@ -72,12 +72,22 @@ class BattleSimulation {
     burstMeter = 0;
     currentNikke = min(nikkes.length, currentNikke);
     for (int index = 0; index < nikkes.length; index += 1) {
-      nikkes[index].init(index + 1);
+      nikkes[index].init(this, index + 1);
+    }
+
+    // BattleStart
+    for (final nikke in nikkes) {
+      nikke.broadcast(BattleStartEvent(nikke.position), this);
+    }
+
+    // all onStart functions applied, battleStart
+    for (final nikke in nikkes) {
+      nikke.startBattle(this);
     }
 
     for (currentFrame = maxFrames; currentFrame > 0; currentFrame -= 1) {
       for (final nikke in nikkes) {
-        nikke.normalAction();
+        nikke.normalAction(this);
       }
 
       // broadcast all events registered for this frame

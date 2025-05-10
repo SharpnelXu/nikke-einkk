@@ -5,13 +5,14 @@ import 'package:nikke_einkk/model/skills.dart';
 class BattleBuff {
   final FunctionData data;
   final int activatorPosition;
+  final int triggerPosition;
   final int ownerPosition;
 
   // TODO: deduct duration
   int duration = 0;
   int count = 0;
 
-  BattleBuff(this.data, this.activatorPosition, this.ownerPosition) {
+  BattleBuff(this.data, this.activatorPosition, this.triggerPosition, this.ownerPosition) {
     duration = data.durationValue;
     count = 1;
   }
@@ -86,10 +87,25 @@ class BattleBuff {
         return simulation.getNikkeOnPosition(activatorPosition);
       case StandardType.functionTarget:
         return simulation.getNikkeOnPosition(ownerPosition);
+      case StandardType.triggerTarget:
+        return simulation.getNikkeOnPosition(triggerPosition);
       case StandardType.unknown:
       case StandardType.none:
-      case StandardType.triggerTarget:
         return null;
+    }
+  }
+
+  int getFunctionStandardTargetPosition(BattleSimulation simulation) {
+    switch (data.functionStandard) {
+      case StandardType.user:
+        return activatorPosition;
+      case StandardType.functionTarget:
+        return ownerPosition;
+      case StandardType.triggerTarget:
+        return triggerPosition;
+      case StandardType.unknown:
+      case StandardType.none:
+        return -1;
     }
   }
 }
