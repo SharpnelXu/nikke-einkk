@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/equipment.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 
 import '../../test_helper.dart';
@@ -37,5 +38,21 @@ void main() async {
       expect(equip.getStat(StatType.hp, Corporation.missilis), moreOrLessEquals(33053, epsilon: 1));
       expect(equip.getStat(StatType.defence, Corporation.missilis), moreOrLessEquals(879, epsilon: 1));
     });
+  });
+
+  test('Equip Line Exists', () {
+    final line = EquipLine.none();
+    for (final type in EquipLineType.values) {
+      if (type == EquipLineType.none) continue;
+
+      line.type = type;
+      for (int level = 1; level <= 15; level += 1) {
+        line.level = level;
+        final stateEffectId = line.getStateEffectId();
+
+        expect(stateEffectId, isNonZero);
+        expect(gameData.stateEffectTable.containsKey(stateEffectId), true);
+      }
+    }
   });
 }
