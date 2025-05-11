@@ -63,7 +63,7 @@ class NikkeReloadStartEvent implements BattleEvent {
 
 class NikkeDamageEvent implements BattleEvent {
   NikkeDamageType type;
-  late WeaponSkillData weaponData;
+  late WeaponData weaponData;
   late String name;
   late int attackerPosition; // this is basically uniqueId for Nikke
   late int targetUniqueId;
@@ -137,7 +137,7 @@ enum NikkeDamageType { bullet }
 
 class BurstGenerationEvent implements BattleEvent {
   String name = '';
-  late WeaponSkillData weaponData;
+  late WeaponData weaponData;
   late int attackerPosition; // this is basically uniqueId for Nikke
   late int targetUniqueId;
   int chargePercent = 0;

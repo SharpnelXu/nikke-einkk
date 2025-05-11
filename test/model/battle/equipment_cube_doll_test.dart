@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/equipment.dart';
+import 'package:nikke_einkk/model/battle/favorite_item.dart';
+import 'package:nikke_einkk/model/battle/harmony_cube.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
@@ -52,6 +54,38 @@ void main() async {
 
         expect(stateEffectId, isNonZero);
         expect(gameData.stateEffectTable.containsKey(stateEffectId), true);
+      }
+    }
+  });
+
+  test('Cube Effect Exists', () {
+    for (final cubeId in gameData.harmonyCubeTable.keys) {
+      for (int level = 1; level <= 15; level += 1) {
+        final cube = BattleHarmonyCube(cubeId, level);
+
+        final stateEffectIds = cube.getCubeStateEffectIds();
+        expect(stateEffectIds.length, isNonZero);
+        for (final stateEffectId in stateEffectIds) {
+          expect(stateEffectId, isNonZero);
+          expect(gameData.stateEffectTable.containsKey(stateEffectId), true);
+        }
+      }
+    }
+  });
+
+  test('Favorite Item Effect Exists', () {
+    for (final favoriteItemData in gameData.favoriteItemTable.values) {
+      for (int level = 0; level <= 15; level += 1) {
+        if (level > 2 && favoriteItemData.favoriteRare == Rarity.ssr) break;
+
+        final doll = BattleFavoriteItem(favoriteItemData.id, level);
+
+        final stateEffectIds = doll.getCollectionItemStateEffectIds();
+        expect(stateEffectIds.length, isNonZero);
+        for (final stateEffectId in stateEffectIds) {
+          expect(stateEffectId, isNonZero);
+          expect(gameData.stateEffectTable.containsKey(stateEffectId), true);
+        }
       }
     }
   });

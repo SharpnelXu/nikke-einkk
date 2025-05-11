@@ -629,3 +629,54 @@ class FunctionData {
 
   Map<String, dynamic> toJson() => _$FunctionDataToJson(this);
 }
+
+@JsonSerializable()
+class SkillDescriptionValue {
+  @JsonKey(name: 'description_value')
+  final String? value;
+
+  SkillDescriptionValue({this.value});
+
+  factory SkillDescriptionValue.fromJson(Map<String, dynamic> json) => _$SkillDescriptionValueFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SkillDescriptionValueToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+class SkillInfoData {
+  final int id;
+  @JsonKey(name: 'group_id')
+  final int groupId;
+  @JsonKey(name: 'skill_level')
+  final int skillLevel;
+  @JsonKey(name: 'next_level_id')
+  final int nextLevelId;
+  @JsonKey(name: 'level_up_cost_id')
+  final int levelUpCostId;
+  final String icon;
+  @JsonKey(name: 'name_localkey')
+  final String nameLocalkey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionLocalkey;
+  @JsonKey(name: 'info_description_localkey')
+  final String infoDescriptionLocalkey;
+  @JsonKey(name: 'description_value_list')
+  final List<SkillDescriptionValue> descriptionValues;
+
+  SkillInfoData({
+    this.id = 0,
+    this.groupId = 0,
+    this.skillLevel = 0,
+    this.nextLevelId = 0,
+    this.levelUpCostId = 0,
+    this.icon = '',
+    this.nameLocalkey = '',
+    this.descriptionLocalkey = '',
+    this.infoDescriptionLocalkey = '',
+    this.descriptionValues = const [],
+  });
+
+  factory SkillInfoData.fromJson(Map<String, dynamic> json) => _$SkillInfoDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SkillInfoDataToJson(this);
+}

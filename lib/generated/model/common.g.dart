@@ -99,6 +99,7 @@ const _$NikkeClassEnumMap = {
   NikkeClass.attacker: 'Attacker',
   NikkeClass.defender: 'Defender',
   NikkeClass.supporter: 'Supporter',
+  NikkeClass.all: 'All',
 };
 
 const _$BurstStepEnumMap = {
@@ -129,7 +130,7 @@ const _$CorporationEnumMap = {
   Corporation.abnormal: 'ABNORMAL',
 };
 
-WeaponSkillData _$WeaponSkillDataFromJson(Map<String, dynamic> json) => WeaponSkillData(
+WeaponData _$WeaponDataFromJson(Map<String, dynamic> json) => WeaponData(
   id: (json['id'] as num?)?.toInt() ?? 0,
   nameLocalkey: json['name_localkey'] as String? ?? '',
   descriptionLocalkey: json['description_localkey'] as String? ?? '',
@@ -192,7 +193,7 @@ WeaponSkillData _$WeaponSkillDataFromJson(Map<String, dynamic> json) => WeaponSk
   shakeWeight: (json['ShakeWeight'] as num?)?.toInt() ?? 0,
 );
 
-Map<String, dynamic> _$WeaponSkillDataToJson(WeaponSkillData instance) => <String, dynamic>{
+Map<String, dynamic> _$WeaponDataToJson(WeaponData instance) => <String, dynamic>{
   'id': instance.id,
   'name_localkey': instance.nameLocalkey,
   'description_localkey': instance.descriptionLocalkey,

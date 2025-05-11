@@ -602,3 +602,40 @@ const _$StatusTriggerTypeEnumMap = {
 };
 
 const _$FunctionStatusEnumMap = {FunctionStatus.on: 'On', FunctionStatus.off: 'Off'};
+
+SkillDescriptionValue _$SkillDescriptionValueFromJson(Map<String, dynamic> json) =>
+    SkillDescriptionValue(value: json['description_value'] as String?);
+
+Map<String, dynamic> _$SkillDescriptionValueToJson(SkillDescriptionValue instance) => <String, dynamic>{
+  'description_value': instance.value,
+};
+
+SkillInfoData _$SkillInfoDataFromJson(Map<String, dynamic> json) => SkillInfoData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  groupId: (json['group_id'] as num?)?.toInt() ?? 0,
+  skillLevel: (json['skill_level'] as num?)?.toInt() ?? 0,
+  nextLevelId: (json['next_level_id'] as num?)?.toInt() ?? 0,
+  levelUpCostId: (json['level_up_cost_id'] as num?)?.toInt() ?? 0,
+  icon: json['icon'] as String? ?? '',
+  nameLocalkey: json['name_localkey'] as String? ?? '',
+  descriptionLocalkey: json['description_localkey'] as String? ?? '',
+  infoDescriptionLocalkey: json['info_description_localkey'] as String? ?? '',
+  descriptionValues:
+      (json['description_value_list'] as List<dynamic>?)
+          ?.map((e) => SkillDescriptionValue.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+);
+
+Map<String, dynamic> _$SkillInfoDataToJson(SkillInfoData instance) => <String, dynamic>{
+  'id': instance.id,
+  'group_id': instance.groupId,
+  'skill_level': instance.skillLevel,
+  'next_level_id': instance.nextLevelId,
+  'level_up_cost_id': instance.levelUpCostId,
+  'icon': instance.icon,
+  'name_localkey': instance.nameLocalkey,
+  'description_localkey': instance.descriptionLocalkey,
+  'info_description_localkey': instance.infoDescriptionLocalkey,
+  'description_value_list': instance.descriptionValues.map((e) => e.toJson()).toList(),
+};

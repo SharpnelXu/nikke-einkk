@@ -12,7 +12,7 @@ class BattleEquipment {
   final EquipType type;
   final NikkeClass equipClass;
   final EquipRarity rarity;
-  EquipmentItemData get equipData => gameData.groupedEquipTable[type]![equipClass]![rarity]!;
+  EquipmentData get equipData => gameData.groupedEquipTable[type]![equipClass]![rarity]!;
   Corporation _corporation = Corporation.none;
   Corporation get corporation => _corporation;
   set corporation(Corporation newCorp) {
@@ -61,14 +61,14 @@ class BattleEquipment {
     return equipStat.statValue * (1 + (level + sameCorpFactor) * 0.1);
   }
 
-  void applyEquipLines(BattleSimulation simulation, BattleNikke owner) {
+  void applyEquipLines(BattleSimulation simulation, BattleNikke wearer) {
     if (rarity != EquipRarity.t10) return;
 
     for (final equipLine in equipLines) {
       if (equipLine.type == EquipLineType.none) continue;
 
       final stateEffectData = gameData.stateEffectTable[equipLine.getStateEffectId()]!;
-      owner.functions.addAll(
+      wearer.functions.addAll(
         stateEffectData.functions
             .where((data) => data.function != 0)
             .map((data) => BattleFunction(gameData.functionTable[data.function]!)),

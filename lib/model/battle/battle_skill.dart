@@ -6,8 +6,8 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 
 class BattleSkill {
-  final int skillId;
-  final SkillType skillType;
+  int skillId;
+  SkillType skillType;
   final bool isBurst;
   final int level;
 

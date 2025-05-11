@@ -220,7 +220,7 @@ class NikkeCharacterData {
 }
 
 @JsonSerializable()
-class WeaponSkillData {
+class WeaponData {
   final int id;
   @JsonKey(name: 'name_localkey')
   final String nameLocalkey;
@@ -334,7 +334,7 @@ class WeaponSkillData {
   @JsonKey(name: 'ShakeWeight')
   final int shakeWeight;
 
-  WeaponSkillData({
+  WeaponData({
     this.id = 0,
     this.nameLocalkey = '',
     this.descriptionLocalkey = '',
@@ -393,9 +393,9 @@ class WeaponSkillData {
     this.shakeWeight = 0,
   });
 
-  factory WeaponSkillData.fromJson(Map<String, dynamic> json) => _$WeaponSkillDataFromJson(json);
+  factory WeaponData.fromJson(Map<String, dynamic> json) => _$WeaponDataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$WeaponSkillDataToJson(this);
+  Map<String, dynamic> toJson() => _$WeaponDataToJson(this);
 }
 
 @JsonSerializable()
@@ -620,6 +620,7 @@ class AttractiveStatData {
   ClassAttractiveStatData getStatData(NikkeClass nikkeClass) {
     return switch (nikkeClass) {
       NikkeClass.unknown => ClassAttractiveStatData.emptyData,
+      NikkeClass.all => ClassAttractiveStatData.emptyData,
       NikkeClass.attacker => attackerStatData,
       NikkeClass.defender => defenderStatData,
       NikkeClass.supporter => supporterStatData,
@@ -659,7 +660,7 @@ enum WeaponType {
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum NikkeClass { unknown, attacker, defender, supporter }
+enum NikkeClass { unknown, attacker, defender, supporter, all }
 
 enum Element {
   unknown(-1),

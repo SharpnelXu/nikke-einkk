@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:nikke_einkk/model/skills.dart';
 
 import 'common.dart';
 
@@ -6,7 +7,7 @@ part '../generated/model/items.g.dart';
 
 // ItemEquipTable
 @JsonSerializable()
-class EquipmentItemData {
+class EquipmentData {
   final int id;
   @JsonKey(name: 'name_localkey')
   final String nameLocalkey;
@@ -36,7 +37,7 @@ class EquipmentItemData {
   @JsonKey(name: 'option_lock_cost')
   final int optionLockCost;
 
-  EquipmentItemData({
+  EquipmentData({
     this.id = 0,
     this.nameLocalkey = '',
     this.descriptionLocalkey = '',
@@ -54,9 +55,9 @@ class EquipmentItemData {
     this.optionLockCost = 0,
   });
 
-  factory EquipmentItemData.fromJson(Map<String, dynamic> json) => _$EquipmentItemDataFromJson(json);
+  factory EquipmentData.fromJson(Map<String, dynamic> json) => _$EquipmentDataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$EquipmentItemDataToJson(this);
+  Map<String, dynamic> toJson() => _$EquipmentDataToJson(this);
 }
 
 @JsonSerializable()
@@ -87,7 +88,7 @@ class OptionSlot {
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum ItemType { unknown, equip }
+enum ItemType { unknown, equip, harmonyCube }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
 enum EquipRarity {
@@ -160,4 +161,273 @@ class EquipLine {
   int getStateEffectId() {
     return type == EquipLineType.none ? 0 : type.stateEffectIdBase + level;
   }
+}
+
+@JsonSerializable()
+class HarmonyCubeSkillGroup {
+  @JsonKey(name: 'skill_group_id')
+  final int skillGroupId;
+
+  HarmonyCubeSkillGroup({this.skillGroupId = 0});
+
+  factory HarmonyCubeSkillGroup.fromJson(Map<String, dynamic> json) => _$HarmonyCubeSkillGroupFromJson(json);
+
+  Map<String, dynamic> toJson() => _$HarmonyCubeSkillGroupToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+class HarmonyCubeData {
+  final int id;
+  @JsonKey(name: 'name_localkey')
+  final String nameLocalkey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionLocalkey;
+  @JsonKey(name: 'location_id')
+  final int locationId;
+  @JsonKey(name: 'location_localkey')
+  final String locationLocalkey;
+  final int order;
+  @JsonKey(name: 'resource_id')
+  final int resourceId;
+  final String bg;
+  @JsonKey(name: 'bg_color')
+  final String bgColor;
+  @JsonKey(name: 'item_type')
+  final ItemType itemType;
+  @JsonKey(name: 'item_sub_type')
+  final String itemSubType;
+  @JsonKey(name: 'item_rare')
+  final Rarity itemRare;
+  @JsonKey(name: 'class')
+  final NikkeClass characterClass;
+  @JsonKey(name: 'level_enhance_id')
+  final int levelEnhanceId;
+  @JsonKey(name: 'harmonycube_skill_group')
+  final List<HarmonyCubeSkillGroup> harmonyCubeSkillGroups;
+
+  HarmonyCubeData({
+    this.id = 0,
+    this.nameLocalkey = '',
+    this.descriptionLocalkey = '',
+    this.locationId = 0,
+    this.locationLocalkey = '',
+    this.order = 0,
+    this.resourceId = 0,
+    this.bg = '',
+    this.bgColor = '',
+    this.itemType = ItemType.harmonyCube,
+    this.itemSubType = '',
+    this.itemRare = Rarity.ssr,
+    this.characterClass = NikkeClass.all,
+    this.levelEnhanceId = 0,
+    this.harmonyCubeSkillGroups = const [],
+  });
+
+  factory HarmonyCubeData.fromJson(Map<String, dynamic> json) => _$HarmonyCubeDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$HarmonyCubeDataToJson(this);
+}
+
+@JsonSerializable()
+class HarmonyCubeSkillLevel {
+  @JsonKey(name: 'skill_level')
+  final int level;
+
+  HarmonyCubeSkillLevel({this.level = 0});
+
+  factory HarmonyCubeSkillLevel.fromJson(Map<String, dynamic> json) => _$HarmonyCubeSkillLevelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$HarmonyCubeSkillLevelToJson(this);
+}
+
+@JsonSerializable()
+class HarmonyCubeStat {
+  @JsonKey(name: 'stat_type')
+  final StatType type;
+  @JsonKey(name: 'stat_rate')
+  final int rate;
+
+  HarmonyCubeStat({this.type = StatType.unknown, this.rate = 0});
+
+  factory HarmonyCubeStat.fromJson(Map<String, dynamic> json) => _$HarmonyCubeStatFromJson(json);
+
+  Map<String, dynamic> toJson() => _$HarmonyCubeStatToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+class HarmonyCubeLevelData {
+  final int id;
+  @JsonKey(name: 'level_enhance_id')
+  final int levelEnhanceId;
+  final int level;
+  @JsonKey(name: 'skill_levels')
+  final List<HarmonyCubeSkillLevel> skillLevels;
+  @JsonKey(name: 'material_id')
+  final int materialId;
+  @JsonKey(name: 'material_value')
+  final int materialValue;
+  @JsonKey(name: 'gold_value')
+  final int goldValue;
+  final int slot;
+  @JsonKey(name: 'harmonycube_stats')
+  final List<HarmonyCubeStat> stats;
+
+  HarmonyCubeLevelData({
+    this.id = 0,
+    this.levelEnhanceId = 0,
+    this.level = 0,
+    this.skillLevels = const [],
+    this.materialId = 0,
+    this.materialValue = 0,
+    this.goldValue = 0,
+    this.slot = 0,
+    this.stats = const [],
+  });
+
+  factory HarmonyCubeLevelData.fromJson(Map<String, dynamic> json) => _$HarmonyCubeLevelDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$HarmonyCubeLevelDataToJson(this);
+}
+
+@JsonSerializable()
+class CollectionItemSkillGroup {
+  @JsonKey(name: 'collection_skill_id')
+  final int skillId;
+
+  CollectionItemSkillGroup({this.skillId = 0});
+
+  factory CollectionItemSkillGroup.fromJson(Map<String, dynamic> json) => _$CollectionItemSkillGroupFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CollectionItemSkillGroupToJson(this);
+}
+
+@JsonSerializable()
+class FavoriteItemSkillGroup {
+  @JsonKey(name: 'favorite_skill_id')
+  final int skillId;
+  @JsonKey(name: 'skill_table')
+  final SkillType skillTable;
+  @JsonKey(name: 'skill_change_slot')
+  final int skillChangeSlot;
+
+  FavoriteItemSkillGroup({this.skillId = 0, this.skillTable = SkillType.none, this.skillChangeSlot = 0});
+
+  factory FavoriteItemSkillGroup.fromJson(Map<String, dynamic> json) => _$FavoriteItemSkillGroupFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FavoriteItemSkillGroupToJson(this);
+}
+
+@JsonEnum(fieldRename: FieldRename.pascal)
+enum FavoriteItemType { collection, favorite }
+
+@JsonSerializable(explicitToJson: true)
+class FavoriteItemData {
+  final int id;
+  @JsonKey(name: 'name_localkey')
+  final String nameLocalkey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionLocalkey;
+  @JsonKey(name: 'icon_resource_id')
+  final String iconResourceId;
+  @JsonKey(name: 'img_resource_id')
+  final String imgResourceId;
+  @JsonKey(name: 'prop_resource_id')
+  final String propResourceId;
+  final int order;
+  @JsonKey(name: 'favorite_rare')
+  final Rarity favoriteRare;
+  @JsonKey(name: 'favorite_type')
+  final FavoriteItemType favoriteType;
+  @JsonKey(name: 'weapon_type')
+  final WeaponType weaponType;
+  @JsonKey(name: 'name_code')
+  final int nameCode;
+  @JsonKey(name: 'max_level')
+  final int maxLevel;
+  @JsonKey(name: 'level_enhance_id')
+  final int levelEnhanceId;
+  @JsonKey(name: 'probability_group')
+  final int probabilityGroup;
+  @JsonKey(name: 'collection_skill_group_data')
+  final List<CollectionItemSkillGroup> collectionSkills;
+  @JsonKey(name: 'favoriteitem_skill_group_data')
+  final List<FavoriteItemSkillGroup> favoriteItemSkills;
+  @JsonKey(name: 'albumcategory_id')
+  final int albumCategoryId;
+
+  FavoriteItemData({
+    this.id = 0,
+    this.nameLocalkey = '',
+    this.descriptionLocalkey = '',
+    this.iconResourceId = '',
+    this.imgResourceId = '',
+    this.propResourceId = '',
+    this.order = 0,
+    this.favoriteRare = Rarity.r,
+    this.favoriteType = FavoriteItemType.collection,
+    this.weaponType = WeaponType.none,
+    this.nameCode = 0,
+    this.maxLevel = 0,
+    this.levelEnhanceId = 0,
+    this.probabilityGroup = 0,
+    this.collectionSkills = const [],
+    this.favoriteItemSkills = const [],
+    this.albumCategoryId = 0,
+  });
+
+  factory FavoriteItemData.fromJson(Map<String, dynamic> json) => _$FavoriteItemDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FavoriteItemDataToJson(this);
+}
+
+@JsonSerializable()
+class FavoriteItemStat {
+  @JsonKey(name: 'stat_type')
+  final StatType type;
+  @JsonKey(name: 'stat_value')
+  final int value;
+
+  FavoriteItemStat({this.type = StatType.unknown, this.value = 0});
+
+  factory FavoriteItemStat.fromJson(Map<String, dynamic> json) => _$FavoriteItemStatFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FavoriteItemStatToJson(this);
+}
+
+@JsonSerializable()
+class CollectionItemSkillLevel {
+  @JsonKey(name: 'collection_skill_level')
+  final int level;
+
+  CollectionItemSkillLevel({this.level = 0});
+
+  factory CollectionItemSkillLevel.fromJson(Map<String, dynamic> json) => _$CollectionItemSkillLevelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CollectionItemSkillLevelToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
+class FavoriteItemLevelData {
+  final int id;
+  @JsonKey(name: 'level_enhance_id')
+  final int levelEnhanceId;
+  final int grade;
+  final int level;
+  @JsonKey(name: 'favoriteitem_stat_data')
+  final List<FavoriteItemStat> stats;
+  @JsonKey(name: 'collection_skill_level_data')
+  final List<CollectionItemSkillLevel> skillLevels;
+
+  FavoriteItemLevelData({
+    this.id = 0,
+    this.levelEnhanceId = 0,
+    this.grade = 0,
+    this.level = 0,
+    this.stats = const [],
+    this.skillLevels = const [],
+  });
+
+  factory FavoriteItemLevelData.fromJson(Map<String, dynamic> json) => _$FavoriteItemLevelDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FavoriteItemLevelDataToJson(this);
 }

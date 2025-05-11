@@ -5,7 +5,9 @@ import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/battle_skill.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/equipment.dart';
+import 'package:nikke_einkk/model/battle/favorite_item.dart';
 import 'package:nikke_einkk/model/battle/function.dart';
+import 'package:nikke_einkk/model/battle/harmony_cube.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
@@ -19,8 +21,8 @@ class BattleNikkeOptions {
   int attractLevel;
   List<BattleEquipment> equips;
   List<int> skillLevels;
-  // cube
-  // doll
+  BattleHarmonyCube? cube;
+  BattleFavoriteItem? favoriteItem;
 
   BattleNikkeOptions({
     required this.nikkeResourceId,
@@ -29,7 +31,15 @@ class BattleNikkeOptions {
     this.attractLevel = 1,
     this.equips = const [],
     this.skillLevels = const [10, 10, 10],
-  });
+    this.cube,
+    this.favoriteItem,
+  }) {
+    final favoriteItemNameCode = favoriteItem?.data.nameCode ?? -1;
+    if (favoriteItemNameCode > 0 &&
+        favoriteItemNameCode != gameData.characterResourceGardeTable[nikkeResourceId]?[coreLevel]?.nameCode) {
+      favoriteItem = null;
+    }
+  }
 }
 
 enum BattleNikkeStatus { behindCover, reloading, forceReloading, shooting }
@@ -43,7 +53,7 @@ class BattleNikke {
   NikkeCharacterData get characterData =>
       gameData.characterResourceGardeTable[option.nikkeResourceId]![option.coreLevel]!;
   String get name => gameData.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId.toString();
-  WeaponSkillData get baseWeaponData => gameData.characterShotTable[characterData.shotId]!;
+  WeaponData get baseWeaponData => gameData.characterShotTable[characterData.shotId]!;
   // skill data
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
@@ -65,6 +75,8 @@ class BattleNikke {
     consoleStat: playerOptions.getRecycleHp(nikkeClass),
     bondStat: attractiveStat.hpRate,
     equipStat: option.equips.fold(0, (sum, equip) => sum + equip.getStat(StatType.hp, corporation)),
+    cubeStat: option.cube?.getStat(StatType.hp) ?? 0,
+    dollStat: option.favoriteItem?.getStat(StatType.hp) ?? 0,
   );
 
   int get baseAttack => getBaseStat(
@@ -74,6 +86,8 @@ class BattleNikke {
     consoleStat: playerOptions.getRecycleAttack(corporation),
     bondStat: attractiveStat.attackRate,
     equipStat: option.equips.fold(0, (sum, equip) => sum + equip.getStat(StatType.atk, corporation)),
+    cubeStat: option.cube?.getStat(StatType.atk) ?? 0,
+    dollStat: option.favoriteItem?.getStat(StatType.atk) ?? 0,
   );
 
   int get baseDefence => getBaseStat(
@@ -83,6 +97,8 @@ class BattleNikke {
     consoleStat: playerOptions.getRecycleDefence(nikkeClass, corporation),
     bondStat: attractiveStat.defenceRate,
     equipStat: option.equips.fold(0, (sum, equip) => sum + equip.getStat(StatType.defence, corporation)),
+    cubeStat: option.cube?.getStat(StatType.defence) ?? 0,
+    dollStat: option.favoriteItem?.getStat(StatType.defence) ?? 0,
   );
 
   int position = 0;
@@ -92,7 +108,7 @@ class BattleNikke {
   int currentAmmo = 0;
 
   WeaponType get currentWeaponType => currentWeaponData.weaponType;
-  WeaponSkillData get currentWeaponData => baseWeaponData;
+  WeaponData get currentWeaponData => baseWeaponData;
 
   // TODO: this encapsulates ranges so don't need to clamp on every change, but it's boiler plate ish
   // a lot of frame counters have min value 0,
@@ -148,6 +164,8 @@ class BattleNikke {
     required int consoleStat,
     required int bondStat,
     required num equipStat,
+    required int cubeStat,
+    required int dollStat,
   }) {
     final gradeLevel = min(4, coreLevel) - 1;
     final gradeStat =
@@ -160,7 +178,7 @@ class BattleNikke {
                 BattleUtils.toModifier(coreEnhanceBaseRatio)
             : 0;
 
-    return (baseStat + gradeStat + coreStat + consoleStat + bondStat + equipStat).round();
+    return (baseStat + gradeStat + coreStat + consoleStat + bondStat + equipStat + cubeStat + dollStat).round();
   }
 
   void init(BattleSimulation simulation, int position) {
@@ -181,9 +199,28 @@ class BattleNikke {
     buffs.clear();
     skills.clear();
 
+    for (final equip in option.equips) {
+      equip.applyEquipLines(simulation, this);
+    }
+    option.cube?.applyCubeEffect(simulation, this);
+    option.favoriteItem?.applyCollectionItemEffect(simulation, this);
+
     skills.add(BattleSkill(characterData.skill1Id, characterData.skill1Table, option.skillLevels[0], false));
     skills.add(BattleSkill(characterData.skill2Id, characterData.skill2Table, option.skillLevels[1], false));
     skills.add(BattleSkill(characterData.ultiSkillId, SkillType.characterSkill, option.skillLevels[2], true));
+
+    final favoriteItem = option.favoriteItem;
+    if (favoriteItem != null) {
+      final substituteCount = min(favoriteItem.data.favoriteItemSkills.length, favoriteItem.levelData.grade);
+      final favoriteItemSkills = favoriteItem.data.favoriteItemSkills.sublist(0, substituteCount);
+      for (final substituteSkillData in favoriteItemSkills) {
+        if (substituteSkillData.skillId == 0) continue;
+
+        final skillToChange = skills[substituteSkillData.skillChangeSlot - 1];
+        skillToChange.skillId = substituteSkillData.skillId;
+        skillToChange.skillType = substituteSkillData.skillTable;
+      }
+    }
 
     for (final skill in skills) {
       skill.init(simulation, this);
