@@ -81,9 +81,9 @@ class BattleSimulation {
     }
 
     // all onStart functions applied, battleStart
-    for (final nikke in nikkes) {
-      nikke.startBattle(this);
-    }
+    // for (final nikke in nikkes) {
+    //   nikke.startBattle(this);
+    // }
 
     for (currentFrame = maxFrames; currentFrame > 0; currentFrame -= 1) {
       for (final nikke in nikkes) {
@@ -100,6 +100,10 @@ class BattleSimulation {
         for (final nikke in nikkes) {
           nikke.broadcast(event, this);
         }
+      }
+
+      for (final nikke in nikkes) {
+        nikke.endCurrentFrame(this);
       }
     }
   }

@@ -8,7 +8,6 @@ class BattleBuff {
   final int triggerPosition;
   final int ownerPosition;
 
-  // TODO: deduct duration
   int duration = 0;
   int count = 0;
 
@@ -18,23 +17,27 @@ class BattleBuff {
   }
 
   bool isActive(BattleSimulation simulation) {
-    return checkDuration(simulation) &&
-        checkStatusTrigger(simulation, data.statusTriggerType, data.statusTriggerStandard, data.statusTriggerValue) &&
+    return checkStatusTrigger(
+          simulation,
+          data.statusTriggerType,
+          data.statusTriggerStandard,
+          data.statusTriggerValue,
+        ) &&
         checkStatusTrigger(simulation, data.statusTrigger2Type, data.statusTrigger2Standard, data.statusTrigger2Value);
   }
 
-  bool checkDuration(BattleSimulation simulation) {
+  bool shouldRemove(BattleSimulation simulation) {
     switch (data.durationType) {
       case DurationType.none:
       case DurationType.battles:
       case DurationType.timeSecBattles:
-        return true;
+        return false;
       case DurationType.timeSec:
       case DurationType.shots:
       case DurationType.hits:
-        return duration > 0;
+        return duration <= 0;
       case DurationType.unknown:
-        return false;
+        return true;
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nikke_einkk/model/battle/harmony_cube.dart';
 
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/module/battle_timeline.dart';
@@ -19,6 +20,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final maxAmmoCube = BattleHarmonyCube(1000306, 15);
+    final burstCube = BattleHarmonyCube(1000307, 15);
     final simulation = BattleSimulation(
       playerOptions: BattlePlayerOptions(
         personalRecycleLevel: 400,
@@ -39,9 +42,9 @@ class MyApp extends StatelessWidget {
         // BattleNikkeOptions(nikkeResourceId: 313, coreLevel: 11, syncLevel: 901, attractLevel: 30),
         // BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30),
         // BattleNikkeOptions(nikkeResourceId: 225, coreLevel: 11, syncLevel: 901, attractLevel: 40),
-        BattleNikkeOptions(nikkeResourceId: 222, coreLevel: 11, syncLevel: 901, attractLevel: 40),
-        BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30),
-        BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+        BattleNikkeOptions(nikkeResourceId: 222, coreLevel: 11, syncLevel: 901, attractLevel: 40, cube: maxAmmoCube),
+        BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30, cube: burstCube),
+        BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30, cube: burstCube),
       ],
     );
 

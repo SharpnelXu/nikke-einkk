@@ -105,6 +105,7 @@ class NikkeDamageEvent implements BattleEvent {
       chargeDamageRate: weaponData.fullChargeDamage,
       chargeDamageBuff: nikke.getChargeDamageBuffValues(simulation),
       chargePercent: chargePercent,
+      partDamageBuff: rapture.hasParts() ? nikke.getPartsDamageBuffValues(simulation) : 0,
     );
   }
 
@@ -166,10 +167,7 @@ class BurstGenerationEvent implements BattleEvent {
 
     positionBurstBonus = bonusBurst ? 10000 + (15000 * BattleUtils.toModifier(chargePercent)).round() : 10000;
 
-    final baseBurst =
-        rapture.isStageTarget
-            ? nikke.currentWeaponData.targetBurstEnergyPerShot
-            : nikke.currentWeaponData.burstEnergyPerShot;
+    final baseBurst = nikke.getBurstGen(simulation, rapture.isStageTarget);
 
     burst = (baseBurst * BattleUtils.toModifier(positionBurstBonus)).round();
   }

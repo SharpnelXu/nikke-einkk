@@ -14,4 +14,8 @@ class BattleRapture {
   int distance = 25;
 
   Element element = Element.unknown;
+
+  bool hasParts() {
+    return false;
+  }
 }

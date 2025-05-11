@@ -12,6 +12,7 @@ class BattleFunction {
   final FunctionData data;
 
   FunctionStatus status = FunctionStatus.off;
+  int timesActivated = 0;
 
   BattleFunction(this.data);
 
@@ -29,6 +30,13 @@ class BattleFunction {
       case TimingTriggerType.onStart:
         if (event is! BattleStartEvent) return;
         executeFunction(event, simulation, standard);
+        break;
+      case TimingTriggerType.onUseAmmo:
+        if (event is! NikkeFireEvent) return;
+
+        if (standard.totalBulletsFired > 0 && standard.totalBulletsFired % data.timingTriggerValue == 0) {
+          executeFunction(event, simulation, standard);
+        }
         break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
@@ -86,7 +94,6 @@ class BattleFunction {
       case TimingTriggerType.onSummonMonster:
       case TimingTriggerType.onTeamHpRatioUnder:
       case TimingTriggerType.onTeamHpRatioUp:
-      case TimingTriggerType.onUseAmmo:
       case TimingTriggerType.onUseBurstSkill:
       case TimingTriggerType.onUserPartsDestroy:
       case TimingTriggerType.unknown:
@@ -95,11 +102,20 @@ class BattleFunction {
   }
 
   void executeFunction(BattleEvent event, BattleSimulation simulation, BattleNikke triggerTarget) {
+    if (data.limitValue > 0 && timesActivated >= data.limitValue) return;
+
+    timesActivated += 1;
     final activator = simulation.getNikkeOnPosition(event.getUserPosition())!;
     final functionTargets = getFunctionTargets(event, simulation);
     switch (data.functionType) {
+      case FunctionType.damageReduction:
+      case FunctionType.firstBurstGaugeSpeedUp:
+      case FunctionType.gainAmmo: // is actually a buff of 0 duration
+      case FunctionType.givingHealVariation:
       case FunctionType.incElementDmg:
+      case FunctionType.partsDamage:
       case FunctionType.statAccuracyCircle:
+      case FunctionType.statAmmo:
       case FunctionType.statAmmoLoad:
       case FunctionType.statAtk:
       case FunctionType.statChargeDamage:
@@ -107,7 +123,13 @@ class BattleFunction {
       case FunctionType.statCritical:
       case FunctionType.statCriticalDamage:
       case FunctionType.statDef:
+      case FunctionType.statHp:
+      case FunctionType.statHpHeal:
+      case FunctionType.statReloadTime:
         for (final nikke in functionTargets) {
+          final previousMaxAmmo = nikke.getMaxAmmo(simulation);
+          final previousMaxHp = nikke.getMaxHp(simulation);
+
           final existingBuff = nikke.buffs.firstWhereOrNull((buff) => buff.data.id == data.id);
           if (existingBuff != null) {
             existingBuff.duration =
@@ -117,6 +139,14 @@ class BattleFunction {
             existingBuff.count = min(existingBuff.count + 1, data.fullCount);
           } else {
             nikke.buffs.add(BattleBuff(data, activator.position, triggerTarget.position, nikke.position));
+          }
+
+          if (data.functionType == FunctionType.statHpHeal) {
+            final afterMaxHp = nikke.getMaxHp(simulation);
+            nikke.currentHp = (nikke.currentHp + afterMaxHp - previousMaxHp).clamp(1, afterMaxHp);
+          } else if (data.functionType == FunctionType.statAmmoLoad) {
+            final afterMaxAmmo = nikke.getMaxAmmo(simulation);
+            nikke.currentAmmo = (nikke.currentAmmo + afterMaxAmmo - previousMaxAmmo).clamp(1, afterMaxAmmo);
           }
         }
         status = data.keepingType;
@@ -164,7 +194,6 @@ class BattleFunction {
       case FunctionType.damageMetal:
       case FunctionType.damageRatioEnergy:
       case FunctionType.damageRatioMetal:
-      case FunctionType.damageReduction:
       case FunctionType.damageShare:
       case FunctionType.damageShareInstant:
       case FunctionType.damageShareInstantUnable:
@@ -178,15 +207,12 @@ class BattleFunction {
       case FunctionType.durationValueChange:
       case FunctionType.explosiveCircuitAccrueDamageRatio:
       case FunctionType.finalStatHpHeal:
-      case FunctionType.firstBurstGaugeSpeedUp:
       case FunctionType.fixStatReloadTime:
       case FunctionType.forcedStop:
       case FunctionType.fullChargeHitDamageRepeat:
       case FunctionType.fullCountDamageRatio:
       case FunctionType.functionOverlapChange:
-      case FunctionType.gainAmmo:
       case FunctionType.gainUltiGauge:
-      case FunctionType.givingHealVariation:
       case FunctionType.gravityBomb:
       case FunctionType.healBarrier:
       case FunctionType.healCharacter:
@@ -223,7 +249,6 @@ class BattleFunction {
       case FunctionType.normalStatCritical:
       case FunctionType.outBonusRangeDamageChange:
       case FunctionType.overHealSave:
-      case FunctionType.partsDamage:
       case FunctionType.partsHpChangeUIOff:
       case FunctionType.partsHpChangeUIOn:
       case FunctionType.partsImmuneDamage:
@@ -238,7 +263,6 @@ class BattleFunction {
       case FunctionType.shareDamageIncrease:
       case FunctionType.silence:
       case FunctionType.singleBurstDamage:
-      case FunctionType.statAmmo:
       case FunctionType.statBioResist:
       case FunctionType.statBonusRangeMax:
       case FunctionType.statBurstSkillCoolTime:
@@ -246,15 +270,12 @@ class BattleFunction {
       case FunctionType.statEndRateOfFire:
       case FunctionType.statEnergyResist:
       case FunctionType.statExplosion:
-      case FunctionType.statHp:
-      case FunctionType.statHpHeal:
       case FunctionType.statInstantSkillRange:
       case FunctionType.statMaintainFireStance:
       case FunctionType.statPenetration:
       case FunctionType.statRateOfFire:
       case FunctionType.statRateOfFirePerShot:
       case FunctionType.statReloadBulletRatio:
-      case FunctionType.statReloadTime:
       case FunctionType.statShotCount:
       case FunctionType.statSpotRadius:
       case FunctionType.stickyProjectileCollisionDamage:
