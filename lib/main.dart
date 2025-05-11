@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
       ],
     );
 
-    simulation.raptures.add(BattleRapture());
+    simulation.raptures.add(BattleRapture()..uniqueId = 11);
 
     return MaterialApp(
       title: 'Flutter Demo',

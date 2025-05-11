@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
@@ -10,32 +11,40 @@ import 'package:nikke_einkk/model/skills.dart';
 
 class BattleFunction {
   final FunctionData data;
+  final int ownerUniqueId;
 
   FunctionStatus status = FunctionStatus.off;
   int timesActivated = 0;
 
-  BattleFunction(this.data);
+  BattleFunction(this.data, this.ownerUniqueId);
 
   void broadcast(BattleEvent event, BattleSimulation simulation) {
+    if ((data.limitValue > 0 && timesActivated >= data.limitValue)) return;
+
     // the idea is that all data necessary for processing this broadcast should be available in the event
-    final standard = getTriggerStandardTarget(event, simulation)!;
+    final standard = getTimingTriggerStandardTarget(event, simulation);
+
     switch (data.timingTriggerType) {
       case TimingTriggerType.onHitNum:
         if (event is! NikkeDamageEvent) return;
 
-        if (standard.totalBulletsHit > 0 && standard.totalBulletsHit % data.timingTriggerValue == 0) {
-          executeFunction(event, simulation, standard);
+        if (standard is BattleNikke &&
+            standard.totalBulletsHit > 0 &&
+            standard.totalBulletsHit % data.timingTriggerValue == 0) {
+          executeFunction(event, simulation);
         }
         break;
       case TimingTriggerType.onStart:
         if (event is! BattleStartEvent) return;
-        executeFunction(event, simulation, standard);
+        executeFunction(event, simulation);
         break;
       case TimingTriggerType.onUseAmmo:
         if (event is! NikkeFireEvent) return;
 
-        if (standard.totalBulletsFired > 0 && standard.totalBulletsFired % data.timingTriggerValue == 0) {
-          executeFunction(event, simulation, standard);
+        if (standard is BattleNikke &&
+            standard.totalBulletsFired > 0 &&
+            standard.totalBulletsFired % data.timingTriggerValue == 0) {
+          executeFunction(event, simulation);
         }
         break;
       case TimingTriggerType.none:
@@ -101,11 +110,26 @@ class BattleFunction {
     }
   }
 
-  void executeFunction(BattleEvent event, BattleSimulation simulation, BattleNikke triggerTarget) {
-    if (data.limitValue > 0 && timesActivated >= data.limitValue) return;
+  BattleEntity? getTimingTriggerStandardTarget(BattleEvent event, BattleSimulation simulation) {
+    switch (data.timingTriggerStandard) {
+      case StandardType.none:
+      case StandardType.user:
+        // a lot of timingTriggerTypes have standards set to none which clearly need an countTarget, so default to user'
+        // examples include Elegg S2
+        return simulation.getEntityByUniqueId(event.getActivatorUniqueId());
+      case StandardType.functionTarget:
+        // functionTarget: {onTeamHpRatioUnder, onPartsBrokenNum, onTeamHpRatioUp, onFullCount (not actually used)}
+        // so essentially this means all nikkes? only that would makes sense for Flora S2
+        // TODO: leaving that out until it's time to write that, so weird
+        return simulation.getEntityByUniqueId(event.getTargetUniqueId());
+      case StandardType.unknown:
+      case StandardType.triggerTarget: // no trigger target for timing trigger standard
+        return null;
+    }
+  }
 
+  void executeFunction(BattleEvent event, BattleSimulation simulation) {
     timesActivated += 1;
-    final activator = simulation.getNikkeOnPosition(event.getUserPosition())!;
     final functionTargets = getFunctionTargets(event, simulation);
     switch (data.functionType) {
       case FunctionType.damageReduction:
@@ -126,27 +150,53 @@ class BattleFunction {
       case FunctionType.statHp:
       case FunctionType.statHpHeal:
       case FunctionType.statReloadTime:
-        for (final nikke in functionTargets) {
-          final previousMaxAmmo = nikke.getMaxAmmo(simulation);
-          final previousMaxHp = nikke.getMaxHp(simulation);
+        for (final target in functionTargets) {
+          final statusCheck =
+              checkStatusTrigger(
+                event,
+                simulation,
+                target,
+                data.statusTriggerType,
+                data.statusTriggerStandard,
+                data.statusTriggerValue,
+              ) &&
+              checkStatusTrigger(
+                event,
+                simulation,
+                target,
+                data.statusTrigger2Type,
+                data.statusTrigger2Standard,
+                data.statusTrigger2Value,
+              );
+          if (!statusCheck) continue;
 
-          final existingBuff = nikke.buffs.firstWhereOrNull((buff) => buff.data.id == data.id);
+          final previousMaxAmmo = target is BattleNikke ? target.getMaxAmmo(simulation) : 0;
+          final previousMaxHp = target.getMaxHp(simulation);
+
+          final existingBuff = target.buffs.firstWhereOrNull((buff) => buff.data.groupId == data.groupId);
           if (existingBuff != null) {
             existingBuff.duration =
                 data.durationType == DurationType.timeSec
                     ? BattleUtils.timeDataToFrame(data.durationValue, simulation.fps)
                     : data.durationValue;
             existingBuff.count = min(existingBuff.count + 1, data.fullCount);
+
+            // overwrite is probably done this way
+            if (existingBuff.data.level < data.level) {
+              existingBuff.data = data;
+              existingBuff.buffGiverUniqueId = event.getActivatorUniqueId();
+              existingBuff.buffReceiverUniqueId = target.uniqueId;
+            }
           } else {
-            nikke.buffs.add(BattleBuff(data, activator.position, triggerTarget.position, nikke.position));
+            target.buffs.add(BattleBuff(data, event.getActivatorUniqueId(), target.uniqueId));
           }
 
           if (data.functionType == FunctionType.statHpHeal) {
-            final afterMaxHp = nikke.getMaxHp(simulation);
-            nikke.currentHp = (nikke.currentHp + afterMaxHp - previousMaxHp).clamp(1, afterMaxHp);
-          } else if (data.functionType == FunctionType.statAmmoLoad) {
-            final afterMaxAmmo = nikke.getMaxAmmo(simulation);
-            nikke.currentAmmo = (nikke.currentAmmo + afterMaxAmmo - previousMaxAmmo).clamp(1, afterMaxAmmo);
+            final afterMaxHp = target.getMaxHp(simulation);
+            target.currentHp = (target.currentHp + afterMaxHp - previousMaxHp).clamp(1, afterMaxHp);
+          } else if (target is BattleNikke && data.functionType == FunctionType.statAmmoLoad) {
+            final afterMaxAmmo = target.getMaxAmmo(simulation);
+            target.currentAmmo = (target.currentAmmo + afterMaxAmmo - previousMaxAmmo).clamp(1, afterMaxAmmo);
           }
         }
         status = data.keepingType;
@@ -295,31 +345,116 @@ class BattleFunction {
     }
   }
 
-  BattleNikke? getTriggerStandardTarget(BattleEvent event, BattleSimulation simulation) {
-    switch (data.timingTriggerStandard) {
+  List<BattleEntity> getFunctionTargets(BattleEvent event, BattleSimulation simulation) {
+    final List<BattleEntity> result = [];
+    switch (data.functionTarget) {
+      case FunctionTargetType.allCharacter:
+        result.addAll(simulation.nikkes);
+        break;
+      case FunctionTargetType.self:
+        final self = simulation.getNikkeOnPosition(ownerUniqueId);
+        if (self != null) {
+          result.add(self);
+        }
+        break;
+      case FunctionTargetType.allMonster:
+        result.addAll(simulation.raptures);
+        break;
+      case FunctionTargetType.target:
+        final target = simulation.getEntityByUniqueId(event.getTargetUniqueId());
+        if (target != null) {
+          result.add(target);
+        }
+        break;
+      case FunctionTargetType.targetCover:
+        final target = simulation.getEntityByUniqueId(event.getTargetUniqueId());
+        if (target != null && target is BattleNikke) {
+          result.add(target.cover);
+        }
+      case FunctionTargetType.userCover:
+        final self = simulation.getNikkeOnPosition(ownerUniqueId);
+        if (self != null) {
+          result.add(self.cover);
+        }
+        break;
+      case FunctionTargetType.unknown:
+      case FunctionTargetType.none:
+        break;
+    }
+    return result;
+  }
+
+  BattleEntity? getStatusTriggerStandardTarget(
+    BattleEvent event,
+    BattleSimulation simulation,
+    StandardType standardType,
+    BattleEntity currentFunctionTarget,
+  ) {
+    switch (standardType) {
       case StandardType.user:
-        return simulation.getNikkeOnPosition(event.getUserPosition());
-      case StandardType.unknown:
-      case StandardType.none:
+        return simulation.getEntityByUniqueId(ownerUniqueId);
       case StandardType.functionTarget:
+        return currentFunctionTarget;
       case StandardType.triggerTarget:
+        // only used by Phantom S1 (addDamage, onShotRatio, isFunctionOn) & Flora S2 (activate barrier, onTeamHpUnder,
+        // checkPosition), current interpretation is whoever triggered the event
+        return simulation.getEntityByUniqueId(event.getActivatorUniqueId());
+      case StandardType.none: // when statusTriggerType is not none, standardType is only none for isCheckMonster
+      case StandardType.unknown:
         return null;
     }
   }
 
-  List<BattleNikke> getFunctionTargets(BattleEvent event, BattleSimulation simulation) {
-    switch (data.functionTarget) {
-      case FunctionTargetType.allCharacter:
-        return simulation.nikkes;
-      case FunctionTargetType.self:
-        return [simulation.getNikkeOnPosition(event.getUserPosition())!];
-      case FunctionTargetType.unknown:
-      case FunctionTargetType.none:
-      case FunctionTargetType.target:
-      case FunctionTargetType.targetCover:
-      case FunctionTargetType.allMonster:
-      case FunctionTargetType.userCover:
-        return [];
+  bool checkStatusTrigger(
+    BattleEvent event,
+    BattleSimulation simulation,
+    BattleEntity currentFunctionTarget,
+    StatusTriggerType type,
+    StandardType standard,
+    int value,
+  ) {
+    final target = getStatusTriggerStandardTarget(event, simulation, standard, currentFunctionTarget);
+    switch (type) {
+      case StatusTriggerType.none:
+        return true;
+      case StatusTriggerType.isCheckMonster:
+        return simulation.raptures.length >= value;
+      case StatusTriggerType.isWeaponType:
+        return target is BattleNikke && target.baseWeaponData.id == value;
+      case StatusTriggerType.unknown:
+      case StatusTriggerType.isAlive:
+      case StatusTriggerType.isAmmoCount:
+      case StatusTriggerType.isBurstMember:
+      case StatusTriggerType.isBurstStepState:
+      case StatusTriggerType.isCharacter:
+      case StatusTriggerType.isCheckFunctionOverlapUp:
+      case StatusTriggerType.isCheckMonsterType:
+      case StatusTriggerType.isCheckPartsId:
+      case StatusTriggerType.isCheckPosition:
+      case StatusTriggerType.isCheckTarget:
+      case StatusTriggerType.isCheckTeamBurstNextStep:
+      case StatusTriggerType.isClassType:
+      case StatusTriggerType.isCover:
+      case StatusTriggerType.isExplosiveCircuitOff:
+      case StatusTriggerType.isFullCharge:
+      case StatusTriggerType.isFullCount:
+      case StatusTriggerType.isFunctionBuffCheck:
+      case StatusTriggerType.isFunctionOff:
+      case StatusTriggerType.isFunctionOn:
+      case StatusTriggerType.isFunctionTypeOffCheck:
+      case StatusTriggerType.isHaveBarrier:
+      case StatusTriggerType.isHaveDecoy:
+      case StatusTriggerType.isHpRatioUnder:
+      case StatusTriggerType.isHpRatioUp:
+      case StatusTriggerType.isNotBurstMember:
+      case StatusTriggerType.isNotCheckTeamBurstNextStep:
+      case StatusTriggerType.isNotHaveBarrier:
+      case StatusTriggerType.isPhase:
+      case StatusTriggerType.isSameSquadCount:
+      case StatusTriggerType.isSameSquadUp:
+      case StatusTriggerType.isSearchElementId:
+      case StatusTriggerType.isStun:
+        return false;
     }
   }
 }

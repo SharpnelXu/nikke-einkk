@@ -33,7 +33,7 @@ class _BattleTimelineState extends State<BattleTimeline> {
                   spacing: 5,
                   children: [
                     ...damageMap.keys.map((pos) {
-                      final nikke = simulation.nikkes.firstWhere((nikke) => nikke.position == pos);
+                      final nikke = simulation.nikkes.firstWhere((nikke) => nikke.uniqueId == pos);
                       return Text(
                         '${nikke.name} (Pos $pos) Total bullets: ${nikke.totalBulletsFired} '
                         'DPS: ${damageMap[pos]! ~/ simulation.maxSeconds} )',

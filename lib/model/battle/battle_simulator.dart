@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
@@ -77,7 +78,7 @@ class BattleSimulation {
 
     // BattleStart
     for (final nikke in nikkes) {
-      nikke.broadcast(BattleStartEvent(nikke.position), this);
+      nikke.broadcast(BattleStartEvent(nikke.uniqueId), this);
     }
 
     // all onStart functions applied, battleStart
@@ -109,10 +110,22 @@ class BattleSimulation {
   }
 
   BattleNikke? getNikkeOnPosition(int position) {
-    return nikkes.firstWhereOrNull((nikke) => nikke.position == position);
+    return nikkes.firstWhereOrNull((nikke) => nikke.uniqueId == position);
   }
 
   BattleRapture? getRaptureByUniqueId(int uniqueId) {
+    return raptures.firstWhereOrNull((rapture) => rapture.uniqueId == uniqueId);
+  }
+
+  BattleEntity? getEntityByUniqueId(int uniqueId) {
+    for (final nikke in nikkes) {
+      if (nikke.uniqueId == uniqueId) {
+        return nikke;
+      } else if (nikke.cover.uniqueId == uniqueId) {
+        return nikke.cover;
+      }
+    }
+
     return raptures.firstWhereOrNull((rapture) => rapture.uniqueId == uniqueId);
   }
 
@@ -121,9 +134,9 @@ class BattleSimulation {
     for (final events in timeline.values) {
       for (final event in events) {
         if (event is NikkeDamageEvent) {
-          totalDamage.putIfAbsent(event.attackerPosition, () => 0);
-          totalDamage[event.attackerPosition] =
-              totalDamage[event.attackerPosition]! + event.damageParameter.calculateExpectedDamage();
+          totalDamage.putIfAbsent(event.attackerUniqueId, () => 0);
+          totalDamage[event.attackerUniqueId] =
+              totalDamage[event.attackerUniqueId]! + event.damageParameter.calculateExpectedDamage();
         }
       }
     }

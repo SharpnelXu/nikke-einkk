@@ -42,7 +42,7 @@ class BattleFavoriteItem {
       owner.functions.addAll(
         stateEffectData.functions
             .where((data) => data.function != 0)
-            .map((data) => BattleFunction(gameData.functionTable[data.function]!)),
+            .map((data) => BattleFunction(gameData.functionTable[data.function]!, owner.uniqueId)),
       );
     }
   }

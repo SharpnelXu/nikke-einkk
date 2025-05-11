@@ -1,17 +1,24 @@
 import 'package:nikke_einkk/model/common.dart';
 
-class BattleRapture {
+import 'battle_entity.dart';
+
+class BattleRapture extends BattleEntity {
   bool canBeTargeted = true;
 
   bool isStageTarget = true;
 
-  int defence = 0;
-
-  int uniqueId = 0;
-
   int coreSize = 10;
 
   int distance = 25;
+
+  @override
+  int get baseHp => 100;
+
+  @override
+  int get baseDefence => 0;
+
+  @override
+  int get baseAttack => 100;
 
   Element element = Element.unknown;
 

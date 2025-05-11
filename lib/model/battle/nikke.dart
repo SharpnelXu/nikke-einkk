@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/battle_skill.dart';
-import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/equipment.dart';
 import 'package:nikke_einkk/model/battle/favorite_item.dart';
 import 'package:nikke_einkk/model/battle/function.dart';
@@ -45,7 +45,20 @@ class BattleNikkeOptions {
 
 enum BattleNikkeStatus { behindCover, reloading, forceReloading, shooting }
 
-class BattleNikke {
+class BattleCover extends BattleEntity {
+  int hp = 0;
+
+  @override
+  int get baseHp => 100;
+
+  @override
+  int get baseAttack => 0;
+
+  @override
+  int get baseDefence => 0;
+}
+
+class BattleNikke extends BattleEntity {
   BattlePlayerOptions playerOptions;
   BattleNikkeOptions option;
 
@@ -69,6 +82,7 @@ class BattleNikke {
   ClassAttractiveStatData get attractiveStat =>
       gameData.attractiveStatTable[option.attractLevel]?.getStatData(nikkeClass) ?? ClassAttractiveStatData.emptyData;
 
+  @override
   int get baseHp => getBaseStat(
     baseStat: baseStat.hp,
     gradeEnhanceBase: statEnhanceData.gradeHp,
@@ -80,6 +94,7 @@ class BattleNikke {
     dollStat: option.favoriteItem?.getStat(StatType.hp) ?? 0,
   );
 
+  @override
   int get baseAttack => getBaseStat(
     baseStat: baseStat.attack,
     gradeEnhanceBase: statEnhanceData.gradeAttack,
@@ -91,6 +106,7 @@ class BattleNikke {
     dollStat: option.favoriteItem?.getStat(StatType.atk) ?? 0,
   );
 
+  @override
   int get baseDefence => getBaseStat(
     baseStat: baseStat.defence,
     gradeEnhanceBase: statEnhanceData.gradeDefence,
@@ -102,10 +118,7 @@ class BattleNikke {
     dollStat: option.favoriteItem?.getStat(StatType.defence) ?? 0,
   );
 
-  int position = 0;
-  int currentHp = 0;
-  // coverBaseHp
-  // coverCurrentHp
+  BattleCover cover = BattleCover();
   int currentAmmo = 0;
 
   WeaponType get currentWeaponType => currentWeaponData.weaponType;
@@ -145,7 +158,6 @@ class BattleNikke {
 
   List<BattleSkill> skills = [];
   List<BattleFunction> functions = [];
-  List<BattleBuff> buffs = [];
 
   BattleNikke({required this.playerOptions, required this.option});
 
@@ -183,7 +195,7 @@ class BattleNikke {
   }
 
   void init(BattleSimulation simulation, int position) {
-    this.position = position;
+    this.uniqueId = position;
     fps = simulation.fps;
     _accuracyCircleScale = baseWeaponData.startAccuracyCircleScale;
     rateOfFire = baseWeaponData.rateOfFire;
@@ -195,6 +207,8 @@ class BattleNikke {
     fullReloadFrameCount = 0;
     currentHp = baseHp;
     currentAmmo = baseWeaponData.maxAmmo;
+    cover.hp = 100; // TODO: change
+    cover.uniqueId = position + 5;
 
     totalBulletsFired = 0;
     totalBulletsHit = 0;
@@ -257,7 +271,7 @@ class BattleNikke {
     }
 
     for (final buff in buffs) {
-      if (buff.data.durationType == DurationType.timeSec && buff.isActive(simulation)) {
+      if (buff.data.durationType == DurationType.timeSec) {
         buff.duration -= 1;
       }
     }
@@ -301,7 +315,7 @@ class BattleNikke {
           name: name,
           reloadTimeData: baseReloadTimeData,
           reloadFrames: fullReloadFrameCount,
-          ownerPosition: position,
+          ownerUniqueId: uniqueId,
         ),
       );
     }
@@ -359,7 +373,7 @@ class BattleNikke {
             name: name,
             currentAmmo: currentAmmo,
             maxAmmo: getMaxAmmo(simulation),
-            ownerPosition: position,
+            ownerUniqueId: uniqueId,
           ),
         );
         if (currentWeaponData.fireType == FireType.instant) {
@@ -423,7 +437,7 @@ class BattleNikke {
                 name: name,
                 currentAmmo: currentAmmo,
                 maxAmmo: getMaxAmmo(simulation),
-                ownerPosition: position,
+                ownerUniqueId: uniqueId,
               ),
             );
           }
@@ -479,7 +493,7 @@ class BattleNikke {
     final target = simulation.raptures.where((rapture) => canTarget(rapture)).firstOrNull;
 
     // forcing cover, or no autoAttack, or no target
-    if (simulation.useCover || (position == simulation.currentNikke && !simulation.autoAttack) || target == null) {
+    if (simulation.useCover || (uniqueId == simulation.currentNikke && !simulation.autoAttack) || target == null) {
       status = BattleNikkeStatus.behindCover;
 
       if (currentAmmo < getMaxAmmo(simulation)) {
@@ -507,12 +521,12 @@ class BattleNikke {
   }
 
   void broadcast(BattleEvent event, BattleSimulation simulation) {
-    if (event is NikkeFireEvent && event.ownerPosition == position) {
+    if (event is NikkeFireEvent && event.ownerUniqueId == uniqueId) {
       currentAmmo = max(0, currentAmmo - 1);
       totalBulletsFired += 1;
 
       for (final buff in buffs) {
-        if (buff.data.durationType == DurationType.shots && buff.isActive(simulation)) {
+        if (buff.data.durationType == DurationType.shots) {
           buff.duration -= 1;
         }
       }
@@ -523,7 +537,7 @@ class BattleNikke {
       }
     }
 
-    if (event is NikkeDamageEvent && event.attackerPosition == position) {
+    if (event is NikkeDamageEvent && event.attackerUniqueId == uniqueId) {
       processDamageEvent(event, simulation);
     }
 
@@ -542,57 +556,20 @@ class BattleNikke {
   }
 
   void endCurrentFrame(BattleSimulation simulation) {
-    final gainAmmo = getBuffValue(simulation, FunctionType.gainAmmo, 0, (nikke) => nikke.getMaxAmmo(simulation));
+    final gainAmmo = getBuffValue(
+      simulation,
+      FunctionType.gainAmmo,
+      0,
+      (nikke) => nikke is BattleNikke ? nikke.getMaxAmmo(simulation) : 0,
+    );
     currentAmmo = (currentAmmo + gainAmmo).clamp(0, getMaxAmmo(simulation));
 
     buffs.removeWhere((buff) => buff.shouldRemove(simulation));
   }
 
-  // maybe change to a dedicated return structure to show which nikke gives which buffs
-  int getAttackBuffValues(BattleSimulation simulation) {
-    return getBuffValue(simulation, FunctionType.statAtk, 0, (nikke) => nikke.baseAttack);
-  }
-
   int getIncreaseElementDamageBuffValues(BattleSimulation simulation) {
     // not sure if function standard does anything here, coule be the base ele rate is 10000 for all in data
     return getPlainBuffValues(simulation, FunctionType.incElementDmg);
-  }
-
-  int getAccuracyCircleScale(BattleSimulation simulation) {
-    return getBuffValue(
-      simulation,
-      FunctionType.statAccuracyCircle,
-      _accuracyCircleScale,
-      (nikke) => nikke.currentWeaponData.startAccuracyCircleScale,
-    );
-  }
-
-  int getMaxAmmo(BattleSimulation simulation) {
-    return getBuffValueOfTypes(
-      simulation,
-      [FunctionType.statAmmoLoad, FunctionType.statAmmo],
-      currentWeaponData.maxAmmo,
-      (nikke) => nikke.currentWeaponData.maxAmmo,
-    );
-  }
-
-  int getChargeDamageBuffValues(BattleSimulation simulation) {
-    return getBuffValue(
-      simulation,
-      FunctionType.statChargeDamage,
-      0,
-      (nikke) => nikke.currentWeaponData.fullChargeDamage,
-    );
-  }
-
-  int getFramesToFullCharge(BattleSimulation simulation) {
-    final result = getBuffValue(
-      simulation,
-      FunctionType.statChargeTime,
-      currentWeaponData.chargeTime,
-      (nikke) => nikke.currentWeaponData.chargeTime,
-    );
-    return max(1, BattleUtils.timeDataToFrame(result, fps));
   }
 
   int getCriticalRate(BattleSimulation simulation) {
@@ -603,8 +580,50 @@ class BattleNikke {
     return getPlainBuffValues(simulation, FunctionType.statCriticalDamage);
   }
 
-  int getDefenceBuffValues(BattleSimulation simulation) {
-    return getBuffValue(simulation, FunctionType.statDef, 0, (nikke) => nikke.baseDefence);
+  int getGivingHealVariationBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.givingHealVariation);
+  }
+
+  int getDamageReductionBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.damageReduction);
+  }
+
+  /// nikke specific buffs
+  int getAccuracyCircleScale(BattleSimulation simulation) {
+    return getBuffValue(
+      simulation,
+      FunctionType.statAccuracyCircle,
+      _accuracyCircleScale,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.startAccuracyCircleScale : 0,
+    );
+  }
+
+  int getMaxAmmo(BattleSimulation simulation) {
+    return getBuffValueOfTypes(
+      simulation,
+      [FunctionType.statAmmoLoad, FunctionType.statAmmo],
+      currentWeaponData.maxAmmo,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.maxAmmo : 0,
+    );
+  }
+
+  int getChargeDamageBuffValues(BattleSimulation simulation) {
+    return getBuffValue(
+      simulation,
+      FunctionType.statChargeDamage,
+      0,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.fullChargeDamage : 0,
+    );
+  }
+
+  int getFramesToFullCharge(BattleSimulation simulation) {
+    final result = getBuffValue(
+      simulation,
+      FunctionType.statChargeTime,
+      currentWeaponData.chargeTime,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
+    );
+    return max(1, BattleUtils.timeDataToFrame(result, fps));
   }
 
   int getTimeToReload(BattleSimulation simulation) {
@@ -612,7 +631,7 @@ class BattleNikke {
       simulation,
       FunctionType.statReloadTime,
       currentWeaponData.reloadTime,
-      (nikke) => nikke.currentWeaponData.reloadTime,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.reloadTime : 0,
     );
     return max(1, result + currentWeaponData.spotLastDelay);
   }
@@ -622,82 +641,16 @@ class BattleNikke {
       simulation,
       FunctionType.firstBurstGaugeSpeedUp,
       isTarget ? currentWeaponData.targetBurstEnergyPerShot : currentWeaponData.burstEnergyPerShot,
-      (nikke) =>
-          isTarget ? nikke.currentWeaponData.targetBurstEnergyPerShot : nikke.currentWeaponData.burstEnergyPerShot,
+      (entity) =>
+          entity is BattleNikke
+              ? isTarget
+                  ? entity.currentWeaponData.targetBurstEnergyPerShot
+                  : entity.currentWeaponData.burstEnergyPerShot
+              : 0,
     );
-  }
-
-  int getMaxHp(BattleSimulation simulation) {
-    return getBuffValueOfTypes(
-      simulation,
-      [FunctionType.statHp, FunctionType.statHpHeal],
-      baseHp,
-      (nikke) => nikke.baseHp,
-    );
-  }
-
-  int getGivingHealVariationBuffValues(BattleSimulation simulation) {
-    return getPlainBuffValues(simulation, FunctionType.givingHealVariation);
-  }
-
-  int getDamageReductionBuffValues(BattleSimulation simulation) {
-    return getPlainBuffValues(simulation, FunctionType.damageReduction);
   }
 
   int getPartsDamageBuffValues(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.partsDamage);
-  }
-
-  int getPlainBuffValues(BattleSimulation simulation, FunctionType type) {
-    int result = 0;
-    for (final buff in buffs) {
-      if (buff.data.functionType != type || !buff.isActive(simulation)) continue;
-      // all valueType is fixed and doesn't make sense to depend on user
-      result += buff.data.functionValue * buff.count;
-    }
-
-    return result;
-  }
-
-  int getBuffValue(
-    BattleSimulation simulation,
-    FunctionType type,
-    int baseValue,
-    int Function(BattleNikke) getStandardBaseValue,
-  ) {
-    return getBuffValueOfTypes(simulation, [type], baseValue, getStandardBaseValue);
-  }
-
-  int getBuffValueOfTypes(
-    BattleSimulation simulation,
-    List<FunctionType> types,
-    int baseValue,
-    int Function(BattleNikke) getStandardBaseValue,
-  ) {
-    // position to percentValues
-    final Map<int, int> percents = {};
-
-    int flatValue = 0;
-    for (final buff in buffs) {
-      if (!types.contains(buff.data.functionType) || !buff.isActive(simulation)) continue;
-
-      if (buff.data.functionValueType == ValueType.percent) {
-        final standardPosition = buff.getFunctionStandardTargetPosition(simulation);
-        if (standardPosition != -1) {
-          percents.putIfAbsent(standardPosition, () => 0);
-          percents[standardPosition] = percents[standardPosition]! + buff.data.functionValue * buff.count;
-        }
-      } else if (buff.data.functionValueType == ValueType.integer) {
-        flatValue += buff.data.functionValue;
-      }
-    }
-
-    int result = baseValue + flatValue;
-    for (final standardPosition in percents.keys) {
-      final standard = simulation.getNikkeOnPosition(standardPosition)!;
-      result += (getStandardBaseValue(standard) * BattleUtils.toModifier(percents[standardPosition]!)).round();
-    }
-
-    return result;
   }
 }

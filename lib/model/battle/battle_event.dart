@@ -11,61 +11,67 @@ import 'nikke.dart';
 abstract class BattleEvent {
   Widget buildDisplay();
 
-  int getUserPosition();
+  int getActivatorUniqueId() {
+    return -1;
+  }
+
+  int getTargetUniqueId() {
+    return -1;
+  }
 }
 
 // or replace these with an enum type if no real use case
-class NikkeFireEvent implements BattleEvent {
+class NikkeFireEvent extends BattleEvent {
   String name;
   int currentAmmo;
   int maxAmmo;
-  int ownerPosition; // this is basically uniqueId
+  int ownerUniqueId;
 
-  NikkeFireEvent({required this.name, required this.currentAmmo, required this.maxAmmo, required this.ownerPosition});
+  NikkeFireEvent({required this.name, required this.currentAmmo, required this.maxAmmo, required this.ownerUniqueId});
 
   @override
   buildDisplay() {
-    return Text('$name (Pos $ownerPosition) attack (Ammo: $currentAmmo/$maxAmmo)');
+    return Text('$name (Pos $ownerUniqueId) attack (Ammo: $currentAmmo/$maxAmmo)');
   }
 
   @override
-  int getUserPosition() {
-    return ownerPosition;
+  int getActivatorUniqueId() {
+    return ownerUniqueId;
   }
 }
 
-class NikkeReloadStartEvent implements BattleEvent {
+class NikkeReloadStartEvent extends BattleEvent {
   String name;
   num reloadTimeData;
   int reloadFrames;
-  int ownerPosition; // this is basically uniqueId
+  int ownerUniqueId;
 
   NikkeReloadStartEvent({
     required this.name,
     required this.reloadTimeData,
     required this.reloadFrames,
-    required this.ownerPosition,
+    required this.ownerUniqueId,
   });
 
   @override
-  int getUserPosition() {
-    return ownerPosition;
+  int getActivatorUniqueId() {
+    return ownerUniqueId;
   }
 
   @override
   Widget buildDisplay() {
     return Text(
-      '$name (Pos $ownerPosition) reloading: '
+      '$name (Pos $ownerUniqueId) reloading: '
       '${(reloadTimeData / 100).toStringAsFixed(2)}s ($reloadFrames frames)',
     );
   }
 }
 
-class NikkeDamageEvent implements BattleEvent {
+class NikkeDamageEvent extends BattleEvent {
   NikkeDamageType type;
   late WeaponData weaponData;
   late String name;
-  late int attackerPosition; // this is basically uniqueId for Nikke
+  late int attackerUniqueId;
   late int targetUniqueId;
   late int chargePercent;
 
@@ -78,7 +84,7 @@ class NikkeDamageEvent implements BattleEvent {
     required this.type,
   }) {
     name = nikke.name;
-    attackerPosition = nikke.position;
+    attackerUniqueId = nikke.uniqueId;
     targetUniqueId = rapture.uniqueId;
     weaponData = nikke.currentWeaponData;
     chargePercent =
@@ -91,7 +97,7 @@ class NikkeDamageEvent implements BattleEvent {
     damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
-      defence: rapture.defence,
+      defence: rapture.getDefenceBuffValues(simulation),
       damageRate: weaponData.damage,
       coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
       coreDamageRate: weaponData.coreDamageRate,
@@ -118,14 +124,19 @@ class NikkeDamageEvent implements BattleEvent {
   }
 
   @override
-  int getUserPosition() {
-    return attackerPosition;
+  int getActivatorUniqueId() {
+    return attackerUniqueId;
+  }
+
+  @override
+  int getTargetUniqueId() {
+    return targetUniqueId;
   }
 
   @override
   Widget buildDisplay() {
     return Text(
-      '$name (Pos $attackerPosition) ${type.name} damage: ${damageParameter.calculateExpectedDamage()}'
+      '$name (Pos $attackerUniqueId) ${type.name} damage: ${damageParameter.calculateExpectedDamage()}'
       '${weaponData.shotCount > 1 ? ' (${weaponData.shotCount} Shots)' : ''}'
       '${chargePercent > 0 ? ' Charge: ${(chargePercent / 100).toStringAsFixed(2)}%' : ''}'
       ' (Core: ${(damageParameter.coreHitRate / 100).toStringAsFixed(2)}%,'
@@ -136,10 +147,10 @@ class NikkeDamageEvent implements BattleEvent {
 
 enum NikkeDamageType { bullet }
 
-class BurstGenerationEvent implements BattleEvent {
+class BurstGenerationEvent extends BattleEvent {
   String name = '';
   late WeaponData weaponData;
-  late int attackerPosition; // this is basically uniqueId for Nikke
+  late int attackerUniqueId;
   late int targetUniqueId;
   int chargePercent = 0;
   int currentMeter = 0;
@@ -153,7 +164,7 @@ class BurstGenerationEvent implements BattleEvent {
   }) {
     name = nikke.name;
     weaponData = nikke.currentWeaponData;
-    attackerPosition = nikke.position;
+    attackerUniqueId = nikke.uniqueId;
     targetUniqueId = rapture.uniqueId;
     chargePercent =
         WeaponType.chargeWeaponTypes.contains(weaponData.weaponType)
@@ -162,7 +173,7 @@ class BurstGenerationEvent implements BattleEvent {
     chargePercent = chargePercent.clamp(0, 10000);
     currentMeter = simulation.burstMeter;
     final bonusBurst =
-        simulation.currentNikke == nikke.position &&
+        simulation.currentNikke == nikke.uniqueId &&
         WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponData.weaponType);
 
     positionBurstBonus = bonusBurst ? 10000 + (15000 * BattleUtils.toModifier(chargePercent)).round() : 10000;
@@ -173,8 +184,13 @@ class BurstGenerationEvent implements BattleEvent {
   }
 
   @override
-  int getUserPosition() {
-    return attackerPosition;
+  int getActivatorUniqueId() {
+    return attackerUniqueId;
+  }
+
+  @override
+  int getTargetUniqueId() {
+    return targetUniqueId;
   }
 
   @override
@@ -182,17 +198,17 @@ class BurstGenerationEvent implements BattleEvent {
     final updatedBurst = min(currentMeter + burst, BattleSimulation.burstMeterCap);
 
     return Text(
-      '$name (Pos $attackerPosition) Burst Gen: ${(updatedBurst / 10000).toStringAsFixed(4)}%'
+      '$name (Pos $attackerUniqueId) Burst Gen: ${(updatedBurst / 10000).toStringAsFixed(4)}%'
       ' (+${(burst / 10000).toStringAsFixed(4)}%)'
       '${positionBurstBonus > 10000 ? ' Bonus: ${(positionBurstBonus / 100).toStringAsFixed(2)}%' : ''}',
     );
   }
 }
 
-class BattleStartEvent implements BattleEvent {
-  final int userPosition;
+class BattleStartEvent extends BattleEvent {
+  final int userUniqueId;
 
-  BattleStartEvent(this.userPosition);
+  BattleStartEvent(this.userUniqueId);
 
   @override
   Widget buildDisplay() {
@@ -200,7 +216,7 @@ class BattleStartEvent implements BattleEvent {
   }
 
   @override
-  int getUserPosition() {
-    return userPosition;
+  int getActivatorUniqueId() {
+    return userUniqueId;
   }
 }

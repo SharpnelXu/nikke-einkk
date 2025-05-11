@@ -58,7 +58,7 @@ Receive Damage Rate = 100% + Receive Damage Buffs + Distributed Damage Buffs
   - A2: has 9 extra frames each attack comparing to data
   - RLs: projectile travel calculation, current formula is hardcoded as `100 * rapture.distance / projectileSpeed`
 - Skills
-- Burst calculation
+  - Function Target & Timing Trigger Standard & Status Trigger Standard
 - Equip skills
 - Cube skills
 - Doll skills

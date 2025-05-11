@@ -331,6 +331,8 @@ enum FunctionType {
   windReduction,
 }
 
+// functionTarget may not mean the actual function target based on Flora's Skill 2 (checks teammates on both sides
+// but triggerStandard is functionTarget which is self)
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum StandardType { unknown, none, user, functionTarget, triggerTarget }
 
@@ -511,6 +513,8 @@ class FunctionData {
   @JsonKey(name: 'status_trigger2_value')
   final int statusTrigger2Value;
   // best guess is whether to keep the function as on or off after trigger
+  // based on conditional max hp cube, this should also dictates if a function should be triggered?
+  // but Elegg's skill2 is onHitNum with keepingType on, and statusTrigger
   @JsonKey(name: 'keeping_type')
   final FunctionStatus keepingType;
   @JsonKey(name: 'buff_icon')

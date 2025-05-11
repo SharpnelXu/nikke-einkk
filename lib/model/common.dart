@@ -635,21 +635,25 @@ enum Rarity { unknown, ssr, sr, r }
 enum StatType { atk, defence, hp, none, unknown }
 
 enum WeaponType {
-  unknown,
+  unknown(-1),
   @JsonValue('None')
-  none,
+  none(0),
   @JsonValue('AR')
-  ar,
+  ar(1),
   @JsonValue('MG')
-  mg,
+  mg(4),
   @JsonValue('RL')
-  rl,
+  rl(2),
   @JsonValue('SG')
-  sg,
+  sg(5),
   @JsonValue('SMG')
-  smg,
+  smg(9),
   @JsonValue('SR')
-  sr;
+  sr(3);
+
+  final int id;
+
+  const WeaponType(this.id);
 
   static const List<WeaponType> chargeWeaponTypes = [WeaponType.rl, WeaponType.sr];
 
