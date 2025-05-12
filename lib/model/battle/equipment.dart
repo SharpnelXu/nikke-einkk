@@ -75,4 +75,15 @@ class BattleEquipment {
       );
     }
   }
+
+  BattleEquipment copy() {
+    return BattleEquipment(
+      type: type,
+      equipClass: equipClass,
+      rarity: rarity,
+      corporation: corporation,
+      level: level,
+      equipLines: equipLines.map((equipLine) => equipLine.copy()).toList(),
+    );
+  }
 }

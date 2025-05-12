@@ -11,16 +11,18 @@ class BattleRapture extends BattleEntity {
 
   int distance = 25;
 
+  int defence = 0;
+
   @override
   int get baseHp => 100;
 
   @override
-  int get baseDefence => 0;
+  int get baseDefence => defence;
 
   @override
   int get baseAttack => 100;
 
-  Element element = Element.unknown;
+  NikkeElement element = NikkeElement.unknown;
 
   bool hasParts() {
     return false;

@@ -41,6 +41,19 @@ class BattleNikkeOptions {
       favoriteItem = null;
     }
   }
+
+  BattleNikkeOptions copy() {
+    return BattleNikkeOptions(
+      nikkeResourceId: nikkeResourceId,
+      coreLevel: coreLevel,
+      syncLevel: syncLevel,
+      attractLevel: attractLevel,
+      equips: equips.map((equip) => equip.copy()).toList(),
+      skillLevels: skillLevels.toList(),
+      cube: cube?.copy(),
+      favoriteItem: favoriteItem?.copy(),
+    );
+  }
 }
 
 enum BattleNikkeStatus { behindCover, reloading, forceReloading, shooting }
@@ -71,7 +84,7 @@ class BattleNikke extends BattleEntity {
   // skill data
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
-  Element get element => Element.fromId(characterData.elementId.first);
+  NikkeElement get element => NikkeElement.fromId(characterData.elementId.first);
 
   int get coreLevel => characterData.gradeCoreId;
 

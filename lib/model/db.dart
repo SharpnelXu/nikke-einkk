@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:logger/logger.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/items.dart';
@@ -221,22 +222,11 @@ class NikkeDatabase {
     final table = File(functionTableFilePath);
     final bool exists = await table.exists();
     if (exists) {
-      Map<StandardType, Set<TimingTriggerType>> checks = {};
-      Map<StandardType, Set<StatusTriggerType>> checks2 = {};
       final json = jsonDecode(await table.readAsString());
       for (final record in json['records']) {
         final function = FunctionData.fromJson(record);
         functionTable[function.id] = function;
-
-        checks.putIfAbsent(function.timingTriggerStandard, () => {});
-        checks[function.timingTriggerStandard]!.add(function.timingTriggerType);
-        checks2.putIfAbsent(function.statusTriggerStandard, () => {});
-        checks2[function.statusTriggerStandard]!.add(function.statusTriggerType);
-        checks2.putIfAbsent(function.statusTrigger2Standard, () => {});
-        checks2[function.statusTrigger2Standard]!.add(function.statusTrigger2Type);
       }
-      logger.i(checks);
-      logger.i(checks2);
     }
     return exists;
   }
@@ -322,5 +312,13 @@ class NikkeDatabase {
 
   EquipmentData? getEquipData(EquipType equipType, NikkeClass nikkeClass, EquipRarity rarity) {
     return groupedEquipTable[equipType]?[nikkeClass]?[rarity];
+  }
+
+  int? getDollId(WeaponType weaponType, Rarity rarity) {
+    if (rarity == Rarity.ssr) return null;
+
+    return favoriteItemTable.values
+        .firstWhereOrNull((data) => data.favoriteRare == rarity && data.weaponType == weaponType)
+        ?.id;
   }
 }

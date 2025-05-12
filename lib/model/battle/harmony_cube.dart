@@ -46,4 +46,8 @@ class BattleHarmonyCube {
       );
     }
   }
+
+  BattleHarmonyCube copy() {
+    return BattleHarmonyCube(cubeId, cubeLevel);
+  }
 }

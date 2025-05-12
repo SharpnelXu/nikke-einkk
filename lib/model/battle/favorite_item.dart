@@ -46,4 +46,8 @@ class BattleFavoriteItem {
       );
     }
   }
+
+  BattleFavoriteItem copy() {
+    return BattleFavoriteItem(favoriteItemId, level);
+  }
 }

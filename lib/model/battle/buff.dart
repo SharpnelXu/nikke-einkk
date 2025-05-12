@@ -29,20 +29,16 @@ class BattleBuff {
     }
   }
 
-  List<int> getFunctionStandardUniqueIds() {
-    final List<int> result = [];
+  int getFunctionStandardUniqueId() {
     switch (data.functionStandard) {
       case StandardType.user:
-        result.add(buffGiverUniqueId);
-        break;
+        return buffGiverUniqueId;
       case StandardType.functionTarget:
-        result.add(buffReceiverUniqueId);
-        break;
+        return buffReceiverUniqueId;
       case StandardType.triggerTarget: // there is no triggerTarget in functionStandardType
       case StandardType.unknown:
       case StandardType.none:
-        break;
+        return -1;
     }
-    return result;
   }
 }

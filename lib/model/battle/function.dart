@@ -19,14 +19,15 @@ class BattleFunction {
   BattleFunction(this.data, this.ownerUniqueId);
 
   void broadcast(BattleEvent event, BattleSimulation simulation) {
-    if ((data.limitValue > 0 && timesActivated >= data.limitValue)) return;
+    if (data.limitValue > 0 && timesActivated >= data.limitValue) return;
 
     // the idea is that all data necessary for processing this broadcast should be available in the event
     final standard = getTimingTriggerStandardTarget(event, simulation);
 
     switch (data.timingTriggerType) {
       case TimingTriggerType.onHitNum:
-        if (event is! NikkeDamageEvent) return;
+        // triggerStandard: {user, none}, majority is user
+        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId) return;
 
         if (standard is BattleNikke &&
             standard.totalBulletsHit > 0 &&
@@ -35,11 +36,13 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onStart:
+        // triggerStandard: {user, none}
         if (event is! BattleStartEvent) return;
         executeFunction(event, simulation);
         break;
       case TimingTriggerType.onUseAmmo:
-        if (event is! NikkeFireEvent) return;
+        // triggerStandard: {user, none}, majority is user
+        if (event is! NikkeFireEvent || standard?.uniqueId != ownerUniqueId) return;
 
         if (standard is BattleNikke &&
             standard.totalBulletsFired > 0 &&
@@ -112,10 +115,10 @@ class BattleFunction {
 
   BattleEntity? getTimingTriggerStandardTarget(BattleEvent event, BattleSimulation simulation) {
     switch (data.timingTriggerStandard) {
-      case StandardType.none:
       case StandardType.user:
-        // a lot of timingTriggerTypes have standards set to none which clearly need an countTarget, so default to user'
-        // examples include Elegg S2
+      case StandardType.none:
+        // a lot of timingTriggerTypes have standards set to none which clearly need an countTarget, so default to
+        // activator. examples include Elegg S2
         return simulation.getEntityByUniqueId(event.getActivatorUniqueId());
       case StandardType.functionTarget:
         // functionTarget: {onTeamHpRatioUnder, onPartsBrokenNum, onTeamHpRatioUp, onFullCount (not actually used)}
@@ -188,7 +191,7 @@ class BattleFunction {
               existingBuff.buffReceiverUniqueId = target.uniqueId;
             }
           } else {
-            target.buffs.add(BattleBuff(data, event.getActivatorUniqueId(), target.uniqueId));
+            target.buffs.add(BattleBuff(data, ownerUniqueId, target.uniqueId));
           }
 
           if (data.functionType == FunctionType.statHpHeal) {

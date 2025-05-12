@@ -666,7 +666,7 @@ enum WeaponType {
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum NikkeClass { unknown, attacker, defender, supporter, all }
 
-enum Element {
+enum NikkeElement {
   unknown(-1),
   fire(100001),
   water(200001),
@@ -676,29 +676,29 @@ enum Element {
 
   final int id;
 
-  const Element(this.id);
+  const NikkeElement(this.id);
 
-  static Element fromId(final int id) {
+  static NikkeElement fromId(final int id) {
     return values.firstWhere(
       (e) => e.id == id,
-      orElse: () => Element.unknown, // default value if not found
+      orElse: () => NikkeElement.unknown, // default value if not found
     );
   }
 
-  bool strongAgainst(Element other) {
+  bool strongAgainst(NikkeElement other) {
     switch (this) {
-      case Element.unknown:
+      case NikkeElement.unknown:
         return false;
-      case Element.fire:
-        return other == Element.wind;
-      case Element.water:
-        return other == Element.fire;
-      case Element.wind:
-        return other == Element.iron;
-      case Element.electric:
-        return other == Element.water;
-      case Element.iron:
-        return other == Element.electric;
+      case NikkeElement.fire:
+        return other == NikkeElement.wind;
+      case NikkeElement.water:
+        return other == NikkeElement.fire;
+      case NikkeElement.wind:
+        return other == NikkeElement.iron;
+      case NikkeElement.electric:
+        return other == NikkeElement.water;
+      case NikkeElement.iron:
+        return other == NikkeElement.electric;
     }
   }
 }

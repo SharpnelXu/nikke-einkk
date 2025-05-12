@@ -31,7 +31,7 @@ class NikkeFireEvent extends BattleEvent {
 
   @override
   buildDisplay() {
-    return Text('$name (Pos $ownerUniqueId) attack (Ammo: $currentAmmo/$maxAmmo)');
+    return Text('$name (Pos $ownerUniqueId) attack (Ammo: ${currentAmmo - 1}/$maxAmmo)');
   }
 
   @override
@@ -97,13 +97,13 @@ class NikkeDamageEvent extends BattleEvent {
     damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
-      defence: rapture.getDefenceBuffValues(simulation),
+      defence: rapture.baseDefence,
       damageRate: weaponData.damage,
       coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
       coreDamageRate: weaponData.coreDamageRate,
       criticalRate: nikke.getCriticalRate(simulation),
       criticalDamageRate: nikke.characterData.criticalDamage,
-      criticalDamageBuff: nikke.getChargeDamageBuffValues(simulation),
+      criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
       isBonusRange: nikke.isBonusRange(rapture.distance),
       isFullBurst: simulation.fullBurst,
       isStrongElement: nikke.element.strongAgainst(rapture.element),
@@ -135,12 +135,18 @@ class NikkeDamageEvent extends BattleEvent {
 
   @override
   Widget buildDisplay() {
+    final coreRate = BattleUtils.toModifier(damageParameter.coreHitRate);
+    final critRate = BattleUtils.toModifier(damageParameter.criticalRate);
+    final critCoreRate = coreRate * critRate;
+
     return Text(
       '$name (Pos $attackerUniqueId) ${type.name} damage: ${damageParameter.calculateExpectedDamage()}'
       '${weaponData.shotCount > 1 ? ' (${weaponData.shotCount} Shots)' : ''}'
       '${chargePercent > 0 ? ' Charge: ${(chargePercent / 100).toStringAsFixed(2)}%' : ''}'
-      ' (Core: ${(damageParameter.coreHitRate / 100).toStringAsFixed(2)}%,'
-      ' Crit: ${(damageParameter.criticalRate / 100).toStringAsFixed(2)}%)',
+      ' (Base: ${damageParameter.calculateDamage()} ${((1 - critCoreRate - coreRate - critRate) * 100).toStringAsFixed(2)}%'
+      ' Core: ${damageParameter.calculateDamage(core: true)} ${(coreRate * 100).toStringAsFixed(2)}%,'
+      ' Crit: ${damageParameter.calculateDamage(critical: true)} ${(critRate * 100).toStringAsFixed(2)}%)'
+      ' Core + Crit: ${damageParameter.calculateDamage(core: true, critical: true)} ${(critCoreRate * 100).toStringAsFixed(2)}%',
     );
   }
 }
@@ -206,17 +212,12 @@ class BurstGenerationEvent extends BattleEvent {
 }
 
 class BattleStartEvent extends BattleEvent {
-  final int userUniqueId;
+  static BattleStartEvent battleStartEvent = BattleStartEvent._();
 
-  BattleStartEvent(this.userUniqueId);
+  BattleStartEvent._();
 
   @override
   Widget buildDisplay() {
     return Text('Battle Start');
-  }
-
-  @override
-  int getActivatorUniqueId() {
-    return userUniqueId;
   }
 }

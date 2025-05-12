@@ -78,7 +78,7 @@ class BattleSimulation {
 
     // BattleStart
     for (final nikke in nikkes) {
-      nikke.broadcast(BattleStartEvent(nikke.uniqueId), this);
+      nikke.broadcast(BattleStartEvent.battleStartEvent, this);
     }
 
     // all onStart functions applied, battleStart

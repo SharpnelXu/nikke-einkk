@@ -161,6 +161,10 @@ class EquipLine {
   int getStateEffectId() {
     return type == EquipLineType.none ? 0 : type.stateEffectIdBase + level;
   }
+
+  EquipLine copy() {
+    return EquipLine(type, level);
+  }
 }
 
 @JsonSerializable()
@@ -430,4 +434,27 @@ class FavoriteItemLevelData {
   factory FavoriteItemLevelData.fromJson(Map<String, dynamic> json) => _$FavoriteItemLevelDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$FavoriteItemLevelDataToJson(this);
+}
+
+/// cube table
+enum HarmonyCubeType {
+  accuracy(1000301),
+  chargeDamage(1000302),
+  reload(1000303),
+  gainAmmo(1000304),
+  chargeSpeed(1000305),
+  ammoCapacity(1000306),
+  burst(1000307),
+  maxHp(1000308),
+  defence(1000309),
+  healPotency(1000310),
+  damageTakenDown(1000311),
+  emergencyMaxHp(1000312),
+  parts(1000313)
+  // pierce(100314)
+  ;
+
+  final int cubeId;
+
+  const HarmonyCubeType(this.cubeId);
 }

@@ -64,12 +64,10 @@ abstract class BattleEntity {
       if (!types.contains(buff.data.functionType)) continue;
 
       if (buff.data.functionValueType == ValueType.percent) {
-        final standardUniqueIds = buff.getFunctionStandardUniqueIds();
-        for (final standardUniqueId in standardUniqueIds) {
-          if (standardUniqueId != -1) {
-            percents.putIfAbsent(standardUniqueId, () => 0);
-            percents[standardUniqueId] = percents[standardUniqueId]! + buff.data.functionValue * buff.count;
-          }
+        final standardUniqueId = buff.getFunctionStandardUniqueId();
+        if (standardUniqueId != -1) {
+          percents.putIfAbsent(standardUniqueId, () => 0);
+          percents[standardUniqueId] = percents[standardUniqueId]! + buff.data.functionValue * buff.count;
         }
       } else if (buff.data.functionValueType == ValueType.integer) {
         flatValue += buff.data.functionValue;

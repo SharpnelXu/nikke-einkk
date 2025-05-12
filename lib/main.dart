@@ -5,9 +5,12 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/module/battle_timeline.dart';
 
 import 'model/battle/battle_simulator.dart';
+import 'model/battle/equipment.dart';
+import 'model/battle/favorite_item.dart';
 import 'model/battle/nikke.dart';
 import 'model/battle/rapture.dart';
 import 'model/common.dart';
+import 'model/items.dart';
 
 Future<void> main() async {
   await gameData.loadData();
@@ -20,35 +23,84 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final maxAmmoCube = BattleHarmonyCube(1000306, 15);
-    final burstCube = BattleHarmonyCube(1000307, 15);
-    final simulation = BattleSimulation(
-      playerOptions: BattlePlayerOptions(
-        personalRecycleLevel: 400,
-        corpRecycleLevels: {
-          Corporation.pilgrim: 400,
-          Corporation.missilis: 400,
-          Corporation.abnormal: 400,
-          Corporation.tetra: 400,
-          Corporation.elysion: 400,
-        },
-        classRecycleLevels: {NikkeClass.attacker: 400, NikkeClass.supporter: 400, NikkeClass.defender: 400},
-      ),
-      nikkeOptions: [
-        // BattleNikkeOptions(nikkeResourceId: 810, coreLevel: 11, syncLevel: 901, attractLevel: 30),
-        // BattleNikkeOptions(nikkeResourceId: 810, coreLevel: 11, syncLevel: 901, attractLevel: 30),
+    final BattlePlayerOptions playerOptions = BattlePlayerOptions(
+      personalRecycleLevel: 420,
+      corpRecycleLevels: {
+        Corporation.pilgrim: 405,
+        Corporation.missilis: 196,
+        Corporation.abnormal: 155,
+        Corporation.tetra: 224,
+        Corporation.elysion: 197,
+      },
+      classRecycleLevels: {NikkeClass.attacker: 210, NikkeClass.supporter: 193, NikkeClass.defender: 184},
+    );
+    final BattleNikkeOptions scarletOption = BattleNikkeOptions(
+      nikkeResourceId: 222,
+      coreLevel: 11,
+      syncLevel: 883,
+      attractLevel: 40,
+      skillLevels: [10, 10, 10],
+      equips: [
+        BattleEquipment(
+          type: EquipType.head,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAmmo, 9), EquipLine(EquipLineType.increaseElementalDamage, 9)],
+        ),
+        BattleEquipment(
+          type: EquipType.body,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [
+            EquipLine(EquipLineType.statChargeTime, 2),
+            EquipLine(EquipLineType.statAmmo, 5),
+            EquipLine(EquipLineType.statDef, 9),
+          ],
+        ),
+        BattleEquipment(
+          type: EquipType.arm,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAtk, 10), EquipLine(EquipLineType.statAmmo, 3)],
+        ),
+        BattleEquipment(
+          type: EquipType.leg,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [
+            EquipLine(EquipLineType.statChargeDamage, 1),
+            EquipLine(EquipLineType.statAtk, 14),
+            EquipLine(EquipLineType.statAmmo, 5),
+          ],
+        ),
+      ],
+      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.ar, Rarity.sr)!, 5),
+      cube: null,
+    );
 
-        // BattleNikkeOptions(nikkeResourceId: 194, coreLevel: 11, syncLevel: 901, attractLevel: 30),
-        // BattleNikkeOptions(nikkeResourceId: 313, coreLevel: 11, syncLevel: 901, attractLevel: 30),
-        // BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30),
-        // BattleNikkeOptions(nikkeResourceId: 225, coreLevel: 11, syncLevel: 901, attractLevel: 40),
-        BattleNikkeOptions(nikkeResourceId: 222, coreLevel: 11, syncLevel: 901, attractLevel: 40, cube: maxAmmoCube),
-        BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30, cube: burstCube),
-        BattleNikkeOptions(nikkeResourceId: 191, coreLevel: 11, syncLevel: 901, attractLevel: 30, cube: burstCube),
+    final simulation = BattleSimulation(
+      playerOptions: playerOptions,
+      nikkeOptions: [
+        scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15),
+        scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.gainAmmo.cubeId, 15),
+        scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.ammoCapacity.cubeId, 7),
+        scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
       ],
     );
 
-    simulation.raptures.add(BattleRapture()..uniqueId = 11);
+    final rapture =
+        BattleRapture()
+          ..uniqueId = 11
+          ..distance = 30
+          ..element = NikkeElement.water
+          ..defence = 100;
+
+    simulation.raptures.add(rapture);
+    simulation.maxSeconds = 15;
 
     return MaterialApp(
       title: 'Flutter Demo',
