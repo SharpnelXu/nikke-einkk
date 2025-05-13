@@ -209,3 +209,23 @@ class NikkeDamageParameter {
     return max(totalDamage.round(), 1);
   }
 }
+
+extension NumUtils on num {
+  int roundToEven() {
+    int rounded = round();
+    if ((this - rounded).abs() == 0.5) {
+      // If the value is exactly halfway, round to the nearest even number
+      return (rounded.isEven) ? rounded : (rounded - 1);
+    }
+    return rounded;
+  }
+
+  int roundToOdd() {
+    int rounded = round();
+    if ((this - rounded).abs() == 0.5) {
+      // If the value is exactly halfway, round to the nearest odd number
+      return (rounded.isOdd) ? rounded : (rounded - 1);
+    }
+    return rounded;
+  }
+}

@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/function.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
+import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
@@ -53,12 +54,24 @@ class BattleEquipment {
     }
   }
 
-  num getStat(StatType statType, Corporation ownerCorp) {
+  int getStat(StatType statType, [Corporation? ownerCorp]) {
     final equipStat = equipData.stat.firstWhereOrNull((stat) => stat.statType == statType);
     if (equipStat == null) return 0;
 
-    final sameCorpFactor = rarity.canHaveCorp && corporation != Corporation.none && ownerCorp == corporation ? 3 : 0;
-    return equipStat.statValue * (1 + (level + sameCorpFactor) * 0.1);
+    final sameCorp = rarity.canHaveCorp && corporation != Corporation.none && ownerCorp == corporation;
+    final levelStat = (level * 0.1 * equipStat.statValue).roundToEven();
+    final corpStat = (sameCorp ? 0.3 * equipStat.statValue : 0).roundToEven();
+
+    final result = equipStat.statValue + levelStat + corpStat;
+
+    return result;
+  }
+
+  num getLevelStat(StatType statType) {
+    final equipStat = equipData.stat.firstWhereOrNull((stat) => stat.statType == statType);
+    if (equipStat == null) return 0;
+
+    return level * 0.1 * equipStat.statValue;
   }
 
   void applyEquipLines(BattleSimulation simulation, BattleNikke wearer) {

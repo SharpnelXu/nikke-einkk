@@ -135,18 +135,20 @@ class NikkeDamageEvent extends BattleEvent {
 
   @override
   Widget buildDisplay() {
-    final coreRate = BattleUtils.toModifier(damageParameter.coreHitRate);
-    final critRate = BattleUtils.toModifier(damageParameter.criticalRate);
-    final critCoreRate = coreRate * critRate;
+
+    final criticalPercent = min(BattleUtils.toModifier(damageParameter.criticalRate), 1);
+    final corePercent = min(BattleUtils.toModifier(damageParameter.coreHitRate), 1);
+    final nonCriticalPercent = 1 - criticalPercent;
+    final nonCorePercent = 1 - corePercent;
 
     return Text(
       '$name (Pos $attackerUniqueId) ${type.name} damage: ${damageParameter.calculateExpectedDamage()}'
       '${weaponData.shotCount > 1 ? ' (${weaponData.shotCount} Shots)' : ''}'
       '${chargePercent > 0 ? ' Charge: ${(chargePercent / 100).toStringAsFixed(2)}%' : ''}'
-      ' (Base: ${damageParameter.calculateDamage()} ${((1 - critCoreRate - coreRate - critRate) * 100).toStringAsFixed(2)}%'
-      ' Core: ${damageParameter.calculateDamage(core: true)} ${(coreRate * 100).toStringAsFixed(2)}%,'
-      ' Crit: ${damageParameter.calculateDamage(critical: true)} ${(critRate * 100).toStringAsFixed(2)}%)'
-      ' Core + Crit: ${damageParameter.calculateDamage(core: true, critical: true)} ${(critCoreRate * 100).toStringAsFixed(2)}%',
+      ' (Base: ${damageParameter.calculateDamage()} ${((nonCriticalPercent * nonCorePercent) * 100).toStringAsFixed(2)}%'
+      ' Core: ${damageParameter.calculateDamage(core: true)} ${(corePercent * 100).toStringAsFixed(2)}%,'
+      ' Crit: ${damageParameter.calculateDamage(critical: true)} ${(criticalPercent * 100).toStringAsFixed(2)}%)'
+      ' Core + Crit: ${damageParameter.calculateDamage(core: true, critical: true)} ${(criticalPercent * corePercent).toStringAsFixed(2)}%',
     );
   }
 }

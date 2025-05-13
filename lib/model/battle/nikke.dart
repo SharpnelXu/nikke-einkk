@@ -189,7 +189,7 @@ class BattleNikke extends BattleEntity {
     required int coreEnhanceBaseRatio,
     required int consoleStat,
     required int bondStat,
-    required num equipStat,
+    required int equipStat,
     required int cubeStat,
     required int dollStat,
   }) {

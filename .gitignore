@@ -12,6 +12,7 @@
 *.ipr
 *.iws
 .idea/
+allTests.run/
 
 data/
 

@@ -11,3 +11,10 @@ class TestHelper {
     return gameData.dataLoaded;
   }
 }
+
+class Pair<A, B> {
+  A value1;
+  B value2;
+
+  Pair(this.value1, this.value2);
+}
