@@ -59,8 +59,8 @@ class BattleEquipment {
     if (equipStat == null) return 0;
 
     final sameCorp = rarity.canHaveCorp && corporation != Corporation.none && ownerCorp == corporation;
-    final levelStat = (level * 0.1 * equipStat.statValue).roundToEven();
-    final corpStat = (sameCorp ? 0.3 * equipStat.statValue : 0).roundToEven();
+    final levelStat = (level * 0.1 * equipStat.statValue).roundHalfToEven();
+    final corpStat = (sameCorp ? 0.3 * equipStat.statValue : 0).roundHalfToEven();
 
     final result = equipStat.statValue + levelStat + corpStat;
 

@@ -194,21 +194,23 @@ class BattleNikke extends BattleEntity {
     required int dollStat,
   }) {
     final gradeLevel = min(4, coreLevel) - 1;
-    final gradeStat =
-        baseStat * gradeLevel * BattleUtils.toModifier(statEnhanceData.gradeRatio) + gradeLevel * gradeEnhanceBase;
+    final gradeFlat = gradeLevel * gradeEnhanceBase;
+    final gradeRatioStat = baseStat * gradeLevel * BattleUtils.toModifier(statEnhanceData.gradeRatio);
+    final gradeAddStat = gradeRatioStat + gradeFlat;
+    final gradeStat = baseStat + consoleStat + bondStat + gradeAddStat.floor();
 
+    final coreActualLevel = coreLevel - 4;
     final coreStat =
-        coreLevel > 4
-            ? (baseStat + gradeStat + consoleStat + bondStat) *
-                (coreLevel - 4) *
-                BattleUtils.toModifier(coreEnhanceBaseRatio)
-            : 0;
+        coreActualLevel > 0 ? gradeStat * coreActualLevel * BattleUtils.toModifier(coreEnhanceBaseRatio) : 0;
 
-    return (baseStat + gradeStat + coreStat + consoleStat + bondStat + equipStat + cubeStat + dollStat).round();
+    // here it seems to be a simple rounding without roundHalfToEven, tested via Brid's HP stat
+    final result = gradeStat + coreStat.round() + equipStat + cubeStat + dollStat;
+
+    return result;
   }
 
   void init(BattleSimulation simulation, int position) {
-    this.uniqueId = position;
+    uniqueId = position;
     fps = simulation.fps;
     _accuracyCircleScale = baseWeaponData.startAccuracyCircleScale;
     rateOfFire = baseWeaponData.rateOfFire;

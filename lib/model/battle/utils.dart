@@ -211,21 +211,13 @@ class NikkeDamageParameter {
 }
 
 extension NumUtils on num {
-  int roundToEven() {
+  int roundHalfToEven() {
     int rounded = round();
-    if ((this - rounded).abs() == 0.5) {
-      // If the value is exactly halfway, round to the nearest even number
-      return (rounded.isEven) ? rounded : (rounded - 1);
-    }
-    return rounded;
+    return (this - rounded).abs() == 0.5 && rounded.isOdd ? rounded - 1 : rounded;
   }
 
-  int roundToOdd() {
+  int roundHalfToOdd() {
     int rounded = round();
-    if ((this - rounded).abs() == 0.5) {
-      // If the value is exactly halfway, round to the nearest odd number
-      return (rounded.isOdd) ? rounded : (rounded - 1);
-    }
-    return rounded;
+    return (this - rounded).abs() == 0.5 && rounded.isEven ? rounded - 1 : rounded;
   }
 }

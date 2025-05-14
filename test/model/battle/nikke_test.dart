@@ -45,8 +45,8 @@ void main() async {
       dorothy.option.attractLevel = 40;
       dorothy.option.coreLevel = 5;
       expect(dorothy.baseHp, 416313);
-      expect(dorothy.baseAttack, moreOrLessEquals(12587, epsilon: 1));
-      expect(dorothy.baseDefence, moreOrLessEquals(3765, epsilon: 1));
+      expect(dorothy.baseAttack, 12587);
+      expect(dorothy.baseDefence, 3765);
     });
 
     test('Rosanna: Chic Ocean resourceId 283', () {
@@ -59,9 +59,9 @@ void main() async {
         option: BattleNikkeOptions(nikkeResourceId: 283, coreLevel: 5, syncLevel: 866, attractLevel: 29),
       );
 
-      expect(rosanna.baseHp, moreOrLessEquals(18537879, epsilon: 1));
-      expect(rosanna.baseAttack, moreOrLessEquals(612174, epsilon: 1));
-      expect(rosanna.baseDefence, moreOrLessEquals(123687, epsilon: 1));
+      expect(rosanna.baseHp, 18537879);
+      expect(rosanna.baseAttack, 612174);
+      expect(rosanna.baseDefence, 123687);
     });
 
     test('Mica: Snow Buddy resourceId 62', () {
@@ -74,9 +74,125 @@ void main() async {
         option: BattleNikkeOptions(nikkeResourceId: 62, coreLevel: 9, syncLevel: 866, attractLevel: 22),
       );
 
-      expect(mica.baseHp, moreOrLessEquals(19979208, epsilon: 1));
-      expect(mica.baseAttack, moreOrLessEquals(659768, epsilon: 1));
-      expect(mica.baseDefence, moreOrLessEquals(115173, epsilon: 1));
+      expect(mica.baseHp, 19979208);
+      expect(mica.baseAttack, 659768);
+      expect(mica.baseDefence, 115173);
+    });
+
+    test('Flora resourceId 411', () {
+      final flora = BattleNikke(
+        playerOptions: BattlePlayerOptions(
+          personalRecycleLevel: 420,
+          corpRecycleLevels: {Corporation.missilis: 197},
+          classRecycleLevels: {NikkeClass.supporter: 193},
+        ),
+        option: BattleNikkeOptions(nikkeResourceId: 411, coreLevel: 11, syncLevel: 884, attractLevel: 13),
+      );
+
+      expect(flora.baseHp, 22070775);
+      expect(flora.baseAttack, 728348);
+      expect(flora.baseDefence, 123496);
+
+      flora.option.syncLevel = 901;
+      expect(flora.baseHp, 22070775 + 1433386);
+      expect(flora.baseAttack, 728348 + 47779);
+      expect(flora.baseDefence, 123496 + 7994);
+
+      flora.option.syncLevel = 601;
+      flora.option.coreLevel = 4;
+      expect(flora.baseHp, 22070775 - 15065630);
+      expect(flora.baseAttack, 728348 - 501285);
+      expect(flora.baseDefence, 123496 - 84073);
+
+      flora.option.coreLevel = 7;
+      expect(flora.baseHp, 22070775 - 14645321);
+      expect(flora.baseAttack, 728348 - 487661);
+      expect(flora.baseDefence, 123496 - 81708);
+
+      flora.option.syncLevel = 963;
+      expect(flora.baseHp, 22070775 + 4464769);
+      expect(flora.baseAttack, 728348 + 149340);
+      expect(flora.baseDefence, 123496 + 24872);
+    });
+
+    test('Brid resourceId 70', () {
+      final brid = BattleNikke(
+        playerOptions: BattlePlayerOptions(
+          personalRecycleLevel: 420,
+          corpRecycleLevels: {Corporation.elysion: 197},
+          classRecycleLevels: {NikkeClass.attacker: 211},
+        ),
+        option: BattleNikkeOptions(nikkeResourceId: 70, coreLevel: 11, syncLevel: 884, attractLevel: 15),
+      );
+
+      expect(brid.baseHp, 19921125);
+      expect(brid.baseAttack, 873013);
+      expect(brid.baseDefence, 132774);
+
+      brid.option.syncLevel = 934;
+      expect(brid.baseHp, 19921125 + 2958183);
+      expect(brid.baseAttack, 873013 + 131474);
+      expect(brid.baseDefence, 132774 + 19720);
+
+      brid.option.syncLevel = 251;
+      brid.option.coreLevel = 8;
+      expect(brid.baseHp, 19921125 - 18647109);
+      expect(brid.baseAttack, 873013 - 828109);
+      expect(brid.baseDefence, 132774 - 124320);
+
+      brid.option.syncLevel = 85;
+      brid.option.coreLevel = 7;
+      expect(brid.baseHp, 19921125 - 19402485);
+      expect(brid.baseAttack, 873013 - 861463);
+      expect(brid.baseDefence, 132774 - 129353);
+
+      brid.option.syncLevel = 565;
+      brid.option.coreLevel = 2;
+      expect(brid.baseHp, 19921125 - 14674981);
+      expect(brid.baseAttack, 873013 - 650474);
+      expect(brid.baseDefence, 132774 - 97992);
+
+      brid.option.syncLevel = 267;
+      brid.option.coreLevel = 4;
+      // this sets hp to end in 25, and would result in a half rounding problem for higher core levels
+      expect(brid.baseHp, 19921125 - 18623700);
+      expect(brid.baseAttack, 873013 - 826201);
+      expect(brid.baseDefence, 132774 - 124160);
+
+      brid.option.coreLevel = 5;
+      expect(brid.baseHp, 19921125 - 18597751);
+      expect(brid.baseAttack, 873013 - 825265);
+      expect(brid.baseDefence, 132774 - 123988);
+
+      brid.option.coreLevel = 6;
+      expect(brid.baseHp, 19921125 - 18571803);
+      expect(brid.baseAttack, 873013 - 824329);
+      expect(brid.baseDefence, 132774 - 123815);
+
+      brid.option.coreLevel = 7;
+      expect(brid.baseHp, 19921125 - 18545854);
+      expect(brid.baseAttack, 873013 - 823392);
+      expect(brid.baseDefence, 132774 - 123643);
+
+      brid.option.coreLevel = 8;
+      expect(brid.baseHp, 19921125 - 18519906);
+      expect(brid.baseAttack, 873013 - 822456);
+      expect(brid.baseDefence, 132774 - 123471);
+
+      brid.option.coreLevel = 9;
+      expect(brid.baseHp, 19921125 - 18493957);
+      expect(brid.baseAttack, 873013 - 821520);
+      expect(brid.baseDefence, 132774 - 123299);
+
+      brid.option.coreLevel = 10;
+      expect(brid.baseHp, 19921125 - 18468009);
+      expect(brid.baseAttack, 873013 - 820584);
+      expect(brid.baseDefence, 132774 - 123126);
+
+      brid.option.coreLevel = 11;
+      expect(brid.baseHp, 19921125 - 18442060);
+      expect(brid.baseAttack, 873013 - 819647);
+      expect(brid.baseDefence, 132774 - 122954);
     });
   });
 }

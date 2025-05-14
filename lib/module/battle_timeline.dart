@@ -34,9 +34,7 @@ class _BattleTimelineState extends State<BattleTimeline> {
                   children: [
                     ...damageMap.keys.map((pos) {
                       final nikke = simulation.nikkes.firstWhere((nikke) => nikke.uniqueId == pos);
-                      return Text(
-                        '${nikke.name} (Pos $pos) Total bullets: ${nikke.totalBulletsFired}'
-                      );
+                      return Text('${nikke.name} (Pos $pos) Total bullets: ${nikke.totalBulletsFired}');
                     }),
                     FilledButton(
                       onPressed: () {

@@ -135,7 +135,6 @@ class NikkeDamageEvent extends BattleEvent {
 
   @override
   Widget buildDisplay() {
-
     final criticalPercent = min(BattleUtils.toModifier(damageParameter.criticalRate), 1);
     final corePercent = min(BattleUtils.toModifier(damageParameter.coreHitRate), 1);
     final nonCriticalPercent = 1 - criticalPercent;

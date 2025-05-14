@@ -189,14 +189,7 @@ void main() async {
       EquipType.arm: {
         NikkeClass.attacker: {
           EquipRarity.t10: {
-            StatType.hp: {
-              0: Pair(0, 0),
-              1: Pair(0, 0),
-              2: Pair(0, 0),
-              3: Pair(0, 0),
-              4: Pair(0, 0),
-              5: Pair(0, 0),
-            },
+            StatType.hp: {0: Pair(0, 0), 1: Pair(0, 0), 2: Pair(0, 0), 3: Pair(0, 0), 4: Pair(0, 0), 5: Pair(0, 0)},
             StatType.atk: {
               0: Pair(3827, 0),
               1: Pair(3827 + 383, 0),
@@ -217,14 +210,7 @@ void main() async {
         },
         NikkeClass.defender: {
           EquipRarity.t10: {
-            StatType.hp: {
-              0: Pair(0, 0),
-              1: Pair(0, 0),
-              2: Pair(0, 0),
-              3: Pair(0, 0),
-              4: Pair(0, 0),
-              5: Pair(0, 0),
-            },
+            StatType.hp: {0: Pair(0, 0), 1: Pair(0, 0), 2: Pair(0, 0), 3: Pair(0, 0), 4: Pair(0, 0), 5: Pair(0, 0)},
             StatType.atk: {
               0: Pair(2551, 0),
               1: Pair(2551 + 255, 0),
@@ -245,14 +231,7 @@ void main() async {
         },
         NikkeClass.supporter: {
           EquipRarity.t10: {
-            StatType.hp: {
-              0: Pair(0, 0),
-              1: Pair(0, 0),
-              2: Pair(0, 0),
-              3: Pair(0, 0),
-              4: Pair(0, 0),
-              5: Pair(0, 0),
-            },
+            StatType.hp: {0: Pair(0, 0), 1: Pair(0, 0), 2: Pair(0, 0), 3: Pair(0, 0), 4: Pair(0, 0), 5: Pair(0, 0)},
             StatType.atk: {
               0: Pair(3189, 0),
               1: Pair(3189 + 319, 0),
@@ -283,14 +262,7 @@ void main() async {
               4: Pair(36887 + 14755, 0),
               5: Pair(36887 + 18444, 0),
             },
-            StatType.atk: {
-              0: Pair(0, 0),
-              1: Pair(0, 0),
-              2: Pair(0, 0),
-              3: Pair(0, 0),
-              4: Pair(0, 0),
-              5: Pair(0, 0),
-            },
+            StatType.atk: {0: Pair(0, 0), 1: Pair(0, 0), 2: Pair(0, 0), 3: Pair(0, 0), 4: Pair(0, 0), 5: Pair(0, 0)},
             StatType.defence: {
               0: Pair(981, 0),
               1: Pair(981 + 98, 0),
@@ -311,14 +283,7 @@ void main() async {
               4: Pair(45084 + 18034, 0),
               5: Pair(45084 + 22542, 0),
             },
-            StatType.atk: {
-              0: Pair(0, 0),
-              1: Pair(0, 0),
-              2: Pair(0, 0),
-              3: Pair(0, 0),
-              4: Pair(0, 0),
-              5: Pair(0, 0),
-            },
+            StatType.atk: {0: Pair(0, 0), 1: Pair(0, 0), 2: Pair(0, 0), 3: Pair(0, 0), 4: Pair(0, 0), 5: Pair(0, 0)},
             StatType.defence: {
               0: Pair(1199, 0),
               1: Pair(1199 + 120, 0),
@@ -339,14 +304,7 @@ void main() async {
               4: Pair(40985 + 16394, 0),
               5: Pair(40985 + 20492, 0),
             },
-            StatType.atk: {
-              0: Pair(0, 0),
-              1: Pair(0, 0),
-              2: Pair(0, 0),
-              3: Pair(0, 0),
-              4: Pair(0, 0),
-              5: Pair(0, 0),
-            },
+            StatType.atk: {0: Pair(0, 0), 1: Pair(0, 0), 2: Pair(0, 0), 3: Pair(0, 0), 4: Pair(0, 0), 5: Pair(0, 0)},
             StatType.defence: {
               0: Pair(1090, 0),
               1: Pair(1090 + 109, 0),
@@ -411,7 +369,7 @@ void main() async {
       }
       expect(allExpected, isTrue);
     });
-    // round()
+    // round(), half round up
     // [I]  attacker head level 5: [hp: 1, 24590.5]
     // [I]  attacker body level 5: [atk: 1, 546.5]
     // [I]  attacker leg level 5: [def: 1, 490.5]
@@ -420,7 +378,7 @@ void main() async {
     // [I]  supporter leg level 1: [hp: 1, 4098.5]
     // [I]  supporter leg level 5: [hp: 1, 20492.5]
 
-    // round() - 0.05
+    // round() - 0.05, half round down
     // [I]  attacker arm level 5: [atk: -1, 1913.5]
     // [I]  attacker leg level 5: [hp: -1, 18443.5]
     // [I]  defender head level 5: [hp: -1, 30055.5]
