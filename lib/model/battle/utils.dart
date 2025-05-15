@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 class BattleUtils {
   static const rangeCorrection = 3000;
@@ -203,10 +204,11 @@ class NikkeDamageParameter {
 
     final receiveDamage = BattleUtils.toModifier(10000 + receiveDamageBuff + distributedDamageBuff);
 
-    final totalDamage =
-        finalAttack * finalRate * finalCorrection * elementRate * chargeRate * addDamageRate * receiveDamage;
+    final nonAttackMultipliers = finalRate * finalCorrection * elementRate * chargeRate * addDamageRate * receiveDamage;
+    final totalDamage = finalAttack * nonAttackMultipliers;
 
-    return max(totalDamage.round(), 1);
+    final adjustedDamage = ((totalDamage * 10).floor() / 10).roundHalfToEven();
+    return max(adjustedDamage, 1);
   }
 }
 
@@ -214,6 +216,10 @@ extension NumUtils on num {
   int roundHalfToEven() {
     int rounded = round();
     return (this - rounded).abs() == 0.5 && rounded.isOdd ? rounded - 1 : rounded;
+  }
+
+  int roundHalfToEvenByFirstDecimal() {
+    return ((this * 10).floor() / 10).roundHalfToEven();
   }
 
   int roundHalfToOdd() {

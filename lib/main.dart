@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         Corporation.tetra: 224,
         Corporation.elysion: 197,
       },
-      classRecycleLevels: {NikkeClass.attacker: 210, NikkeClass.supporter: 193, NikkeClass.defender: 184},
+      classRecycleLevels: {NikkeClass.attacker: 211, NikkeClass.supporter: 193, NikkeClass.defender: 184},
     );
     final BattleNikkeOptions scarletOption = BattleNikkeOptions(
       nikkeResourceId: 222,
@@ -81,14 +81,57 @@ class MyApp extends StatelessWidget {
       favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.ar, Rarity.sr)!, 5),
       cube: null,
     );
+    final BattleNikkeOptions aliceOption = BattleNikkeOptions(
+      nikkeResourceId: 191,
+      coreLevel: 11,
+      syncLevel: 884,
+      attractLevel: 30,
+      skillLevels: [10, 6, 10],
+      equips: [
+        BattleEquipment(
+          type: EquipType.head,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [
+            EquipLine(EquipLineType.statAtk, 9),
+            EquipLine(EquipLineType.statChargeTime, 7),
+            EquipLine(EquipLineType.statAmmo, 13),
+          ],
+        ),
+        BattleEquipment(
+          type: EquipType.body,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAmmo, 11), EquipLine(EquipLineType.statAtk, 5)],
+        ),
+        BattleEquipment(
+          type: EquipType.arm,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAtk, 11), EquipLine(EquipLineType.statChargeTime, 9)],
+        ),
+        BattleEquipment(
+          type: EquipType.leg,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAtk, 11), EquipLine(EquipLineType.statAmmo, 7)],
+        ),
+      ],
+      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.sr, Rarity.sr)!, 15),
+      cube: null,
+    );
 
     final simulation = BattleSimulation(
       playerOptions: playerOptions,
       nikkeOptions: [
-        scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15),
-        scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.gainAmmo.cubeId, 15),
-        scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.ammoCapacity.cubeId, 7),
-        scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
+        aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15),
+        aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.chargeDamage.cubeId, 7),
+        aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.chargeSpeed.cubeId, 7),
+        aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
       ],
     );
 

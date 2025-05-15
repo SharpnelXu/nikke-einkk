@@ -425,6 +425,15 @@ class BattleNikke extends BattleEntity {
         if (currentWeaponData.fireType == FireType.instant) {
           simulation.registerEvent(
             simulation.currentFrame,
+            NikkeFireEvent(
+              name: name,
+              currentAmmo: currentAmmo,
+              maxAmmo: getMaxAmmo(simulation),
+              ownerUniqueId: uniqueId,
+            ),
+          );
+          simulation.registerEvent(
+            simulation.currentFrame,
             NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
           );
           simulation.registerEvent(

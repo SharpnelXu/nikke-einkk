@@ -93,6 +93,7 @@ void main() async {
       expect(flora.baseAttack, 728348);
       expect(flora.baseDefence, 123496);
 
+      // from blabla so may not be entirely accurate too be honest...
       flora.option.syncLevel = 901;
       expect(flora.baseHp, 22070775 + 1433386);
       expect(flora.baseAttack, 728348 + 47779);
@@ -129,6 +130,7 @@ void main() async {
       expect(brid.baseAttack, 873013);
       expect(brid.baseDefence, 132774);
 
+      // from blabla so may not be entirely accurate too be honest...
       brid.option.syncLevel = 934;
       expect(brid.baseHp, 19921125 + 2958183);
       expect(brid.baseAttack, 873013 + 131474);

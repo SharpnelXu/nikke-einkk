@@ -57,8 +57,9 @@ abstract class BattleEntity {
     int Function(BattleEntity) getStandardBaseValue,
   ) {
     // position to percentValues
-    final Map<int, int> percents = {};
+    final Map<int, Map<BuffType, int>> percents = {};
 
+    // might need to group by buffType (buff & buffEtc) and round separately
     int flatValue = 0;
     for (final buff in buffs) {
       if (!types.contains(buff.data.functionType)) continue;
@@ -66,8 +67,9 @@ abstract class BattleEntity {
       if (buff.data.functionValueType == ValueType.percent) {
         final standardUniqueId = buff.getFunctionStandardUniqueId();
         if (standardUniqueId != -1) {
-          percents.putIfAbsent(standardUniqueId, () => 0);
-          percents[standardUniqueId] = percents[standardUniqueId]! + buff.data.functionValue * buff.count;
+          percents.putIfAbsent(standardUniqueId, () => {});
+          final previousValue = percents[standardUniqueId]![buff.data.buff] ?? 0;
+          percents[standardUniqueId]![buff.data.buff] = previousValue + buff.data.functionValue * buff.count;
         }
       } else if (buff.data.functionValueType == ValueType.integer) {
         flatValue += buff.data.functionValue;
@@ -78,7 +80,10 @@ abstract class BattleEntity {
     for (final standardUniqueId in percents.keys) {
       final standard = simulation.getEntityByUniqueId(standardUniqueId);
       if (standard != null) {
-        result += (getStandardBaseValue(standard) * BattleUtils.toModifier(percents[standardUniqueId]!)).round();
+        for (final buffType in percents[standardUniqueId]!.keys) {
+          final percent = percents[standardUniqueId]![buffType]!;
+          result += (getStandardBaseValue(standard) * BattleUtils.toModifier(percent)).round();
+        }
       }
     }
 
