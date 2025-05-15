@@ -59,16 +59,26 @@ class BattleNikkeOptions {
 enum BattleNikkeStatus { behindCover, reloading, forceReloading, shooting }
 
 class BattleCover extends BattleEntity {
-  int hp = 0;
+  int level;
 
   @override
-  int get baseHp => 100;
+  String get name => 'Cover';
+
+  @override
+  int get baseHp => gameData.coverStatTable[level]!.levelHp;
 
   @override
   int get baseAttack => 0;
 
   @override
-  int get baseDefence => 0;
+  int get baseDefence => gameData.coverStatTable[level]!.levelDefence;
+
+  BattleCover(this.level);
+
+  void init(BattleSimulation simulation) {
+    currentHp = baseHp;
+    buffs.clear();
+  }
 }
 
 class BattleNikke extends BattleEntity {
@@ -132,7 +142,7 @@ class BattleNikke extends BattleEntity {
     dollStat: option.favoriteItem?.getStat(StatType.defence) ?? 0,
   );
 
-  BattleCover cover = BattleCover();
+  late BattleCover cover;
   int currentAmmo = 0;
 
   WeaponType get currentWeaponType => currentWeaponData.weaponType;
@@ -173,7 +183,9 @@ class BattleNikke extends BattleEntity {
   List<BattleSkill> skills = [];
   List<BattleFunction> functions = [];
 
-  BattleNikke({required this.playerOptions, required this.option});
+  BattleNikke({required this.playerOptions, required this.option}) {
+    cover = BattleCover(option.syncLevel);
+  }
 
   // CharacterStatTable[statEnhanceId = groupId][lv] to get baseStat
   // CharacterStateEnhanceTable[statEnhanceId = id] to get gradeEnhanceStat
@@ -223,8 +235,8 @@ class BattleNikke extends BattleEntity {
     fullReloadFrameCount = 0;
     currentHp = baseHp;
     currentAmmo = baseWeaponData.maxAmmo;
-    cover.hp = 100; // TODO: change
     cover.uniqueId = position + 5;
+    cover.init(simulation);
 
     totalBulletsFired = 0;
     totalBulletsHit = 0;

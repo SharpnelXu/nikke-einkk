@@ -834,3 +834,19 @@ enum AttackType { fire, water, electronic, iron, wind, energy, bio, metal, unkno
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum SkillType { none, stateEffect, characterSkill, unknown }
+
+@JsonSerializable()
+class CoverStatData {
+  final int id;
+  final int lv;
+  @JsonKey(name: 'level_hp')
+  final int levelHp;
+  @JsonKey(name: 'level_defence')
+  final int levelDefence;
+
+  CoverStatData({this.id = 0, this.lv = 0, this.levelHp = 0, this.levelDefence = 0});
+
+  factory CoverStatData.fromJson(Map<String, dynamic> json) => _$CoverStatDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CoverStatDataToJson(this);
+}

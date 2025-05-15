@@ -33,6 +33,7 @@ class NikkeDatabase {
   String get favoriteItemTableFilePath => join(dataPath, 'FavoriteItemTable.json');
   String get favoriteItemLevelTableFilePath => join(dataPath, 'FavoriteItemLevelTable.json');
   String get skillInfoTableFilePath => join(dataPath, 'SkillInfoTable.json');
+  String get coverStatEnhanceTableFilePath => join(dataPath, 'CoverStatEnhanceTable.json');
 
   final Map<int, NikkeCharacterData> characterData = {}; // maybe not needed
   final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
@@ -43,6 +44,7 @@ class NikkeDatabase {
   final Map<int, FunctionData> functionTable = {};
   final Map<int, HarmonyCubeData> harmonyCubeTable = {};
   final Map<int, FavoriteItemData> favoriteItemTable = {};
+  final Map<int, CoverStatData> coverStatTable = {};
 
   // character stats
   // grouped by enhanceId, level
@@ -82,6 +84,7 @@ class NikkeDatabase {
     result &= await loadHarmonyCubeLevelData();
     result &= await loadFavoriteItemData();
     result &= await loadFavoriteItemLevelData();
+    result &= await loadCoverStatData();
 
     dataLoaded = result;
     logger.i('Loading completed, result: $dataLoaded');
@@ -295,6 +298,19 @@ class NikkeDatabase {
         final favoriteItemStat = FavoriteItemLevelData.fromJson(record);
         favoriteItemLevelTable.putIfAbsent(favoriteItemStat.levelEnhanceId, () => {});
         favoriteItemLevelTable[favoriteItemStat.levelEnhanceId]![favoriteItemStat.level] = favoriteItemStat;
+      }
+    }
+    return exists;
+  }
+
+  Future<bool> loadCoverStatData() async {
+    final table = File(coverStatEnhanceTableFilePath);
+    final bool exists = await table.exists();
+    if (exists) {
+      final json = jsonDecode(await table.readAsString());
+      for (final record in json['records']) {
+        final coverStat = CoverStatData.fromJson(record);
+        coverStatTable[coverStat.lv] = coverStat;
       }
     }
     return exists;

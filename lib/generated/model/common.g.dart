@@ -438,3 +438,17 @@ Map<String, dynamic> _$AttractiveStatDataToJson(AttractiveStatData instance) => 
   'supporter_metal_resist_rate': instance.supporterMetalResistRate,
   'supporter_bio_resist_rate': instance.supporterBioResistRate,
 };
+
+CoverStatData _$CoverStatDataFromJson(Map<String, dynamic> json) => CoverStatData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  lv: (json['lv'] as num?)?.toInt() ?? 0,
+  levelHp: (json['level_hp'] as num?)?.toInt() ?? 0,
+  levelDefence: (json['level_defence'] as num?)?.toInt() ?? 0,
+);
+
+Map<String, dynamic> _$CoverStatDataToJson(CoverStatData instance) => <String, dynamic>{
+  'id': instance.id,
+  'lv': instance.lv,
+  'level_hp': instance.levelHp,
+  'level_defence': instance.levelDefence,
+};

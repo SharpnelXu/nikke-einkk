@@ -346,11 +346,11 @@ void main() async {
       );
 
       final rapture =
-      BattleRapture()
-        ..uniqueId = 11
-        ..distance = 30
-        ..element = NikkeElement.water
-        ..defence = 140;
+          BattleRapture()
+            ..uniqueId = 11
+            ..distance = 30
+            ..element = NikkeElement.water
+            ..defence = 140;
 
       simulation.raptures.add(rapture);
       simulation.maxSeconds = 180;
@@ -358,7 +358,8 @@ void main() async {
 
       final scarlet = simulation.nikkes.first;
       expect(scarlet.getMaxHp(simulation), 20565804);
-      final hpChangeEvent1 = simulation.timeline[10743]?.firstWhereOrNull((event) => event is HpChangeEvent) as HpChangeEvent;
+      final hpChangeEvent1 =
+          simulation.timeline[10743]?.firstWhereOrNull((event) => event is HpChangeEvent) as HpChangeEvent;
       expect(hpChangeEvent1, isNotNull);
       expect(hpChangeEvent1.maxHp, 20565804);
       expect(hpChangeEvent1.afterChangeHp, 19741115);
