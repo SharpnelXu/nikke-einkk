@@ -51,6 +51,36 @@ class BattleFunction {
           executeFunction(event, simulation);
         }
         break;
+      case TimingTriggerType.onHpRatioUnder:
+        if (event is! HpChangeEvent || standard == null || standard.uniqueId != ownerUniqueId) return;
+
+        final hpPercent = standard.currentHp / standard.getMaxHp(simulation);
+        if ((hpPercent * 10000).round() <= data.timingTriggerValue) {
+          if (status == FunctionStatus.off) {
+            executeFunction(event, simulation);
+            status = FunctionStatus.on;
+          }
+        } else {
+          // until the true meaning of keepStatus is figured out this is used as a simple boolean for certain
+          // functions only
+          status = FunctionStatus.off;
+        }
+        break;
+      case TimingTriggerType.onHpRatioUp:
+        if (event is! HpChangeEvent || standard == null || standard.uniqueId != ownerUniqueId) return;
+
+        final hpPercent = standard.currentHp / standard.getMaxHp(simulation);
+        if ((hpPercent * 10000).round() >= data.timingTriggerValue) {
+          if (status == FunctionStatus.off) {
+            executeFunction(event, simulation);
+            status = FunctionStatus.on;
+          }
+        } else {
+          // until the true meaning of keepStatus is figured out this is used as a simple boolean for certain
+          // functions only
+          status = FunctionStatus.off;
+        }
+        break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
       case TimingTriggerType.onBurstSkillStep:
@@ -80,8 +110,6 @@ class BattleFunction {
       case TimingTriggerType.onHitNumExceptCore:
       case TimingTriggerType.onHitNumberOver:
       case TimingTriggerType.onHitRatio:
-      case TimingTriggerType.onHpRatioUnder:
-      case TimingTriggerType.onHpRatioUp:
       case TimingTriggerType.onHurtCount:
       case TimingTriggerType.onHurtRatio:
       case TimingTriggerType.onInstallBarrier:
@@ -110,6 +138,7 @@ class BattleFunction {
       case TimingTriggerType.onUseBurstSkill:
       case TimingTriggerType.onUserPartsDestroy:
       case TimingTriggerType.unknown:
+        // logger.i('Unimplemented TimingTriggerType: ${data.timingTriggerType}');
         break;
     }
   }
@@ -177,10 +206,16 @@ class BattleFunction {
 
       if (data.functionType == FunctionType.statHpHeal) {
         final afterMaxHp = target.getMaxHp(simulation);
-        target.changeHp(simulation, target.currentHp + afterMaxHp - previousMaxHp);
+        target.changeHp(simulation, afterMaxHp - previousMaxHp);
       } else if (target is BattleNikke && data.functionType == FunctionType.statAmmoLoad) {
         final afterMaxAmmo = target.getMaxAmmo(simulation);
         target.currentAmmo = (target.currentAmmo + afterMaxAmmo - previousMaxAmmo).clamp(1, afterMaxAmmo);
+      } else if (data.functionType == FunctionType.statHp) {
+        final afterMaxHp = target.getMaxHp(simulation);
+        simulation.registerEvent(
+          simulation.currentFrame,
+          HpChangeEvent(simulation, target, afterMaxHp - previousMaxHp, true),
+        );
       }
     }
     status = data.keepingType;
@@ -363,6 +398,7 @@ class BattleFunction {
       case FunctionType.useCharacterSkillId:
       case FunctionType.useSkill2:
       case FunctionType.windReduction:
+        logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
     }
 
@@ -452,6 +488,10 @@ class BattleFunction {
         return true;
       case StatusTriggerType.isCheckMonster:
         return simulation.raptures.length >= value;
+      case StatusTriggerType.isHpRatioUnder:
+        return target != null && (target.currentHp / target.getMaxHp(simulation) * 10000).round() <= value;
+      case StatusTriggerType.isHpRatioUp:
+        return target != null && (target.currentHp / target.getMaxHp(simulation) * 10000).round() >= value;
       case StatusTriggerType.isWeaponType:
         return target is BattleNikke && target.baseWeaponData.id == value;
       case StatusTriggerType.unknown:
@@ -477,8 +517,6 @@ class BattleFunction {
       case StatusTriggerType.isFunctionTypeOffCheck:
       case StatusTriggerType.isHaveBarrier:
       case StatusTriggerType.isHaveDecoy:
-      case StatusTriggerType.isHpRatioUnder:
-      case StatusTriggerType.isHpRatioUp:
       case StatusTriggerType.isNotBurstMember:
       case StatusTriggerType.isNotCheckTeamBurstNextStep:
       case StatusTriggerType.isNotHaveBarrier:
@@ -487,6 +525,7 @@ class BattleFunction {
       case StatusTriggerType.isSameSquadUp:
       case StatusTriggerType.isSearchElementId:
       case StatusTriggerType.isStun:
+        logger.i('Unimplemented StatusTriggerType: $type');
         return false;
     }
   }

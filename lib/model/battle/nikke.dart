@@ -592,7 +592,12 @@ class BattleNikke extends BattleEntity {
     );
     currentAmmo = (currentAmmo + gainAmmo).clamp(0, getMaxAmmo(simulation));
 
+    final previousMaxHp = getMaxHp(simulation);
     buffs.removeWhere((buff) => buff.shouldRemove(simulation));
+    final afterMaxHp = getMaxHp(simulation);
+    if (previousMaxHp != afterMaxHp) {
+      simulation.registerEvent(simulation.nextFrame, HpChangeEvent(simulation, this, afterMaxHp - previousMaxHp, true));
+    }
   }
 
   int getIncreaseElementDamageBuffValues(BattleSimulation simulation) {

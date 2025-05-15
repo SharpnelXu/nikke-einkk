@@ -18,7 +18,7 @@ abstract class BattleEntity {
   void changeHp(BattleSimulation simulation, int changeValue) {
     currentHp = (currentHp + changeValue).clamp(1, getMaxHp(simulation));
 
-    simulation.registerEvent(simulation.nextFrame, HpChangeEvent(simulation, this, changeValue));
+    simulation.registerEvent(simulation.currentFrame, HpChangeEvent(simulation, this, changeValue));
   }
 
   int getAttackBuffValues(BattleSimulation simulation) {

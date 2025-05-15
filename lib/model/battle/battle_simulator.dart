@@ -94,7 +94,9 @@ class BattleSimulation {
       }
 
       // broadcast all events registered for this frame
-      for (final event in timeline[currentFrame] ?? []) {
+      for (int index = 0; index < (timeline[currentFrame]?.length ?? 0); index += 1) {
+        final event = timeline[currentFrame]![index];
+
         if (event is BurstGenerationEvent) {
           event.currentMeter = burstMeter;
           burstMeter += event.burst;

@@ -1,4 +1,7 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 
@@ -54,14 +57,23 @@ class _BattleTimelineState extends State<BattleTimeline> {
   }
 
   Widget buildTimeline() {
-    final frames = simulation.timeline.keys.toList();
+    final Map<int, List<Widget>> filteredTimeline = SplayTreeMap((a, b) => b.compareTo(a));
+    for (final frame in simulation.timeline.keys) {
+      final frameEvents = buildFrameEvents(simulation.timeline[frame]!);
+
+      if (frameEvents.isNotEmpty) {
+        filteredTimeline[frame] = frameEvents;
+      }
+    }
+
+    final frames = filteredTimeline.keys.toList();
     return CustomScrollView(
       slivers: [
         SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
             final frame = frames[index];
             final timeData = BattleUtils.frameToTimeData(frame, simulation.fps);
-            final events = simulation.timeline[frames[index]]!;
+
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: SingleChildScrollView(
@@ -73,7 +85,7 @@ class _BattleTimelineState extends State<BattleTimeline> {
                     Column(
                       spacing: 8,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: events.map((event) => event.buildDisplay()).toList(),
+                      children: filteredTimeline[frame]!,
                     ),
                   ],
                 ),
@@ -83,5 +95,16 @@ class _BattleTimelineState extends State<BattleTimeline> {
         ),
       ],
     );
+  }
+
+  List<Widget> buildFrameEvents(List<BattleEvent> events) {
+    final List<Widget> result = [];
+    final skipList = [NikkeDamageEvent, NikkeFireEvent, NikkeReloadStartEvent, BurstGenerationEvent];
+    for (final event in events) {
+      if (skipList.contains(event.runtimeType)) continue;
+
+      result.add(event.buildDisplay());
+    }
+    return result;
   }
 }

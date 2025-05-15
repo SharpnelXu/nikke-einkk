@@ -12,6 +12,8 @@ import 'package:path/path.dart';
 /// db object
 final gameData = NikkeDatabase();
 
+final Logger logger = Logger();
+
 class NikkeDatabase {
   static const String appPath = '.';
 
@@ -58,7 +60,6 @@ class NikkeDatabase {
   final Map<int, Map<int, HarmonyCubeLevelData>> harmonyCubeLevelTable = {};
   final Map<int, Map<int, FavoriteItemLevelData>> favoriteItemLevelTable = {};
 
-  static final Logger logger = Logger();
   bool dataLoaded = false;
 
   Future<bool> loadData() async {

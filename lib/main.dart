@@ -127,7 +127,7 @@ class MyApp extends StatelessWidget {
 
     final simulation = BattleSimulation(
       playerOptions: playerOptions,
-      nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15)],
+      nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.emergencyMaxHp.cubeId, 15)],
     );
 
     final rapture =

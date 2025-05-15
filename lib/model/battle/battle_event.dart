@@ -229,9 +229,10 @@ class HpChangeEvent extends BattleEvent {
   late int ownerUniqueId;
   late int afterChangeHp;
   late int maxHp;
+  bool isMaxHpOnly;
   int changeAmount;
 
-  HpChangeEvent(BattleSimulation simulation, BattleEntity entity, this.changeAmount) {
+  HpChangeEvent(BattleSimulation simulation, BattleEntity entity, this.changeAmount, [this.isMaxHpOnly = false]) {
     name = entity.name;
     ownerUniqueId = entity.uniqueId;
     afterChangeHp = entity.currentHp;
@@ -246,6 +247,9 @@ class HpChangeEvent extends BattleEvent {
   @override
   Widget buildDisplay() {
     final hpPercent = (afterChangeHp / maxHp * 100).toStringAsFixed(2);
-    return Text('$name (Pos $ownerUniqueId) HP change: $changeAmount ($hpPercent% $afterChangeHp/$maxHp)');
+    return Text(
+      '$name (Pos $ownerUniqueId) ${isMaxHpOnly ? 'Max' : ''}HP change:'
+      ' $changeAmount ($hpPercent% $afterChangeHp/$maxHp)',
+    );
   }
 }
