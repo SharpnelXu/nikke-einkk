@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
     final BattleNikkeOptions scarletOption = BattleNikkeOptions(
       nikkeResourceId: 222,
       coreLevel: 11,
-      syncLevel: 883,
+      syncLevel: 884,
       attractLevel: 40,
       skillLevels: [10, 10, 10],
       equips: [

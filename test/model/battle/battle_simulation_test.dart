@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
@@ -336,6 +337,57 @@ void main() async {
       expect(simulation.timeline[831]!.length, 3); // first bullet (fire, damage, burstGen)
       expect(simulation.timeline[749]!.length, 3);
       expect(simulation.timeline[667]!.length, 3);
+    });
+
+    test('Scarlet with emergency max hp cube', () {
+      final simulation = BattleSimulation(
+        playerOptions: playerOptions,
+        nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.emergencyMaxHp.cubeId, 15)],
+      );
+
+      final rapture =
+      BattleRapture()
+        ..uniqueId = 11
+        ..distance = 30
+        ..element = NikkeElement.water
+        ..defence = 140;
+
+      simulation.raptures.add(rapture);
+      simulation.maxSeconds = 180;
+      simulation.simulate();
+
+      final scarlet = simulation.nikkes.first;
+      expect(scarlet.getMaxHp(simulation), 20565804);
+      final hpChangeEvent1 = simulation.timeline[10743]?.firstWhereOrNull((event) => event is HpChangeEvent) as HpChangeEvent;
+      expect(hpChangeEvent1, isNotNull);
+      expect(hpChangeEvent1.maxHp, 20565804);
+      expect(hpChangeEvent1.afterChangeHp, 19741115);
+      expect(hpChangeEvent1.changeAmount, -824689);
+
+      final hpChangeEvents2 = simulation.timeline[7687]?.whereType<HpChangeEvent>().toList();
+      expect(hpChangeEvents2, isNotNull);
+      expect(hpChangeEvents2!.length, 2);
+      expect(hpChangeEvents2[0].maxHp, 20565804);
+      expect(hpChangeEvents2[0].afterChangeHp, 4001155);
+      expect(hpChangeEvents2[0].changeAmount, -167149);
+      expect(hpChangeEvents2[1].maxHp, 23062493);
+      expect(hpChangeEvents2[1].afterChangeHp, 4001155 + 23062493 - 20565804);
+      expect(hpChangeEvents2[1].changeAmount, 23062493 - 20565804);
+      expect(hpChangeEvents2[1].isMaxHpOnly, false);
+
+      final hpChangeEvents3 = simulation.timeline[7079]?.whereType<HpChangeEvent>().toList();
+      expect(hpChangeEvents3, isNotNull);
+      expect(hpChangeEvents3!.length, 2);
+      expect(hpChangeEvents3[1].maxHp, 23062493);
+      expect(hpChangeEvents3[1].changeAmount, 0);
+      expect(hpChangeEvents3[1].isMaxHpOnly, false);
+
+      final hpChangeEvents4 = simulation.timeline[5878]?.whereType<HpChangeEvent>().toList();
+      expect(hpChangeEvents4, isNotNull);
+      expect(hpChangeEvents4!.length, 1);
+      expect(hpChangeEvents4[0].maxHp, 20565804);
+      expect(hpChangeEvents4[0].changeAmount, 20565804 - 23062493);
+      expect(hpChangeEvents4[0].isMaxHpOnly, true);
     });
   });
 }
