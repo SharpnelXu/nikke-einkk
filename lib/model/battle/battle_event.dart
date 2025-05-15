@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
@@ -220,5 +221,31 @@ class BattleStartEvent extends BattleEvent {
   @override
   Widget buildDisplay() {
     return Text('Battle Start');
+  }
+}
+
+class HpChangeEvent extends BattleEvent {
+  late String name;
+  late int ownerUniqueId;
+  late int afterChangeHp;
+  late int maxHp;
+  int changeAmount;
+
+  HpChangeEvent(BattleSimulation simulation, BattleEntity entity, this.changeAmount) {
+    name = entity.name;
+    ownerUniqueId = entity.uniqueId;
+    afterChangeHp = entity.currentHp;
+    maxHp = entity.getMaxHp(simulation);
+  }
+
+  @override
+  int getActivatorUniqueId() {
+    return ownerUniqueId;
+  }
+
+  @override
+  Widget buildDisplay() {
+    final hpPercent = (afterChangeHp / maxHp * 100).toStringAsFixed(2);
+    return Text('$name (Pos $ownerUniqueId) HP change: $changeAmount ($hpPercent% $afterChangeHp/$maxHp)');
   }
 }

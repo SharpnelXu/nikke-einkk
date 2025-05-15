@@ -45,6 +45,7 @@ class BattleSimulation {
   // timeline
   SplayTreeMap<int, List<BattleEvent>> timeline = SplayTreeMap((a, b) => b.compareTo(a));
   late int currentFrame;
+  int get nextFrame => currentFrame - 1;
 
   // maybe configurable in the future or put into a global option class
   int fps = 60;
@@ -76,6 +77,7 @@ class BattleSimulation {
       nikkes[index].init(this, index + 1);
     }
 
+    currentFrame = maxFrames + 1;
     // BattleStart
     for (final nikke in nikkes) {
       nikke.broadcast(BattleStartEvent.battleStartEvent, this);

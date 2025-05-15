@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:typed_data';
 
 class BattleUtils {
   static const rangeCorrection = 3000;

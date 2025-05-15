@@ -1,3 +1,4 @@
+import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
@@ -9,9 +10,16 @@ abstract class BattleEntity {
 
   final List<BattleBuff> buffs = [];
 
+  String get name => 'Entity $uniqueId';
   int get baseAttack;
   int get baseDefence;
   int get baseHp;
+
+  void changeHp(BattleSimulation simulation, int changeValue) {
+    currentHp = (currentHp + changeValue).clamp(1, getMaxHp(simulation));
+
+    simulation.registerEvent(simulation.nextFrame, HpChangeEvent(simulation, this, changeValue));
+  }
 
   int getAttackBuffValues(BattleSimulation simulation) {
     return getBuffValue(simulation, FunctionType.statAtk, 0, (entity) => entity.baseAttack);

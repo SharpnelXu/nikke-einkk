@@ -7,6 +7,7 @@ import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
+import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 class BattleFunction {
@@ -131,9 +132,62 @@ class BattleFunction {
     }
   }
 
+  void addBuff(BattleEvent event, BattleSimulation simulation) {
+    final functionTargets = getFunctionTargets(event, simulation);
+    for (final target in functionTargets) {
+      final statusCheck =
+          checkStatusTrigger(
+            event,
+            simulation,
+            target,
+            data.statusTriggerType,
+            data.statusTriggerStandard,
+            data.statusTriggerValue,
+          ) &&
+          checkStatusTrigger(
+            event,
+            simulation,
+            target,
+            data.statusTrigger2Type,
+            data.statusTrigger2Standard,
+            data.statusTrigger2Value,
+          );
+      if (!statusCheck) continue;
+
+      final previousMaxAmmo = target is BattleNikke ? target.getMaxAmmo(simulation) : 0;
+      final previousMaxHp = target.getMaxHp(simulation);
+
+      final existingBuff = target.buffs.firstWhereOrNull((buff) => buff.data.groupId == data.groupId);
+      if (existingBuff != null) {
+        existingBuff.duration =
+            data.durationType == DurationType.timeSec
+                ? BattleUtils.timeDataToFrame(data.durationValue, simulation.fps)
+                : data.durationValue;
+        existingBuff.count = min(existingBuff.count + 1, data.fullCount);
+
+        // overwrite is probably done this way
+        if (existingBuff.data.level < data.level) {
+          existingBuff.data = data;
+          existingBuff.buffGiverUniqueId = event.getActivatorUniqueId();
+          existingBuff.buffReceiverUniqueId = target.uniqueId;
+        }
+      } else {
+        target.buffs.add(BattleBuff(data, ownerUniqueId, target.uniqueId));
+      }
+
+      if (data.functionType == FunctionType.statHpHeal) {
+        final afterMaxHp = target.getMaxHp(simulation);
+        target.changeHp(simulation, target.currentHp + afterMaxHp - previousMaxHp);
+      } else if (target is BattleNikke && data.functionType == FunctionType.statAmmoLoad) {
+        final afterMaxAmmo = target.getMaxAmmo(simulation);
+        target.currentAmmo = (target.currentAmmo + afterMaxAmmo - previousMaxAmmo).clamp(1, afterMaxAmmo);
+      }
+    }
+    status = data.keepingType;
+  }
+
   void executeFunction(BattleEvent event, BattleSimulation simulation) {
     timesActivated += 1;
-    final functionTargets = getFunctionTargets(event, simulation);
     switch (data.functionType) {
       case FunctionType.damageReduction:
       case FunctionType.firstBurstGaugeSpeedUp:
@@ -153,56 +207,22 @@ class BattleFunction {
       case FunctionType.statHp:
       case FunctionType.statHpHeal:
       case FunctionType.statReloadTime:
+        // add buff
+        addBuff(event, simulation);
+        break;
+      case FunctionType.changeCurrentHpValue:
+        final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
-          final statusCheck =
-              checkStatusTrigger(
-                event,
-                simulation,
-                target,
-                data.statusTriggerType,
-                data.statusTriggerStandard,
-                data.statusTriggerValue,
-              ) &&
-              checkStatusTrigger(
-                event,
-                simulation,
-                target,
-                data.statusTrigger2Type,
-                data.statusTrigger2Standard,
-                data.statusTrigger2Value,
-              );
-          if (!statusCheck) continue;
-
-          final previousMaxAmmo = target is BattleNikke ? target.getMaxAmmo(simulation) : 0;
-          final previousMaxHp = target.getMaxHp(simulation);
-
-          final existingBuff = target.buffs.firstWhereOrNull((buff) => buff.data.groupId == data.groupId);
-          if (existingBuff != null) {
-            existingBuff.duration =
-                data.durationType == DurationType.timeSec
-                    ? BattleUtils.timeDataToFrame(data.durationValue, simulation.fps)
-                    : data.durationValue;
-            existingBuff.count = min(existingBuff.count + 1, data.fullCount);
-
-            // overwrite is probably done this way
-            if (existingBuff.data.level < data.level) {
-              existingBuff.data = data;
-              existingBuff.buffGiverUniqueId = event.getActivatorUniqueId();
-              existingBuff.buffReceiverUniqueId = target.uniqueId;
+          if (data.functionValueType == ValueType.integer) {
+            target.changeHp(simulation, data.functionValue);
+          } else if (data.functionValueType == ValueType.percent) {
+            final functionStandard = simulation.getEntityByUniqueId(getFunctionStandardUniqueId(target.uniqueId));
+            if (functionStandard != null) {
+              final changeValue = BattleUtils.toModifier(data.functionValue) * functionStandard.currentHp;
+              target.changeHp(simulation, changeValue.round());
             }
-          } else {
-            target.buffs.add(BattleBuff(data, ownerUniqueId, target.uniqueId));
-          }
-
-          if (data.functionType == FunctionType.statHpHeal) {
-            final afterMaxHp = target.getMaxHp(simulation);
-            target.currentHp = (target.currentHp + afterMaxHp - previousMaxHp).clamp(1, afterMaxHp);
-          } else if (target is BattleNikke && data.functionType == FunctionType.statAmmoLoad) {
-            final afterMaxAmmo = target.getMaxAmmo(simulation);
-            target.currentAmmo = (target.currentAmmo + afterMaxAmmo - previousMaxAmmo).clamp(1, afterMaxAmmo);
           }
         }
-        status = data.keepingType;
         break;
       case FunctionType.unknown:
       case FunctionType.addDamage:
@@ -225,7 +245,6 @@ class BattleFunction {
       case FunctionType.changeCoolTimeSkill1:
       case FunctionType.changeCoolTimeSkill2:
       case FunctionType.changeCoolTimeUlti:
-      case FunctionType.changeCurrentHpValue:
       case FunctionType.changeMaxSkillCoolTime2:
       case FunctionType.changeMaxSkillCoolTimeUlti:
       case FunctionType.changeNormalDefIgnoreDamage:
@@ -346,6 +365,17 @@ class BattleFunction {
       case FunctionType.windReduction:
         break;
     }
+
+    if (data.connectedFunction.isNotEmpty) {
+      for (final functionId in data.connectedFunction) {
+        final functionData = gameData.functionTable[functionId];
+        if (functionData != null) {
+          final connectedFunction = BattleFunction(functionData, ownerUniqueId);
+          // connected function likely doesn't check trigger target
+          connectedFunction.executeFunction(event, simulation);
+        }
+      }
+    }
   }
 
   List<BattleEntity> getFunctionTargets(BattleEvent event, BattleSimulation simulation) {
@@ -458,6 +488,19 @@ class BattleFunction {
       case StatusTriggerType.isSearchElementId:
       case StatusTriggerType.isStun:
         return false;
+    }
+  }
+
+  int getFunctionStandardUniqueId(int targetUniqueId) {
+    switch (data.functionStandard) {
+      case StandardType.user:
+        return ownerUniqueId;
+      case StandardType.functionTarget:
+        return targetUniqueId;
+      case StandardType.triggerTarget: // there is no triggerTarget in functionStandardType
+      case StandardType.unknown:
+      case StandardType.none:
+        return -1;
     }
   }
 }

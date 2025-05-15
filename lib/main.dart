@@ -127,12 +127,7 @@ class MyApp extends StatelessWidget {
 
     final simulation = BattleSimulation(
       playerOptions: playerOptions,
-      nikkeOptions: [
-        aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15),
-        aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.chargeDamage.cubeId, 7),
-        aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.chargeSpeed.cubeId, 7),
-        aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
-      ],
+      nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15)],
     );
 
     final rapture =
@@ -143,7 +138,7 @@ class MyApp extends StatelessWidget {
           ..defence = 100;
 
     simulation.raptures.add(rapture);
-    simulation.maxSeconds = 15;
+    simulation.maxSeconds = 180;
 
     return MaterialApp(
       title: 'Flutter Demo',

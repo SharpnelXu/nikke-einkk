@@ -79,6 +79,7 @@ class BattleNikke extends BattleEntity {
 
   NikkeCharacterData get characterData =>
       gameData.characterResourceGardeTable[option.nikkeResourceId]![option.coreLevel]!;
+  @override
   String get name => gameData.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId.toString();
   WeaponData get baseWeaponData => gameData.characterShotTable[characterData.shotId]!;
   // skill data

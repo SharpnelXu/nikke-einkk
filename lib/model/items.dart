@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:nikke_einkk/model/skills.dart';
 
 import 'common.dart';
 
@@ -449,7 +448,7 @@ enum HarmonyCubeType {
   defence(1000309),
   healPotency(1000310),
   damageTakenDown(1000311),
-  emergencyMaxHp(1000312),
+  emergencyMaxHp(1000312), // 400180101
   parts(1000313)
   // pierce(100314)
   ;
