@@ -94,14 +94,19 @@ class NikkeDamageEvent extends BattleEvent {
             : 0;
     chargePercent = chargePercent.clamp(0, 10000);
 
+    final normalDamageRatioChange =
+        type == NikkeDamageType.bullet ? nikke.getNormalDamageRatioChangeBuffValues(simulation) : 0;
+
     // TODO: fill in other buff params
     damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
       defence: rapture.baseDefence,
-      damageRate: weaponData.damage,
+      damageRate: weaponData.damage * weaponData.muzzleCount,
+      damageRateBuff: normalDamageRatioChange,
       coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
       coreDamageRate: weaponData.coreDamageRate,
+      coreDamageBuff: nikke.getCoreDamageBuffValues(simulation),
       criticalRate: nikke.getCriticalRate(simulation),
       criticalDamageRate: nikke.characterData.criticalDamage,
       criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),

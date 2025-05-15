@@ -95,6 +95,35 @@ void main() async {
       // expect(notFullChargeParam1.calculateDamage(core: true), 1377003);
     });
 
+    test('Shotgun doll attack damage', () {
+      final dollParam = NikkeDamageParameter(
+        attack: 738792,
+        defence: 100,
+        damageRate: 23160,
+        damageRateBuff: (23160 * 0.0473).round(),
+        coreDamageRate: 20000,
+        criticalDamageRate: 15000,
+        isStrongElement: true,
+        isBonusRange: true,
+      );
+
+      // with doll
+      expect(dollParam.calculateDamage() / 10, moreOrLessEquals(256213, epsilon: 1));
+
+      final normalParam = NikkeDamageParameter(
+        attack: 728489,
+        defence: 100,
+        damageRate: 10075 * 2,
+        coreDamageRate: 20000,
+        criticalDamageRate: 15000,
+        isStrongElement: true,
+        isBonusRange: true,
+      );
+
+      // with doll
+      expect(normalParam.calculateDamage() / 10, moreOrLessEquals(209882, epsilon: 1));
+    });
+
     test('Scarlet attack damage', () {
       final baseAtk = 904831;
       final defence = 140;

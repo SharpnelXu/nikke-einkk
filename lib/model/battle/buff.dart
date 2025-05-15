@@ -41,4 +41,9 @@ class BattleBuff {
         return -1;
     }
   }
+
+  @override
+  String toString() {
+    return '[$count] ${data.functionType.name} ${data.functionValue} ${data.functionValueType.name}';
+  }
 }

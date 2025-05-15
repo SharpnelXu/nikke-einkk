@@ -661,6 +661,19 @@ class BattleNikke extends BattleEntity {
     );
   }
 
+  int getCoreDamageBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.coreShotDamageChange);
+  }
+
+  int getNormalDamageRatioChangeBuffValues(BattleSimulation simulation) {
+    return getBuffValue(
+      simulation,
+      FunctionType.normalDamageRatioChange,
+      0,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.damage : 0,
+    );
+  }
+
   int getFramesToFullCharge(BattleSimulation simulation) {
     final result = getBuffValue(
       simulation,

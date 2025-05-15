@@ -52,6 +52,7 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onHpRatioUnder:
+        // all standard is User
         if (event is! HpChangeEvent || standard == null || standard.uniqueId != ownerUniqueId) return;
 
         final hpPercent = standard.currentHp / standard.getMaxHp(simulation);
@@ -67,6 +68,7 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onHpRatioUp:
+        // all standard is User
         if (event is! HpChangeEvent || standard == null || standard.uniqueId != ownerUniqueId) return;
 
         final hpPercent = standard.currentHp / standard.getMaxHp(simulation);
@@ -224,11 +226,13 @@ class BattleFunction {
   void executeFunction(BattleEvent event, BattleSimulation simulation) {
     timesActivated += 1;
     switch (data.functionType) {
+      case FunctionType.coreShotDamageChange:
       case FunctionType.damageReduction:
       case FunctionType.firstBurstGaugeSpeedUp:
       case FunctionType.gainAmmo: // is actually a buff of 0 duration
       case FunctionType.givingHealVariation:
       case FunctionType.incElementDmg:
+      case FunctionType.normalDamageRatioChange: // user & functionTarget (Rumani Burst)
       case FunctionType.partsDamage:
       case FunctionType.statAccuracyCircle:
       case FunctionType.statAmmo:
@@ -246,6 +250,7 @@ class BattleFunction {
         addBuff(event, simulation);
         break;
       case FunctionType.changeCurrentHpValue:
+        // all function standard is user
         final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
           if (data.functionValueType == ValueType.integer) {
@@ -288,7 +293,6 @@ class BattleFunction {
       case FunctionType.changeUseBurstSkill:
       case FunctionType.copyAtk:
       case FunctionType.copyHp:
-      case FunctionType.coreShotDamageChange:
       case FunctionType.coverResurrection:
       case FunctionType.currentHpRatioDamage:
       case FunctionType.cycleUse:
@@ -352,7 +356,6 @@ class BattleFunction {
       case FunctionType.linkAtk:
       case FunctionType.linkDef:
       case FunctionType.none:
-      case FunctionType.normalDamageRatioChange:
       case FunctionType.normalStatCritical:
       case FunctionType.outBonusRangeDamageChange:
       case FunctionType.overHealSave:
@@ -489,8 +492,10 @@ class BattleFunction {
       case StatusTriggerType.isCheckMonster:
         return simulation.raptures.length >= value;
       case StatusTriggerType.isHpRatioUnder:
+        // functionTarget (only Trina S1, which is triggered by skill) & user
         return target != null && (target.currentHp / target.getMaxHp(simulation) * 10000).round() <= value;
       case StatusTriggerType.isHpRatioUp:
+        // all user
         return target != null && (target.currentHp / target.getMaxHp(simulation) * 10000).round() >= value;
       case StatusTriggerType.isWeaponType:
         return target is BattleNikke && target.baseWeaponData.id == value;
