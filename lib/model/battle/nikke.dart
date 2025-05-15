@@ -362,6 +362,9 @@ class BattleNikke extends BattleEntity {
     // before shooting need to go outside cover first, not sure if this should be its own status tho
     if (spotFirstDelayFrameCount > 0) {
       spotFirstDelayFrameCount -= 1;
+      if (spotFirstDelayFrameCount == 0 && WeaponType.chargeWeaponTypes.contains(currentWeaponType)) {
+        chargeFrames = 1; // charge weapons seem to start with one frame of charge at the last frame of this animation
+      }
       return;
     }
 
@@ -417,8 +420,8 @@ class BattleNikke extends BattleEntity {
         return;
       case WeaponType.rl:
       case WeaponType.sr:
+        chargeFrames += 1;
         if (chargeFrames < getFramesToFullCharge(simulation)) {
-          chargeFrames += 1;
           return;
         }
 
@@ -647,7 +650,7 @@ class BattleNikke extends BattleEntity {
       currentWeaponData.chargeTime,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
     );
-    return max(1, BattleUtils.timeDataToFrame(result, fps));
+    return max(1, BattleUtils.timeDataToFrame(result, fps) - 1);
   }
 
   int getTimeToReload(BattleSimulation simulation) {

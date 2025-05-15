@@ -290,21 +290,52 @@ void main() async {
       expect(alice1.getMaxAmmo(simulation), 18);
       expect(alice1.getMaxHp(simulation), 20699696);
 
-      expect(simulation.timeline[807]!.length, 3); // first bullet (fire, damage, burstGen)
-      final damageEvent1Alice3 = simulation.timeline[807]![1] as NikkeDamageEvent;
+      expect(simulation.timeline[810]!.length, 3); // first bullet (fire, damage, burstGen)
+      final damageEvent1Alice3 = simulation.timeline[810]![1] as NikkeDamageEvent;
       expect(damageEvent1Alice3.damageParameter.calculateDamage(core: true), 6756013);
-      final burstGenEvent1Alice3 = simulation.timeline[807]![2] as BurstGenerationEvent;
+      final burstGenEvent1Alice3 = simulation.timeline[810]![2] as BurstGenerationEvent;
       expect(burstGenEvent1Alice3.burst, 140000);
 
-      expect(simulation.timeline[805]!.length, 9);
-      final damageEvent1Alice1 = simulation.timeline[805]![1] as NikkeDamageEvent;
+      expect(simulation.timeline[808]!.length, 9);
+      final damageEvent1Alice1 = simulation.timeline[808]![1] as NikkeDamageEvent;
       expect(damageEvent1Alice1.damageParameter.calculateDamage(core: true), 6770023);
-      final burstGenEvent1Alice1 = simulation.timeline[805]![2] as BurstGenerationEvent;
+      final burstGenEvent1Alice1 = simulation.timeline[808]![2] as BurstGenerationEvent;
       expect(burstGenEvent1Alice1.burst, 56000);
-      final damageEvent1Alice2 = simulation.timeline[805]![4] as NikkeDamageEvent;
+      final damageEvent1Alice2 = simulation.timeline[808]![4] as NikkeDamageEvent;
       expect(damageEvent1Alice2.damageParameter.calculateDamage(core: true), moreOrLessEquals(6845765, epsilon: 1));
-      final burstGenEvent1Alice4 = simulation.timeline[805]![8] as BurstGenerationEvent;
+      final burstGenEvent1Alice4 = simulation.timeline[808]![8] as BurstGenerationEvent;
       expect(burstGenEvent1Alice4.burst, 58610);
+    });
+
+    test('Rapunzel: Pure Grace fire timing', () {
+      final simulation = BattleSimulation(
+        playerOptions: playerOptions,
+        nikkeOptions: [
+          BattleNikkeOptions(
+            nikkeResourceId: 226,
+            coreLevel: 11,
+            syncLevel: 884,
+            attractLevel: 33,
+            skillLevels: [1, 1, 1],
+            equips: [],
+          ),
+        ],
+      );
+
+      final rapture =
+          BattleRapture()
+            ..uniqueId = 11
+            ..distance = 30
+            ..element = NikkeElement.water
+            ..defence = 140;
+
+      simulation.raptures.add(rapture);
+      simulation.maxSeconds = 15;
+      simulation.simulate();
+
+      expect(simulation.timeline[831]!.length, 3); // first bullet (fire, damage, burstGen)
+      expect(simulation.timeline[749]!.length, 3);
+      expect(simulation.timeline[667]!.length, 3);
     });
   });
 }
