@@ -5,6 +5,7 @@ import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/function.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
+import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
@@ -81,7 +82,7 @@ class BattleSkill {
         function.executeFunction(event, simulation);
       }
     }
-    
+
     switch (skillData.skillType) {
       case CharacterSkillType.setBuff:
       case CharacterSkillType.instantAll:
@@ -157,9 +158,6 @@ class BattleSkill {
         skillData.skillValueData[targetCountIndex].skillValueType == ValueType.integer
             ? skillData.skillValueData[targetCountIndex].skillValue
             : 0;
-    if (targetCount == 0) {
-      return [];
-    }
 
     // isThisNikke  targetEnemy list
     // 1            1           raptures
@@ -168,6 +166,41 @@ class BattleSkill {
     // 0            0           raptures
     final targetNikkes = isThisNikke ^ targetEnemy;
     final targetList = targetNikkes ? simulation.nikkes.toList() : simulation.raptures.toList();
+
+    switch (skillData.preferTargetCondition) {
+      case PreferTargetCondition.unknown:
+      case PreferTargetCondition.none:
+        break;
+      case PreferTargetCondition.includeNoneTargetLast:
+        targetList.sort((a, b) {
+          final canTargetA = (a as BattleRapture).canBeTargeted ? -1 : 1;
+          final canTargetB = (b as BattleRapture).canBeTargeted ? -1 : 1;
+          return canTargetA - canTargetB;
+        });
+        break;
+      case PreferTargetCondition.includeNoneTargetNone:
+        targetList.retainWhere((rapture) => rapture is BattleRapture && rapture.canBeTargeted);
+        break;
+      case PreferTargetCondition.excludeSelf:
+        targetList.remove(owner);
+        break;
+      case PreferTargetCondition.destroyCover:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).cover.currentHp == 0);
+        break;
+      case PreferTargetCondition.onlySG:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseWeaponData.weaponType == WeaponType.sg);
+        break;
+      case PreferTargetCondition.onlyRL:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseWeaponData.weaponType == WeaponType.rl);
+        break;
+      case PreferTargetCondition.onlyAR:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseWeaponData.weaponType == WeaponType.ar);
+        break;
+    }
+
+    if (targetCount == 0) {
+      return targetList;
+    }
 
     switch (skillData.preferTarget) {
       case PreferTarget.random:
