@@ -46,6 +46,18 @@ Receive Damage Rate = 100% + Receive Damage Buffs + Distributed Damage Buffs
 - SRs & RLs start charging at 100% (first frame of charging), and will fire after charging complete (since `inputType` is `UP`)
   - Without charging speed buffs, charging time is constant regardless of charge rate buffs
 
+## Niche Mechanisms Waiting To Be Categorized
+- Shotgun's burst gen data is per pellet
+- Snipers & Rocket Launchers have -1 frame charge time compared to data, so chargeTime = 60 frames (from 1s) only needs
+59 frames to fully charge, and the 60th frame is for firing the bullet / projectile. Also, when moving out of cover,
+the last frame will actually be the first charging frame, so each full charge attack cycle is actually 2 frames faster
+compared to calculation
+- Equipment level stat rounding method is roundHalfToEvent (stat from level & stat from same corp are rounded separately)
+- Nikke stat rounding: gradeRatioStat is truncated to int, core stat is normal rounding
+- Current damage formula is roughly 0.0001% inaccurate due to rounding, the extreme example I used is Snow White's ult
+where the difference is 0.000004% (actual: 902435165 vs calculated: 902435200)
+- HP Ratio triggers (Emergency Max HP Cube) will not trigger again if the HP stays in trigger range
+
 ## TODOs
 
 ### Simulation
