@@ -74,6 +74,8 @@ class _BattleTimelineState extends State<BattleTimeline> {
             final frame = frames[index];
             final timeData = BattleUtils.frameToTimeData(frame, simulation.fps);
 
+            final seconds = timeData % 6000 / 100;
+
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: SingleChildScrollView(
@@ -81,7 +83,12 @@ class _BattleTimelineState extends State<BattleTimeline> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${timeData ~/ 6000}:${(timeData % 6000 / 100).toStringAsFixed(2)} (Frame: $frame) ==>'),
+                    Text(
+                      '${timeData ~/ 6000}:'
+                      '${seconds < 10 ? '0' : ''}'
+                      '${(timeData % 6000 / 100).toStringAsFixed(2)}'
+                      ' (Frame: $frame) ==>',
+                    ),
                     Column(
                       spacing: 8,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,7 +106,7 @@ class _BattleTimelineState extends State<BattleTimeline> {
 
   List<Widget> buildFrameEvents(List<BattleEvent> events) {
     final List<Widget> result = [];
-    final skipList = [NikkeFireEvent, NikkeReloadStartEvent, BurstGenerationEvent];
+    final skipList = [NikkeFireEvent, NikkeReloadStartEvent];
     for (final event in events) {
       if (skipList.contains(event.runtimeType)) continue;
 

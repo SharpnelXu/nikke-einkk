@@ -221,7 +221,7 @@ class BurstGenerationEvent extends BattleEvent {
 
     final baseBurst = nikke.getBurstGen(simulation, rapture.isStageTarget);
 
-    burst = (baseBurst * BattleUtils.toModifier(positionBurstBonus)).round();
+    burst = (baseBurst * weaponData.shotCount * BattleUtils.toModifier(positionBurstBonus)).round();
   }
 
   @override
@@ -311,5 +311,43 @@ class UseSkillEvent extends BattleEvent {
   @override
   Widget buildDisplay() {
     return Text('$name (Pos $ownerUniqueId) activates skill $skillNum');
+  }
+}
+
+class ChangeBurstStepEvent extends BattleEvent {
+  late String? name;
+  final int ownerUniqueId;
+  late int currentStage;
+  late int nextStage;
+  late int duration;
+
+  ChangeBurstStepEvent(BattleSimulation simulation, this.ownerUniqueId, this.nextStage, this.duration) {
+    final owner = simulation.getNikkeOnPosition(ownerUniqueId);
+    name = owner?.name;
+    currentStage = simulation.burstStage;
+  }
+
+  @override
+  int getActivatorUniqueId() {
+    return ownerUniqueId;
+  }
+
+  @override
+  Widget buildDisplay() {
+    return Text(
+      'Burst stage $currentStage -> $nextStage ${name != null ? 'by $name (Pos $ownerUniqueId) '
+              'Duration ${(duration / 100).toStringAsFixed(2)}s' : ''}',
+    );
+  }
+}
+
+class ExitFullBurstEvent extends BattleEvent {
+  static ExitFullBurstEvent exitFullBurstEvent = ExitFullBurstEvent._();
+
+  ExitFullBurstEvent._();
+
+  @override
+  Widget buildDisplay() {
+    return Text('Exit full burst');
   }
 }

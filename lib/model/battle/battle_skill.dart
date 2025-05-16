@@ -45,8 +45,11 @@ class BattleSkill {
     }
   }
 
-  bool canUseSkill() {
-    return skillType == SkillType.characterSkill && coolDown == 0;
+  bool canUseSkill(BattleSimulation simulation) {
+    final requiredStep = simulation.getNikkeOnPosition(ownerUniqueId)?.characterData.useBurstSkill;
+    final allStepCheck = requiredStep == BurstStep.allStep && [1, 2, 3].contains(simulation.burstStage);
+    final stepCheck = skillNum != 3 || allStepCheck || requiredStep?.step == simulation.burstStage;
+    return skillType == SkillType.characterSkill && coolDown == 0 && stepCheck;
   }
 
   void processFrame(BattleSimulation simulation) {
@@ -56,7 +59,7 @@ class BattleSkill {
       coolDown -= 1;
     }
 
-    if (coolDown == 0 && skillNum != 3) {
+    if (coolDown == 0 && canUseSkill(simulation)) {
       activateSkill(simulation);
     }
   }
@@ -74,8 +77,8 @@ class BattleSkill {
       skillTargets.map((entity) => entity.uniqueId).toList(),
     );
 
-    for (final beforeUseFunctionId in [...skillData.beforeUseFunctionIdList, skillData.beforeHurtFunctionIdList]) {
-      final functionData = gameData.functionTable[beforeUseFunctionId];
+    for (final beforeFuncId in [...skillData.beforeUseFunctionIdList, ...skillData.beforeHurtFunctionIdList]) {
+      final functionData = gameData.functionTable[beforeFuncId];
       if (functionData != null) {
         final function = BattleFunction(functionData, ownerUniqueId);
         // connected function likely doesn't check trigger target
@@ -103,7 +106,6 @@ class BattleSkill {
           }
         }
         break;
-      case CharacterSkillType.setBuff:
       case CharacterSkillType.instantSequentialAttack:
       case CharacterSkillType.installBarrier:
       case CharacterSkillType.installDecoy:
@@ -113,12 +115,13 @@ class BattleSkill {
       case CharacterSkillType.explosiveCircuit:
       case CharacterSkillType.stigma:
       case CharacterSkillType.hitMonsterGetBuff:
+      case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.unknown:
         break;
     }
 
-    for (final beforeUseFunctionId in [...skillData.afterUseFunctionIdList, skillData.afterHurtFunctionIdList]) {
-      final functionData = gameData.functionTable[beforeUseFunctionId];
+    for (final afterFuncId in [...skillData.afterUseFunctionIdList, ...skillData.afterHurtFunctionIdList]) {
+      final functionData = gameData.functionTable[afterFuncId];
       if (functionData != null) {
         final function = BattleFunction(functionData, ownerUniqueId);
         // connected function likely doesn't check trigger target
@@ -127,6 +130,24 @@ class BattleSkill {
     }
 
     coolDown = BattleUtils.timeDataToFrame(skillData.skillCooltime, simulation.fps);
+    final owner = simulation.getNikkeOnPosition(ownerUniqueId)!.characterData;
+    final nextStep = owner.changeBurstStep;
+    if (skillNum == 3 && simulation.reEnterBurstCd == 0) {
+      if ([
+        BurstStep.nextStep,
+        BurstStep.step1,
+        BurstStep.step2,
+        BurstStep.step3,
+        BurstStep.stepFull,
+      ].contains(nextStep)) {
+        final nextStageNum = nextStep == BurstStep.nextStep ? simulation.burstStage + 1 : nextStep.step;
+        simulation.reEnterBurstCd = BattleUtils.timeDataToFrame(50, simulation.fps); // 0.5s fixed cd
+        simulation.registerEvent(
+          simulation.currentFrame,
+          ChangeBurstStepEvent(simulation, ownerUniqueId, nextStageNum, owner.burstDuration),
+        );
+      }
+    }
   }
 
   List<BattleEntity> getSkillTargets(BattleSimulation simulation, SkillData skillData) {

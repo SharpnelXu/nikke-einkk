@@ -166,7 +166,29 @@ class MyApp extends StatelessWidget {
 
     final simulation = BattleSimulation(
       playerOptions: playerOptions,
-      nikkeOptions: [snowWhiteOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15)],
+      nikkeOptions: [
+        BattleNikkeOptions(
+          nikkeResourceId: 82,
+          coreLevel: 11,
+          syncLevel: 884,
+          attractLevel: 30,
+          skillLevels: [10, 10, 10],
+        ),
+        BattleNikkeOptions(
+          nikkeResourceId: 270,
+          coreLevel: 11,
+          syncLevel: 884,
+          attractLevel: 30,
+          skillLevels: [10, 10, 10],
+        ),
+        BattleNikkeOptions(
+          nikkeResourceId: 271,
+          coreLevel: 11,
+          syncLevel: 884,
+          attractLevel: 30,
+          skillLevels: [10, 10, 10],
+        ),
+      ],
     );
 
     final rapture =

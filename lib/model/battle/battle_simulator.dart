@@ -6,6 +6,7 @@ import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
+import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 
 class BattlePlayerOptions {
@@ -56,6 +57,8 @@ class BattleSimulation {
   int get burstMeter => _burstMeter;
   set burstMeter(int value) => _burstMeter = value.clamp(0, burstMeterCap);
   int burstStage = 0;
+  int reEnterBurstCd = 0;
+  int burstStageDuration = 0;
 
   // player actions, maybe move to a dedicated object to represent current frame
   bool autoAttack = true;
@@ -73,6 +76,8 @@ class BattleSimulation {
     timeline.clear();
     burstMeter = 0;
     burstStage = 0;
+    reEnterBurstCd = 0;
+    burstStageDuration = 0;
     currentNikke = min(nikkes.length, currentNikke);
     for (int index = 0; index < nikkes.length; index += 1) {
       nikkes[index].init(this, index + 1);
@@ -94,16 +99,38 @@ class BattleSimulation {
         nikke.normalAction(this);
       }
 
+      reEnterBurstCd = max(0, reEnterBurstCd - 1);
+      burstStageDuration = max(0, burstStageDuration - 1);
+      if (burstStage > 1 && burstStageDuration == 0) {
+        if (burstStage == 4) {
+          registerEvent(currentFrame, ExitFullBurstEvent.exitFullBurstEvent);
+        }
+        burstStage = 0;
+      }
+
       // broadcast all events registered for this frame
       for (int index = 0; index < (timeline[currentFrame]?.length ?? 0); index += 1) {
         final event = timeline[currentFrame]![index];
 
         if (event is BurstGenerationEvent) {
           event.currentMeter = burstMeter;
-          burstMeter += event.burst;
-          if (burstMeter == burstMeterCap) {
-            burstStage = 1;
+          if (burstStage == 0) {
+            burstMeter += event.burst;
+
+            if (burstMeter == burstMeterCap) {
+              registerEvent(currentFrame, ChangeBurstStepEvent(this, -1, 1, -1));
+              burstStage = 1;
+              burstMeter = 0;
+            }
           }
+        }
+
+        if (event is ChangeBurstStepEvent) {
+          if (event.nextStage > event.currentStage) {
+            reEnterBurstCd = 0;
+          }
+          burstStage = event.nextStage;
+          burstStageDuration = BattleUtils.timeDataToFrame(event.duration, fps);
         }
 
         for (final nikke in nikkes) {

@@ -705,18 +705,22 @@ enum NikkeElement {
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum BurstStep {
-  unknown,
-  step1,
-  step2,
-  step3,
-  stepFull,
+  unknown(-1),
+  step1(1),
+  step2(2),
+  step3(3),
+  stepFull(4),
 
   // red hood
-  allStep,
-  nextStep,
+  allStep(-1),
+  nextStep(-1),
 
   // marian
-  none,
+  none(-1);
+
+  final int step;
+
+  const BurstStep(this.step);
 }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
