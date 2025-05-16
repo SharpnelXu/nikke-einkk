@@ -390,5 +390,91 @@ void main() async {
       expect(hpChangeEvents4[0].changeAmount, 20565804 - 23062493);
       expect(hpChangeEvents4[0].isMaxHpOnly, true);
     });
+
+    test('SnowWhite attack & normal skill damage tests resource Id 220', () {
+      final BattleNikkeOptions snowWhiteOption = BattleNikkeOptions(
+        nikkeResourceId: 220,
+        coreLevel: 11,
+        syncLevel: 884,
+        attractLevel: 40,
+        skillLevels: [7, 10, 10],
+        equips: [
+          BattleEquipment(
+            type: EquipType.head,
+            equipClass: NikkeClass.attacker,
+            rarity: EquipRarity.t10,
+            level: 5,
+            equipLines: [EquipLine(EquipLineType.statAtk, 5)],
+          ),
+          BattleEquipment(
+            type: EquipType.body,
+            equipClass: NikkeClass.attacker,
+            rarity: EquipRarity.t10,
+            level: 5,
+            equipLines: [EquipLine(EquipLineType.statAtk, 8)],
+          ),
+          BattleEquipment(
+            type: EquipType.arm,
+            equipClass: NikkeClass.attacker,
+            rarity: EquipRarity.t10,
+            level: 5,
+            equipLines: [EquipLine(EquipLineType.statAtk, 5)],
+          ),
+          BattleEquipment(
+            type: EquipType.leg,
+            equipClass: NikkeClass.attacker,
+            rarity: EquipRarity.t10,
+            level: 1,
+            equipLines: [EquipLine(EquipLineType.statAtk, 11)],
+          ),
+        ],
+        favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.ar, Rarity.r)!, 0),
+        cube: null,
+      );
+
+      final simulation = BattleSimulation(
+        playerOptions: BattlePlayerOptions(
+          personalRecycleLevel: 420,
+          corpRecycleLevels: {Corporation.pilgrim: 417},
+          classRecycleLevels: {NikkeClass.attacker: 212},
+        ),
+        nikkeOptions: [snowWhiteOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15)],
+      );
+
+      final rapture =
+          BattleRapture()
+            ..uniqueId = 11
+            ..distance = 30
+            ..element = NikkeElement.electric
+            ..defence = 140;
+
+      simulation.raptures.add(rapture);
+      simulation.maxSeconds = 90;
+      simulation.simulate();
+
+      final snowWhite = simulation.nikkes.first;
+      expect(snowWhite.baseAttack, 900990);
+      expect(snowWhite.baseDefence, 137056);
+      expect(snowWhite.getMaxAmmo(simulation), 60);
+      expect(snowWhite.getMaxHp(simulation), 20421354);
+
+      expect(simulation.timeline[5238]!.length, 3);
+      final damageEvent31SnowWhite = simulation.timeline[5238]![1] as NikkeDamageEvent;
+      expect(damageEvent31SnowWhite.damageParameter.calculateDamage(), 320091);
+      // 443203 is actual damage
+      expect(damageEvent31SnowWhite.damageParameter.calculateDamage(critical: true), 443203 - 1);
+      expect(damageEvent31SnowWhite.damageParameter.calculateDamage(core: true), 580275);
+      expect(damageEvent31SnowWhite.damageParameter.calculateDamage(critical: true, core: true), 703387);
+
+      expect(simulation.timeline[5093]!.length, 4); // S1
+      final damageEventSkill1SnowWhite = simulation.timeline[5093]![3] as NikkeDamageEvent;
+      expect(damageEventSkill1SnowWhite.type, NikkeDamageType.skill);
+      expect(damageEventSkill1SnowWhite.damageParameter.calculateDamage(), 1212706);
+
+      expect(simulation.timeline[4501]!.length, 1); // S2
+      final damageEventSkill2SnowWhite = simulation.timeline[4501]![0] as NikkeDamageEvent;
+      expect(damageEventSkill2SnowWhite.type, NikkeDamageType.skill);
+      expect(damageEventSkill2SnowWhite.damageParameter.calculateDamage(), 2422566);
+    });
   });
 }

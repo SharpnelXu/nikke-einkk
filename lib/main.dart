@@ -26,13 +26,13 @@ class MyApp extends StatelessWidget {
     final BattlePlayerOptions playerOptions = BattlePlayerOptions(
       personalRecycleLevel: 420,
       corpRecycleLevels: {
-        Corporation.pilgrim: 405,
+        Corporation.pilgrim: 417,
         Corporation.missilis: 196,
         Corporation.abnormal: 155,
         Corporation.tetra: 224,
         Corporation.elysion: 197,
       },
-      classRecycleLevels: {NikkeClass.attacker: 211, NikkeClass.supporter: 193, NikkeClass.defender: 184},
+      classRecycleLevels: {NikkeClass.attacker: 212, NikkeClass.supporter: 193, NikkeClass.defender: 184},
     );
     final BattleNikkeOptions scarletOption = BattleNikkeOptions(
       nikkeResourceId: 222,
@@ -129,23 +129,55 @@ class MyApp extends StatelessWidget {
       coreLevel: 11,
       syncLevel: 884,
       attractLevel: 40,
-      skillLevels: [10, 10, 10],
-      equips: [],
+      skillLevels: [7, 10, 10],
+      equips: [
+        BattleEquipment(
+          type: EquipType.head,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAtk, 5)],
+        ),
+        BattleEquipment(
+          type: EquipType.body,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAtk, 8)],
+        ),
+        BattleEquipment(
+          type: EquipType.arm,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAtk, 5)],
+        ),
+        BattleEquipment(
+          type: EquipType.leg,
+          equipClass: NikkeClass.attacker,
+          rarity: EquipRarity.t10,
+          level: 1,
+          equipLines: [EquipLine(EquipLineType.statAtk, 11)],
+        ),
+      ],
       favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.ar, Rarity.r)!, 0),
       cube: null,
     );
 
-    final simulation = BattleSimulation(playerOptions: playerOptions, nikkeOptions: [snowWhiteOption.copy()]);
+    final simulation = BattleSimulation(
+      playerOptions: playerOptions,
+      nikkeOptions: [snowWhiteOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15)],
+    );
 
     final rapture =
         BattleRapture()
           ..uniqueId = 11
           ..distance = 30
-          ..element = NikkeElement.water
-          ..defence = 100;
+          ..element = NikkeElement.electric
+          ..defence = 140;
 
     simulation.raptures.add(rapture);
-    simulation.maxSeconds = 180;
+    simulation.maxSeconds = 90;
 
     return MaterialApp(
       title: 'Flutter Demo',

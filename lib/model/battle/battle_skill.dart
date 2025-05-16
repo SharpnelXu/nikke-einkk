@@ -92,13 +92,13 @@ class BattleSkill {
         for (final target in skillTargets) {
           if (target is BattleRapture) {
             simulation.registerEvent(
-                simulation.currentFrame,
-                NikkeDamageEvent.skill(
-                  simulation: simulation,
-                  nikke: simulation.getNikkeOnPosition(ownerUniqueId)!,
-                  rapture: target,
-                  damageRate: skillData.skillValueData[0].skillValue,
-                ),
+              simulation.currentFrame,
+              NikkeDamageEvent.skill(
+                simulation: simulation,
+                nikke: simulation.getNikkeOnPosition(ownerUniqueId)!,
+                rapture: target,
+                damageRate: skillData.skillValueData[0].skillValue,
+              ),
             );
           }
         }
