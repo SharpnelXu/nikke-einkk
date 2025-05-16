@@ -6,6 +6,7 @@ import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
+import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
@@ -28,7 +29,9 @@ class BattleFunction {
     switch (data.timingTriggerType) {
       case TimingTriggerType.onHitNum:
         // triggerStandard: {user, none}, majority is user
-        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId) return;
+        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId || event.type != NikkeDamageType.bullet) {
+          return;
+        }
 
         if (standard is BattleNikke &&
             standard.totalBulletsHit > 0 &&
@@ -264,6 +267,22 @@ class BattleFunction {
           }
         }
         break;
+      case FunctionType.damage:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          if (target is BattleRapture) {
+            simulation.registerEvent(
+              simulation.currentFrame,
+              NikkeDamageEvent.skill(
+                simulation: simulation,
+                nikke: simulation.getNikkeOnPosition(ownerUniqueId)!,
+                rapture: target,
+                damageRate: data.functionValue,
+              ),
+            );
+          }
+        }
+        break;
       case FunctionType.unknown:
       case FunctionType.addDamage:
       case FunctionType.addIncElementDmgType:
@@ -296,7 +315,6 @@ class BattleFunction {
       case FunctionType.coverResurrection:
       case FunctionType.currentHpRatioDamage:
       case FunctionType.cycleUse:
-      case FunctionType.damage:
       case FunctionType.damageBio:
       case FunctionType.damageEnergy:
       case FunctionType.damageFunctionTargetGroupId:

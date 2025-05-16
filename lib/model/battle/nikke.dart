@@ -415,7 +415,7 @@ class BattleNikke extends BattleEntity {
         if (currentWeaponData.fireType == FireType.instant) {
           simulation.registerEvent(
             simulation.currentFrame,
-            NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
+            NikkeDamageEvent.bullet(simulation: simulation, nikke: this, rapture: target),
           );
           if (simulation.burstStage == 0) {
             simulation.registerEvent(
@@ -457,7 +457,7 @@ class BattleNikke extends BattleEntity {
           );
           simulation.registerEvent(
             simulation.currentFrame,
-            NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
+            NikkeDamageEvent.bullet(simulation: simulation, nikke: this, rapture: target),
           );
           if (simulation.burstStage == 0) {
             simulation.registerEvent(
@@ -500,7 +500,7 @@ class BattleNikke extends BattleEntity {
             // TODO: fill in defender buffs on hit rather now
             simulation.registerEvent(
               damageFrame,
-              NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
+              NikkeDamageEvent.bullet(simulation: simulation, nikke: this, rapture: target),
             );
             if (simulation.burstStage == 0) {
               simulation.registerEvent(

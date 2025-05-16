@@ -84,12 +84,26 @@ class BattleSkill {
     }
 
     switch (skillData.skillType) {
-      case CharacterSkillType.setBuff:
       case CharacterSkillType.instantAll:
       case CharacterSkillType.instantArea:
       case CharacterSkillType.instantCircle:
       case CharacterSkillType.instantCircleSeparate:
       case CharacterSkillType.instantNumber:
+        for (final target in skillTargets) {
+          if (target is BattleRapture) {
+            simulation.registerEvent(
+                simulation.currentFrame,
+                NikkeDamageEvent.skill(
+                  simulation: simulation,
+                  nikke: simulation.getNikkeOnPosition(ownerUniqueId)!,
+                  rapture: target,
+                  damageRate: skillData.skillValueData[0].skillValue,
+                ),
+            );
+          }
+        }
+        break;
+      case CharacterSkillType.setBuff:
       case CharacterSkillType.instantSequentialAttack:
       case CharacterSkillType.installBarrier:
       case CharacterSkillType.installDecoy:
