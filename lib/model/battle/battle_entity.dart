@@ -2,6 +2,7 @@ import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
+import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 abstract class BattleEntity {
@@ -14,6 +15,8 @@ abstract class BattleEntity {
   int get baseAttack;
   int get baseDefence;
   int get baseHp;
+
+  NikkeElement element = NikkeElement.unknown;
 
   void changeHp(BattleSimulation simulation, int changeValue) {
     currentHp = (currentHp + changeValue).clamp(1, getMaxHp(simulation));

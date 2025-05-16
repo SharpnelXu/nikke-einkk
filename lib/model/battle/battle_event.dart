@@ -16,8 +16,8 @@ abstract class BattleEvent {
     return -1;
   }
 
-  int getTargetUniqueId() {
-    return -1;
+  List<int> getTargetUniqueIds() {
+    return [];
   }
 }
 
@@ -111,7 +111,7 @@ class NikkeDamageEvent extends BattleEvent {
       criticalDamageRate: nikke.characterData.criticalDamage,
       criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
       isBonusRange: nikke.isBonusRange(rapture.distance),
-      isFullBurst: simulation.fullBurst,
+      isFullBurst: simulation.burstStage == 4,
       isStrongElement: nikke.element.strongAgainst(rapture.element),
       elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
       chargeDamageRate: weaponData.fullChargeDamage,
@@ -135,8 +135,8 @@ class NikkeDamageEvent extends BattleEvent {
   }
 
   @override
-  int getTargetUniqueId() {
-    return targetUniqueId;
+  List<int> getTargetUniqueIds() {
+    return [targetUniqueId];
   }
 
   @override
@@ -202,8 +202,8 @@ class BurstGenerationEvent extends BattleEvent {
   }
 
   @override
-  int getTargetUniqueId() {
-    return targetUniqueId;
+  List<int> getTargetUniqueIds() {
+    return [targetUniqueId];
   }
 
   @override
@@ -256,5 +256,32 @@ class HpChangeEvent extends BattleEvent {
       '$name (Pos $ownerUniqueId) ${isMaxHpOnly ? 'Max' : ''}HP change:'
       ' $changeAmount ($hpPercent% $afterChangeHp/$maxHp)',
     );
+  }
+}
+
+class UseSkillEvent extends BattleEvent {
+  late String name;
+  final int ownerUniqueId;
+  final int skillNum;
+  final List<int> skillTargetUniqueIds = [];
+
+  UseSkillEvent(BattleSimulation simulation, this.ownerUniqueId, this.skillNum, List<int> targetUniqueIds) {
+    name = simulation.getEntityByUniqueId(ownerUniqueId)!.name;
+    skillTargetUniqueIds.addAll(targetUniqueIds);
+  }
+
+  @override
+  int getActivatorUniqueId() {
+    return ownerUniqueId;
+  }
+
+  @override
+  List<int> getTargetUniqueIds() {
+    return skillTargetUniqueIds;
+  }
+
+  @override
+  Widget buildDisplay() {
+    return Text('$name (Pos $ownerUniqueId) activates skill $skillNum');
   }
 }

@@ -124,11 +124,18 @@ class MyApp extends StatelessWidget {
       favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.sr, Rarity.sr)!, 15),
       cube: null,
     );
-
-    final simulation = BattleSimulation(
-      playerOptions: playerOptions,
-      nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.emergencyMaxHp.cubeId, 15)],
+    final BattleNikkeOptions snowWhiteOption = BattleNikkeOptions(
+      nikkeResourceId: 220,
+      coreLevel: 11,
+      syncLevel: 884,
+      attractLevel: 40,
+      skillLevels: [10, 10, 10],
+      equips: [],
+      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.ar, Rarity.r)!, 0),
+      cube: null,
     );
+
+    final simulation = BattleSimulation(playerOptions: playerOptions, nikkeOptions: [snowWhiteOption.copy()]);
 
     final rapture =
         BattleRapture()

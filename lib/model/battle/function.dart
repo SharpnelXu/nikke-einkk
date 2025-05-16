@@ -156,7 +156,7 @@ class BattleFunction {
         // functionTarget: {onTeamHpRatioUnder, onPartsBrokenNum, onTeamHpRatioUp, onFullCount (not actually used)}
         // so essentially this means all nikkes? only that would makes sense for Flora S2
         // TODO: leaving that out until it's time to write that, so weird
-        return simulation.getEntityByUniqueId(event.getTargetUniqueId());
+        return null;
       case StandardType.unknown:
       case StandardType.triggerTarget: // no trigger target for timing trigger standard
         return null;
@@ -433,15 +433,20 @@ class BattleFunction {
         result.addAll(simulation.raptures);
         break;
       case FunctionTargetType.target:
-        final target = simulation.getEntityByUniqueId(event.getTargetUniqueId());
-        if (target != null) {
-          result.add(target);
+        // if used with skills, it's skill's target
+        for (final targetUniqueId in event.getTargetUniqueIds()) {
+          final target = simulation.getEntityByUniqueId(targetUniqueId);
+          if (target != null) {
+            result.add(target);
+          }
         }
         break;
       case FunctionTargetType.targetCover:
-        final target = simulation.getEntityByUniqueId(event.getTargetUniqueId());
-        if (target != null && target is BattleNikke) {
-          result.add(target.cover);
+        for (final targetUniqueId in event.getTargetUniqueIds()) {
+          final target = simulation.getEntityByUniqueId(targetUniqueId);
+          if (target != null && target is BattleNikke) {
+            result.add(target.cover);
+          }
         }
       case FunctionTargetType.userCover:
         final self = simulation.getNikkeOnPosition(ownerUniqueId);
@@ -489,6 +494,8 @@ class BattleFunction {
     switch (type) {
       case StatusTriggerType.none:
         return true;
+      case StatusTriggerType.isBurstStepState:
+        return simulation.burstStage == value;
       case StatusTriggerType.isCheckMonster:
         return simulation.raptures.length >= value;
       case StatusTriggerType.isHpRatioUnder:
@@ -503,7 +510,6 @@ class BattleFunction {
       case StatusTriggerType.isAlive:
       case StatusTriggerType.isAmmoCount:
       case StatusTriggerType.isBurstMember:
-      case StatusTriggerType.isBurstStepState:
       case StatusTriggerType.isCharacter:
       case StatusTriggerType.isCheckFunctionOverlapUp:
       case StatusTriggerType.isCheckMonsterType:

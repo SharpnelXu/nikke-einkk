@@ -185,6 +185,7 @@ class BattleNikke extends BattleEntity {
 
   BattleNikke({required this.playerOptions, required this.option}) {
     cover = BattleCover(option.syncLevel);
+    element = NikkeElement.fromId(characterData.elementId.first);
   }
 
   // CharacterStatTable[statEnhanceId = groupId][lv] to get baseStat
@@ -250,9 +251,9 @@ class BattleNikke extends BattleEntity {
     option.cube?.applyCubeEffect(simulation, this);
     option.favoriteItem?.applyCollectionItemEffect(simulation, this);
 
-    skills.add(BattleSkill(characterData.skill1Id, characterData.skill1Table, option.skillLevels[0], false));
-    skills.add(BattleSkill(characterData.skill2Id, characterData.skill2Table, option.skillLevels[1], false));
-    skills.add(BattleSkill(characterData.ultiSkillId, SkillType.characterSkill, option.skillLevels[2], true));
+    skills.add(BattleSkill(characterData.skill1Id, characterData.skill1Table, option.skillLevels[0], 1, uniqueId));
+    skills.add(BattleSkill(characterData.skill2Id, characterData.skill2Table, option.skillLevels[1], 2, uniqueId));
+    skills.add(BattleSkill(characterData.ultiSkillId, SkillType.characterSkill, option.skillLevels[2], 3, uniqueId));
 
     // substitute favorite item skill
     final favoriteItem = option.favoriteItem;
@@ -302,6 +303,10 @@ class BattleNikke extends BattleEntity {
       if (buff.data.durationType == DurationType.timeSec) {
         buff.duration -= 1;
       }
+    }
+
+    for (final skill in skills) {
+      skill.processFrame(simulation);
     }
   }
 
@@ -412,10 +417,12 @@ class BattleNikke extends BattleEntity {
             simulation.currentFrame,
             NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
           );
-          simulation.registerEvent(
-            simulation.currentFrame,
-            BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
-          );
+          if (simulation.burstStage == 0) {
+            simulation.registerEvent(
+              simulation.currentFrame,
+              BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
+            );
+          }
         }
 
         // rateOfFire 90 = shoot 90 bullets per minute, so time data per bullet is 6000 / 90 = 66.66 (0.6666 second)
@@ -452,10 +459,12 @@ class BattleNikke extends BattleEntity {
             simulation.currentFrame,
             NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
           );
-          simulation.registerEvent(
-            simulation.currentFrame,
-            BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
-          );
+          if (simulation.burstStage == 0) {
+            simulation.registerEvent(
+              simulation.currentFrame,
+              BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
+            );
+          }
 
           // TODO: move to attackDoneEvent (end of fire animation) for A2 & SBS (end of uptype_fire_timing)
           chargeFrames = 0;
@@ -493,10 +502,12 @@ class BattleNikke extends BattleEntity {
               damageFrame,
               NikkeDamageEvent(simulation: simulation, nikke: this, rapture: target, type: NikkeDamageType.bullet),
             );
-            simulation.registerEvent(
-              damageFrame,
-              BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
-            );
+            if (simulation.burstStage == 0) {
+              simulation.registerEvent(
+                damageFrame,
+                BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
+              );
+            }
           }
         }
 

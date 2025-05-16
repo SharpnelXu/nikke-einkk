@@ -55,12 +55,12 @@ class BattleSimulation {
   int _burstMeter = 0;
   int get burstMeter => _burstMeter;
   set burstMeter(int value) => _burstMeter = value.clamp(0, burstMeterCap);
+  int burstStage = 0;
 
   // player actions, maybe move to a dedicated object to represent current frame
   bool autoAttack = true;
   bool autoBurst = true;
   bool useCover = false;
-  bool fullBurst = false;
   int currentNikke = 3;
 
   BattleSimulation({required this.playerOptions, required List<BattleNikkeOptions?> nikkeOptions}) {
@@ -72,6 +72,7 @@ class BattleSimulation {
 
     timeline.clear();
     burstMeter = 0;
+    burstStage = 0;
     currentNikke = min(nikkes.length, currentNikke);
     for (int index = 0; index < nikkes.length; index += 1) {
       nikkes[index].init(this, index + 1);
@@ -100,6 +101,9 @@ class BattleSimulation {
         if (event is BurstGenerationEvent) {
           event.currentMeter = burstMeter;
           burstMeter += event.burst;
+          if (burstMeter == burstMeterCap) {
+            burstStage = 1;
+          }
         }
 
         for (final nikke in nikkes) {

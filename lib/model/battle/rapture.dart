@@ -1,5 +1,3 @@
-import 'package:nikke_einkk/model/common.dart';
-
 import 'battle_entity.dart';
 
 class BattleRapture extends BattleEntity {
@@ -21,8 +19,6 @@ class BattleRapture extends BattleEntity {
 
   @override
   int get baseAttack => 100;
-
-  NikkeElement element = NikkeElement.unknown;
 
   bool hasParts() {
     return false;
