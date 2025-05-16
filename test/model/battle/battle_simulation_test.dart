@@ -201,7 +201,7 @@ void main() async {
       final damageEvent11Scarlet2 = simulation.timeline[838]![4] as NikkeDamageEvent;
       expect(damageEvent11Scarlet2.damageParameter.calculateDamage(), 707230);
 
-      final damageEvent51Scarlet2 = simulation.timeline[638]![4] as NikkeDamageEvent; // 51 st
+      final damageEvent51Scarlet2 = simulation.timeline[638]![3] as NikkeDamageEvent; // 51 st, no more burst gen event
       expect(damageEvent51Scarlet2.damageParameter.calculateDamage(), 1149206);
 
       expect(simulation.timeline[607]!.length, 2); // 1 & 4 reload
