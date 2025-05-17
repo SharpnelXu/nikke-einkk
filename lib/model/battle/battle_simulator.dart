@@ -131,6 +131,7 @@ class BattleSimulation {
           }
           burstStage = event.nextStage;
           burstStageDuration = BattleUtils.timeDataToFrame(event.duration, fps);
+          burstStageDuration = max(0, burstStageDuration);
         }
 
         for (final nikke in nikkes) {

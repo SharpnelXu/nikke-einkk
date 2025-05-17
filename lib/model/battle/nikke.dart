@@ -615,6 +615,14 @@ class BattleNikke extends BattleEntity {
     );
     currentAmmo = (currentAmmo + gainAmmo).clamp(0, getMaxAmmo(simulation));
 
+    final ultCdReduceTimeData = getBuffValue(
+      simulation,
+      FunctionType.changeCoolTimeUlti,
+      0,
+      (nikke) => nikke is BattleNikke ? nikke.skills[2].skillData?.skillCooltime ?? 0 : 0,
+    );
+    skills[2].changeCd(simulation, ultCdReduceTimeData);
+
     final previousMaxHp = getMaxHp(simulation);
     buffs.removeWhere((buff) => buff.shouldRemove(simulation));
     final afterMaxHp = getMaxHp(simulation);

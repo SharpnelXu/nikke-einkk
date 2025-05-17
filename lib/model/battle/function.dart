@@ -86,6 +86,18 @@ class BattleFunction {
           status = FunctionStatus.off;
         }
         break;
+      case TimingTriggerType.onSkillUse:
+        if (event is UseSkillEvent &&
+            event.skillGroup == data.timingTriggerValue &&
+            standard?.uniqueId == ownerUniqueId) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onEnterBurstStep:
+        if (event is ChangeBurstStepEvent && event.nextStage == data.timingTriggerValue) {
+          executeFunction(event, simulation);
+        }
+        break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
       case TimingTriggerType.onBurstSkillStep:
@@ -99,7 +111,6 @@ class BattleFunction {
       case TimingTriggerType.onDead:
       case TimingTriggerType.onEndFullBurst:
       case TimingTriggerType.onEndReload:
-      case TimingTriggerType.onEnterBurstStep:
       case TimingTriggerType.onFullCharge:
       case TimingTriggerType.onFullChargeHit:
       case TimingTriggerType.onFullChargeHitNum:
@@ -133,7 +144,6 @@ class BattleFunction {
       case TimingTriggerType.onResurrection:
       case TimingTriggerType.onShotNotFullCharge:
       case TimingTriggerType.onShotRatio:
-      case TimingTriggerType.onSkillUse:
       case TimingTriggerType.onSpawnMonster:
       case TimingTriggerType.onSpawnTarget:
       case TimingTriggerType.onSquadHurtRatio:
@@ -229,6 +239,7 @@ class BattleFunction {
   void executeFunction(BattleEvent event, BattleSimulation simulation) {
     timesActivated += 1;
     switch (data.functionType) {
+      case FunctionType.changeCoolTimeUlti: // act as a buff for rounding
       case FunctionType.coreShotDamageChange:
       case FunctionType.damageReduction:
       case FunctionType.firstBurstGaugeSpeedUp:
@@ -249,6 +260,7 @@ class BattleFunction {
       case FunctionType.statHp:
       case FunctionType.statHpHeal:
       case FunctionType.statReloadTime:
+      case FunctionType.none: // misc counters etc.
         // add buff
         addBuff(event, simulation);
         break;
@@ -283,6 +295,20 @@ class BattleFunction {
           }
         }
         break;
+      case FunctionType.healCover:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          if (target is! BattleNikke) continue;
+
+          if (data.functionValueType == ValueType.integer) {
+            target.cover.changeHp(simulation, data.functionValue);
+          } else if (data.functionValueType == ValueType.percent) {
+            final functionStandard = simulation.getNikkeOnPosition(getFunctionStandardUniqueId(target.uniqueId))!.cover;
+            final changeValue = BattleUtils.toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
+            target.cover.changeHp(simulation, changeValue.round());
+          }
+        }
+        break;
       case FunctionType.unknown:
       case FunctionType.addDamage:
       case FunctionType.addIncElementDmgType:
@@ -303,7 +329,6 @@ class BattleFunction {
       case FunctionType.changeCoolTimeAll:
       case FunctionType.changeCoolTimeSkill1:
       case FunctionType.changeCoolTimeSkill2:
-      case FunctionType.changeCoolTimeUlti:
       case FunctionType.changeMaxSkillCoolTime2:
       case FunctionType.changeMaxSkillCoolTimeUlti:
       case FunctionType.changeNormalDefIgnoreDamage:
@@ -345,7 +370,6 @@ class BattleFunction {
       case FunctionType.gravityBomb:
       case FunctionType.healBarrier:
       case FunctionType.healCharacter:
-      case FunctionType.healCover:
       case FunctionType.healDecoy:
       case FunctionType.healShare:
       case FunctionType.healVariation:
@@ -373,7 +397,6 @@ class BattleFunction {
       case FunctionType.instantDeath:
       case FunctionType.linkAtk:
       case FunctionType.linkDef:
-      case FunctionType.none:
       case FunctionType.normalStatCritical:
       case FunctionType.outBonusRangeDamageChange:
       case FunctionType.overHealSave:
@@ -524,6 +547,10 @@ class BattleFunction {
         return target != null && (target.currentHp / target.getMaxHp(simulation) * 10000).round() >= value;
       case StatusTriggerType.isWeaponType:
         return target is BattleNikke && target.baseWeaponData.id == value;
+      case StatusTriggerType.isFunctionOff:
+        return target != null && target.buffs.every((buff) => buff.data.groupId != value);
+      case StatusTriggerType.isFunctionOn:
+        return target != null && target.buffs.any((buff) => buff.data.groupId == value);
       case StatusTriggerType.unknown:
       case StatusTriggerType.isAlive:
       case StatusTriggerType.isAmmoCount:
@@ -541,8 +568,6 @@ class BattleFunction {
       case StatusTriggerType.isFullCharge:
       case StatusTriggerType.isFullCount:
       case StatusTriggerType.isFunctionBuffCheck:
-      case StatusTriggerType.isFunctionOff:
-      case StatusTriggerType.isFunctionOn:
       case StatusTriggerType.isFunctionTypeOffCheck:
       case StatusTriggerType.isHaveBarrier:
       case StatusTriggerType.isHaveDecoy:

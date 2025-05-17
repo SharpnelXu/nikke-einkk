@@ -45,6 +45,7 @@ class NikkeDatabase {
   final Map<int, HarmonyCubeData> harmonyCubeTable = {};
   final Map<int, FavoriteItemData> favoriteItemTable = {};
   final Map<int, CoverStatData> coverStatTable = {};
+  final Map<int, SkillInfoData> skillInfoTable = {};
 
   // character stats
   // grouped by enhanceId, level
@@ -53,7 +54,7 @@ class NikkeDatabase {
   final Map<int, CharacterStatEnhanceData> characterStatEnhanceTable = {};
   final Map<int, AttractiveStatData> attractiveStatTable = {};
   // grouped by skillGroupId, skillLevel
-  final Map<int, Map<int, SkillInfoData>> skillInfoTable = {};
+  final Map<int, Map<int, SkillInfoData>> groupedSkillInfoTable = {};
 
   // equips
   final Map<EquipType, Map<NikkeClass, Map<EquipRarity, EquipmentData>>> groupedEquipTable = {};
@@ -242,8 +243,9 @@ class NikkeDatabase {
       final json = jsonDecode(await table.readAsString());
       for (final record in json['records']) {
         final skillInfo = SkillInfoData.fromJson(record);
-        skillInfoTable.putIfAbsent(skillInfo.groupId, () => {});
-        skillInfoTable[skillInfo.groupId]![skillInfo.skillLevel] = skillInfo;
+        skillInfoTable[skillInfo.id] = skillInfo;
+        groupedSkillInfoTable.putIfAbsent(skillInfo.groupId, () => {});
+        groupedSkillInfoTable[skillInfo.groupId]![skillInfo.skillLevel] = skillInfo;
       }
     }
     return exists;

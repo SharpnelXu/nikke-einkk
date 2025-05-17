@@ -13,6 +13,9 @@ import 'package:nikke_einkk/model/skills.dart';
 
 class BattleSkill {
   int skillId;
+  int get skillGroupId => gameData.skillInfoTable[skillId]!.groupId;
+  int? get levelSkillId => gameData.groupedSkillInfoTable[skillGroupId]?[level]?.id;
+  SkillData? get skillData => gameData.characterSkillTable[levelSkillId];
   SkillType skillType;
   final int ownerUniqueId;
   final int level;
@@ -27,11 +30,9 @@ class BattleSkill {
     coolDown = 0;
 
     if (skillType == SkillType.characterSkill) {
-      final skillData = gameData.characterSkillTable[skillId + level - 1]!;
-
       if (skillNum != 3) {
         // normal skills start with coolDown
-        coolDown = BattleUtils.timeDataToFrame(skillData.skillCooltime, simulation.fps);
+        coolDown = BattleUtils.timeDataToFrame(skillData!.skillCooltime, simulation.fps);
       }
     }
 
@@ -46,15 +47,23 @@ class BattleSkill {
   }
 
   bool canUseSkill(BattleSimulation simulation) {
+    if (skillType != SkillType.characterSkill || coolDown > 0) return false;
+    if (skillNum != 3) return true;
+
     final requiredStep = simulation.getNikkeOnPosition(ownerUniqueId)?.characterData.useBurstSkill;
     final allStepCheck = requiredStep == BurstStep.allStep && [1, 2, 3].contains(simulation.burstStage);
-    final stepCheck = skillNum != 3 || allStepCheck || requiredStep?.step == simulation.burstStage;
-    return skillType == SkillType.characterSkill && coolDown == 0 && stepCheck;
+    final stepCheck = allStepCheck || requiredStep?.step == simulation.burstStage;
+    return simulation.reEnterBurstCd == 0 && stepCheck;
+  }
+
+  void changeCd(BattleSimulation simulation, int ultCdChangeTimeData) {
+    if (ultCdChangeTimeData == 0) return;
+
+    coolDown = max(coolDown + BattleUtils.timeDataToFrame(ultCdChangeTimeData, simulation.fps).round(), 0);
   }
 
   void processFrame(BattleSimulation simulation) {
     if (skillType == SkillType.stateEffect) return;
-
     if (coolDown > 0) {
       coolDown -= 1;
     }
@@ -65,14 +74,13 @@ class BattleSkill {
   }
 
   void activateSkill(BattleSimulation simulation) {
-    final skillData = gameData.characterSkillTable[skillId + level - 1];
-    if (skillData == null) return;
-
+    final skillData = this.skillData!;
     final skillTargets = getSkillTargets(simulation, skillData);
 
     final event = UseSkillEvent(
       simulation,
       ownerUniqueId,
+      skillGroupId,
       skillNum,
       skillTargets.map((entity) => entity.uniqueId).toList(),
     );

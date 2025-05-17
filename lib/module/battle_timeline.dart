@@ -106,7 +106,7 @@ class _BattleTimelineState extends State<BattleTimeline> {
 
   List<Widget> buildFrameEvents(List<BattleEvent> events) {
     final List<Widget> result = [];
-    final skipList = [NikkeFireEvent, NikkeReloadStartEvent];
+    final skipList = [NikkeFireEvent, NikkeReloadStartEvent, NikkeDamageEvent, BurstGenerationEvent, HpChangeEvent];
     for (final event in events) {
       if (skipList.contains(event.runtimeType)) continue;
 

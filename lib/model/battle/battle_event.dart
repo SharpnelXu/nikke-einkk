@@ -290,10 +290,17 @@ class HpChangeEvent extends BattleEvent {
 class UseSkillEvent extends BattleEvent {
   late String name;
   final int ownerUniqueId;
+  final int skillGroup;
   final int skillNum;
   final List<int> skillTargetUniqueIds = [];
 
-  UseSkillEvent(BattleSimulation simulation, this.ownerUniqueId, this.skillNum, List<int> targetUniqueIds) {
+  UseSkillEvent(
+    BattleSimulation simulation,
+    this.ownerUniqueId,
+    this.skillGroup,
+    this.skillNum,
+    List<int> targetUniqueIds,
+  ) {
     name = simulation.getEntityByUniqueId(ownerUniqueId)!.name;
     skillTargetUniqueIds.addAll(targetUniqueIds);
   }

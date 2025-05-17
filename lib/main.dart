@@ -175,19 +175,21 @@ class MyApp extends StatelessWidget {
           skillLevels: [10, 10, 10],
         ),
         BattleNikkeOptions(
-          nikkeResourceId: 270,
+          nikkeResourceId: 80,
           coreLevel: 11,
           syncLevel: 884,
           attractLevel: 30,
           skillLevels: [10, 10, 10],
         ),
         BattleNikkeOptions(
-          nikkeResourceId: 271,
+          nikkeResourceId: 80,
           coreLevel: 11,
           syncLevel: 884,
           attractLevel: 30,
           skillLevels: [10, 10, 10],
         ),
+        scarletOption.copy(),
+        scarletOption.copy(),
       ],
     );
 

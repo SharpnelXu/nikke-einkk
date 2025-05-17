@@ -27,7 +27,7 @@ class BattleHarmonyCube {
 
       final skillGroupId = cubeData.harmonyCubeSkillGroups[index].skillGroupId;
       final skillLevel = levelData.skillLevels[index].level;
-      final skillLevelData = gameData.skillInfoTable[skillGroupId]?[skillLevel];
+      final skillLevelData = gameData.groupedSkillInfoTable[skillGroupId]?[skillLevel];
 
       if (skillLevelData != null) {
         result.add(skillLevelData.id);

@@ -57,6 +57,7 @@ compared to calculation
 - Current damage formula is roughly 0.0001% inaccurate due to rounding, the extreme example I used is Snow White's ult
 where the difference is 0.000004% (actual: 902435165 vs calculated: 902435200)
 - HP Ratio triggers (Emergency Max HP Cube) will not trigger again if the HP stays in trigger range
+- Each burst skill takes 1 frame (fastest possible), re-enter burst skills have 0.5s cd
 
 ## TODOs
 
