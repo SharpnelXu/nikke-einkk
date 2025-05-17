@@ -176,28 +176,33 @@ class BattleFunction {
     }
   }
 
-  void addBuff(BattleEvent event, BattleSimulation simulation) {
+  bool checkTargetStatus(BattleEvent event, BattleSimulation simulation, BattleEntity target) {
+    return checkStatusTrigger(
+          event,
+          simulation,
+          target,
+          data.statusTriggerType,
+          data.statusTriggerStandard,
+          data.statusTriggerValue,
+        ) &&
+        checkStatusTrigger(
+          event,
+          simulation,
+          target,
+          data.statusTrigger2Type,
+          data.statusTrigger2Standard,
+          data.statusTrigger2Value,
+        );
+  }
+
+  bool addBuff(BattleEvent event, BattleSimulation simulation) {
+    bool result = false;
     final functionTargets = getFunctionTargets(event, simulation);
     for (final target in functionTargets) {
-      final statusCheck =
-          checkStatusTrigger(
-            event,
-            simulation,
-            target,
-            data.statusTriggerType,
-            data.statusTriggerStandard,
-            data.statusTriggerValue,
-          ) &&
-          checkStatusTrigger(
-            event,
-            simulation,
-            target,
-            data.statusTrigger2Type,
-            data.statusTrigger2Standard,
-            data.statusTrigger2Value,
-          );
+      final statusCheck = checkTargetStatus(event, simulation, target);
       if (!statusCheck) continue;
 
+      result = true;
       final previousMaxAmmo = target is BattleNikke ? target.getMaxAmmo(simulation) : 0;
       final previousMaxHp = target.getMaxHp(simulation);
 
@@ -234,10 +239,11 @@ class BattleFunction {
       }
     }
     status = data.keepingType;
+    return result;
   }
 
   void executeFunction(BattleEvent event, BattleSimulation simulation) {
-    timesActivated += 1;
+    bool activated = false;
     switch (data.functionType) {
       case FunctionType.changeCoolTimeUlti: // act as a buff for rounding
       case FunctionType.coreShotDamageChange:
@@ -262,12 +268,13 @@ class BattleFunction {
       case FunctionType.statReloadTime:
       case FunctionType.none: // misc counters etc.
         // add buff
-        addBuff(event, simulation);
+        activated = addBuff(event, simulation);
         break;
       case FunctionType.changeCurrentHpValue:
         // all function standard is user
         final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
+          activated |= checkTargetStatus(event, simulation, target);
           if (data.functionValueType == ValueType.integer) {
             target.changeHp(simulation, data.functionValue);
           } else if (data.functionValueType == ValueType.percent) {
@@ -283,6 +290,7 @@ class BattleFunction {
         final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
           if (target is BattleRapture) {
+            activated |= checkTargetStatus(event, simulation, target);
             simulation.registerEvent(
               simulation.currentFrame,
               NikkeDamageEvent.skill(
@@ -300,6 +308,7 @@ class BattleFunction {
         for (final target in functionTargets) {
           if (target is! BattleNikke) continue;
 
+          activated |= checkTargetStatus(event, simulation, target);
           if (data.functionValueType == ValueType.integer) {
             target.cover.changeHp(simulation, data.functionValue);
           } else if (data.functionValueType == ValueType.percent) {
@@ -446,13 +455,17 @@ class BattleFunction {
         break;
     }
 
-    if (data.connectedFunction.isNotEmpty) {
-      for (final functionId in data.connectedFunction) {
-        final functionData = gameData.functionTable[functionId];
-        if (functionData != null) {
-          final connectedFunction = BattleFunction(functionData, ownerUniqueId);
-          // connected function likely doesn't check trigger target
-          connectedFunction.executeFunction(event, simulation);
+    if (activated) {
+      // TODO: confirm if connected functions have proper status check or only apply to succeeded targets
+      timesActivated += 1;
+      if (data.connectedFunction.isNotEmpty) {
+        for (final functionId in data.connectedFunction) {
+          final functionData = gameData.functionTable[functionId];
+          if (functionData != null) {
+            final connectedFunction = BattleFunction(functionData, ownerUniqueId);
+            // connected function likely doesn't check trigger target
+            connectedFunction.executeFunction(event, simulation);
+          }
         }
       }
     }
@@ -550,7 +563,8 @@ class BattleFunction {
       case StatusTriggerType.isFunctionOff:
         return target != null && target.buffs.every((buff) => buff.data.groupId != value);
       case StatusTriggerType.isFunctionOn:
-        return target != null && target.buffs.any((buff) => buff.data.groupId == value);
+        final result = target != null && target.buffs.any((buff) => buff.data.groupId == value);
+        return result;
       case StatusTriggerType.unknown:
       case StatusTriggerType.isAlive:
       case StatusTriggerType.isAmmoCount:

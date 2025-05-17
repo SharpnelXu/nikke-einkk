@@ -13,12 +13,14 @@ class BattlePlayerOptions {
   int personalRecycleLevel;
   Map<Corporation, int> corpRecycleLevels;
   Map<NikkeClass, int> classRecycleLevels;
+  bool forceFillBurst = false;
   // cube levels
 
   BattlePlayerOptions({
     this.personalRecycleLevel = 0,
     this.corpRecycleLevels = const {},
     this.classRecycleLevels = const {},
+    this.forceFillBurst = false,
   });
 
   int getRecycleHp(NikkeClass nikkeClass) {
@@ -97,6 +99,11 @@ class BattleSimulation {
     for (currentFrame = maxFrames; currentFrame > 0; currentFrame -= 1) {
       for (final nikke in nikkes) {
         nikke.normalAction(this);
+      }
+
+      if (playerOptions.forceFillBurst && burstStage == 0) {
+        registerEvent(currentFrame, ChangeBurstStepEvent(this, -1, 1, -1));
+        burstStage = 1;
       }
 
       reEnterBurstCd = max(0, reEnterBurstCd - 1);

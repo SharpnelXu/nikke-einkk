@@ -476,5 +476,136 @@ void main() async {
       expect(damageEventSkill2SnowWhite.type, NikkeDamageType.skill);
       expect(damageEventSkill2SnowWhite.damageParameter.calculateDamage(), 2422566);
     });
+
+    final BattleNikkeOptions literOption = BattleNikkeOptions(
+      nikkeResourceId: 82,
+      coreLevel: 11,
+      syncLevel: 884,
+      attractLevel: 30,
+      skillLevels: [10, 6, 10],
+      equips: [
+        BattleEquipment(
+          type: EquipType.head,
+          equipClass: NikkeClass.supporter,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.increaseElementalDamage, 11)],
+        ),
+        BattleEquipment(
+          type: EquipType.body,
+          equipClass: NikkeClass.supporter,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAmmo, 11), EquipLine(EquipLineType.startAccuracyCircle, 11)],
+        ),
+        BattleEquipment(
+          type: EquipType.arm,
+          equipClass: NikkeClass.supporter,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statDef, 11), EquipLine(EquipLineType.statAmmo, 11)],
+        ),
+        BattleEquipment(
+          type: EquipType.leg,
+          equipClass: NikkeClass.supporter,
+          rarity: EquipRarity.t10,
+          level: 3,
+          equipLines: [
+            EquipLine(EquipLineType.increaseElementalDamage, 11),
+            EquipLine(EquipLineType.statChargeTime, 11),
+          ],
+        ),
+      ],
+      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.smg, Rarity.r)!, 0),
+      cube: null,
+    );
+
+    test('Liter skill test on minus CD', () {
+      final simulation = BattleSimulation(
+        playerOptions: BattlePlayerOptions(forceFillBurst: true),
+        nikkeOptions: [
+          literOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.gainAmmo.cubeId, 15),
+          BattleNikkeOptions(
+            nikkeResourceId: 80,
+            coreLevel: 11,
+            syncLevel: 884,
+            attractLevel: 30,
+            skillLevels: [4, 4, 4],
+          )..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
+          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
+          scarletOption.copy(),
+          BattleNikkeOptions(
+            nikkeResourceId: 80,
+            coreLevel: 11,
+            syncLevel: 884,
+            attractLevel: 30,
+            skillLevels: [4, 4, 4],
+          )..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
+        ],
+      );
+
+      final rapture =
+          BattleRapture()
+            ..uniqueId = 11
+            ..distance = 30
+            ..element = NikkeElement.water
+            ..defence = 140;
+
+      simulation.raptures.add(rapture);
+      simulation.maxSeconds = 180;
+      simulation.simulate();
+
+      final firstBurstFrame = simulation.timeline.keys.firstWhere(
+        (frame) => simulation.timeline[frame]!.any((event) => event is ChangeBurstStepEvent),
+      );
+      final toStage1 =
+          simulation.timeline[firstBurstFrame]!.firstWhere((event) => event is ChangeBurstStepEvent)
+              as ChangeBurstStepEvent;
+      expect(toStage1.ownerUniqueId, -1);
+      expect(toStage1.nextStage, 1);
+      final toStage2 =
+          simulation.timeline[firstBurstFrame - 1]!.firstWhere((event) => event is ChangeBurstStepEvent)
+              as ChangeBurstStepEvent;
+      expect(toStage2.ownerUniqueId, 1);
+      expect(toStage2.nextStage, 2);
+      final toStage3 =
+          simulation.timeline[firstBurstFrame - 2]!.firstWhere((event) => event is ChangeBurstStepEvent)
+              as ChangeBurstStepEvent;
+      expect(toStage3.ownerUniqueId, 2);
+      expect(toStage3.nextStage, 3);
+      final toStage4 =
+          simulation.timeline[firstBurstFrame - 3]!.firstWhere((event) => event is ChangeBurstStepEvent)
+              as ChangeBurstStepEvent;
+      expect(toStage4.ownerUniqueId, 3);
+      expect(toStage4.nextStage, 4);
+      expect(toStage4.duration, 1000);
+
+      final nextLiterBurstFrame = firstBurstFrame - 1 - 1200 + (2.34 * 60).round();
+      expect(simulation.timeline.containsKey(nextLiterBurstFrame), true);
+      final nextLiterBurst =
+          simulation.timeline[nextLiterBurstFrame]!.firstWhereOrNull((event) => event is ChangeBurstStepEvent)
+              as ChangeBurstStepEvent?;
+      expect(nextLiterBurst, isNotNull);
+      expect(nextLiterBurst!.ownerUniqueId, 1);
+      expect(nextLiterBurst.nextStage, 2);
+
+      final thirdLiterBurstFrame = nextLiterBurstFrame - 1200 + ((2.34 + 2.7) * 60).round();
+      expect(simulation.timeline.containsKey(thirdLiterBurstFrame), true);
+      final thirdLiterBurst =
+          simulation.timeline[thirdLiterBurstFrame]!.firstWhereOrNull((event) => event is ChangeBurstStepEvent)
+              as ChangeBurstStepEvent?;
+      expect(thirdLiterBurst, isNotNull);
+      expect(thirdLiterBurst!.ownerUniqueId, 1);
+      expect(thirdLiterBurst.nextStage, 2);
+
+      final fourthLiterBurstFrame = thirdLiterBurstFrame - 1200 + ((2.34 + 2.7 + 3.17) * 60).round();
+      expect(simulation.timeline.containsKey(fourthLiterBurstFrame), true);
+      final fourthLiterBurst =
+          simulation.timeline[fourthLiterBurstFrame]!.firstWhereOrNull((event) => event is ChangeBurstStepEvent)
+              as ChangeBurstStepEvent?;
+      expect(fourthLiterBurst, isNotNull);
+      expect(fourthLiterBurst!.ownerUniqueId, 1);
+      expect(fourthLiterBurst.nextStage, 2);
+    });
   });
 }
