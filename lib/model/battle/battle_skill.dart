@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:nikke_einkk/model/battle/barrier.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
@@ -76,6 +77,7 @@ class BattleSkill {
   void activateSkill(BattleSimulation simulation) {
     final skillData = this.skillData!;
     final skillTargets = getSkillTargets(simulation, skillData);
+    final owner = simulation.getNikkeOnPosition(ownerUniqueId)!;
 
     final event = UseSkillEvent(
       simulation,
@@ -114,8 +116,22 @@ class BattleSkill {
           }
         }
         break;
-      case CharacterSkillType.instantSequentialAttack:
       case CharacterSkillType.installBarrier:
+        for (final target in skillTargets) {
+          final barrierHp = owner.getMaxHp(simulation) * BattleUtils.toModifier(skillData.skillValueData[1].skillValue);
+          final barrier = Barrier(
+            barrierHp.round(),
+            skillData.durationType,
+            BattleUtils.timeDataToFrame(skillData.durationValue, simulation.fps),
+          );
+          if (target is BattleRapture) {
+            target.barrier = barrier;
+          } else if (target is BattleNikke) {
+            target.barrier = barrier;
+          }
+        }
+        break;
+      case CharacterSkillType.instantSequentialAttack:
       case CharacterSkillType.installDecoy:
       case CharacterSkillType.changeWeapon:
       case CharacterSkillType.launchWeapon:
@@ -138,25 +154,28 @@ class BattleSkill {
     }
 
     coolDown = BattleUtils.timeDataToFrame(skillData.skillCooltime, simulation.fps);
-    final owner = simulation.getNikkeOnPosition(ownerUniqueId)!.characterData;
-    final nextStep = owner.changeBurstStep;
-    if (skillNum == 3 && simulation.reEnterBurstCd == 0) {
-      if ([
-        BurstStep.nextStep,
-        BurstStep.step1,
-        BurstStep.step2,
-        BurstStep.step3,
-        BurstStep.stepFull,
-      ].contains(nextStep)) {
+    final nextStep = owner.characterData.changeBurstStep;
+    if (skillNum == 3) {
+      owner.activatedBurstSkillThisCycle = true;
+
+      if (validNextStep.contains(nextStep) && simulation.reEnterBurstCd == 0) {
         final nextStageNum = nextStep == BurstStep.nextStep ? simulation.burstStage + 1 : nextStep.step;
         simulation.reEnterBurstCd = BattleUtils.timeDataToFrame(50, simulation.fps); // 0.5s fixed cd
         simulation.registerEvent(
           simulation.currentFrame,
-          ChangeBurstStepEvent(simulation, ownerUniqueId, nextStageNum, owner.burstDuration),
+          ChangeBurstStepEvent(simulation, ownerUniqueId, nextStageNum, owner.characterData.burstDuration),
         );
       }
     }
   }
+
+  static List<BurstStep> validNextStep = [
+    BurstStep.nextStep,
+    BurstStep.step1,
+    BurstStep.step2,
+    BurstStep.step3,
+    BurstStep.stepFull,
+  ];
 
   List<BattleEntity> getSkillTargets(BattleSimulation simulation, SkillData skillData) {
     final owner = simulation.getEntityByUniqueId(ownerUniqueId);

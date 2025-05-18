@@ -98,6 +98,19 @@ class BattleFunction {
           executeFunction(event, simulation);
         }
         break;
+      case TimingTriggerType.onFullCount:
+        if (event is BuffEvent &&
+            standard?.uniqueId == ownerUniqueId &&
+            event.buffCount == event.fullCount &&
+            event.buffGroupId == data.timingTriggerValue) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onHealedBy:
+        if (event is HpChangeEvent && event.getActivatorUniqueId() == ownerUniqueId && event.isHeal) {
+          executeFunction(event, simulation);
+        }
+        break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
       case TimingTriggerType.onBurstSkillStep:
@@ -117,12 +130,10 @@ class BattleFunction {
       case TimingTriggerType.onFullChargeNum:
       case TimingTriggerType.onFullChargeShot:
       case TimingTriggerType.onFullChargeShotNum:
-      case TimingTriggerType.onFullCount:
       case TimingTriggerType.onFunctionBuffCheck:
       case TimingTriggerType.onFunctionOff:
       case TimingTriggerType.onFunctionOn:
       case TimingTriggerType.onHealCover:
-      case TimingTriggerType.onHealedBy:
       case TimingTriggerType.onHitNumExceptCore:
       case TimingTriggerType.onHitNumberOver:
       case TimingTriggerType.onHitRatio:
@@ -220,8 +231,11 @@ class BattleFunction {
           existingBuff.buffGiverUniqueId = event.getActivatorUniqueId();
           existingBuff.buffReceiverUniqueId = target.uniqueId;
         }
+        simulation.registerEvent(simulation.currentFrame, BuffEvent(simulation, existingBuff));
       } else {
-        target.buffs.add(BattleBuff(data, ownerUniqueId, target.uniqueId));
+        final buff = BattleBuff(data, ownerUniqueId, target.uniqueId);
+        target.buffs.add(buff);
+        simulation.registerEvent(simulation.currentFrame, BuffEvent(simulation, buff));
       }
 
       if (data.functionType == FunctionType.statHpHeal) {
@@ -245,15 +259,19 @@ class BattleFunction {
   void executeFunction(BattleEvent event, BattleSimulation simulation) {
     bool activated = false;
     switch (data.functionType) {
+      case FunctionType.attention:
       case FunctionType.changeCoolTimeUlti: // act as a buff for rounding
       case FunctionType.coreShotDamageChange:
       case FunctionType.damageReduction:
       case FunctionType.firstBurstGaugeSpeedUp:
       case FunctionType.gainAmmo: // is actually a buff of 0 duration
       case FunctionType.givingHealVariation:
+      case FunctionType.healVariation:
       case FunctionType.incElementDmg:
+      case FunctionType.immuneDamage: // TODO: actually implement after hp deduction is real for boss
       case FunctionType.normalDamageRatioChange: // user & functionTarget (Rumani Burst)
       case FunctionType.partsDamage:
+      case FunctionType.removeFunctionGroup: // probably better to remove at end of frame
       case FunctionType.statAccuracyCircle:
       case FunctionType.statAmmo:
       case FunctionType.statAmmoLoad:
@@ -310,12 +328,32 @@ class BattleFunction {
 
           activated |= checkTargetStatus(event, simulation, target);
           if (data.functionValueType == ValueType.integer) {
-            target.cover.changeHp(simulation, data.functionValue);
+            target.cover.changeHp(simulation, data.functionValue, true);
           } else if (data.functionValueType == ValueType.percent) {
             final functionStandard = simulation.getNikkeOnPosition(getFunctionStandardUniqueId(target.uniqueId))!.cover;
             final changeValue = BattleUtils.toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
-            target.cover.changeHp(simulation, changeValue.round());
+            target.cover.changeHp(simulation, changeValue.round(), true);
           }
+        }
+        break;
+      case FunctionType.healCharacter:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          activated |= checkTargetStatus(event, simulation, target);
+
+          final activator = simulation.getEntityByUniqueId(event.getActivatorUniqueId());
+          final healVariation = activator?.getHealVariation(simulation) ?? 0;
+
+          int healValue = 0;
+          if (data.functionValueType == ValueType.integer) {
+            healValue = data.functionValue;
+          } else if (data.functionValueType == ValueType.percent) {
+            final functionStandard = simulation.getNikkeOnPosition(getFunctionStandardUniqueId(target.uniqueId))!;
+            final changeValue = BattleUtils.toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
+            healValue = changeValue.round();
+          }
+          final finalHeal = healValue + healValue * BattleUtils.toModifier(healVariation);
+          target.changeHp(simulation, finalHeal.round(), true);
         }
         break;
       case FunctionType.unknown:
@@ -327,7 +365,6 @@ class BattleFunction {
       case FunctionType.atkChangHpRate:
       case FunctionType.atkChangeMaxHpRate:
       case FunctionType.atkReplaceMaxHpRate:
-      case FunctionType.attention:
       case FunctionType.barrierDamage:
       case FunctionType.bonusRangeDamageChange:
       case FunctionType.breakDamage:
@@ -378,16 +415,13 @@ class BattleFunction {
       case FunctionType.gainUltiGauge:
       case FunctionType.gravityBomb:
       case FunctionType.healBarrier:
-      case FunctionType.healCharacter:
       case FunctionType.healDecoy:
       case FunctionType.healShare:
-      case FunctionType.healVariation:
       case FunctionType.hide:
       case FunctionType.hpProportionDamage:
       case FunctionType.immuneAttention:
       case FunctionType.immuneBio:
       case FunctionType.immuneChangeCoolTimeUlti:
-      case FunctionType.immuneDamage:
       case FunctionType.immuneDamageMainHp:
       case FunctionType.immuneEnergy:
       case FunctionType.immuneForcedStop:
@@ -417,7 +451,6 @@ class BattleFunction {
       case FunctionType.plusInstantSkillTargetNum:
       case FunctionType.projectileDamage:
       case FunctionType.projectileExplosionDamage:
-      case FunctionType.removeFunctionGroup:
       case FunctionType.repeatUseBurstStep:
       case FunctionType.resurrection:
       case FunctionType.shareDamageIncrease:
@@ -455,9 +488,9 @@ class BattleFunction {
         break;
     }
 
+    timesActivated += 1; // probably still count as activated?
     if (activated) {
       // TODO: confirm if connected functions have proper status check or only apply to succeeded targets
-      timesActivated += 1;
       if (data.connectedFunction.isNotEmpty) {
         for (final functionId in data.connectedFunction) {
           final functionData = gameData.functionTable[functionId];
@@ -565,10 +598,13 @@ class BattleFunction {
       case StatusTriggerType.isFunctionOn:
         final result = target != null && target.buffs.any((buff) => buff.data.groupId == value);
         return result;
+      case StatusTriggerType.isBurstMember:
+        return target is BattleNikke && target.activatedBurstSkillThisCycle == true;
+      case StatusTriggerType.isNotBurstMember:
+        return target is BattleNikke && target.activatedBurstSkillThisCycle == false;
       case StatusTriggerType.unknown:
       case StatusTriggerType.isAlive:
       case StatusTriggerType.isAmmoCount:
-      case StatusTriggerType.isBurstMember:
       case StatusTriggerType.isCharacter:
       case StatusTriggerType.isCheckFunctionOverlapUp:
       case StatusTriggerType.isCheckMonsterType:
@@ -585,7 +621,6 @@ class BattleFunction {
       case StatusTriggerType.isFunctionTypeOffCheck:
       case StatusTriggerType.isHaveBarrier:
       case StatusTriggerType.isHaveDecoy:
-      case StatusTriggerType.isNotBurstMember:
       case StatusTriggerType.isNotCheckTeamBurstNextStep:
       case StatusTriggerType.isNotHaveBarrier:
       case StatusTriggerType.isPhase:

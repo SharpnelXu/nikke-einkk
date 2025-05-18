@@ -3,9 +3,11 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/skills.dart';
 
 import 'nikke.dart';
 
@@ -259,13 +261,20 @@ class BattleStartEvent extends BattleEvent {
 
 class HpChangeEvent extends BattleEvent {
   late String name;
-  late int ownerUniqueId;
+  late int ownerUniqueId; // who changed hp
   late int afterChangeHp;
   late int maxHp;
   bool isMaxHpOnly;
+  bool isHeal;
   int changeAmount;
 
-  HpChangeEvent(BattleSimulation simulation, BattleEntity entity, this.changeAmount, [this.isMaxHpOnly = false]) {
+  HpChangeEvent(
+    BattleSimulation simulation,
+    BattleEntity entity,
+    this.changeAmount, [
+    this.isMaxHpOnly = false,
+    this.isHeal = false,
+  ]) {
     name = entity.name;
     ownerUniqueId = entity.uniqueId;
     afterChangeHp = entity.currentHp;
@@ -356,5 +365,46 @@ class ExitFullBurstEvent extends BattleEvent {
   @override
   Widget buildDisplay() {
     return Text('Exit full burst');
+  }
+}
+
+class BuffEvent extends BattleEvent {
+  late String funcString;
+  late String giverName;
+  late int buffGiverUniqueId;
+  late String receiverName;
+  late int buffReceiverUniqueId;
+  late int buffCount;
+  late int fullCount;
+  late int buffGroupId; // if one more variable then this stores FunctionData instead
+
+  BuffEvent(BattleSimulation simulation, BattleBuff buff) {
+    final valueString =
+        buff.data.functionValueType == ValueType.percent
+            ? '${(buff.data.functionValue / 100).toStringAsFixed(2)}%'
+            : '${buff.data.functionValue}';
+    funcString = '${buff.data.functionType.name} $valueString (${buff.data.functionStandard.name})';
+    buffGiverUniqueId = buff.buffGiverUniqueId;
+    giverName = simulation.getEntityByUniqueId(buffGiverUniqueId)!.name;
+    buffReceiverUniqueId = buff.buffReceiverUniqueId;
+    receiverName = simulation.getEntityByUniqueId(buffReceiverUniqueId)!.name;
+    buffCount = buff.count;
+    fullCount = buff.data.fullCount;
+    buffGroupId = buff.data.groupId;
+  }
+
+  @override
+  int getActivatorUniqueId() {
+    return buffGiverUniqueId;
+  }
+
+  @override
+  List<int> getTargetUniqueIds() {
+    return [buffReceiverUniqueId];
+  }
+
+  @override
+  Widget buildDisplay() {
+    return Text('$funcString (to $receiverName by $giverName)');
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:nikke_einkk/model/battle/barrier.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
@@ -143,6 +144,7 @@ class BattleNikke extends BattleEntity {
   );
 
   late BattleCover cover;
+  Barrier? barrier;
   int currentAmmo = 0;
 
   WeaponType get currentWeaponType => currentWeaponData.weaponType;
@@ -177,6 +179,7 @@ class BattleNikke extends BattleEntity {
 
   int totalBulletsFired = 0;
   int totalBulletsHit = 0;
+  bool activatedBurstSkillThisCycle = false;
 
   BattleNikkeStatus status = BattleNikkeStatus.behindCover;
 
@@ -238,9 +241,11 @@ class BattleNikke extends BattleEntity {
     currentAmmo = baseWeaponData.maxAmmo;
     cover.uniqueId = position + 5;
     cover.init(simulation);
+    barrier = null;
 
     totalBulletsFired = 0;
     totalBulletsHit = 0;
+    activatedBurstSkillThisCycle = false;
     functions.clear();
     buffs.clear();
     skills.clear();
@@ -307,6 +312,20 @@ class BattleNikke extends BattleEntity {
 
     for (final skill in skills) {
       skill.processFrame(simulation);
+    }
+
+    final barrier = this.barrier;
+    if (barrier != null) {
+      if (barrier.durationType == DurationType.timeSec) {
+        barrier.duration -= 1;
+        if (barrier.duration == 0) {
+          this.barrier = null;
+        }
+      }
+
+      if (barrier.hp <= 0) {
+        this.barrier = null;
+      }
     }
   }
 
@@ -592,6 +611,10 @@ class BattleNikke extends BattleEntity {
       processDamageEvent(event, simulation);
     }
 
+    if (event is ExitFullBurstEvent) {
+      activatedBurstSkillThisCycle = false;
+    }
+
     for (final function in functions) {
       function.broadcast(event, simulation);
     }
@@ -624,7 +647,15 @@ class BattleNikke extends BattleEntity {
     skills[2].changeCd(simulation, ultCdReduceTimeData);
 
     final previousMaxHp = getMaxHp(simulation);
-    buffs.removeWhere((buff) => buff.shouldRemove(simulation));
+
+    final removeBuffGroupIds =
+        buffs
+            .where((buff) => buff.data.functionType == FunctionType.removeFunctionGroup)
+            .map((buff) => buff.data.functionValue)
+            .toList();
+
+    buffs.removeWhere((buff) => buff.shouldRemove(simulation) || removeBuffGroupIds.contains(buff.data.groupId));
+
     final afterMaxHp = getMaxHp(simulation);
     if (previousMaxHp != afterMaxHp) {
       simulation.registerEvent(simulation.nextFrame, HpChangeEvent(simulation, this, afterMaxHp - previousMaxHp, true));

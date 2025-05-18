@@ -1,3 +1,5 @@
+import 'package:nikke_einkk/model/battle/barrier.dart';
+
 import 'battle_entity.dart';
 
 class BattleRapture extends BattleEntity {
@@ -11,6 +13,8 @@ class BattleRapture extends BattleEntity {
 
   int defence = 0;
 
+  Barrier? barrier;
+
   @override
   int get baseHp => 100;
 
@@ -23,4 +27,6 @@ class BattleRapture extends BattleEntity {
   bool hasParts() {
     return false;
   }
+
+  // todo: countdown debuffs
 }

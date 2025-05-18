@@ -466,7 +466,7 @@ void main() async {
       expect(damageEvent31SnowWhite.damageParameter.calculateDamage(core: true), 580275);
       expect(damageEvent31SnowWhite.damageParameter.calculateDamage(critical: true, core: true), 703387);
 
-      expect(simulation.timeline[5093]!.length, 4); // S1
+      expect(simulation.timeline[5093]!.length, 5); // S1
       final damageEventSkill1SnowWhite = simulation.timeline[5093]![3] as NikkeDamageEvent;
       expect(damageEventSkill1SnowWhite.type, NikkeDamageType.skill);
       expect(damageEventSkill1SnowWhite.damageParameter.calculateDamage(), 1212706);
