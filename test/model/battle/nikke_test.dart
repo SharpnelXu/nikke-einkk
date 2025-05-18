@@ -1,7 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/equipment.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
+import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/items.dart';
 
 import '../../test_helper.dart';
 
@@ -195,6 +198,56 @@ void main() async {
       expect(brid.baseHp, 19921125 - 18442060);
       expect(brid.baseAttack, 873013 - 819647);
       expect(brid.baseDefence, 132774 - 122954);
+    });
+
+    test('Yarou Scarlet ammo rounding test', () {
+      final BattleNikkeOptions scarletOption = BattleNikkeOptions(
+        nikkeResourceId: 222,
+        coreLevel: 11,
+        syncLevel: 884,
+        attractLevel: 40,
+        skillLevels: [10, 10, 10],
+        equips: [
+          BattleEquipment(
+            type: EquipType.head,
+            equipClass: NikkeClass.attacker,
+            rarity: EquipRarity.t10,
+            level: 5,
+            equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
+          ),
+          BattleEquipment(
+            type: EquipType.body,
+            equipClass: NikkeClass.attacker,
+            rarity: EquipRarity.t10,
+            level: 5,
+            equipLines: [EquipLine(EquipLineType.statAmmo, 5)],
+          ),
+          BattleEquipment(
+            type: EquipType.arm,
+            equipClass: NikkeClass.attacker,
+            rarity: EquipRarity.t10,
+            level: 5,
+            equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
+          ),
+          BattleEquipment(
+            type: EquipType.leg,
+            equipClass: NikkeClass.attacker,
+            rarity: EquipRarity.t10,
+            level: 5,
+            equipLines: [EquipLine(EquipLineType.statAmmo, 5)],
+          ),
+        ],
+      );
+      final simulation = BattleSimulation(playerOptions: BattlePlayerOptions(), nikkeOptions: [scarletOption]);
+
+      final rapture = BattleRapture()..uniqueId = 11;
+
+      simulation.raptures.add(rapture);
+      simulation.maxSeconds = 1;
+      simulation.simulate();
+
+      final scarlet = simulation.nikkes.first;
+      expect(scarlet.getMaxAmmo(simulation), 66);
     });
   });
 }

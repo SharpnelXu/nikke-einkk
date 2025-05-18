@@ -71,8 +71,8 @@ abstract class BattleEntity {
     int baseValue,
     int Function(BattleEntity) getStandardBaseValue,
   ) {
-    // position to percentValues
-    final Map<int, Map<BuffType, int>> percents = {};
+    // position to group Id to percentValues
+    final Map<int, Map<int, int>> percents = {};
 
     // might need to group by buffType (buff & buffEtc) and round separately
     int flatValue = 0;
@@ -83,8 +83,8 @@ abstract class BattleEntity {
         final standardUniqueId = buff.getFunctionStandardUniqueId();
         if (standardUniqueId != -1) {
           percents.putIfAbsent(standardUniqueId, () => {});
-          final previousValue = percents[standardUniqueId]![buff.data.buff] ?? 0;
-          percents[standardUniqueId]![buff.data.buff] = previousValue + buff.data.functionValue * buff.count;
+          final previousValue = percents[standardUniqueId]![buff.data.groupId] ?? 0;
+          percents[standardUniqueId]![buff.data.groupId] = previousValue + buff.data.functionValue * buff.count;
         }
       } else if (buff.data.functionValueType == ValueType.integer) {
         flatValue += buff.data.functionValue;
