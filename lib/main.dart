@@ -164,40 +164,97 @@ class MyApp extends StatelessWidget {
       cube: null,
     );
 
+    final BattleNikkeOptions literOption = BattleNikkeOptions(
+      nikkeResourceId: 82,
+      coreLevel: 11,
+      syncLevel: 884,
+      attractLevel: 30,
+      skillLevels: [10, 6, 10],
+      equips: [
+        BattleEquipment(
+          type: EquipType.head,
+          equipClass: NikkeClass.supporter,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.increaseElementalDamage, 11)],
+        ),
+        BattleEquipment(
+          type: EquipType.body,
+          equipClass: NikkeClass.supporter,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAmmo, 11), EquipLine(EquipLineType.startAccuracyCircle, 11)],
+        ),
+        BattleEquipment(
+          type: EquipType.arm,
+          equipClass: NikkeClass.supporter,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statDef, 11), EquipLine(EquipLineType.statAmmo, 11)],
+        ),
+        BattleEquipment(
+          type: EquipType.leg,
+          equipClass: NikkeClass.supporter,
+          rarity: EquipRarity.t10,
+          level: 3,
+          equipLines: [
+            EquipLine(EquipLineType.increaseElementalDamage, 11),
+            EquipLine(EquipLineType.statChargeTime, 11),
+          ],
+        ),
+      ],
+      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.smg, Rarity.r)!, 0),
+      cube: null,
+    );
+    final crownOption = BattleNikkeOptions(
+      nikkeResourceId: 330,
+      coreLevel: 11,
+      syncLevel: 884,
+      attractLevel: 40,
+      skillLevels: [10, 10, 10],
+      equips: [
+        BattleEquipment(
+          type: EquipType.head,
+          equipClass: NikkeClass.defender,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [],
+        ),
+        BattleEquipment(
+          type: EquipType.body,
+          equipClass: NikkeClass.defender,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
+        ),
+        BattleEquipment(
+          type: EquipType.arm,
+          equipClass: NikkeClass.defender,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
+        ),
+        BattleEquipment(
+          type: EquipType.leg,
+          equipClass: NikkeClass.defender,
+          rarity: EquipRarity.t10,
+          level: 3,
+          equipLines: [],
+        ),
+      ],
+      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.mg, Rarity.sr)!, 15),
+      cube: null,
+    );
     final simulation = BattleSimulation(
       playerOptions: playerOptions,
-      nikkeOptions: [
-        BattleNikkeOptions(
-          nikkeResourceId: 82,
-          coreLevel: 11,
-          syncLevel: 884,
-          attractLevel: 30,
-          skillLevels: [10, 10, 10],
-        ),
-        BattleNikkeOptions(
-          nikkeResourceId: 80,
-          coreLevel: 11,
-          syncLevel: 884,
-          attractLevel: 30,
-          skillLevels: [10, 10, 10],
-        ),
-        BattleNikkeOptions(
-          nikkeResourceId: 80,
-          coreLevel: 11,
-          syncLevel: 884,
-          attractLevel: 30,
-          skillLevels: [10, 10, 10],
-        ),
-        scarletOption.copy(),
-        scarletOption.copy(),
-      ],
+      nikkeOptions: [literOption, crownOption, scarletOption, scarletOption],
     );
 
     final rapture =
         BattleRapture()
           ..uniqueId = 11
           ..distance = 30
-          ..element = NikkeElement.electric
+          ..element = NikkeElement.water
           ..defence = 140;
 
     simulation.raptures.add(rapture);

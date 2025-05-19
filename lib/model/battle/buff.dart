@@ -1,4 +1,5 @@
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 class BattleBuff {
@@ -9,8 +10,11 @@ class BattleBuff {
   int duration = 0;
   int count = 0;
 
-  BattleBuff(this.data, this.buffGiverUniqueId, this.buffReceiverUniqueId) {
-    duration = data.durationValue;
+  BattleBuff(this.data, this.buffGiverUniqueId, this.buffReceiverUniqueId, BattleSimulation simulation) {
+    duration =
+        data.durationType == DurationType.timeSec
+            ? BattleUtils.timeDataToFrame(data.durationValue, simulation.fps)
+            : data.durationValue;
     count = 1;
   }
 

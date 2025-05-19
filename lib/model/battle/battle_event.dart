@@ -118,6 +118,7 @@ class NikkeDamageEvent extends BattleEvent {
       chargeDamageBuff: nikke.getChargeDamageBuffValues(simulation),
       chargePercent: chargePercent,
       partDamageBuff: rapture.hasParts() ? nikke.getPartsDamageBuffValues(simulation) : 0,
+      addDamageBuff: nikke.getAddDamageBuffValues(simulation),
     );
   }
 
@@ -148,6 +149,7 @@ class NikkeDamageEvent extends BattleEvent {
       isFullBurst: simulation.burstStage == 4,
       isStrongElement: nikke.element.strongAgainst(rapture.element),
       elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
+      addDamageBuff: nikke.getAddDamageBuffValues(simulation),
     );
   }
 
@@ -271,10 +273,10 @@ class HpChangeEvent extends BattleEvent {
   HpChangeEvent(
     BattleSimulation simulation,
     BattleEntity entity,
-    this.changeAmount, [
+    this.changeAmount, {
     this.isMaxHpOnly = false,
     this.isHeal = false,
-  ]) {
+  }) {
     name = entity.name;
     ownerUniqueId = entity.uniqueId;
     afterChangeHp = entity.currentHp;
@@ -379,11 +381,6 @@ class BuffEvent extends BattleEvent {
   late int buffGroupId; // if one more variable then this stores FunctionData instead
 
   BuffEvent(BattleSimulation simulation, BattleBuff buff) {
-    final valueString =
-        buff.data.functionValueType == ValueType.percent
-            ? '${(buff.data.functionValue / 100).toStringAsFixed(2)}%'
-            : '${buff.data.functionValue}';
-    funcString = '${buff.data.functionType.name} $valueString (${buff.data.functionStandard.name})';
     buffGiverUniqueId = buff.buffGiverUniqueId;
     giverName = simulation.getEntityByUniqueId(buffGiverUniqueId)!.name;
     buffReceiverUniqueId = buff.buffReceiverUniqueId;
@@ -391,6 +388,12 @@ class BuffEvent extends BattleEvent {
     buffCount = buff.count;
     fullCount = buff.data.fullCount;
     buffGroupId = buff.data.groupId;
+    final valueString =
+        buff.data.functionValueType == ValueType.percent
+            ? '${(buff.data.functionValue / 100).toStringAsFixed(2)}%'
+            : '${buff.data.functionValue}';
+    funcString =
+        '${buff.data.functionType.name} $valueString (${buff.data.functionStandard.name}) $buffCount/$fullCount';
   }
 
   @override

@@ -18,10 +18,10 @@ abstract class BattleEntity {
 
   NikkeElement element = NikkeElement.unknown;
 
-  void changeHp(BattleSimulation simulation, int changeValue, [isHeal = false]) {
+  void changeHp(BattleSimulation simulation, int changeValue, [bool isHeal = false]) {
     currentHp = (currentHp + changeValue).clamp(1, getMaxHp(simulation));
 
-    simulation.registerEvent(simulation.currentFrame, HpChangeEvent(simulation, this, changeValue, isHeal));
+    simulation.registerEvent(simulation.currentFrame, HpChangeEvent(simulation, this, changeValue, isHeal: isHeal));
   }
 
   int getAttackBuffValues(BattleSimulation simulation) {
@@ -43,6 +43,10 @@ abstract class BattleEntity {
 
   int getHealVariation(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.healVariation);
+  }
+
+  int getAddDamageBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.addDamage);
   }
 
   int getPlainBuffValues(BattleSimulation simulation, FunctionType type) {

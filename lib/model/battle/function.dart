@@ -233,7 +233,7 @@ class BattleFunction {
         }
         simulation.registerEvent(simulation.currentFrame, BuffEvent(simulation, existingBuff));
       } else {
-        final buff = BattleBuff(data, ownerUniqueId, target.uniqueId);
+        final buff = BattleBuff(data, ownerUniqueId, target.uniqueId, simulation);
         target.buffs.add(buff);
         simulation.registerEvent(simulation.currentFrame, BuffEvent(simulation, buff));
       }
@@ -248,7 +248,7 @@ class BattleFunction {
         final afterMaxHp = target.getMaxHp(simulation);
         simulation.registerEvent(
           simulation.currentFrame,
-          HpChangeEvent(simulation, target, afterMaxHp - previousMaxHp, true),
+          HpChangeEvent(simulation, target, afterMaxHp - previousMaxHp, isMaxHpOnly: true),
         );
       }
     }
@@ -259,6 +259,7 @@ class BattleFunction {
   void executeFunction(BattleEvent event, BattleSimulation simulation) {
     bool activated = false;
     switch (data.functionType) {
+      case FunctionType.addDamage:
       case FunctionType.attention:
       case FunctionType.changeCoolTimeUlti: // act as a buff for rounding
       case FunctionType.coreShotDamageChange:
@@ -357,7 +358,6 @@ class BattleFunction {
         }
         break;
       case FunctionType.unknown:
-      case FunctionType.addDamage:
       case FunctionType.addIncElementDmgType:
       case FunctionType.allAmmo:
       case FunctionType.allStepBurstNextStep:

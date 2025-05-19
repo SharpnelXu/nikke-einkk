@@ -607,5 +607,137 @@ void main() async {
       expect(fourthLiterBurst!.ownerUniqueId, 1);
       expect(fourthLiterBurst.nextStage, 2);
     });
+
+    final crownOption = BattleNikkeOptions(
+      nikkeResourceId: 330,
+      coreLevel: 11,
+      syncLevel: 884,
+      attractLevel: 40,
+      skillLevels: [10, 10, 10],
+      equips: [
+        BattleEquipment(
+          type: EquipType.head,
+          equipClass: NikkeClass.defender,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [],
+        ),
+        BattleEquipment(
+          type: EquipType.body,
+          equipClass: NikkeClass.defender,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
+        ),
+        BattleEquipment(
+          type: EquipType.arm,
+          equipClass: NikkeClass.defender,
+          rarity: EquipRarity.t10,
+          level: 5,
+          equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
+        ),
+        BattleEquipment(
+          type: EquipType.leg,
+          equipClass: NikkeClass.defender,
+          rarity: EquipRarity.t10,
+          level: 3,
+          equipLines: [],
+        ),
+      ],
+      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.mg, Rarity.sr)!, 15),
+      cube: null,
+    );
+
+    test('Crown skill tests', () {
+      final BattlePlayerOptions updatedPlayerOptions = BattlePlayerOptions(
+        personalRecycleLevel: 420,
+        corpRecycleLevels: {
+          Corporation.pilgrim: 417,
+          Corporation.missilis: 198,
+          Corporation.abnormal: 156,
+          Corporation.tetra: 225,
+          Corporation.elysion: 200,
+        },
+        classRecycleLevels: {NikkeClass.attacker: 212, NikkeClass.supporter: 197, NikkeClass.defender: 187},
+      );
+      final simulation = BattleSimulation(
+        playerOptions: updatedPlayerOptions,
+        nikkeOptions: [
+          literOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.gainAmmo.cubeId, 15),
+          crownOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15),
+          scarletOption.copy(),
+          scarletOption.copy(),
+        ],
+      );
+
+      final rapture =
+          BattleRapture()
+            ..uniqueId = 11
+            ..distance = 30
+            ..element = NikkeElement.water
+            ..defence = 140;
+
+      simulation.raptures.add(rapture);
+      simulation.maxSeconds = 90;
+      simulation.simulate();
+
+      final crown = simulation.nikkes[1];
+      expect(crown.baseHp, 25116193);
+      expect(crown.baseAttack, 614834);
+      expect(crown.baseDefence, 142547);
+
+      // go to second burst so scarlet has full self buffs
+      final burstTimeFrame = simulation.timeline.keys.firstWhere(
+        (frame) =>
+            frame < 5168 &&
+            simulation.timeline[frame]!.any((event) => event is ChangeBurstStepEvent && event.nextStage == 4),
+      );
+      // crown's add def skill group
+      expect(
+        simulation.timeline[burstTimeFrame]!.firstWhereOrNull(
+          (event) => event is BuffEvent && event.buffGroupId == 2330102,
+        ),
+        isNotNull,
+      );
+      final scarletBurstDamageEvent =
+          simulation.timeline[burstTimeFrame]!.firstWhere(
+                (event) =>
+                    event is NikkeDamageEvent && event.type == NikkeDamageType.skill && event.attackerUniqueId == 4,
+              )
+              as NikkeDamageEvent;
+      expect(scarletBurstDamageEvent.damageParameter.calculateDamage(), 48325502 + 3); // 3 more than actual
+
+      final scarletDamageFrameAfterBurst = simulation.timeline.keys.firstWhere(
+        (frame) =>
+            frame < burstTimeFrame &&
+            simulation.timeline[frame]!.any(
+              (event) =>
+                  event is NikkeDamageEvent && event.type == NikkeDamageType.bullet && event.attackerUniqueId == 3,
+            ),
+      );
+      final scarletDamageEventPos4 =
+          simulation.timeline[scarletDamageFrameAfterBurst]!.firstWhere(
+                (event) =>
+                    event is NikkeDamageEvent && event.type == NikkeDamageType.bullet && event.attackerUniqueId == 4,
+              )
+              as NikkeDamageEvent;
+      expect(scarletDamageEventPos4.damageParameter.calculateDamage(), 3171493);
+
+      final scarletDamageEventPos3 =
+          simulation.timeline[scarletDamageFrameAfterBurst]!.firstWhere(
+                (event) =>
+                    event is NikkeDamageEvent && event.type == NikkeDamageType.bullet && event.attackerUniqueId == 3,
+              )
+              as NikkeDamageEvent;
+      expect(scarletDamageEventPos3.damageParameter.calculateDamage(), 2774043);
+
+      // when crown max stacks skill 2, 2330206 is add damage group
+      expect(
+        simulation.timeline.values.firstWhereOrNull(
+          (events) => events.any((event) => event is BuffEvent && event.buffGroupId == 2330206),
+        ),
+        isNotNull,
+      );
+    });
   });
 }

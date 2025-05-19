@@ -658,7 +658,10 @@ class BattleNikke extends BattleEntity {
 
     final afterMaxHp = getMaxHp(simulation);
     if (previousMaxHp != afterMaxHp) {
-      simulation.registerEvent(simulation.nextFrame, HpChangeEvent(simulation, this, afterMaxHp - previousMaxHp, true));
+      simulation.registerEvent(
+        simulation.nextFrame,
+        HpChangeEvent(simulation, this, afterMaxHp - previousMaxHp, isMaxHpOnly: true),
+      );
     }
   }
 
