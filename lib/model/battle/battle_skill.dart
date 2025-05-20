@@ -70,13 +70,19 @@ class BattleSkill {
     }
 
     if (coolDown == 0 && canUseSkill(simulation)) {
-      activateSkill(simulation);
+      activateSkill(simulation, skillData!, ownerUniqueId, skillGroupId, skillNum);
+      coolDown = BattleUtils.timeDataToFrame(skillData!.skillCooltime, simulation.fps);
     }
   }
 
-  void activateSkill(BattleSimulation simulation) {
-    final skillData = this.skillData!;
-    final skillTargets = getSkillTargets(simulation, skillData);
+  static void activateSkill(
+    BattleSimulation simulation,
+    SkillData skillData,
+    int ownerUniqueId,
+    int skillGroupId,
+    int skillNum,
+  ) {
+    final skillTargets = getSkillTargets(simulation, skillData, ownerUniqueId);
     final owner = simulation.getNikkeOnPosition(ownerUniqueId)!;
 
     final event = UseSkillEvent(
@@ -153,7 +159,6 @@ class BattleSkill {
       }
     }
 
-    coolDown = BattleUtils.timeDataToFrame(skillData.skillCooltime, simulation.fps);
     final nextStep = owner.characterData.changeBurstStep;
     if (skillNum == 3) {
       owner.activatedBurstSkillThisCycle = true;
@@ -177,7 +182,7 @@ class BattleSkill {
     BurstStep.stepFull,
   ];
 
-  List<BattleEntity> getSkillTargets(BattleSimulation simulation, SkillData skillData) {
+  static List<BattleEntity> getSkillTargets(BattleSimulation simulation, SkillData skillData, int ownerUniqueId) {
     final owner = simulation.getEntityByUniqueId(ownerUniqueId);
     final isThisNikke = owner is BattleNikke;
     bool targetEnemy;

@@ -247,7 +247,16 @@ class MyApp extends StatelessWidget {
     );
     final simulation = BattleSimulation(
       playerOptions: playerOptions,
-      nikkeOptions: [literOption, crownOption, scarletOption, scarletOption],
+      nikkeOptions: [
+        aliceOption.copy()
+          ..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15)
+          ..chargeMode = NikkeFullChargeMode.never
+          ..forceCancelShootDelay = true
+          ..alwaysFocus = true,
+        literOption,
+        crownOption,
+        scarletOption,
+      ],
     );
 
     final rapture =

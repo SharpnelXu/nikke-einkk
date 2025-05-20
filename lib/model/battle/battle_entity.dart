@@ -142,10 +142,10 @@ abstract class BattleEntity {
     final previousMaxHp = getMaxHp(simulation);
 
     final removeBuffGroupIds =
-    buffs
-        .where((buff) => buff.data.functionType == FunctionType.removeFunctionGroup)
-        .map((buff) => buff.data.functionValue)
-        .toList();
+        buffs
+            .where((buff) => buff.data.functionType == FunctionType.removeFunctionGroup)
+            .map((buff) => buff.data.functionValue)
+            .toList();
 
     buffs.removeWhere((buff) => buff.shouldRemove(simulation) || removeBuffGroupIds.contains(buff.data.groupId));
 

@@ -26,6 +26,10 @@ class BattleNikkeOptions {
   BattleHarmonyCube? cube;
   BattleFavoriteItem? favoriteItem;
 
+  bool alwaysFocus;
+  bool forceCancelShootDelay;
+  NikkeFullChargeMode chargeMode;
+
   BattleNikkeOptions({
     required this.nikkeResourceId,
     this.coreLevel = 1,
@@ -35,6 +39,9 @@ class BattleNikkeOptions {
     this.skillLevels = const [10, 10, 10],
     this.cube,
     this.favoriteItem,
+    this.alwaysFocus = false,
+    this.forceCancelShootDelay = false,
+    this.chargeMode = NikkeFullChargeMode.always,
   }) {
     final favoriteItemNameCode = favoriteItem?.data.nameCode ?? -1;
     if (favoriteItemNameCode > 0 &&
@@ -53,9 +60,14 @@ class BattleNikkeOptions {
       skillLevels: skillLevels.toList(),
       cube: cube?.copy(),
       favoriteItem: favoriteItem?.copy(),
+      alwaysFocus: alwaysFocus,
+      forceCancelShootDelay: forceCancelShootDelay,
+      chargeMode: chargeMode,
     );
   }
 }
+
+enum NikkeFullChargeMode { always, never, whenExitingBurst }
 
 enum BattleNikkeStatus { behindCover, reloading, forceReloading, shooting }
 
@@ -457,8 +469,13 @@ class BattleNikke extends BattleEntity {
           chargeFrames = (framesToFullCharge * chargePercent).round();
           previousFullChargeFrameCount = framesToFullCharge;
         }
+
         chargeFrames += 1;
-        if (chargeFrames < getFramesToFullCharge(simulation)) {
+        if (chargeFrames < framesToFullCharge && option.chargeMode == NikkeFullChargeMode.always) {
+          return;
+        }
+
+        if (simulation.burstStage == 4 && simulation.burstStageDuration < framesToFullCharge) {
           return;
         }
 
@@ -517,7 +534,10 @@ class BattleNikke extends BattleEntity {
             fps,
           );
         } else {
-          spotLastDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotLastDelay, fps);
+          spotLastDelayFrameCount =
+              option.forceCancelShootDelay ? 0 : BattleUtils.timeDataToFrame(currentWeaponData.spotLastDelay, fps);
+          spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
+          chargeFrames = 0;
         }
 
         // these two should probably be available for all weapon types

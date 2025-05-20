@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/battle_skill.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
@@ -356,6 +357,13 @@ class BattleFunction {
           target.changeHp(simulation, finalHeal.round(), true);
         }
         break;
+      case FunctionType.useCharacterSkillId:
+        final skill = gameData.characterSkillTable[data.functionValue];
+        if (skill != null) {
+          activated = true;
+          BattleSkill.activateSkill(simulation, skill, ownerUniqueId, gameData.skillInfoTable[skill.id]!.groupId, -1);
+        }
+        break;
       case FunctionType.unknown:
       case FunctionType.addIncElementDmgType:
       case FunctionType.allAmmo:
@@ -477,7 +485,6 @@ class BattleFunction {
       case FunctionType.timingTriggerValueChange:
       case FunctionType.transformation:
       case FunctionType.uncoverable:
-      case FunctionType.useCharacterSkillId:
       case FunctionType.useSkill2:
       case FunctionType.windReduction:
         logger.i('Unimplemented FunctionType: ${data.functionType}');

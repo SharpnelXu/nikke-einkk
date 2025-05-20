@@ -140,9 +140,9 @@ class NikkeDamageEvent extends BattleEvent {
     final weaponData = nikke.currentWeaponData;
     shotCount = weaponData.shotCount;
     chargePercent =
-    WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponType)
-        ? (10000 * nikke.chargeFrames / nikke.getFramesToFullCharge(simulation)).round()
-        : 0;
+        WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponType)
+            ? (10000 * nikke.chargeFrames / nikke.getFramesToFullCharge(simulation)).round()
+            : 0;
     chargePercent = chargePercent.clamp(0, 10000);
     partId = part.id;
 
@@ -203,11 +203,7 @@ class NikkeDamageEvent extends BattleEvent {
     );
   }
 
-  int calculateCoreHitRate(
-    BattleSimulation simulation,
-    BattleNikke nikke,
-    BattleRapture rapture,
-  ) {
+  int calculateCoreHitRate(BattleSimulation simulation, BattleNikke nikke, BattleRapture rapture) {
     if (rapture.coreSize == 0) {
       // no core
       return 0;
@@ -284,7 +280,7 @@ class BurstGenerationEvent extends BattleEvent {
     chargePercent = chargePercent.clamp(0, 10000);
     currentMeter = simulation.burstMeter;
     final bonusBurst =
-        simulation.currentNikke == nikke.uniqueId &&
+        (nikke.option.alwaysFocus || simulation.currentNikke == nikke.uniqueId) &&
         WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponData.weaponType);
 
     positionBurstBonus = bonusBurst ? 10000 + (15000 * BattleUtils.toModifier(chargePercent)).round() : 10000;
