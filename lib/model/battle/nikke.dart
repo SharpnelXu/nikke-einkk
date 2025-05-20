@@ -170,6 +170,7 @@ class BattleNikke extends BattleEntity {
   // these start with 0 (+= 1 each frame)
   int reloadingFrameCount = 0; // reason for += 1: fullReloadFrameCount is calculated as max at first reload frame
   int chargeFrames = 0;
+  int previousFullChargeFrameCount = 0;
 
   // TODO: min value 0?
   // these starts with max (-= 1 each frame)
@@ -232,6 +233,7 @@ class BattleNikke extends BattleEntity {
     _accuracyCircleScale = baseWeaponData.startAccuracyCircleScale;
     rateOfFire = baseWeaponData.rateOfFire;
     chargeFrames = 0;
+    previousFullChargeFrameCount = 0;
     shootingFrameCount = 0;
     spotLastDelayFrameCount = 0;
     spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(baseWeaponData.spotFirstDelay, fps);
@@ -400,6 +402,7 @@ class BattleNikke extends BattleEntity {
     if (spotFirstDelayFrameCount > 0) {
       spotFirstDelayFrameCount -= 1;
       if (spotFirstDelayFrameCount == 0 && WeaponType.chargeWeaponTypes.contains(currentWeaponType)) {
+        previousFullChargeFrameCount = getFramesToFullCharge(simulation);
         chargeFrames = 1; // charge weapons seem to start with one frame of charge at the last frame of this animation
       }
       return;
@@ -459,6 +462,13 @@ class BattleNikke extends BattleEntity {
         return;
       case WeaponType.rl:
       case WeaponType.sr:
+        final framesToFullCharge = getFramesToFullCharge(simulation);
+        if (framesToFullCharge != previousFullChargeFrameCount) {
+          // update chargeFrames to based on percentage, this is for change in charge speed
+          final chargePercent = chargeFrames / previousFullChargeFrameCount;
+          chargeFrames = (framesToFullCharge * chargePercent).round();
+          previousFullChargeFrameCount = framesToFullCharge;
+        }
         chargeFrames += 1;
         if (chargeFrames < getFramesToFullCharge(simulation)) {
           return;
@@ -663,6 +673,18 @@ class BattleNikke extends BattleEntity {
         HpChangeEvent(simulation, this, afterMaxHp - previousMaxHp, isMaxHpOnly: true),
       );
     }
+  }
+
+  int getFramesCharged(BattleSimulation simulation) {
+    final chargeSpeedSubtractedFrame = getBuffValue(
+      simulation,
+      FunctionType.statChargeTime,
+      currentWeaponData.chargeTime,
+          (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
+    );
+    final framesToFullCharge = getFramesToFullCharge(simulation);
+    final framesCharged = framesToFullCharge / max(1, framesToFullCharge - chargeSpeedSubtractedFrame);
+    return framesCharged.round();
   }
 
   int getIncreaseElementDamageBuffValues(BattleSimulation simulation) {
