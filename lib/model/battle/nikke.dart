@@ -680,7 +680,7 @@ class BattleNikke extends BattleEntity {
       simulation,
       FunctionType.statChargeTime,
       currentWeaponData.chargeTime,
-          (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
     );
     final framesToFullCharge = getFramesToFullCharge(simulation);
     final framesCharged = framesToFullCharge / max(1, framesToFullCharge - chargeSpeedSubtractedFrame);

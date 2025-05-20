@@ -297,21 +297,25 @@ class BattleSkill {
         targetList.sort((a, b) {
           final totalAttackA = a.baseAttack + a.getAttackBuffValues(simulation);
           final totalAttackB = b.baseAttack + b.getAttackBuffValues(simulation);
-          return totalAttackB - totalAttackA;
+          return totalAttackB != totalAttackA ? totalAttackB - totalAttackA : a.uniqueId - b.uniqueId;
         });
         break;
       case PreferTarget.highAttackFirstSelf:
         targetList.sort((a, b) {
           final totalAttackA = a.baseAttack + a.getAttackBuffValues(simulation);
           final totalAttackB = b.baseAttack + b.getAttackBuffValues(simulation);
-          return totalAttackB - totalAttackA;
+          return totalAttackB != totalAttackA ? totalAttackB - totalAttackA : a.uniqueId - b.uniqueId;
         });
+        if (owner != null && targetList.contains(owner)) {
+          targetList.remove(owner);
+          targetList.insert(0, owner);
+        }
         break;
       case PreferTarget.highAttackLastSelf:
         targetList.sort((a, b) {
           final totalAttackA = a.baseAttack + a.getAttackBuffValues(simulation);
           final totalAttackB = b.baseAttack + b.getAttackBuffValues(simulation);
-          return totalAttackB - totalAttackA;
+          return totalAttackB != totalAttackA ? totalAttackB - totalAttackA : a.uniqueId - b.uniqueId;
         });
         if (owner != null && targetList.contains(owner)) {
           targetList.remove(owner);
@@ -322,36 +326,42 @@ class BattleSkill {
         targetList.sort((a, b) {
           final totalDefenceA = a.baseDefence + a.getDefenceBuffValues(simulation);
           final totalDefenceB = b.baseDefence + b.getDefenceBuffValues(simulation);
-          return totalDefenceB - totalDefenceA;
+          return totalDefenceB != totalDefenceA ? totalDefenceB - totalDefenceA : a.uniqueId - b.uniqueId;
         });
-        if (owner != null && targetList.contains(owner)) {
-          targetList.remove(owner);
-          targetList.insert(0, owner);
-        }
         break;
       case PreferTarget.highHP:
-        targetList.sort((a, b) => b.currentHp - a.currentHp);
+        targetList.sort((a, b) => b.currentHp != a.currentHp ? b.currentHp - a.currentHp : a.uniqueId - b.uniqueId);
         break;
       case PreferTarget.highMaxHP:
-        targetList.sort((a, b) => b.getMaxHp(simulation) - a.getMaxHp(simulation));
+        targetList.sort((a, b) {
+          final maxHpA = a.getMaxHp(simulation);
+          final maxHpB = b.getMaxHp(simulation);
+
+          return maxHpB != maxHpA ? maxHpB - maxHpA : a.uniqueId - b.uniqueId;
+        });
         break;
       case PreferTarget.lowDefence:
         targetList.sort((a, b) {
           final totalDefenceA = a.baseDefence + a.getDefenceBuffValues(simulation);
           final totalDefenceB = b.baseDefence + b.getDefenceBuffValues(simulation);
-          return totalDefenceA - totalDefenceB;
+          return totalDefenceB != totalDefenceA ? totalDefenceA - totalDefenceB : a.uniqueId - b.uniqueId;
         });
         break;
       case PreferTarget.lowHP:
-        targetList.sort((a, b) => a.currentHp - b.currentHp);
+        targetList.sort((a, b) => a.currentHp != b.currentHp ? a.currentHp - b.currentHp : a.uniqueId - b.uniqueId);
         break;
       case PreferTarget.lowHPCover:
         if (!targetNikkes) return [];
 
-        targetList.sort((a, b) => (a as BattleNikke).cover.currentHp - (b as BattleNikke).cover.currentHp);
+        targetList.sort(
+          (a, b) =>
+              (a as BattleNikke).cover.currentHp != (b as BattleNikke).cover.currentHp
+                  ? a.cover.currentHp - b.cover.currentHp
+                  : a.uniqueId - b.uniqueId,
+        );
         break;
       case PreferTarget.lowHPLastSelf:
-        targetList.sort((a, b) => a.currentHp - b.currentHp);
+        targetList.sort((a, b) => a.currentHp != b.currentHp ? a.currentHp - b.currentHp : a.uniqueId - b.uniqueId);
         if (owner != null && targetList.contains(owner)) {
           targetList.remove(owner);
           targetList.add(owner);
@@ -361,7 +371,7 @@ class BattleSkill {
         targetList.sort((a, b) {
           final ratioA = (a.currentHp / a.getMaxHp(simulation) * 10000).round();
           final ratioB = (b.currentHp / b.getMaxHp(simulation) * 10000).round();
-          return ratioA - ratioB;
+          return ratioA != ratioB ? ratioA - ratioB : a.uniqueId - b.uniqueId;
         });
         break;
       case PreferTarget.fire:
