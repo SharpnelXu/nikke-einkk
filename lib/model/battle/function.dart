@@ -189,19 +189,15 @@ class BattleFunction {
 
   bool checkTargetStatus(BattleEvent event, BattleSimulation simulation, BattleEntity target) {
     return checkStatusTrigger(
-          event,
           simulation,
-          target,
+          getStatusTriggerStandardTarget(event, simulation, data.statusTriggerStandard, target),
           data.statusTriggerType,
-          data.statusTriggerStandard,
           data.statusTriggerValue,
         ) &&
         checkStatusTrigger(
-          event,
           simulation,
-          target,
+          getStatusTriggerStandardTarget(event, simulation, data.statusTrigger2Standard, target),
           data.statusTrigger2Type,
-          data.statusTrigger2Standard,
           data.statusTrigger2Value,
         );
   }
@@ -264,6 +260,7 @@ class BattleFunction {
       case FunctionType.changeCoolTimeUlti: // act as a buff for rounding
       case FunctionType.coreShotDamageChange:
       case FunctionType.damageReduction:
+      case FunctionType.drainHpBuff:
       case FunctionType.firstBurstGaugeSpeedUp:
       case FunctionType.gainAmmo: // is actually a buff of 0 duration
       case FunctionType.givingHealVariation:
@@ -272,6 +269,7 @@ class BattleFunction {
       case FunctionType.immuneDamage: // TODO: actually implement after hp deduction is real for boss
       case FunctionType.normalDamageRatioChange: // user & functionTarget (Rumani Burst)
       case FunctionType.partsDamage:
+      case FunctionType.penetrationDamage:
       case FunctionType.removeFunctionGroup: // probably better to remove at end of frame
       case FunctionType.statAccuracyCircle:
       case FunctionType.statAmmo:
@@ -284,6 +282,7 @@ class BattleFunction {
       case FunctionType.statDef:
       case FunctionType.statHp:
       case FunctionType.statHpHeal:
+      case FunctionType.statPenetration:
       case FunctionType.statReloadTime:
       case FunctionType.none: // misc counters etc.
         // add buff
@@ -402,7 +401,6 @@ class BattleFunction {
       case FunctionType.defChangHpRate:
       case FunctionType.defIgnoreDamage:
       case FunctionType.defIgnoreDamageRatio:
-      case FunctionType.drainHpBuff:
       case FunctionType.durationDamageRatio:
       case FunctionType.durationValueChange:
       case FunctionType.explosiveCircuitAccrueDamageRatio:
@@ -446,7 +444,6 @@ class BattleFunction {
       case FunctionType.partsHpChangeUIOff:
       case FunctionType.partsHpChangeUIOn:
       case FunctionType.partsImmuneDamage:
-      case FunctionType.penetrationDamage:
       case FunctionType.plusDebuffCount:
       case FunctionType.plusInstantSkillTargetNum:
       case FunctionType.projectileDamage:
@@ -465,7 +462,6 @@ class BattleFunction {
       case FunctionType.statExplosion:
       case FunctionType.statInstantSkillRange:
       case FunctionType.statMaintainFireStance:
-      case FunctionType.statPenetration:
       case FunctionType.statRateOfFire:
       case FunctionType.statRateOfFirePerShot:
       case FunctionType.statReloadBulletRatio:
@@ -569,15 +565,7 @@ class BattleFunction {
     }
   }
 
-  bool checkStatusTrigger(
-    BattleEvent event,
-    BattleSimulation simulation,
-    BattleEntity currentFunctionTarget,
-    StatusTriggerType type,
-    StandardType standard,
-    int value,
-  ) {
-    final target = getStatusTriggerStandardTarget(event, simulation, standard, currentFunctionTarget);
+  static bool checkStatusTrigger(BattleSimulation simulation, BattleEntity? target, StatusTriggerType type, int value) {
     switch (type) {
       case StatusTriggerType.none:
         return true;

@@ -77,6 +77,7 @@ class NikkeDamageEvent extends BattleEvent {
   late int targetUniqueId;
   late int chargePercent;
   late int shotCount;
+  int? partId;
 
   late NikkeDamageParameter damageParameter;
 
@@ -96,6 +97,8 @@ class NikkeDamageEvent extends BattleEvent {
             ? (10000 * nikke.chargeFrames / nikke.getFramesToFullCharge(simulation)).round()
             : 0;
     chargePercent = chargePercent.clamp(0, 10000);
+    final pierce = nikke.getPierce(simulation);
+    partId = rapture.getPartsInFront();
 
     // TODO: fill in other buff params
     damageParameter = NikkeDamageParameter(
@@ -117,7 +120,54 @@ class NikkeDamageEvent extends BattleEvent {
       chargeDamageRate: weaponData.fullChargeDamage,
       chargeDamageBuff: nikke.getChargeDamageBuffValues(simulation),
       chargePercent: chargePercent,
-      partDamageBuff: rapture.hasParts() ? nikke.getPartsDamageBuffValues(simulation) : 0,
+      // pierce won't hit rapture body as parts
+      partDamageBuff: pierce == 0 && partId != null ? nikke.getPartsDamageBuffValues(simulation) : 0,
+      pierceDamageBuff: pierce > 0 ? nikke.getPierceDamageBuffValues(simulation) : 0,
+      addDamageBuff: nikke.getAddDamageBuffValues(simulation),
+    );
+  }
+
+  NikkeDamageEvent.piercePart({
+    required BattleSimulation simulation,
+    required BattleNikke nikke,
+    required BattleRapture rapture,
+    required BattleRaptureParts part,
+  }) {
+    name = nikke.name;
+    type = NikkeDamageType.piercePart;
+    attackerUniqueId = nikke.uniqueId;
+    targetUniqueId = rapture.uniqueId;
+    final weaponData = nikke.currentWeaponData;
+    shotCount = weaponData.shotCount;
+    chargePercent =
+    WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponType)
+        ? (10000 * nikke.chargeFrames / nikke.getFramesToFullCharge(simulation)).round()
+        : 0;
+    chargePercent = chargePercent.clamp(0, 10000);
+    partId = part.id;
+
+    // TODO: fill in other buff params
+    damageParameter = NikkeDamageParameter(
+      attack: nikke.baseAttack,
+      attackBuff: nikke.getAttackBuffValues(simulation),
+      defence: rapture.baseDefence,
+      damageRate: weaponData.damage * weaponData.muzzleCount,
+      damageRateBuff: nikke.getNormalDamageRatioChangeBuffValues(simulation),
+      coreHitRate: part.isCore ? 10000 : 0,
+      coreDamageRate: weaponData.coreDamageRate,
+      coreDamageBuff: nikke.getCoreDamageBuffValues(simulation),
+      criticalRate: nikke.getCriticalRate(simulation),
+      criticalDamageRate: nikke.characterData.criticalDamage,
+      criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
+      isBonusRange: nikke.isBonusRange(rapture.distance),
+      isFullBurst: simulation.burstStage == 4,
+      isStrongElement: nikke.element.strongAgainst(rapture.element),
+      elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
+      chargeDamageRate: weaponData.fullChargeDamage,
+      chargeDamageBuff: nikke.getChargeDamageBuffValues(simulation),
+      chargePercent: chargePercent,
+      partDamageBuff: nikke.getPartsDamageBuffValues(simulation),
+      pierceDamageBuff: nikke.getPierceDamageBuffValues(simulation),
       addDamageBuff: nikke.getAddDamageBuffValues(simulation),
     );
   }
@@ -153,8 +203,24 @@ class NikkeDamageEvent extends BattleEvent {
     );
   }
 
-  int calculateCoreHitRate(BattleSimulation simulation, BattleNikke nikke, BattleRapture rapture) {
-    if (WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponType)) return 10000;
+  int calculateCoreHitRate(
+    BattleSimulation simulation,
+    BattleNikke nikke,
+    BattleRapture rapture,
+  ) {
+    if (rapture.coreSize == 0) {
+      // no core
+      return 0;
+    }
+
+    if (rapture.coreRequiresPierce && nikke.getPierce(simulation) == 0) {
+      // cannot hit core
+      return 0;
+    }
+
+    if (WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponType)) {
+      return 10000;
+    }
 
     // just a wild guess for now
     return (50 * rapture.coreSize / max(1, nikke.getAccuracyCircleScale(simulation) * rapture.distance) * 10000)
@@ -190,7 +256,7 @@ class NikkeDamageEvent extends BattleEvent {
   }
 }
 
-enum NikkeDamageType { bullet, skill }
+enum NikkeDamageType { bullet, skill, piercePart }
 
 class BurstGenerationEvent extends BattleEvent {
   String name = '';

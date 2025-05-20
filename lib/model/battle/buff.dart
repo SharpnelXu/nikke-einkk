@@ -1,4 +1,6 @@
+import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/function.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
@@ -21,15 +23,41 @@ class BattleBuff {
   bool shouldRemove(BattleSimulation simulation) {
     switch (data.durationType) {
       case DurationType.none:
-      case DurationType.battles:
       case DurationType.timeSecBattles:
         return false;
+      case DurationType.battles:
+        // added for Alice S2 (continuous penetration if hp above threshold)
+        return !BattleFunction.checkStatusTrigger(
+              simulation,
+              getStatusTriggerStandardTarget(simulation, data.statusTriggerStandard),
+              data.statusTriggerType,
+              data.statusTriggerValue,
+            ) ||
+            !BattleFunction.checkStatusTrigger(
+              simulation,
+              getStatusTriggerStandardTarget(simulation, data.statusTrigger2Standard),
+              data.statusTrigger2Type,
+              data.statusTrigger2Value,
+            );
       case DurationType.timeSec:
       case DurationType.shots:
       case DurationType.hits:
         return duration <= 0;
       case DurationType.unknown:
         return true;
+    }
+  }
+
+  BattleEntity? getStatusTriggerStandardTarget(BattleSimulation simulation, StandardType standardType) {
+    switch (standardType) {
+      case StandardType.user:
+        return simulation.getEntityByUniqueId(buffGiverUniqueId);
+      case StandardType.functionTarget:
+        return simulation.getEntityByUniqueId(buffReceiverUniqueId);
+      case StandardType.triggerTarget:
+      case StandardType.none:
+      case StandardType.unknown:
+        return null;
     }
   }
 

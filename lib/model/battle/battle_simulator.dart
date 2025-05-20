@@ -97,8 +97,8 @@ class BattleSimulation {
     // }
 
     for (currentFrame = maxFrames; currentFrame > 0; currentFrame -= 1) {
-      for (final nikke in nikkes) {
-        nikke.normalAction(this);
+      for (final entity in [...nikkes, ...raptures]) {
+        entity.normalAction(this);
       }
 
       if (playerOptions.forceFillBurst && burstStage == 0) {
@@ -146,8 +146,8 @@ class BattleSimulation {
         }
       }
 
-      for (final nikke in nikkes) {
-        nikke.endCurrentFrame(this);
+      for (final entity in [...nikkes, ...raptures]) {
+        entity.endCurrentFrame(this);
       }
     }
   }

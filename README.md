@@ -46,6 +46,10 @@ Receive Damage Rate = 100% + Receive Damage Buffs + Distributed Damage Buffs
 - SRs & RLs start charging at 100% (first frame of charging), and will fire after charging complete (since `inputType` is `UP`)
   - Without charging speed buffs, charging time is constant regardless of charge rate buffs
 
+## Program Constraints
+- Drain HP (Alice S2 when below 80% HP) is based on expected damage (crit chance & core chance), else one would need to
+manually set if each bullet is crit / core hit or not
+
 ## Niche Mechanisms Waiting To Be Categorized
 - Shotgun's burst gen data is per pellet
 - Snipers & Rocket Launchers have -1 frame charge time compared to data, so chargeTime = 60 frames (from 1s) only needs

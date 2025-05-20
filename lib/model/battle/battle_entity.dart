@@ -49,6 +49,27 @@ abstract class BattleEntity {
     return getPlainBuffValues(simulation, FunctionType.addDamage);
   }
 
+  int getDrainHpBuff(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.drainHpBuff);
+  }
+
+  int getIncreaseElementDamageBuffValues(BattleSimulation simulation) {
+    // not sure if function standard does anything here, coule be the base ele rate is 10000 for all in data
+    return getPlainBuffValues(simulation, FunctionType.incElementDmg);
+  }
+
+  int getCriticalDamageBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.statCriticalDamage);
+  }
+
+  int getGivingHealVariationBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.givingHealVariation);
+  }
+
+  int getDamageReductionBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.damageReduction);
+  }
+
   int getPlainBuffValues(BattleSimulation simulation, FunctionType type) {
     int result = 0;
     for (final buff in buffs) {
@@ -107,5 +128,33 @@ abstract class BattleEntity {
     }
 
     return result;
+  }
+
+  void normalAction(BattleSimulation simulation) {
+    for (final buff in buffs) {
+      if (buff.data.durationType == DurationType.timeSec) {
+        buff.duration -= 1;
+      }
+    }
+  }
+
+  void endCurrentFrame(BattleSimulation simulation) {
+    final previousMaxHp = getMaxHp(simulation);
+
+    final removeBuffGroupIds =
+    buffs
+        .where((buff) => buff.data.functionType == FunctionType.removeFunctionGroup)
+        .map((buff) => buff.data.functionValue)
+        .toList();
+
+    buffs.removeWhere((buff) => buff.shouldRemove(simulation) || removeBuffGroupIds.contains(buff.data.groupId));
+
+    final afterMaxHp = getMaxHp(simulation);
+    if (previousMaxHp != afterMaxHp) {
+      simulation.registerEvent(
+        simulation.nextFrame,
+        HpChangeEvent(simulation, this, afterMaxHp - previousMaxHp, isMaxHpOnly: true),
+      );
+    }
   }
 }

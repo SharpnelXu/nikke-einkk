@@ -290,6 +290,7 @@ class BattleNikke extends BattleEntity {
     currentAmmo = getMaxAmmo(simulation);
   }
 
+  @override
   void normalAction(BattleSimulation simulation) {
     determineStatus(simulation);
 
@@ -306,11 +307,7 @@ class BattleNikke extends BattleEntity {
         break;
     }
 
-    for (final buff in buffs) {
-      if (buff.data.durationType == DurationType.timeSec) {
-        buff.duration -= 1;
-      }
-    }
+    super.normalAction(simulation);
 
     for (final skill in skills) {
       skill.processFrame(simulation);
@@ -435,16 +432,7 @@ class BattleNikke extends BattleEntity {
           ),
         );
         if (currentWeaponData.fireType == FireType.instant) {
-          simulation.registerEvent(
-            simulation.currentFrame,
-            NikkeDamageEvent.bullet(simulation: simulation, nikke: this, rapture: target),
-          );
-          if (simulation.burstStage == 0) {
-            simulation.registerEvent(
-              simulation.currentFrame,
-              BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
-            );
-          }
+          generateDamageAndBurstEvents(simulation, simulation.currentFrame, target);
         }
 
         // rateOfFire 90 = shoot 90 bullets per minute, so time data per bullet is 6000 / 90 = 66.66 (0.6666 second)
@@ -484,16 +472,7 @@ class BattleNikke extends BattleEntity {
               ownerUniqueId: uniqueId,
             ),
           );
-          simulation.registerEvent(
-            simulation.currentFrame,
-            NikkeDamageEvent.bullet(simulation: simulation, nikke: this, rapture: target),
-          );
-          if (simulation.burstStage == 0) {
-            simulation.registerEvent(
-              simulation.currentFrame,
-              BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
-            );
-          }
+          generateDamageAndBurstEvents(simulation, simulation.currentFrame, target);
 
           // TODO: move to attackDoneEvent (end of fire animation) for A2 & SBS (end of uptype_fire_timing)
           chargeFrames = 0;
@@ -526,17 +505,7 @@ class BattleNikke extends BattleEntity {
           final damageFrame = fireFrame - projectileTravelFrame.round();
 
           if (damageFrame > 0) {
-            // TODO: fill in defender buffs on hit rather now
-            simulation.registerEvent(
-              damageFrame,
-              NikkeDamageEvent.bullet(simulation: simulation, nikke: this, rapture: target),
-            );
-            if (simulation.burstStage == 0) {
-              simulation.registerEvent(
-                damageFrame,
-                BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
-              );
-            }
+            generateDamageAndBurstEvents(simulation, damageFrame, target);
           }
         }
 
@@ -564,6 +533,33 @@ class BattleNikke extends BattleEntity {
       case WeaponType.none:
         // TODO: probably log?
         return;
+    }
+  }
+
+  void generateDamageAndBurstEvents(BattleSimulation simulation, int frame, BattleRapture target) {
+    simulation.registerEvent(
+      simulation.currentFrame,
+      NikkeDamageEvent.bullet(simulation: simulation, nikke: this, rapture: target),
+    );
+    if (simulation.burstStage == 0) {
+      simulation.registerEvent(
+        simulation.currentFrame,
+        BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
+      );
+    }
+    if (getPierce(simulation) > 0) {
+      for (final part in target.parts) {
+        simulation.registerEvent(
+          simulation.currentFrame,
+          NikkeDamageEvent.piercePart(simulation: simulation, nikke: this, rapture: target, part: part),
+        );
+        if (simulation.burstStage == 0) {
+          simulation.registerEvent(
+            simulation.currentFrame,
+            BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
+          );
+        }
+      }
     }
   }
 
@@ -631,14 +627,21 @@ class BattleNikke extends BattleEntity {
   }
 
   void processDamageEvent(NikkeDamageEvent event, BattleSimulation simulation) {
-    if (event.type != NikkeDamageType.bullet) return;
-
     final rapture = simulation.getRaptureByUniqueId(event.targetUniqueId);
     if (rapture == null) return;
 
-    totalBulletsHit += 1;
+    if (event.type == NikkeDamageType.bullet) {
+      totalBulletsHit += 1;
+    }
+
+    final drainHp = getDrainHpBuff(simulation);
+    if (drainHp > 0) {
+      final expectedDamage = event.damageParameter.calculateExpectedDamage();
+      changeHp(simulation, (BattleUtils.toModifier(drainHp) * expectedDamage).round(), true);
+    }
   }
 
+  @override
   void endCurrentFrame(BattleSimulation simulation) {
     final gainAmmo = getBuffValue(
       simulation,
@@ -656,23 +659,7 @@ class BattleNikke extends BattleEntity {
     );
     skills[2].changeCd(simulation, ultCdReduceTimeData);
 
-    final previousMaxHp = getMaxHp(simulation);
-
-    final removeBuffGroupIds =
-        buffs
-            .where((buff) => buff.data.functionType == FunctionType.removeFunctionGroup)
-            .map((buff) => buff.data.functionValue)
-            .toList();
-
-    buffs.removeWhere((buff) => buff.shouldRemove(simulation) || removeBuffGroupIds.contains(buff.data.groupId));
-
-    final afterMaxHp = getMaxHp(simulation);
-    if (previousMaxHp != afterMaxHp) {
-      simulation.registerEvent(
-        simulation.nextFrame,
-        HpChangeEvent(simulation, this, afterMaxHp - previousMaxHp, isMaxHpOnly: true),
-      );
-    }
+    super.endCurrentFrame(simulation);
   }
 
   int getFramesCharged(BattleSimulation simulation) {
@@ -687,25 +674,8 @@ class BattleNikke extends BattleEntity {
     return framesCharged.round();
   }
 
-  int getIncreaseElementDamageBuffValues(BattleSimulation simulation) {
-    // not sure if function standard does anything here, coule be the base ele rate is 10000 for all in data
-    return getPlainBuffValues(simulation, FunctionType.incElementDmg);
-  }
-
   int getCriticalRate(BattleSimulation simulation) {
     return characterData.criticalRatio + getPlainBuffValues(simulation, FunctionType.statCritical);
-  }
-
-  int getCriticalDamageBuffValues(BattleSimulation simulation) {
-    return getPlainBuffValues(simulation, FunctionType.statCriticalDamage);
-  }
-
-  int getGivingHealVariationBuffValues(BattleSimulation simulation) {
-    return getPlainBuffValues(simulation, FunctionType.givingHealVariation);
-  }
-
-  int getDamageReductionBuffValues(BattleSimulation simulation) {
-    return getPlainBuffValues(simulation, FunctionType.damageReduction);
   }
 
   /// nikke specific buffs
@@ -785,5 +755,13 @@ class BattleNikke extends BattleEntity {
 
   int getPartsDamageBuffValues(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.partsDamage);
+  }
+
+  int getPierceDamageBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.penetrationDamage);
+  }
+
+  int getPierce(BattleSimulation simulation) {
+    return currentWeaponData.penetration + getPlainBuffValues(simulation, FunctionType.statPenetration);
   }
 }
