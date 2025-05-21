@@ -26,7 +26,6 @@ class NikkeDatabase {
   String get characterStatTableFilePath => join(dataPath, 'CharacterStatTable.json');
   String get characterStatEnhanceTableFilePath => join(dataPath, 'CharacterStatEnhanceTable.json');
   String get attractiveLevelTableFilePath => join(dataPath, 'AttractiveLevelTable.json');
-  String get localeCharacterTableFilePath => join(dataPath, 'LocaleCharacterTable.json');
   String get itemEquipTableFilePath => join(dataPath, 'ItemEquipTable.json');
   String get itemHarmonyCubeTableFilePath => join(dataPath, 'ItemHarmonyCubeTable.json');
   String get itemHarmonyCubeLevelTableFilePath => join(dataPath, 'ItemHarmonyCubeLevelTable.json');
@@ -34,10 +33,11 @@ class NikkeDatabase {
   String get favoriteItemLevelTableFilePath => join(dataPath, 'FavoriteItemLevelTable.json');
   String get skillInfoTableFilePath => join(dataPath, 'SkillInfoTable.json');
   String get coverStatEnhanceTableFilePath => join(dataPath, 'CoverStatEnhanceTable.json');
+  String get localeCharacterFilePath => join(dataPath, 'Locale_Character.json');
+  String get localeSkillFilePath => join(dataPath, 'Locale_Skill.json');
 
   final Map<int, NikkeCharacterData> characterData = {}; // maybe not needed
   final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
-  final Map<String, Translation> localeCharacterTable = {};
   final Map<int, WeaponData> characterShotTable = {};
   final Map<int, SkillData> characterSkillTable = {};
   final Map<int, StateEffectData> stateEffectTable = {};
@@ -46,6 +46,8 @@ class NikkeDatabase {
   final Map<int, FavoriteItemData> favoriteItemTable = {};
   final Map<int, CoverStatData> coverStatTable = {};
   final Map<int, SkillInfoData> skillInfoTable = {};
+  final Map<String, Translation> localeCharacterTable = {};
+  final Map<String, Translation> localeSkillTable = {};
 
   // character stats
   // grouped by enhanceId, level
@@ -71,7 +73,8 @@ class NikkeDatabase {
     bool result = true;
 
     result &= await loadCharacterData();
-    result &= await loadTranslationData();
+    result &= await loadLocaleCharacter();
+    result &= await loadLocaleSkill();
     result &= await loadCharacterShotData();
     result &= await loadCharacterStatData();
     result &= await loadCharacterStatEnhanceData();
@@ -109,8 +112,8 @@ class NikkeDatabase {
     return exists;
   }
 
-  Future<bool> loadTranslationData() async {
-    final characterTranslationTableFile = File(localeCharacterTableFilePath);
+  Future<bool> loadLocaleCharacter() async {
+    final characterTranslationTableFile = File(localeCharacterFilePath);
     final bool exists = await characterTranslationTableFile.exists();
     if (exists) {
       final jsonList = jsonDecode(await characterTranslationTableFile.readAsString());
@@ -121,6 +124,19 @@ class NikkeDatabase {
         if (match) {
           localeCharacterTable[translation.key] = translation;
         }
+      }
+    }
+    return exists;
+  }
+
+  Future<bool> loadLocaleSkill() async {
+    final file = File(localeSkillFilePath);
+    final bool exists = await file.exists();
+    if (exists) {
+      final jsonList = jsonDecode(await file.readAsString());
+      for (final record in jsonList) {
+        final translation = Translation.fromJson(record);
+        localeSkillTable[translation.key] = translation;
       }
     }
     return exists;
@@ -318,12 +334,18 @@ class NikkeDatabase {
     return exists;
   }
 
-  Translation? getTranslation(String joinedKey) {
+  Translation? getTranslation(String? joinedKey) {
+    if (joinedKey == null) return null;
+
     final splits = joinedKey.split(':');
+    if (splits.length != 2) return null;
+
     final tableType = splits[0];
     final key = splits[1];
     if (tableType == 'Locale_Character') {
       return localeCharacterTable[key];
+    } else if (tableType == 'Locale_Skill') {
+      return localeSkillTable[key];
     }
 
     return null;

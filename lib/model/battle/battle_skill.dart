@@ -88,6 +88,7 @@ class BattleSkill {
 
     final event = UseSkillEvent(
       simulation,
+      skillData.id,
       ownerUniqueId,
       skillGroupId,
       skillNum,

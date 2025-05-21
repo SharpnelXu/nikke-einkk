@@ -103,8 +103,8 @@ class BattleFunction {
       case TimingTriggerType.onFullCount:
         if (event is BuffEvent &&
             standard?.uniqueId == ownerUniqueId &&
-            event.buffCount == event.fullCount &&
-            event.buffGroupId == timingTriggerValue) {
+            event.buffCount == event.data.fullCount &&
+            event.data.groupId == timingTriggerValue) {
           executeFunction(event, simulation);
         }
         break;

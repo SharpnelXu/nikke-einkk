@@ -7,6 +7,7 @@ import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 import 'nikke.dart';
@@ -388,6 +389,7 @@ class HpChangeEvent extends BattleEvent {
 
 class UseSkillEvent extends BattleEvent {
   late String name;
+  final int skillId;
   final int ownerUniqueId;
   final int skillGroup;
   final int skillNum;
@@ -395,6 +397,7 @@ class UseSkillEvent extends BattleEvent {
 
   UseSkillEvent(
     BattleSimulation simulation,
+    this.skillId,
     this.ownerUniqueId,
     this.skillGroup,
     this.skillNum,
@@ -416,7 +419,9 @@ class UseSkillEvent extends BattleEvent {
 
   @override
   Widget buildDisplay() {
-    return Text('$name (Pos $ownerUniqueId) activates skill $skillNum');
+    final skillName =
+        gameData.getTranslation(gameData.skillInfoTable[skillId]?.nameLocalkey)?.zhCN ?? 'Skill $skillNum';
+    return Text('$name (Pos $ownerUniqueId) activates $skillName');
   }
 }
 
@@ -459,29 +464,20 @@ class ExitFullBurstEvent extends BattleEvent {
 }
 
 class BuffEvent extends BattleEvent {
-  late String funcString;
+  late FunctionData data;
   late String giverName;
   late int buffGiverUniqueId;
   late String receiverName;
   late int buffReceiverUniqueId;
   late int buffCount;
-  late int fullCount;
-  late int buffGroupId; // if one more variable then this stores FunctionData instead
 
   BuffEvent(BattleSimulation simulation, BattleBuff buff) {
+    data = buff.data;
     buffGiverUniqueId = buff.buffGiverUniqueId;
     giverName = simulation.getEntityByUniqueId(buffGiverUniqueId)!.name;
     buffReceiverUniqueId = buff.buffReceiverUniqueId;
     receiverName = simulation.getEntityByUniqueId(buffReceiverUniqueId)!.name;
     buffCount = buff.count;
-    fullCount = buff.data.fullCount;
-    buffGroupId = buff.data.groupId;
-    final valueString =
-        buff.data.functionValueType == ValueType.percent
-            ? '${(buff.data.functionValue / 100).toStringAsFixed(2)}%'
-            : '${buff.data.functionValue}';
-    funcString =
-        '${buff.data.functionType.name} $valueString (${buff.data.functionStandard.name}) $buffCount/$fullCount';
   }
 
   @override
@@ -496,6 +492,13 @@ class BuffEvent extends BattleEvent {
 
   @override
   Widget buildDisplay() {
-    return Text('$funcString (to $receiverName by $giverName)');
+    final valueString =
+        data.functionValueType == ValueType.percent
+            ? '${(data.functionValue / 100).toStringAsFixed(2)}%'
+            : '${data.functionValue}';
+    final funcString =
+        '${data.functionType.name} $valueString (${data.functionStandard.name}) $buffCount/${data.fullCount}';
+    final skillName = gameData.getTranslation(data.nameLocalkey)?.zhCN ?? 'Buff';
+    return Text('$skillName $funcString (to $receiverName by $giverName)');
   }
 }

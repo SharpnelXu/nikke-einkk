@@ -14,6 +14,7 @@ class Translation {
   @JsonKey(name: 'zh-CN')
   String zhCN;
   String th;
+  String de;
   String fr;
   @JsonKey(name: 'IsSmart')
   int isSmart;
@@ -26,6 +27,7 @@ class Translation {
     this.zhTW = "",
     this.zhCN = "",
     this.th = "",
+    this.de = "",
     this.fr = "",
     this.isSmart = 0,
   });

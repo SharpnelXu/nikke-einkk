@@ -14,6 +14,7 @@ Translation _$TranslationFromJson(Map<String, dynamic> json) => Translation(
   zhTW: json['zh-TW'] as String? ?? "",
   zhCN: json['zh-CN'] as String? ?? "",
   th: json['th'] as String? ?? "",
+  de: json['de'] as String? ?? "",
   fr: json['fr'] as String? ?? "",
   isSmart: (json['IsSmart'] as num?)?.toInt() ?? 0,
 );
@@ -26,6 +27,7 @@ Map<String, dynamic> _$TranslationToJson(Translation instance) => <String, dynam
   'zh-TW': instance.zhTW,
   'zh-CN': instance.zhCN,
   'th': instance.th,
+  'de': instance.de,
   'fr': instance.fr,
   'IsSmart': instance.isSmart,
 };
