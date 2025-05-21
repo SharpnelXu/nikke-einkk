@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:nikke_einkk/model/battle/barrier.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
@@ -92,6 +93,7 @@ class BattleSkill {
       skillNum,
       skillTargets.map((entity) => entity.uniqueId).toList(),
     );
+    simulation.registerEvent(simulation.currentFrame, event);
 
     for (final beforeFuncId in [...skillData.beforeUseFunctionIdList, ...skillData.beforeHurtFunctionIdList]) {
       final functionData = gameData.functionTable[beforeFuncId];
@@ -110,6 +112,14 @@ class BattleSkill {
       case CharacterSkillType.instantNumber:
         for (final target in skillTargets) {
           if (target is BattleRapture) {
+            bool shareDamage = false;
+            final shareDamageBuff = target.buffs.firstWhereOrNull(
+              (buff) => buff.data.functionType == FunctionType.damageShareInstant,
+            );
+            if (shareDamageBuff != null) {
+              shareDamage = true;
+              target.buffs.remove(shareDamageBuff);
+            }
             simulation.registerEvent(
               simulation.currentFrame,
               NikkeDamageEvent.skill(
@@ -117,6 +127,7 @@ class BattleSkill {
                 nikke: simulation.getNikkeOnPosition(ownerUniqueId)!,
                 rapture: target,
                 damageRate: skillData.skillValueData[0].skillValue,
+                isShareDamage: shareDamage,
               ),
             );
           }

@@ -191,6 +191,7 @@ class BattleNikke extends BattleEntity {
   int shootingFrameCount = 0;
 
   int totalBulletsFired = 0;
+  int totalFullChargeFired = 0;
   int totalBulletsHit = 0;
   bool activatedBurstSkillThisCycle = false;
 
@@ -258,6 +259,7 @@ class BattleNikke extends BattleEntity {
     barrier = null;
 
     totalBulletsFired = 0;
+    totalFullChargeFired = 0;
     totalBulletsHit = 0;
     activatedBurstSkillThisCycle = false;
     functions.clear();
@@ -441,6 +443,7 @@ class BattleNikke extends BattleEntity {
             currentAmmo: currentAmmo,
             maxAmmo: getMaxAmmo(simulation),
             ownerUniqueId: uniqueId,
+            isFullCharge: false,
           ),
         );
         if (currentWeaponData.fireType == FireType.instant) {
@@ -487,6 +490,7 @@ class BattleNikke extends BattleEntity {
               currentAmmo: currentAmmo,
               maxAmmo: getMaxAmmo(simulation),
               ownerUniqueId: uniqueId,
+              isFullCharge: chargeFrames >= framesToFullCharge,
             ),
           );
           generateDamageAndBurstEvents(simulation, simulation.currentFrame, target);
@@ -512,6 +516,7 @@ class BattleNikke extends BattleEntity {
                 currentAmmo: currentAmmo,
                 maxAmmo: getMaxAmmo(simulation),
                 ownerUniqueId: uniqueId,
+                isFullCharge: chargeFrames >= framesToFullCharge,
               ),
             );
           }
@@ -569,15 +574,17 @@ class BattleNikke extends BattleEntity {
     }
     if (getPierce(simulation) > 0) {
       for (final part in target.parts) {
-        simulation.registerEvent(
-          simulation.currentFrame,
-          NikkeDamageEvent.piercePart(simulation: simulation, nikke: this, rapture: target, part: part),
-        );
-        if (simulation.burstStage == 0) {
+        if (part.hp > 0) {
           simulation.registerEvent(
             simulation.currentFrame,
-            BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
+            NikkeDamageEvent.piercePart(simulation: simulation, nikke: this, rapture: target, part: part),
           );
+          if (simulation.burstStage == 0) {
+            simulation.registerEvent(
+              simulation.currentFrame,
+              BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
+            );
+          }
         }
       }
     }
@@ -620,6 +627,10 @@ class BattleNikke extends BattleEntity {
     if (event is NikkeFireEvent && event.ownerUniqueId == uniqueId) {
       currentAmmo = max(0, currentAmmo - 1);
       totalBulletsFired += 1;
+
+      if (event.isFullCharge) {
+        totalFullChargeFired += 1;
+      }
 
       for (final buff in buffs) {
         if (buff.data.durationType == DurationType.shots) {
@@ -779,6 +790,10 @@ class BattleNikke extends BattleEntity {
 
   int getPierceDamageBuffValues(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.penetrationDamage);
+  }
+
+  int getShareDamageBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.shareDamageIncrease);
   }
 
   int getPierce(BattleSimulation simulation) {

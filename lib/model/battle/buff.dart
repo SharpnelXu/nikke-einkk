@@ -9,6 +9,7 @@ class BattleBuff {
   int buffReceiverUniqueId;
   FunctionData data;
 
+  int targetGroupId = 0;
   int duration = 0;
   int count = 0;
 

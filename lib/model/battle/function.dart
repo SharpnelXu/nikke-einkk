@@ -27,6 +27,9 @@ class BattleFunction {
     // the idea is that all data necessary for processing this broadcast should be available in the event
     final standard = getTimingTriggerStandardTarget(event, simulation);
 
+    int timingTriggerValue = data.timingTriggerValue;
+    timingTriggerValue += standard?.getTimingTriggerValueChange(simulation, timingTriggerValue, data.groupId) ?? 0;
+
     switch (data.timingTriggerType) {
       case TimingTriggerType.onHitNum:
         // triggerStandard: {user, none}, majority is user
@@ -36,7 +39,7 @@ class BattleFunction {
 
         if (standard is BattleNikke &&
             standard.totalBulletsHit > 0 &&
-            standard.totalBulletsHit % data.timingTriggerValue == 0) {
+            standard.totalBulletsHit % timingTriggerValue == 0) {
           executeFunction(event, simulation);
         }
         break;
@@ -51,7 +54,7 @@ class BattleFunction {
 
         if (standard is BattleNikke &&
             standard.totalBulletsFired > 0 &&
-            standard.totalBulletsFired % data.timingTriggerValue == 0) {
+            standard.totalBulletsFired % timingTriggerValue == 0) {
           executeFunction(event, simulation);
         }
         break;
@@ -60,7 +63,7 @@ class BattleFunction {
         if (event is! HpChangeEvent || standard == null || standard.uniqueId != ownerUniqueId) return;
 
         final hpPercent = standard.currentHp / standard.getMaxHp(simulation);
-        if ((hpPercent * 10000).round() <= data.timingTriggerValue) {
+        if ((hpPercent * 10000).round() <= timingTriggerValue) {
           if (status == FunctionStatus.off) {
             executeFunction(event, simulation);
             status = FunctionStatus.on;
@@ -76,7 +79,7 @@ class BattleFunction {
         if (event is! HpChangeEvent || standard == null || standard.uniqueId != ownerUniqueId) return;
 
         final hpPercent = standard.currentHp / standard.getMaxHp(simulation);
-        if ((hpPercent * 10000).round() >= data.timingTriggerValue) {
+        if ((hpPercent * 10000).round() >= timingTriggerValue) {
           if (status == FunctionStatus.off) {
             executeFunction(event, simulation);
             status = FunctionStatus.on;
@@ -88,14 +91,12 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onSkillUse:
-        if (event is UseSkillEvent &&
-            event.skillGroup == data.timingTriggerValue &&
-            standard?.uniqueId == ownerUniqueId) {
+        if (event is UseSkillEvent && event.skillGroup == timingTriggerValue && standard?.uniqueId == ownerUniqueId) {
           executeFunction(event, simulation);
         }
         break;
       case TimingTriggerType.onEnterBurstStep:
-        if (event is ChangeBurstStepEvent && event.nextStage == data.timingTriggerValue) {
+        if (event is ChangeBurstStepEvent && event.nextStage == timingTriggerValue) {
           executeFunction(event, simulation);
         }
         break;
@@ -103,12 +104,21 @@ class BattleFunction {
         if (event is BuffEvent &&
             standard?.uniqueId == ownerUniqueId &&
             event.buffCount == event.fullCount &&
-            event.buffGroupId == data.timingTriggerValue) {
+            event.buffGroupId == timingTriggerValue) {
           executeFunction(event, simulation);
         }
         break;
       case TimingTriggerType.onHealedBy:
         if (event is HpChangeEvent && event.getActivatorUniqueId() == ownerUniqueId && event.isHeal) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onFullChargeShotNum:
+        if (event is! NikkeFireEvent || standard?.uniqueId != ownerUniqueId) return;
+
+        if (standard is BattleNikke &&
+            standard.totalFullChargeFired > 0 &&
+            standard.totalFullChargeFired % timingTriggerValue == 0) {
           executeFunction(event, simulation);
         }
         break;
@@ -130,7 +140,6 @@ class BattleFunction {
       case TimingTriggerType.onFullChargeHitNum:
       case TimingTriggerType.onFullChargeNum:
       case TimingTriggerType.onFullChargeShot:
-      case TimingTriggerType.onFullChargeShotNum:
       case TimingTriggerType.onFunctionBuffCheck:
       case TimingTriggerType.onFunctionOff:
       case TimingTriggerType.onFunctionOn:
@@ -203,7 +212,7 @@ class BattleFunction {
         );
   }
 
-  bool addBuff(BattleEvent event, BattleSimulation simulation) {
+  bool addBuff(BattleEvent event, BattleSimulation simulation, {int? parentFunctionValue}) {
     bool result = false;
     final functionTargets = getFunctionTargets(event, simulation);
     for (final target in functionTargets) {
@@ -231,6 +240,7 @@ class BattleFunction {
         simulation.registerEvent(simulation.currentFrame, BuffEvent(simulation, existingBuff));
       } else {
         final buff = BattleBuff(data, ownerUniqueId, target.uniqueId, simulation);
+        buff.targetGroupId = parentFunctionValue ?? 0;
         target.buffs.add(buff);
         simulation.registerEvent(simulation.currentFrame, BuffEvent(simulation, buff));
       }
@@ -253,7 +263,7 @@ class BattleFunction {
     return result;
   }
 
-  void executeFunction(BattleEvent event, BattleSimulation simulation) {
+  void executeFunction(BattleEvent event, BattleSimulation simulation, {int? parentFunctionValue}) {
     bool activated = false;
     switch (data.functionType) {
       case FunctionType.addDamage:
@@ -261,6 +271,7 @@ class BattleFunction {
       case FunctionType.changeCoolTimeUlti: // act as a buff for rounding
       case FunctionType.coreShotDamageChange:
       case FunctionType.damageReduction:
+      case FunctionType.damageShareInstant: // used by SBS's skills to denote the next skill damage is shared damage
       case FunctionType.drainHpBuff:
       case FunctionType.firstBurstGaugeSpeedUp:
       case FunctionType.gainAmmo: // is actually a buff of 0 duration
@@ -303,6 +314,12 @@ class BattleFunction {
               target.changeHp(simulation, changeValue.round());
             }
           }
+        }
+        break;
+      case FunctionType.timingTriggerValueChange:
+        if (parentFunctionValue != null) {
+          activated = true;
+          addBuff(event, simulation, parentFunctionValue: parentFunctionValue);
         }
         break;
       case FunctionType.damage:
@@ -364,7 +381,11 @@ class BattleFunction {
           BattleSkill.activateSkill(simulation, skill, ownerUniqueId, gameData.skillInfoTable[skill.id]!.groupId, -1);
         }
         break;
+      case FunctionType.cycleUse: // this cycles through connected functions, no actual use
+      case FunctionType.targetGroupid: // only func value needed, pass it to the connected function
       case FunctionType.unknown:
+        activated = true;
+        break;
       case FunctionType.addIncElementDmgType:
       case FunctionType.allAmmo:
       case FunctionType.allStepBurstNextStep:
@@ -392,7 +413,6 @@ class BattleFunction {
       case FunctionType.copyHp:
       case FunctionType.coverResurrection:
       case FunctionType.currentHpRatioDamage:
-      case FunctionType.cycleUse:
       case FunctionType.damageBio:
       case FunctionType.damageEnergy:
       case FunctionType.damageFunctionTargetGroupId:
@@ -402,7 +422,6 @@ class BattleFunction {
       case FunctionType.damageRatioEnergy:
       case FunctionType.damageRatioMetal:
       case FunctionType.damageShare:
-      case FunctionType.damageShareInstant:
       case FunctionType.damageShareInstantUnable:
       case FunctionType.debuffImmune:
       case FunctionType.debuffRemove:
@@ -480,9 +499,7 @@ class BattleFunction {
       case FunctionType.stickyProjectileInstantExplosion:
       case FunctionType.stun:
       case FunctionType.taunt:
-      case FunctionType.targetGroupid:
       case FunctionType.targetPartsId:
-      case FunctionType.timingTriggerValueChange:
       case FunctionType.transformation:
       case FunctionType.uncoverable:
       case FunctionType.useSkill2:
@@ -495,12 +512,20 @@ class BattleFunction {
     if (activated) {
       // TODO: confirm if connected functions have proper status check or only apply to succeeded targets
       if (data.connectedFunction.isNotEmpty) {
-        for (final functionId in data.connectedFunction) {
+        final List<int> functionsToExecute = [];
+
+        if (data.functionType == FunctionType.cycleUse) {
+          functionsToExecute.add(data.connectedFunction[(timesActivated - 1) % data.connectedFunction.length]);
+        } else {
+          functionsToExecute.addAll(data.connectedFunction);
+        }
+
+        for (final functionId in functionsToExecute) {
           final functionData = gameData.functionTable[functionId];
           if (functionData != null) {
             final connectedFunction = BattleFunction(functionData, ownerUniqueId);
             // connected function likely doesn't check trigger target
-            connectedFunction.executeFunction(event, simulation);
+            connectedFunction.executeFunction(event, simulation, parentFunctionValue: data.functionValue);
           }
         }
       }

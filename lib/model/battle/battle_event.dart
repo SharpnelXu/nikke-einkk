@@ -28,9 +28,16 @@ class NikkeFireEvent extends BattleEvent {
   String name;
   int currentAmmo;
   int maxAmmo;
+  bool isFullCharge;
   int ownerUniqueId;
 
-  NikkeFireEvent({required this.name, required this.currentAmmo, required this.maxAmmo, required this.ownerUniqueId});
+  NikkeFireEvent({
+    required this.name,
+    required this.isFullCharge,
+    required this.currentAmmo,
+    required this.maxAmmo,
+    required this.ownerUniqueId,
+  });
 
   @override
   buildDisplay() {
@@ -77,6 +84,8 @@ class NikkeDamageEvent extends BattleEvent {
   late int targetUniqueId;
   late int chargePercent;
   late int shotCount;
+  bool isShareDamage = false;
+  int shareCount = 0;
   int? partId;
 
   late NikkeDamageParameter damageParameter;
@@ -177,6 +186,7 @@ class NikkeDamageEvent extends BattleEvent {
     required BattleNikke nikke,
     required BattleRapture rapture,
     required int damageRate,
+    this.isShareDamage = false,
   }) {
     name = nikke.name;
     type = NikkeDamageType.skill;
@@ -184,6 +194,7 @@ class NikkeDamageEvent extends BattleEvent {
     targetUniqueId = rapture.uniqueId;
 
     shotCount = 1;
+    shareCount = simulation.raptures.length; // just share damage to all enemies
     chargePercent = 0;
 
     // TODO: fill in other buff params
@@ -200,6 +211,7 @@ class NikkeDamageEvent extends BattleEvent {
       isStrongElement: nikke.element.strongAgainst(rapture.element),
       elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
       addDamageBuff: nikke.getAddDamageBuffValues(simulation),
+      distributedDamageBuff: isShareDamage ? nikke.getShareDamageBuffValues(simulation) : 0,
     );
   }
 
@@ -237,18 +249,32 @@ class NikkeDamageEvent extends BattleEvent {
   Widget buildDisplay() {
     final criticalPercent = min(BattleUtils.toModifier(damageParameter.criticalRate), 1);
     final corePercent = min(BattleUtils.toModifier(damageParameter.coreHitRate), 1);
-    final nonCriticalPercent = 1 - criticalPercent;
+    final nonCritPercent = 1 - criticalPercent;
     final nonCorePercent = 1 - corePercent;
+    final basePercent = nonCritPercent * nonCorePercent;
+    final coreCritPercent = criticalPercent * corePercent;
 
-    return Text(
-      '$name (Pos $attackerUniqueId) ${type.name} damage: ${damageParameter.calculateExpectedDamage()}'
-      '${shotCount > 1 ? ' ($shotCount Shots)' : ''}'
-      '${chargePercent > 0 ? ' Charge: ${(chargePercent / 100).toStringAsFixed(2)}%' : ''}'
-      ' (Base: ${damageParameter.calculateDamage()} ${((nonCriticalPercent * nonCorePercent) * 100).toStringAsFixed(2)}%'
-      ' Core: ${damageParameter.calculateDamage(core: true)} ${(corePercent * 100).toStringAsFixed(2)}%,'
-      ' Crit: ${damageParameter.calculateDamage(critical: true)} ${(criticalPercent * 100).toStringAsFixed(2)}%)'
-      ' Core + Crit: ${damageParameter.calculateDamage(core: true, critical: true)} ${(criticalPercent * corePercent).toStringAsFixed(2)}%',
-    );
+    final nameText = '$name (Pos $attackerUniqueId) ${type.name} damage: ${damageParameter.calculateExpectedDamage()}';
+    final shotText = shotCount > 1 ? ' ($shotCount Shots)' : '';
+    final chargeText = chargePercent > 0 ? ' Charge: ${(chargePercent / 100).toStringAsFixed(2)}%' : '';
+    final baseText =
+        basePercent > 0 ? ' Base: ${damageParameter.calculateDamage()} ${(basePercent * 100).toStringAsFixed(2)}%' : '';
+    final coreText =
+        corePercent > 0
+            ? ' Core: ${damageParameter.calculateDamage(core: true)} ${(corePercent * 100).toStringAsFixed(2)}%'
+            : '';
+    final critText =
+        criticalPercent > 0
+            ? ' Crit: ${damageParameter.calculateDamage(critical: true)} ${(criticalPercent * 100).toStringAsFixed(2)}%'
+            : '';
+    final coreCritText =
+        coreCritPercent > 0
+            ? ' Core + Crit: ${damageParameter.calculateDamage(core: true, critical: true)}'
+                ' ${(criticalPercent * 100).toStringAsFixed(2)}%'
+            : '';
+    final shareText = isShareDamage ? ' Shared by $shotCount targets' : '';
+
+    return Text('$nameText$shotText$chargeText$baseText$coreText$critText$coreCritText$shareText');
   }
 }
 

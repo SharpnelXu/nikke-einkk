@@ -3,6 +3,7 @@ import 'package:nikke_einkk/model/battle/harmony_cube.dart';
 
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/module/battle_timeline.dart';
+import 'package:nikke_einkk/temp/my_nikkes.dart';
 
 import 'model/battle/battle_simulator.dart';
 import 'model/battle/equipment.dart';
@@ -23,239 +24,40 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final sync = 885;
     final BattlePlayerOptions playerOptions = BattlePlayerOptions(
       personalRecycleLevel: 420,
       corpRecycleLevels: {
-        Corporation.pilgrim: 417,
-        Corporation.missilis: 196,
-        Corporation.abnormal: 155,
-        Corporation.tetra: 224,
-        Corporation.elysion: 197,
+        Corporation.elysion: 201,
+        Corporation.tetra: 226,
+        Corporation.missilis: 199,
+        Corporation.pilgrim: 418,
+        Corporation.abnormal: 156,
       },
-      classRecycleLevels: {NikkeClass.attacker: 212, NikkeClass.supporter: 193, NikkeClass.defender: 184},
+      classRecycleLevels: {NikkeClass.attacker: 212, NikkeClass.defender: 187, NikkeClass.supporter: 197},
     );
-    final BattleNikkeOptions scarletOption = BattleNikkeOptions(
-      nikkeResourceId: 222,
-      coreLevel: 11,
-      syncLevel: 884,
-      attractLevel: 40,
-      skillLevels: [10, 10, 10],
-      equips: [
-        BattleEquipment(
-          type: EquipType.head,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAmmo, 9), EquipLine(EquipLineType.increaseElementalDamage, 9)],
-        ),
-        BattleEquipment(
-          type: EquipType.body,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [
-            EquipLine(EquipLineType.statChargeTime, 2),
-            EquipLine(EquipLineType.statAmmo, 5),
-            EquipLine(EquipLineType.statDef, 9),
-          ],
-        ),
-        BattleEquipment(
-          type: EquipType.arm,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAtk, 10), EquipLine(EquipLineType.statAmmo, 3)],
-        ),
-        BattleEquipment(
-          type: EquipType.leg,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [
-            EquipLine(EquipLineType.statChargeDamage, 1),
-            EquipLine(EquipLineType.statAtk, 14),
-            EquipLine(EquipLineType.statAmmo, 5),
-          ],
-        ),
-      ],
-      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.ar, Rarity.sr)!, 5),
-      cube: null,
-    );
-    final BattleNikkeOptions aliceOption = BattleNikkeOptions(
-      nikkeResourceId: 191,
-      coreLevel: 11,
-      syncLevel: 884,
-      attractLevel: 30,
-      skillLevels: [10, 6, 10],
-      equips: [
-        BattleEquipment(
-          type: EquipType.head,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [
-            EquipLine(EquipLineType.statAtk, 9),
-            EquipLine(EquipLineType.statChargeTime, 7),
-            EquipLine(EquipLineType.statAmmo, 13),
-          ],
-        ),
-        BattleEquipment(
-          type: EquipType.body,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAmmo, 11), EquipLine(EquipLineType.statAtk, 5)],
-        ),
-        BattleEquipment(
-          type: EquipType.arm,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAtk, 11), EquipLine(EquipLineType.statChargeTime, 9)],
-        ),
-        BattleEquipment(
-          type: EquipType.leg,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAtk, 11), EquipLine(EquipLineType.statAmmo, 7)],
-        ),
-      ],
-      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.sr, Rarity.sr)!, 15),
-      cube: null,
-    );
-    final BattleNikkeOptions snowWhiteOption = BattleNikkeOptions(
-      nikkeResourceId: 220,
-      coreLevel: 11,
-      syncLevel: 884,
-      attractLevel: 40,
-      skillLevels: [7, 10, 10],
-      equips: [
-        BattleEquipment(
-          type: EquipType.head,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAtk, 5)],
-        ),
-        BattleEquipment(
-          type: EquipType.body,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAtk, 8)],
-        ),
-        BattleEquipment(
-          type: EquipType.arm,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAtk, 5)],
-        ),
-        BattleEquipment(
-          type: EquipType.leg,
-          equipClass: NikkeClass.attacker,
-          rarity: EquipRarity.t10,
-          level: 1,
-          equipLines: [EquipLine(EquipLineType.statAtk, 11)],
-        ),
-      ],
-      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.ar, Rarity.r)!, 0),
-      cube: null,
-    );
+    final BattleHarmonyCube reloadCube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15);
+    final BattleHarmonyCube gainAmmoCube = BattleHarmonyCube(HarmonyCubeType.gainAmmo.cubeId, 15);
+    final BattleHarmonyCube burstCube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 15);
 
-    final BattleNikkeOptions literOption = BattleNikkeOptions(
-      nikkeResourceId: 82,
-      coreLevel: 11,
-      syncLevel: 884,
-      attractLevel: 30,
-      skillLevels: [10, 6, 10],
-      equips: [
-        BattleEquipment(
-          type: EquipType.head,
-          equipClass: NikkeClass.supporter,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.increaseElementalDamage, 11)],
-        ),
-        BattleEquipment(
-          type: EquipType.body,
-          equipClass: NikkeClass.supporter,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAmmo, 11), EquipLine(EquipLineType.startAccuracyCircle, 11)],
-        ),
-        BattleEquipment(
-          type: EquipType.arm,
-          equipClass: NikkeClass.supporter,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statDef, 11), EquipLine(EquipLineType.statAmmo, 11)],
-        ),
-        BattleEquipment(
-          type: EquipType.leg,
-          equipClass: NikkeClass.supporter,
-          rarity: EquipRarity.t10,
-          level: 3,
-          equipLines: [
-            EquipLine(EquipLineType.increaseElementalDamage, 11),
-            EquipLine(EquipLineType.statChargeTime, 11),
-          ],
-        ),
-      ],
-      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.smg, Rarity.r)!, 0),
-      cube: null,
-    );
-    final crownOption = BattleNikkeOptions(
-      nikkeResourceId: 330,
-      coreLevel: 11,
-      syncLevel: 884,
-      attractLevel: 40,
-      skillLevels: [10, 10, 10],
-      equips: [
-        BattleEquipment(
-          type: EquipType.head,
-          equipClass: NikkeClass.defender,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [],
-        ),
-        BattleEquipment(
-          type: EquipType.body,
-          equipClass: NikkeClass.defender,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
-        ),
-        BattleEquipment(
-          type: EquipType.arm,
-          equipClass: NikkeClass.defender,
-          rarity: EquipRarity.t10,
-          level: 5,
-          equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
-        ),
-        BattleEquipment(
-          type: EquipType.leg,
-          equipClass: NikkeClass.defender,
-          rarity: EquipRarity.t10,
-          level: 3,
-          equipLines: [],
-        ),
-      ],
-      favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.mg, Rarity.sr)!, 15),
-      cube: null,
-    );
     final simulation = BattleSimulation(
       playerOptions: playerOptions,
       nikkeOptions: [
+        literOption.copy()
+          ..syncLevel = sync
+          ..cube = burstCube,
+        crownOption.copy()
+          ..syncLevel = sync
+          ..cube = reloadCube,
+        scarletBlackShadow.copy()
+          ..syncLevel = sync
+          ..cube = gainAmmoCube,
         aliceOption.copy()
-          ..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15)
-          ..chargeMode = NikkeFullChargeMode.never
+          ..syncLevel = sync
+          ..cube = reloadCube
           ..forceCancelShootDelay = true
-          ..alwaysFocus = true,
-        literOption,
-        crownOption,
-        scarletOption,
+          ..alwaysFocus = true
+          ..chargeMode = NikkeFullChargeMode.whenExitingBurst,
       ],
     );
 

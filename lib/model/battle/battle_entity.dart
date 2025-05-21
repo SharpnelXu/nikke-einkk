@@ -157,4 +157,18 @@ abstract class BattleEntity {
       );
     }
   }
+
+  int getTimingTriggerValueChange(BattleSimulation simulation, int baseValue, int groupId) {
+    int result = 0;
+    for (final buff in buffs) {
+      if (buff.data.functionType == FunctionType.timingTriggerValueChange && buff.targetGroupId == groupId) {
+        if (buff.data.functionValueType == ValueType.integer) {
+          result += buff.data.functionValue;
+        } else if (buff.data.functionValueType == ValueType.percent) {
+          result += (baseValue * BattleUtils.toModifier(buff.data.functionValue)).round();
+        }
+      }
+    }
+    return result;
+  }
 }
