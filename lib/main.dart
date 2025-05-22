@@ -6,8 +6,6 @@ import 'package:nikke_einkk/module/battle_timeline.dart';
 import 'package:nikke_einkk/temp/my_nikkes.dart';
 
 import 'model/battle/battle_simulator.dart';
-import 'model/battle/equipment.dart';
-import 'model/battle/favorite_item.dart';
 import 'model/battle/nikke.dart';
 import 'model/battle/rapture.dart';
 import 'model/common.dart';
@@ -58,6 +56,12 @@ class MyApp extends StatelessWidget {
           ..forceCancelShootDelay = true
           ..alwaysFocus = true
           ..chargeMode = NikkeFullChargeMode.whenExitingBurst,
+        helm.copy()
+          ..syncLevel = sync
+          ..cube = reloadCube
+          ..forceCancelShootDelay = true
+          ..alwaysFocus = true
+          ..chargeMode = NikkeFullChargeMode.always,
       ],
     );
 

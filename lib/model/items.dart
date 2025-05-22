@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:nikke_einkk/model/db.dart';
 
 import 'common.dart';
 
@@ -154,6 +155,21 @@ class EquipLine {
   set level(int newLevel) => _level = newLevel.clamp(1, 15);
 
   EquipLine(this.type, this._level);
+
+  EquipLine.onValue(this.type, int stat) : _level = 1 {
+    for (int level = 1; level <= 15; level += 1) {
+      _level = level;
+      final stateEffectData = gameData.stateEffectTable[getStateEffectId()]!;
+      for (final functionId in stateEffectData.functions) {
+        if (functionId.function != 0) {
+          final function = gameData.functionTable[functionId.function]!;
+          if (stat == function.functionValue) {
+            return;
+          }
+        }
+      }
+    }
+  }
 
   EquipLine.none() : type = EquipLineType.none, _level = 1;
 

@@ -362,4 +362,8 @@ class NikkeDatabase {
         .firstWhereOrNull((data) => data.favoriteRare == rarity && data.weaponType == weaponType)
         ?.id;
   }
+
+  int? getFavoriteItemId(int nameCode) {
+    return favoriteItemTable.values.firstWhereOrNull((data) => data.nameCode == nameCode)?.id;
+  }
 }

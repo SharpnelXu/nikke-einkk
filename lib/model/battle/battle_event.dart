@@ -120,7 +120,7 @@ class NikkeDamageEvent extends BattleEvent {
       coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
       coreDamageRate: weaponData.coreDamageRate,
       coreDamageBuff: nikke.getCoreDamageBuffValues(simulation),
-      criticalRate: nikke.getCriticalRate(simulation),
+      criticalRate: nikke.getCriticalRate(simulation) + nikke.getNormalCriticalBuff(simulation),
       criticalDamageRate: nikke.characterData.criticalDamage,
       criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
       isBonusRange: nikke.isBonusRange(rapture.distance),
@@ -134,6 +134,7 @@ class NikkeDamageEvent extends BattleEvent {
       partDamageBuff: pierce == 0 && partId != null ? nikke.getPartsDamageBuffValues(simulation) : 0,
       pierceDamageBuff: pierce > 0 ? nikke.getPierceDamageBuffValues(simulation) : 0,
       addDamageBuff: nikke.getAddDamageBuffValues(simulation),
+      breakDamageBuff: partId == null && rapture.hasRedCircle ? nikke.getBreakDamageBuff(simulation) : 0,
     );
   }
 
@@ -283,13 +284,13 @@ enum NikkeDamageType { bullet, skill, piercePart }
 
 class BurstGenerationEvent extends BattleEvent {
   String name = '';
-  late WeaponData weaponData;
   late int attackerUniqueId;
-  late int targetUniqueId;
+  int targetUniqueId = -1;
   int chargePercent = 0;
   int currentMeter = 0;
   int burst = 0;
   int positionBurstBonus = 10000;
+  bool isBullet = true;
 
   BurstGenerationEvent({
     required BattleSimulation simulation,
@@ -297,7 +298,7 @@ class BurstGenerationEvent extends BattleEvent {
     required BattleRapture rapture,
   }) {
     name = nikke.name;
-    weaponData = nikke.currentWeaponData;
+    final weaponData = nikke.currentWeaponData;
     attackerUniqueId = nikke.uniqueId;
     targetUniqueId = rapture.uniqueId;
     chargePercent =
@@ -317,6 +318,12 @@ class BurstGenerationEvent extends BattleEvent {
     burst = (baseBurst * weaponData.shotCount * BattleUtils.toModifier(positionBurstBonus)).round();
   }
 
+  BurstGenerationEvent.fill({required BattleSimulation simulation, required BattleNikke nikke, required this.burst}) {
+    name = nikke.name;
+    attackerUniqueId = nikke.uniqueId;
+    isBullet = false;
+  }
+
   @override
   int getActivatorUniqueId() {
     return attackerUniqueId;
@@ -334,7 +341,7 @@ class BurstGenerationEvent extends BattleEvent {
     return Text(
       '$name (Pos $attackerUniqueId) Burst Gen: ${(updatedBurst / 10000).toStringAsFixed(4)}%'
       ' (+${(burst / 10000).toStringAsFixed(4)}%)'
-      '${positionBurstBonus > 10000 ? ' Bonus: ${(positionBurstBonus / 100).toStringAsFixed(2)}%' : ''}',
+      '${positionBurstBonus > 10000 && isBullet ? ' Bonus: ${(positionBurstBonus / 100).toStringAsFixed(2)}%' : ''}',
     );
   }
 }

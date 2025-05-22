@@ -60,6 +60,7 @@ class NikkeDamageParameter {
   int interruptionPartDamageBuff = 0;
   int sustainedDamageBuff = 0;
   int pierceDamageBuff = 0;
+  int breakDamageBuff = 0;
 
   // receive damage, distribute
   int receiveDamageBuff = 0;
@@ -90,6 +91,7 @@ class NikkeDamageParameter {
     this.interruptionPartDamageBuff = 0,
     this.sustainedDamageBuff = 0,
     this.pierceDamageBuff = 0,
+    this.breakDamageBuff = 0,
     this.receiveDamageBuff = 0,
     this.distributedDamageBuff = 0,
   });
@@ -121,6 +123,7 @@ class NikkeDamageParameter {
         'interruptionPartDamageBuff: $interruptionPartDamageBuff, '
         'sustainedDamageBuff: $sustainedDamageBuff, '
         'pierceDamageBuff: $pierceDamageBuff, '
+        'breakDamageBuff: $breakDamageBuff, '
         'receiveDamageBuff: $receiveDamageBuff, '
         'distributedDamageBuff: $distributedDamageBuff'
         '}';
@@ -152,6 +155,7 @@ class NikkeDamageParameter {
       interruptionPartDamageBuff: interruptionPartDamageBuff,
       sustainedDamageBuff: sustainedDamageBuff,
       pierceDamageBuff: pierceDamageBuff,
+      breakDamageBuff: breakDamageBuff,
       receiveDamageBuff: receiveDamageBuff,
       distributedDamageBuff: distributedDamageBuff,
     );

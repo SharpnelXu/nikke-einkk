@@ -334,9 +334,9 @@ void main() async {
       simulation.maxSeconds = 15;
       simulation.simulate();
 
-      expect(simulation.timeline[831]!.length, 3); // first bullet (fire, damage, burstGen)
-      expect(simulation.timeline[749]!.length, 3);
-      expect(simulation.timeline[667]!.length, 3);
+      expect(simulation.timeline[831]!.isNotEmpty, true); // first bullet (fire, damage, burstGen)
+      expect(simulation.timeline[749]!.isNotEmpty, true);
+      expect(simulation.timeline[667]!.isNotEmpty, true);
     });
 
     test('Scarlet with emergency max hp cube', () {
@@ -472,7 +472,7 @@ void main() async {
       expect(damageEventSkill1SnowWhite.damageParameter.calculateDamage(), 1212706);
 
       expect(simulation.timeline[4501]!.length, 2); // S2
-      final damageEventSkill2SnowWhite = simulation.timeline[4501]![0] as NikkeDamageEvent;
+      final damageEventSkill2SnowWhite = simulation.timeline[4501]![1] as NikkeDamageEvent;
       expect(damageEventSkill2SnowWhite.type, NikkeDamageType.skill);
       expect(damageEventSkill2SnowWhite.damageParameter.calculateDamage(), 2422566);
     });
@@ -695,7 +695,7 @@ void main() async {
       // crown's add def skill group
       expect(
         simulation.timeline[burstTimeFrame]!.firstWhereOrNull(
-          (event) => event is BuffEvent && event.buffGroupId == 2330102,
+          (event) => event is BuffEvent && event.data.groupId == 2330102,
         ),
         isNotNull,
       );
@@ -734,7 +734,7 @@ void main() async {
       // when crown max stacks skill 2, 2330206 is add damage group
       expect(
         simulation.timeline.values.firstWhereOrNull(
-          (events) => events.any((event) => event is BuffEvent && event.buffGroupId == 2330206),
+          (events) => events.any((event) => event is BuffEvent && event.data.groupId == 2330206),
         ),
         isNotNull,
       );

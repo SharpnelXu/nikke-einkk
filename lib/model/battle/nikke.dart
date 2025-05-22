@@ -709,6 +709,10 @@ class BattleNikke extends BattleEntity {
     return characterData.criticalRatio + getPlainBuffValues(simulation, FunctionType.statCritical);
   }
 
+  int getNormalCriticalBuff(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.normalStatCritical);
+  }
+
   /// nikke specific buffs
   int getAccuracyCircleScale(BattleSimulation simulation) {
     return getBuffValue(
@@ -798,5 +802,9 @@ class BattleNikke extends BattleEntity {
 
   int getPierce(BattleSimulation simulation) {
     return currentWeaponData.penetration + getPlainBuffValues(simulation, FunctionType.statPenetration);
+  }
+
+  int getBreakDamageBuff(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.breakDamage);
   }
 }

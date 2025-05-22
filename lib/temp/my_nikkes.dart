@@ -264,3 +264,51 @@ final scarletBlackShadow = BattleNikkeOptions(
   favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.rl, Rarity.sr)!, 15),
   cube: null,
 );
+
+final helm = BattleNikkeOptions(
+  nikkeResourceId: 352,
+  coreLevel: 11,
+  syncLevel: 884,
+  attractLevel: 30,
+  skillLevels: [10, 10, 10],
+  equips: [
+    BattleEquipment(
+      type: EquipType.head,
+      equipClass: NikkeClass.attacker,
+      rarity: EquipRarity.t10,
+      level: 5,
+      equipLines: [
+        EquipLine.onValue(EquipLineType.statCritical, 366),
+        EquipLine(EquipLineType.statAtk, 13),
+        EquipLine(EquipLineType.increaseElementalDamage, 10),
+      ],
+    ),
+    BattleEquipment(
+      type: EquipType.body,
+      equipClass: NikkeClass.attacker,
+      rarity: EquipRarity.t10,
+      level: 5,
+      equipLines: [EquipLine(EquipLineType.statAtk, 15), EquipLine(EquipLineType.increaseElementalDamage, 8)],
+    ),
+    BattleEquipment(
+      type: EquipType.arm,
+      equipClass: NikkeClass.attacker,
+      rarity: EquipRarity.t10,
+      level: 5,
+      equipLines: [EquipLine(EquipLineType.statAtk, 12), EquipLine(EquipLineType.increaseElementalDamage, 11)],
+    ),
+    BattleEquipment(
+      type: EquipType.leg,
+      equipClass: NikkeClass.attacker,
+      rarity: EquipRarity.t10,
+      level: 0,
+      equipLines: [
+        EquipLine.onValue(EquipLineType.statAmmo, 4428),
+        EquipLine(EquipLineType.statAtk, 11),
+        EquipLine(EquipLineType.increaseElementalDamage, 8),
+      ],
+    ),
+  ],
+  favoriteItem: BattleFavoriteItem(gameData.getFavoriteItemId(5066)!, 2),
+  cube: null,
+);

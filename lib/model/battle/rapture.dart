@@ -46,9 +46,7 @@ class BattleRapture extends BattleEntity {
 
   List<BattleRaptureParts> parts = [];
 
-  bool hasParts() {
-    return parts.isNotEmpty;
-  }
+  bool hasRedCircle = false;
 
   bool hasPartsInFront() {
     return parts.isNotEmpty && parts.any((part) => !part.isBehindBoss);

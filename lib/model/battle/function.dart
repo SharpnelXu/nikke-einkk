@@ -60,7 +60,8 @@ class BattleFunction {
         break;
       case TimingTriggerType.onHpRatioUnder:
         // all standard is User
-        if (event is! HpChangeEvent || standard == null || standard.uniqueId != ownerUniqueId) return;
+        final checkEventType = event is HpChangeEvent || event is BattleStartEvent;
+        if (!checkEventType || standard == null || standard.uniqueId != ownerUniqueId) return;
 
         final hpPercent = standard.currentHp / standard.getMaxHp(simulation);
         if ((hpPercent * 10000).round() <= timingTriggerValue) {
@@ -76,7 +77,8 @@ class BattleFunction {
         break;
       case TimingTriggerType.onHpRatioUp:
         // all standard is User
-        if (event is! HpChangeEvent || standard == null || standard.uniqueId != ownerUniqueId) return;
+        final checkEventType = event is HpChangeEvent || event is BattleStartEvent;
+        if (!checkEventType || standard == null || standard.uniqueId != ownerUniqueId) return;
 
         final hpPercent = standard.currentHp / standard.getMaxHp(simulation);
         if ((hpPercent * 10000).round() >= timingTriggerValue) {
@@ -113,14 +115,59 @@ class BattleFunction {
           executeFunction(event, simulation);
         }
         break;
-      case TimingTriggerType.onFullChargeShotNum:
-        if (event is! NikkeFireEvent || standard?.uniqueId != ownerUniqueId) return;
+      case TimingTriggerType.onFullChargeHit:
+        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId) return;
+
+        if (standard is BattleNikke && event.chargePercent >= 10000) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onFullChargeHitNum:
+        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId) return;
 
         if (standard is BattleNikke &&
+            event.chargePercent >= 10000 &&
             standard.totalFullChargeFired > 0 &&
             standard.totalFullChargeFired % timingTriggerValue == 0) {
           executeFunction(event, simulation);
         }
+        break;
+      case TimingTriggerType.onFullCharge:
+      case TimingTriggerType.onFullChargeShot:
+        if (event is! NikkeFireEvent || standard?.uniqueId != ownerUniqueId) return;
+
+        if (standard is BattleNikke && event.isFullCharge) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onFullChargeNum:
+      case TimingTriggerType.onFullChargeShotNum:
+        if (event is! NikkeFireEvent || standard?.uniqueId != ownerUniqueId) return;
+
+        if (standard is BattleNikke &&
+            event.isFullCharge &&
+            standard.totalFullChargeFired > 0 &&
+            standard.totalFullChargeFired % timingTriggerValue == 0) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onLastAmmoUse:
+        if (event is! NikkeFireEvent || standard is! BattleNikke || standard.uniqueId != ownerUniqueId) return;
+
+        if (standard.currentAmmo == 0) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onLastShotHit:
+        // triggerValue is probability
+        if (event is! NikkeDamageEvent || standard is! BattleNikke || standard.uniqueId != ownerUniqueId) return;
+
+        if (event.type == NikkeDamageType.bullet && standard.currentAmmo == 0) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onResurrection:
+        // TODO: implement with Resurrection
         break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
@@ -135,11 +182,6 @@ class BattleFunction {
       case TimingTriggerType.onDead:
       case TimingTriggerType.onEndFullBurst:
       case TimingTriggerType.onEndReload:
-      case TimingTriggerType.onFullCharge:
-      case TimingTriggerType.onFullChargeHit:
-      case TimingTriggerType.onFullChargeHitNum:
-      case TimingTriggerType.onFullChargeNum:
-      case TimingTriggerType.onFullChargeShot:
       case TimingTriggerType.onFunctionBuffCheck:
       case TimingTriggerType.onFunctionOff:
       case TimingTriggerType.onFunctionOn:
@@ -153,8 +195,6 @@ class BattleFunction {
       case TimingTriggerType.onInstantDeath:
       case TimingTriggerType.onKeepFullcharge:
       case TimingTriggerType.onKillRatio:
-      case TimingTriggerType.onLastAmmoUse:
-      case TimingTriggerType.onLastShotHit:
       case TimingTriggerType.onNikkeDead:
       case TimingTriggerType.onPartsBrokenNum:
       case TimingTriggerType.onPartsHitNum:
@@ -162,7 +202,6 @@ class BattleFunction {
       case TimingTriggerType.onPartsHurtCount:
       case TimingTriggerType.onPelletHitNum:
       case TimingTriggerType.onPelletHitPerShot:
-      case TimingTriggerType.onResurrection:
       case TimingTriggerType.onShotNotFullCharge:
       case TimingTriggerType.onShotRatio:
       case TimingTriggerType.onSpawnMonster:
@@ -183,6 +222,10 @@ class BattleFunction {
     switch (data.timingTriggerStandard) {
       case StandardType.user:
       case StandardType.none:
+        if (event is BattleStartEvent) {
+          return simulation.getEntityByUniqueId(ownerUniqueId);
+        }
+
         // a lot of timingTriggerTypes have standards set to none which clearly need an countTarget, so default to
         // activator. examples include Elegg S2
         return simulation.getEntityByUniqueId(event.getActivatorUniqueId());
@@ -268,6 +311,7 @@ class BattleFunction {
     switch (data.functionType) {
       case FunctionType.addDamage:
       case FunctionType.attention:
+      case FunctionType.breakDamage:
       case FunctionType.changeCoolTimeUlti: // act as a buff for rounding
       case FunctionType.coreShotDamageChange:
       case FunctionType.damageReduction:
@@ -280,6 +324,7 @@ class BattleFunction {
       case FunctionType.incElementDmg:
       case FunctionType.immuneDamage: // TODO: actually implement after hp deduction is real for boss
       case FunctionType.normalDamageRatioChange: // user & functionTarget (Rumani Burst)
+      case FunctionType.normalStatCritical:
       case FunctionType.partsDamage:
       case FunctionType.penetrationDamage:
       case FunctionType.removeFunctionGroup: // probably better to remove at end of frame
@@ -304,7 +349,10 @@ class BattleFunction {
         // all function standard is user
         final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
-          activated |= checkTargetStatus(event, simulation, target);
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck) continue;
+
+          activated = true;
           if (data.functionValueType == ValueType.integer) {
             target.changeHp(simulation, data.functionValue);
           } else if (data.functionValueType == ValueType.percent) {
@@ -326,7 +374,10 @@ class BattleFunction {
         final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
           if (target is BattleRapture) {
-            activated |= checkTargetStatus(event, simulation, target);
+            final statusCheck = checkTargetStatus(event, simulation, target);
+            if (!statusCheck) continue;
+
+            activated = true;
             simulation.registerEvent(
               simulation.currentFrame,
               NikkeDamageEvent.skill(
@@ -344,7 +395,10 @@ class BattleFunction {
         for (final target in functionTargets) {
           if (target is! BattleNikke) continue;
 
-          activated |= checkTargetStatus(event, simulation, target);
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck) continue;
+
+          activated = true;
           if (data.functionValueType == ValueType.integer) {
             target.cover.changeHp(simulation, data.functionValue, true);
           } else if (data.functionValueType == ValueType.percent) {
@@ -357,7 +411,10 @@ class BattleFunction {
       case FunctionType.healCharacter:
         final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
-          activated |= checkTargetStatus(event, simulation, target);
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck) continue;
+
+          activated = true;
 
           final activator = simulation.getEntityByUniqueId(event.getActivatorUniqueId());
           final healVariation = activator?.getHealVariation(simulation) ?? 0;
@@ -375,10 +432,36 @@ class BattleFunction {
         }
         break;
       case FunctionType.useCharacterSkillId:
-        final skill = gameData.characterSkillTable[data.functionValue];
-        if (skill != null) {
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck) continue;
+
+          final skill = gameData.characterSkillTable[data.functionValue];
+          if (skill != null) {
+            activated = true;
+            BattleSkill.activateSkill(
+              simulation,
+              skill,
+              target.uniqueId,
+              gameData.skillInfoTable[skill.id]!.groupId,
+              -1,
+            );
+          }
+        }
+        break;
+      case FunctionType.burstGaugeCharge:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck || target is! BattleNikke) continue;
+
           activated = true;
-          BattleSkill.activateSkill(simulation, skill, ownerUniqueId, gameData.skillInfoTable[skill.id]!.groupId, -1);
+          final burst = BattleUtils.toModifier(data.functionValue) * BattleSimulation.burstMeterCap;
+          simulation.registerEvent(
+            simulation.currentFrame,
+            BurstGenerationEvent.fill(simulation: simulation, nikke: target, burst: burst.round()),
+          );
         }
         break;
       case FunctionType.cycleUse: // this cycles through connected functions, no actual use
@@ -395,9 +478,7 @@ class BattleFunction {
       case FunctionType.atkReplaceMaxHpRate:
       case FunctionType.barrierDamage:
       case FunctionType.bonusRangeDamageChange:
-      case FunctionType.breakDamage:
       case FunctionType.buffRemove:
-      case FunctionType.burstGaugeCharge:
       case FunctionType.callingMonster:
       case FunctionType.changeChangeBurstStep:
       case FunctionType.changeCoolTimeAll:
@@ -465,7 +546,6 @@ class BattleFunction {
       case FunctionType.instantDeath:
       case FunctionType.linkAtk:
       case FunctionType.linkDef:
-      case FunctionType.normalStatCritical:
       case FunctionType.outBonusRangeDamageChange:
       case FunctionType.overHealSave:
       case FunctionType.partsHpChangeUIOff:

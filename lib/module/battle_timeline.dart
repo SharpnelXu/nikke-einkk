@@ -106,11 +106,19 @@ class _BattleTimelineState extends State<BattleTimeline> {
 
   List<Widget> buildFrameEvents(List<BattleEvent> events) {
     final List<Widget> result = [];
-    final allowList = [ChangeBurstStepEvent, BuffEvent, ExitFullBurstEvent, UseSkillEvent, NikkeDamageEvent];
+    final allowList = [
+      ChangeBurstStepEvent,
+      BuffEvent,
+      ExitFullBurstEvent,
+      UseSkillEvent,
+      NikkeDamageEvent,
+      BurstGenerationEvent,
+    ];
     for (final event in events) {
       if (!allowList.contains(event.runtimeType)) continue;
 
       if (event is NikkeDamageEvent && [2, 1].contains(event.attackerUniqueId)) continue;
+      if (event is BurstGenerationEvent && [2, 1].contains(event.attackerUniqueId)) continue;
 
       result.add(event.buildDisplay());
     }
