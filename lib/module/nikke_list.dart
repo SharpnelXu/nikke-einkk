@@ -1,8 +1,12 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nikke_einkk/model/battle/equipment.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
 
@@ -262,6 +266,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                 Expanded(
                   child: RangedNumberTextField(
                     maxValue: gameData.maxSyncLevel,
+                    defaultValue: option.syncLevel,
                     onChangeFunction:
                         (newValue) => setState(() {
                           option.syncLevel = newValue;
@@ -306,12 +311,72 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                 },
               ),
             ),
+            ...List.generate(
+              4,
+              (index) => _buildEquipmentOption(characterData?.characterClass, EquipType.values[index + 1]),
+            ),
           ].map((widget) => Padding(padding: const EdgeInsets.all(5), child: widget)).toList(),
     );
 
     return Scaffold(
       appBar: AppBar(title: const Text('Nikke Options')),
-      body: Row(children: [filterList, SizedBox(width: 250, child: optionColumn)]),
+      body: Row(
+        children: [
+          filterList,
+          Container(width: 250, alignment: Alignment.topLeft, child: SingleChildScrollView(child: optionColumn)),
+        ],
+      ),
+    );
+  }
+
+  static final List<DropdownMenuEntry<EquipRarity>> menuEntries = UnmodifiableListView<DropdownMenuEntry<EquipRarity>>(
+    EquipRarity.values.map<DropdownMenuEntry<EquipRarity>>(
+      (EquipRarity rare) => DropdownMenuEntry<EquipRarity>(
+        value: rare,
+        label: rare == EquipRarity.unknown ? 'None' : rare.name.toUpperCase(),
+      ),
+    ),
+  );
+
+  Widget _buildEquipmentOption(NikkeClass? nikkeClass, EquipType type) {
+    final equipListIndex = type.index - 1;
+    final equipment = option.equips[equipListIndex];
+    return Container(
+      padding: const EdgeInsets.all(3.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: equipment?.rarity.color ?? Colors.grey, width: 2),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        spacing: 2,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            spacing: 3,
+            children: [
+              Text('${type.name.toUpperCase()} Gear:'),
+              DropdownMenu<EquipRarity>(
+                initialSelection: equipment?.rarity ?? EquipRarity.unknown,
+                onSelected: (EquipRarity? value) {
+                  if (equipment == null) {
+                    option.equips[equipListIndex] = BattleEquipment(
+                      type: type,
+                      equipClass: nikkeClass ?? NikkeClass.unknown,
+                      rarity: value!,
+                    );
+                  } else {
+                    equipment.type = type;
+                    equipment.equipClass = nikkeClass ?? NikkeClass.unknown;
+                    equipment.rarity = value!;
+                  }
+                  setState(() {});
+                },
+                dropdownMenuEntries: menuEntries,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

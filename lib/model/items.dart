@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/db.dart';
 
@@ -103,6 +104,31 @@ enum EquipRarity {
   t8,
   t9,
   t10;
+
+  Color get color {
+    switch (this) {
+      case EquipRarity.unknown:
+      case EquipRarity.t1:
+      case EquipRarity.t2:
+        return Colors.grey;
+      case EquipRarity.t3:
+        return Colors.lightGreen;
+      case EquipRarity.t4:
+        return Colors.green;
+      case EquipRarity.t5:
+        return Colors.indigo;
+      case EquipRarity.t6:
+        return Colors.blue;
+      case EquipRarity.t7:
+        return Colors.deepPurple;
+      case EquipRarity.t8:
+        return Colors.purple;
+      case EquipRarity.t9:
+        return Colors.orange;
+      case EquipRarity.t10:
+        return Colors.purpleAccent;
+    }
+  }
 
   int get maxLevel => switch (this) {
     EquipRarity.unknown => -1,

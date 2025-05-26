@@ -21,7 +21,7 @@ class BattleNikkeOptions {
   int coreLevel;
   int syncLevel;
   int attractLevel;
-  List<BattleEquipment> equips;
+  List<BattleEquipment?> equips;
   List<int> skillLevels;
   BattleHarmonyCube? cube;
   BattleFavoriteItem? favoriteItem;
@@ -35,7 +35,7 @@ class BattleNikkeOptions {
     this.coreLevel = 1,
     this.syncLevel = 1,
     this.attractLevel = 1,
-    List<BattleEquipment> equips = const [],
+    List<BattleEquipment?> equips = const [null, null, null, null],
     List<int> skillLevels = const [10, 10, 10],
     this.cube,
     this.favoriteItem,
@@ -57,7 +57,7 @@ class BattleNikkeOptions {
       coreLevel: coreLevel,
       syncLevel: syncLevel,
       attractLevel: attractLevel,
-      equips: equips.map((equip) => equip.copy()).toList(),
+      equips: equips.map((equip) => equip?.copy()).toList(),
       skillLevels: skillLevels.toList(),
       cube: cube?.copy(),
       favoriteItem: favoriteItem?.copy(),
@@ -127,7 +127,7 @@ class BattleNikke extends BattleEntity {
     coreEnhanceBaseRatio: statEnhanceData.coreHp,
     consoleStat: playerOptions.getRecycleHp(nikkeClass),
     bondStat: attractiveStat.hpRate,
-    equipStat: option.equips.fold(0, (sum, equip) => sum + equip.getStat(StatType.hp, corporation)),
+    equipStat: option.equips.fold(0, (sum, equip) => sum + (equip?.getStat(StatType.hp, corporation) ?? 0)),
     cubeStat: option.cube?.getStat(StatType.hp) ?? 0,
     dollStat: option.favoriteItem?.getStat(StatType.hp) ?? 0,
   );
@@ -139,7 +139,7 @@ class BattleNikke extends BattleEntity {
     coreEnhanceBaseRatio: statEnhanceData.coreAttack,
     consoleStat: playerOptions.getRecycleAttack(corporation),
     bondStat: attractiveStat.attackRate,
-    equipStat: option.equips.fold(0, (sum, equip) => sum + equip.getStat(StatType.atk, corporation)),
+    equipStat: option.equips.fold(0, (sum, equip) => sum + (equip?.getStat(StatType.atk, corporation) ?? 0)),
     cubeStat: option.cube?.getStat(StatType.atk) ?? 0,
     dollStat: option.favoriteItem?.getStat(StatType.atk) ?? 0,
   );
@@ -151,7 +151,7 @@ class BattleNikke extends BattleEntity {
     coreEnhanceBaseRatio: statEnhanceData.coreDefence,
     consoleStat: playerOptions.getRecycleDefence(nikkeClass, corporation),
     bondStat: attractiveStat.defenceRate,
-    equipStat: option.equips.fold(0, (sum, equip) => sum + equip.getStat(StatType.defence, corporation)),
+    equipStat: option.equips.fold(0, (sum, equip) => sum + (equip?.getStat(StatType.defence, corporation) ?? 0)),
     cubeStat: option.cube?.getStat(StatType.defence) ?? 0,
     dollStat: option.favoriteItem?.getStat(StatType.defence) ?? 0,
   );
@@ -268,7 +268,7 @@ class BattleNikke extends BattleEntity {
     skills.clear();
 
     for (final equip in option.equips) {
-      equip.applyEquipLines(simulation, this);
+      equip?.applyEquipLines(simulation, this);
     }
     option.cube?.applyCubeEffect(simulation, this);
     option.favoriteItem?.applyCollectionItemEffect(simulation, this);

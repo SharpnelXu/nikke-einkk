@@ -10,9 +10,9 @@ import 'package:nikke_einkk/model/items.dart';
 class BattleEquipment {
   // equipment stat formula: baseStat * (100% + 10% * (level (0~5) + sameCorpFactor (3)))
   // t10 does not have corp label
-  final EquipType type;
-  final NikkeClass equipClass;
-  final EquipRarity rarity;
+  EquipType type;
+  NikkeClass equipClass;
+  EquipRarity rarity;
   EquipmentData get equipData => gameData.groupedEquipTable[type]![equipClass]![rarity]!;
   Corporation _corporation = Corporation.none;
   Corporation get corporation => _corporation;
