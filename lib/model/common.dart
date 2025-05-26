@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part '../generated/model/common.g.dart';
@@ -149,6 +150,8 @@ class NikkeCharacterData {
   final String categoryType3;
   @JsonKey(unknownEnumValue: Corporation.unknown)
   final Corporation corporation;
+  @JsonKey(name: 'corporation_sub_type')
+  final CorporationSubType corporationSubType;
   @JsonKey(name: 'cv_localkey')
   final String cvLocalkey;
   final String squad;
@@ -198,6 +201,7 @@ class NikkeCharacterData {
     this.categoryType2 = '',
     this.categoryType3 = '',
     this.corporation = Corporation.unknown,
+    this.corporationSubType = CorporationSubType.none,
     this.cvLocalkey = '',
     this.squad = '',
     this.pieceId = 0,
@@ -218,6 +222,9 @@ class NikkeCharacterData {
         characterClass == NikkeClass.unknown;
   }
 }
+
+@JsonEnum(fieldRename: FieldRename.screamingSnake)
+enum CorporationSubType { none, overspec }
 
 @JsonSerializable()
 class WeaponData {
@@ -629,7 +636,25 @@ class AttractiveStatData {
 }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
-enum Rarity { unknown, ssr, sr, r }
+enum Rarity {
+  unknown,
+  ssr,
+  sr,
+  r;
+
+  Color get color {
+    switch (this) {
+      case Rarity.unknown:
+        return Colors.black;
+      case Rarity.ssr:
+        return Colors.orange;
+      case Rarity.sr:
+        return Colors.purple;
+      case Rarity.r:
+        return Colors.blue;
+    }
+  }
+}
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum StatType { atk, defence, hp, none, unknown }
@@ -701,6 +726,23 @@ enum NikkeElement {
         return other == NikkeElement.electric;
     }
   }
+
+  Color get color {
+    switch (this) {
+      case NikkeElement.unknown:
+        return Colors.black;
+      case NikkeElement.fire:
+        return Colors.red;
+      case NikkeElement.water:
+        return Colors.blue;
+      case NikkeElement.wind:
+        return Colors.lightGreen;
+      case NikkeElement.electric:
+        return Colors.deepPurple;
+      case NikkeElement.iron:
+        return Colors.orangeAccent;
+    }
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
@@ -721,6 +763,26 @@ enum BurstStep {
   final int step;
 
   const BurstStep(this.step);
+
+  @override
+  String toString() {
+    switch (this) {
+      case BurstStep.none:
+      case BurstStep.unknown:
+      case BurstStep.nextStep:
+        return name.toUpperCase();
+      case BurstStep.step1:
+        return 'I';
+      case BurstStep.step2:
+        return 'II';
+      case BurstStep.step3:
+        return 'III';
+      case BurstStep.stepFull:
+        return 'FB';
+      case BurstStep.allStep:
+        return 'ANY';
+    }
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)

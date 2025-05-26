@@ -42,6 +42,8 @@ NikkeCharacterData _$NikkeCharacterDataFromJson(Map<String, dynamic> json) => Ni
   corporation:
       $enumDecodeNullable(_$CorporationEnumMap, json['corporation'], unknownValue: Corporation.unknown) ??
       Corporation.unknown,
+  corporationSubType:
+      $enumDecodeNullable(_$CorporationSubTypeEnumMap, json['corporation_sub_type']) ?? CorporationSubType.none,
   cvLocalkey: json['cv_localkey'] as String? ?? '',
   squad: json['squad'] as String? ?? '',
   pieceId: (json['piece_id'] as num?)?.toInt() ?? 0,
@@ -84,6 +86,7 @@ Map<String, dynamic> _$NikkeCharacterDataToJson(NikkeCharacterData instance) => 
   'category_type_2': instance.categoryType2,
   'category_type_3': instance.categoryType3,
   'corporation': _$CorporationEnumMap[instance.corporation]!,
+  'corporation_sub_type': _$CorporationSubTypeEnumMap[instance.corporationSubType]!,
   'cv_localkey': instance.cvLocalkey,
   'squad': instance.squad,
   'piece_id': instance.pieceId,
@@ -129,6 +132,8 @@ const _$CorporationEnumMap = {
   Corporation.pilgrim: 'PILGRIM',
   Corporation.abnormal: 'ABNORMAL',
 };
+
+const _$CorporationSubTypeEnumMap = {CorporationSubType.none: 'NONE', CorporationSubType.overspec: 'OVERSPEC'};
 
 WeaponData _$WeaponDataFromJson(Map<String, dynamic> json) => WeaponData(
   id: (json['id'] as num?)?.toInt() ?? 0,

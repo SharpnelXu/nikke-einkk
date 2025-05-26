@@ -35,14 +35,15 @@ class BattleNikkeOptions {
     this.coreLevel = 1,
     this.syncLevel = 1,
     this.attractLevel = 1,
-    this.equips = const [],
-    this.skillLevels = const [10, 10, 10],
+    List<BattleEquipment> equips = const [],
+    List<int> skillLevels = const [10, 10, 10],
     this.cube,
     this.favoriteItem,
     this.alwaysFocus = false,
     this.forceCancelShootDelay = false,
     this.chargeMode = NikkeFullChargeMode.always,
-  }) {
+  }) : equips = equips.toList(),
+       skillLevels = skillLevels.toList() {
     final favoriteItemNameCode = favoriteItem?.data.nameCode ?? -1;
     if (favoriteItemNameCode > 0 &&
         favoriteItemNameCode != gameData.characterResourceGardeTable[nikkeResourceId]?[coreLevel]?.nameCode) {

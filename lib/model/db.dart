@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:logger/logger.dart';
@@ -66,6 +67,7 @@ class NikkeDatabase {
   final Map<int, Map<int, FavoriteItemLevelData>> favoriteItemLevelTable = {};
 
   bool dataLoaded = false;
+  int maxSyncLevel = 1;
 
   Future<bool> loadData() async {
     logger.i('Loading Database......');
@@ -103,6 +105,10 @@ class NikkeDatabase {
       for (final record in json['records']) {
         final character = NikkeCharacterData.fromJson(record);
         if (!character.isVisible) continue;
+
+        if (character.resourceId == 16) {
+          character.elementId.add(NikkeElement.iron.id);
+        }
 
         characterData[character.id] = character;
         characterResourceGardeTable.putIfAbsent(character.resourceId, () => <int, NikkeCharacterData>{});
@@ -164,6 +170,7 @@ class NikkeDatabase {
         final stat = CharacterStatData.fromJson(record);
         groupedCharacterStatTable.putIfAbsent(stat.group, () => <int, CharacterStatData>{});
         groupedCharacterStatTable[stat.group]![stat.level] = stat;
+        maxSyncLevel = max(maxSyncLevel, stat.level);
       }
     }
     return exists;
