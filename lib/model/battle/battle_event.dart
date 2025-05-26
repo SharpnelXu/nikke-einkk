@@ -170,7 +170,7 @@ class NikkeDamageEvent extends BattleEvent {
       criticalRate: nikke.getCriticalRate(simulation),
       criticalDamageRate: nikke.characterData.criticalDamage,
       criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
-      isBonusRange: nikke.isBonusRange(rapture.distance),
+      isBonusRange: nikke.currentWeaponType != WeaponType.rl ? nikke.isBonusRange(rapture.distance) : false,
       isFullBurst: simulation.burstStage == 4,
       isStrongElement: nikke.element.strongAgainst(rapture.element),
       elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),

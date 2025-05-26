@@ -5,6 +5,16 @@ import 'package:nikke_einkk/model/skills.dart';
 
 import 'battle_entity.dart';
 
+class BattleRaptureOptions {
+  String name = "Rapture";
+  bool isStageTarget = false;
+  int coreSize = 0;
+  int startDistance = 0;
+  int startHp = 1;
+  int startAttack = 0;
+  int startDefence = 0;
+}
+
 class BattleRaptureParts {
   int id;
   int maxHp = 10000;

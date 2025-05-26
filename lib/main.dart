@@ -10,6 +10,7 @@ import 'model/battle/nikke.dart';
 import 'model/battle/rapture.dart';
 import 'model/common.dart';
 import 'model/items.dart';
+import 'module/battle_setup.dart';
 
 Future<void> main() async {
   await gameData.loadData();
@@ -95,7 +96,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: BattleTimeline(simulation: simulation),
+      home: BattleSetupPage(),
     );
   }
 }
