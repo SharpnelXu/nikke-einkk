@@ -17,7 +17,7 @@ class BattleEquipment {
   Corporation _corporation = Corporation.none;
   Corporation get corporation => _corporation;
   set corporation(Corporation newCorp) {
-    if (rarity.canHaveCorp) corporation = newCorp;
+    if (rarity.canHaveCorp) _corporation = newCorp;
   }
 
   int _level = 0;

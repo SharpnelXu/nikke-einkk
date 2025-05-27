@@ -49,7 +49,6 @@ final BattleNikkeOptions scarletOption = BattleNikkeOptions(
       ],
     ),
   ],
-  favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.ar, Rarity.sr)!, 5),
   cube: null,
 );
 
@@ -93,7 +92,6 @@ final BattleNikkeOptions aliceOption = BattleNikkeOptions(
       equipLines: [EquipLine(EquipLineType.statAtk, 11), EquipLine(EquipLineType.statAmmo, 7)],
     ),
   ],
-  favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.sr, Rarity.sr)!, 15),
   cube: null,
 );
 
@@ -133,7 +131,6 @@ final BattleNikkeOptions snowWhiteOption = BattleNikkeOptions(
       equipLines: [EquipLine(EquipLineType.statAtk, 11)],
     ),
   ],
-  favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.ar, Rarity.r)!, 0),
   cube: null,
 );
 
@@ -173,7 +170,6 @@ final BattleNikkeOptions literOption = BattleNikkeOptions(
       equipLines: [EquipLine(EquipLineType.increaseElementalDamage, 11), EquipLine(EquipLineType.statChargeTime, 11)],
     ),
   ],
-  favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.smg, Rarity.r)!, 0),
   cube: null,
 );
 
@@ -213,7 +209,6 @@ final crownOption = BattleNikkeOptions(
       equipLines: [],
     ),
   ],
-  favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.mg, Rarity.sr)!, 15),
   cube: null,
 );
 
@@ -261,7 +256,6 @@ final scarletBlackShadow = BattleNikkeOptions(
       ],
     ),
   ],
-  favoriteItem: BattleFavoriteItem(gameData.getDollId(WeaponType.rl, Rarity.sr)!, 15),
   cube: null,
 );
 
@@ -309,6 +303,5 @@ final helm = BattleNikkeOptions(
       ],
     ),
   ],
-  favoriteItem: BattleFavoriteItem(gameData.getFavoriteItemId(5066)!, 2),
   cube: null,
 );

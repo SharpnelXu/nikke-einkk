@@ -131,7 +131,7 @@ enum EquipRarity {
   }
 
   int get maxLevel => switch (this) {
-    EquipRarity.unknown => -1,
+    EquipRarity.unknown => 0,
     EquipRarity.t1 || EquipRarity.t2 => 0,
     EquipRarity.t3 || EquipRarity.t4 => 3,
     EquipRarity.t5 || EquipRarity.t6 => 4,
@@ -165,13 +165,39 @@ enum EquipLineType {
   statAtk(7000800),
   statChargeDamage(7000900),
   statChargeTime(7001000),
-  statCriticalDamage(7001100),
-  statCritical(7001200),
+  statCriticalDamage(7001200),
+  statCritical(7001100),
   statDef(7001300);
 
   final int stateEffectIdBase;
 
   const EquipLineType(this.stateEffectIdBase);
+
+  @override
+  String toString() {
+    switch (this) {
+      case EquipLineType.none:
+        return 'None';
+      case EquipLineType.increaseElementalDamage:
+        return 'ElementDamage';
+      case EquipLineType.startAccuracyCircle:
+        return 'Accuracy';
+      case EquipLineType.statAmmo:
+        return 'Ammo';
+      case EquipLineType.statAtk:
+        return 'Attack';
+      case EquipLineType.statChargeDamage:
+        return 'ChargeDamage';
+      case EquipLineType.statChargeTime:
+        return 'ChargeSpeed';
+      case EquipLineType.statCriticalDamage:
+        return 'CriticalDamage';
+      case EquipLineType.statCritical:
+        return 'CriticalRate';
+      case EquipLineType.statDef:
+        return 'Defence';
+    }
+  }
 }
 
 class EquipLine {

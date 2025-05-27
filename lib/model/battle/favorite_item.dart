@@ -7,12 +7,15 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 
 class BattleFavoriteItem {
-  final int favoriteItemId;
-  final int level;
+  WeaponType weaponType;
+  Rarity rarity;
+  int level;
+  int nameCode;
 
-  BattleFavoriteItem(this.favoriteItemId, this.level);
+  BattleFavoriteItem({required this.weaponType, required this.rarity, this.level = 0, this.nameCode = 0});
 
-  FavoriteItemData get data => gameData.favoriteItemTable[favoriteItemId]!;
+  FavoriteItemData get data =>
+      rarity == Rarity.ssr ? gameData.nameCodeFavItemTable[nameCode]! : gameData.dollTable[weaponType]![rarity]!;
 
   FavoriteItemLevelData get levelData => gameData.favoriteItemLevelTable[data.levelEnhanceId]![level]!;
 
@@ -48,6 +51,6 @@ class BattleFavoriteItem {
   }
 
   BattleFavoriteItem copy() {
-    return BattleFavoriteItem(favoriteItemId, level);
+    return BattleFavoriteItem(weaponType: weaponType, rarity: rarity, level: level, nameCode: nameCode);
   }
 }

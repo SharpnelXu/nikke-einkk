@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:collection/collection.dart';
 import 'package:logger/logger.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/items.dart';
@@ -44,7 +43,6 @@ class NikkeDatabase {
   final Map<int, StateEffectData> stateEffectTable = {};
   final Map<int, FunctionData> functionTable = {};
   final Map<int, HarmonyCubeData> harmonyCubeTable = {};
-  final Map<int, FavoriteItemData> favoriteItemTable = {};
   final Map<int, CoverStatData> coverStatTable = {};
   final Map<int, SkillInfoData> skillInfoTable = {};
   final Map<String, Translation> localeCharacterTable = {};
@@ -61,6 +59,10 @@ class NikkeDatabase {
 
   // equips
   final Map<EquipType, Map<NikkeClass, Map<EquipRarity, EquipmentData>>> groupedEquipTable = {};
+
+  // favoriteItems
+  final Map<WeaponType, Map<Rarity, FavoriteItemData>> dollTable = {};
+  final Map<int, FavoriteItemData> nameCodeFavItemTable = {};
 
   // grouped by enhanceId, level
   final Map<int, Map<int, HarmonyCubeLevelData>> harmonyCubeLevelTable = {};
@@ -308,7 +310,12 @@ class NikkeDatabase {
       final json = jsonDecode(await table.readAsString());
       for (final record in json['records']) {
         final favoriteItem = FavoriteItemData.fromJson(record);
-        favoriteItemTable[favoriteItem.id] = favoriteItem;
+        if (favoriteItem.favoriteRare == Rarity.ssr) {
+          nameCodeFavItemTable[favoriteItem.nameCode] = favoriteItem;
+        } else {
+          dollTable.putIfAbsent(favoriteItem.weaponType, () => {});
+          dollTable[favoriteItem.weaponType]![favoriteItem.favoriteRare] = favoriteItem;
+        }
       }
     }
     return exists;
@@ -360,17 +367,5 @@ class NikkeDatabase {
 
   EquipmentData? getEquipData(EquipType equipType, NikkeClass nikkeClass, EquipRarity rarity) {
     return groupedEquipTable[equipType]?[nikkeClass]?[rarity];
-  }
-
-  int? getDollId(WeaponType weaponType, Rarity rarity) {
-    if (rarity == Rarity.ssr) return null;
-
-    return favoriteItemTable.values
-        .firstWhereOrNull((data) => data.favoriteRare == rarity && data.weaponType == weaponType)
-        ?.id;
-  }
-
-  int? getFavoriteItemId(int nameCode) {
-    return favoriteItemTable.values.firstWhereOrNull((data) => data.nameCode == nameCode)?.id;
   }
 }

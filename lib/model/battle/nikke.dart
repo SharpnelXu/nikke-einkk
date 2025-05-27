@@ -14,6 +14,7 @@ import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 class BattleNikkeOptions {
@@ -48,6 +49,84 @@ class BattleNikkeOptions {
     if (favoriteItemNameCode > 0 &&
         favoriteItemNameCode != gameData.characterResourceGardeTable[nikkeResourceId]?[coreLevel]?.nameCode) {
       favoriteItem = null;
+    }
+  }
+
+  void errorCorrection() {
+    if (!gameData.characterResourceGardeTable.containsKey(nikkeResourceId)) {
+      return;
+    }
+
+    syncLevel = syncLevel.clamp(1, gameData.maxSyncLevel);
+
+    final groupedData = gameData.characterResourceGardeTable[nikkeResourceId]!;
+    final coreLevels = groupedData.keys.toList();
+    coreLevels.sort();
+    coreLevel.clamp(coreLevels.first, coreLevels.last);
+
+    final characterData = groupedData[coreLevel]!;
+    final maxAttract = characterData.corporationSubType == CorporationSubType.overspec ? 40 : 30;
+    attractLevel = attractLevel.clamp(1, maxAttract);
+
+    for (int index = 0; index < 4; index += 1) {
+      if (equips.length <= index) {
+        equips.add(null);
+      } else if (equips[index] != null) {
+        final equipment = equips[index]!;
+        final type = EquipType.values[index + 1];
+        equipment.type = type;
+        equipment.equipClass = characterData.characterClass;
+        if (equipment.rarity.canHaveCorp && equipment.corporation != Corporation.none) {
+          equipment.corporation = characterData.corporation;
+        } else {
+          equipment.corporation = Corporation.none;
+        }
+        if (equipment.level > equipment.rarity.maxLevel) {
+          equipment.level = equipment.rarity.maxLevel;
+        }
+
+        if (equipment.rarity == EquipRarity.t10) {
+          for (int index = 0; index < 3; index += 1) {
+            if (equipment.equipLines.length <= index) {
+              equipment.equipLines.add(EquipLine.none());
+            } else {
+              equipment.equipLines[index].level = equipment.equipLines[index].level.clamp(1, 15);
+            }
+          }
+          if (equipment.equipLines.length > 3) {
+            equipment.equipLines = equipment.equipLines.sublist(0, 3);
+          }
+        } else {
+          equipment.equipLines.clear();
+        }
+      }
+    }
+    if (equips.length > 4) {
+      equips = equips.sublist(0, 4);
+    }
+
+    for (int index = 0; index < 3; index += 1) {
+      if (skillLevels.length <= index) {
+        skillLevels.add(1);
+      } else {
+        skillLevels[index] = skillLevels[index].clamp(1, 10);
+      }
+    }
+    if (skillLevels.length > 3) {
+      skillLevels = skillLevels.sublist(0, 3);
+    }
+
+    final doll = favoriteItem;
+    final weapon = gameData.characterShotTable[characterData.shotId]!;
+    if (doll != null) {
+      doll.weaponType = weapon.weaponType;
+      if (doll.rarity == Rarity.ssr && !gameData.nameCodeFavItemTable.containsKey(characterData.nameCode)) {
+        doll.rarity = Rarity.sr;
+        doll.nameCode = 0;
+      }
+
+      final maxLevel = doll.rarity == Rarity.ssr ? 2 : 15;
+      doll.level = doll.level.clamp(0, maxLevel);
     }
   }
 

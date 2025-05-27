@@ -495,11 +495,33 @@ void main() async {
   });
 
   test('Favorite Item Effect Exists', () {
-    for (final favoriteItemData in gameData.favoriteItemTable.values) {
-      for (int level = 0; level <= 15; level += 1) {
-        if (level > 2 && favoriteItemData.favoriteRare == Rarity.ssr) break;
+    for (final groupedData in gameData.dollTable.values) {
+      for (final favoriteItemData in groupedData.values) {
+        for (int level = 0; level <= 15; level += 1) {
+          final doll = BattleFavoriteItem(
+            weaponType: favoriteItemData.weaponType,
+            rarity: favoriteItemData.favoriteRare,
+            level: level,
+          );
 
-        final doll = BattleFavoriteItem(favoriteItemData.id, level);
+          final stateEffectIds = doll.getCollectionItemStateEffectIds();
+          expect(stateEffectIds.length, isNonZero);
+          for (final stateEffectId in stateEffectIds) {
+            expect(stateEffectId, isNonZero);
+            expect(gameData.stateEffectTable.containsKey(stateEffectId), true);
+          }
+        }
+      }
+    }
+
+    for (final favoriteItemData in gameData.nameCodeFavItemTable.values) {
+      for (int level = 0; level <= 2; level += 1) {
+        final doll = BattleFavoriteItem(
+          weaponType: favoriteItemData.weaponType,
+          rarity: favoriteItemData.favoriteRare,
+          level: level,
+          nameCode: favoriteItemData.nameCode,
+        );
 
         final stateEffectIds = doll.getCollectionItemStateEffectIds();
         expect(stateEffectIds.length, isNonZero);

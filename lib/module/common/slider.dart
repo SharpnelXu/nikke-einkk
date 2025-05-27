@@ -14,6 +14,7 @@ class SliderWithPrefix extends StatelessWidget {
   final int? division;
   final double leadingWidth;
   final EdgeInsetsGeometry? padding;
+  final TextStyle? labelStyle;
 
   const SliderWithPrefix({
     super.key,
@@ -28,18 +29,20 @@ class SliderWithPrefix extends StatelessWidget {
     this.division,
     this.leadingWidth = 48,
     this.padding,
+    this.labelStyle,
   });
 
   @override
   Widget build(BuildContext context) {
-    Color? labelColor = Theme.of(context).colorScheme.primary;
+    Color? labelColor = labelStyle?.color;
     Widget header;
     final valueText = valueFormatter?.call(value) ?? value.toString();
     if (titled) {
       header = Text.rich(
         TextSpan(
           text: label,
-          children: [const TextSpan(text: ': '), TextSpan(text: valueText, style: TextStyle(color: labelColor))],
+          children: [const TextSpan(text: ': '), TextSpan(text: valueText, style: labelStyle)],
+          style: labelStyle,
         ),
       );
     } else {
@@ -52,9 +55,9 @@ class SliderWithPrefix extends StatelessWidget {
             maxLines: 1,
             minFontSize: 10,
             maxFontSize: 16,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: valueText.isEmpty ? labelColor : null),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: labelColor),
           ),
-          AutoSizeText(valueText, maxLines: 1, minFontSize: 9, maxFontSize: 9, style: TextStyle(color: labelColor)),
+          AutoSizeText(valueText, maxLines: 1, minFontSize: 9, maxFontSize: 9, style: labelStyle),
         ],
       );
     }
