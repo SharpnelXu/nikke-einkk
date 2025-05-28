@@ -7,12 +7,12 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 
 class BattleHarmonyCube {
-  final int cubeId;
-  final int cubeLevel;
+  HarmonyCubeType type;
+  int cubeLevel;
 
-  BattleHarmonyCube(this.cubeId, this.cubeLevel);
+  BattleHarmonyCube(this.type, this.cubeLevel);
 
-  HarmonyCubeData get cubeData => gameData.harmonyCubeTable[cubeId]!;
+  HarmonyCubeData get cubeData => gameData.harmonyCubeTable[type.cubeId]!;
 
   HarmonyCubeLevelData get levelData => gameData.harmonyCubeLevelTable[cubeData.levelEnhanceId]![cubeLevel]!;
 
@@ -48,6 +48,6 @@ class BattleHarmonyCube {
   }
 
   BattleHarmonyCube copy() {
-    return BattleHarmonyCube(cubeId, cubeLevel);
+    return BattleHarmonyCube(type, cubeLevel);
   }
 }

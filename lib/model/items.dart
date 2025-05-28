@@ -524,4 +524,67 @@ enum HarmonyCubeType {
   final int cubeId;
 
   const HarmonyCubeType(this.cubeId);
+
+  @override
+  String toString() {
+    switch (this) {
+      case HarmonyCubeType.accuracy:
+        return 'Accuracy';
+      case HarmonyCubeType.chargeDamage:
+        return 'Charge Damage';
+      case HarmonyCubeType.reload:
+        return 'Reload Speed';
+      case HarmonyCubeType.gainAmmo:
+        return 'Ammo Regen';
+      case HarmonyCubeType.chargeSpeed:
+        return 'Charge Speed';
+      case HarmonyCubeType.ammoCapacity:
+        return 'Ammo Capacity';
+      case HarmonyCubeType.burst:
+        return 'Burst Gen';
+      case HarmonyCubeType.maxHp:
+        return 'Max Hp';
+      case HarmonyCubeType.defence:
+        return 'Defence';
+      case HarmonyCubeType.healPotency:
+        return 'Heal Potency';
+      case HarmonyCubeType.damageTakenDown:
+        return 'Damage Resist';
+      case HarmonyCubeType.emergencyMaxHp:
+        return 'Emergency Max Hp';
+      case HarmonyCubeType.parts:
+        return 'Parts Damage';
+    }
+  }
+
+  String shortString() {
+    switch (this) {
+      case HarmonyCubeType.accuracy:
+        return 'ACC';
+      case HarmonyCubeType.chargeDamage:
+        return 'CHD';
+      case HarmonyCubeType.reload:
+        return 'RLS';
+      case HarmonyCubeType.gainAmmo:
+        return 'AMR';
+      case HarmonyCubeType.chargeSpeed:
+        return 'CHS';
+      case HarmonyCubeType.ammoCapacity:
+        return 'AMC';
+      case HarmonyCubeType.burst:
+        return 'BRG';
+      case HarmonyCubeType.maxHp:
+        return 'MHP';
+      case HarmonyCubeType.defence:
+        return 'DEF';
+      case HarmonyCubeType.healPotency:
+        return 'HEL';
+      case HarmonyCubeType.damageTakenDown:
+        return 'DAR';
+      case HarmonyCubeType.emergencyMaxHp:
+        return 'EMH';
+      case HarmonyCubeType.parts:
+        return 'PTD';
+    }
+  }
 }

@@ -369,3 +369,7 @@ class NikkeDatabase {
     return groupedEquipTable[equipType]?[nikkeClass]?[rarity];
   }
 }
+
+int maxResearchLevel(int syncLevel) {
+  return max(syncLevel ~/ 20 - 2, 1) * 10;
+}

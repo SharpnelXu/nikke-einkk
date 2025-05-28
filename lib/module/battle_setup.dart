@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/harmony_cube.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
+import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
+import 'package:nikke_einkk/module/common/simple_dialog.dart';
+import 'package:nikke_einkk/module/common/slider.dart';
 import 'package:nikke_einkk/module/nikke_list.dart';
 
 class BattleSetupPage extends StatefulWidget {
@@ -16,51 +21,104 @@ class BattleSetupPage extends StatefulWidget {
 }
 
 class _BattleSetupPageState extends State<BattleSetupPage> {
-  final RaptureDisplay raptureDisplay = RaptureDisplay();
-  final List<NikkeDisplay> nikkeDisplays = List.generate(5, (_) => NikkeDisplay());
-
-  // List of colors for the containers (optional)
-  final List<Color> containerColors = [
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.yellow,
-    Colors.orange,
-    Colors.purple,
-  ];
+  final BattleRaptureOptions raptureOption = BattleRaptureOptions();
+  final List<BattleNikkeOptions> nikkeOptions = List.generate(5, (_) => BattleNikkeOptions(nikkeResourceId: -1));
+  final BattlePlayerOptions playerOptions = BattlePlayerOptions();
+  final List<BattleHarmonyCube> cubes = List.generate(HarmonyCubeType.values.length, (index) {
+    return BattleHarmonyCube(HarmonyCubeType.values[index], 1);
+  });
+  int globalSyncLevel = 1;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Battle Simulation')),
-      body: SingleChildScrollView(
-        // Vertical scrolling
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: [
-            SizedBox(
-              height: 500,
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              // Vertical scrolling
+              scrollDirection: Axis.vertical,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: raptureDisplay),
+                  Expanded(child: RaptureDisplay(option: raptureOption)),
                   ...List.generate(5, (index) {
-                    return Expanded(child: nikkeDisplays[index]);
+                    return Expanded(
+                      child: NikkeDisplay(option: nikkeOptions[index], cubes: cubes, playerOptions: playerOptions),
+                    );
                   }),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          Divider(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              spacing: 5,
+              children: [
+                FilledButton.icon(
+                  onPressed: () async {
+                    await showDialog(
+                      context: context,
+                      useRootNavigator: false,
+                      builder: (ctx) {
+                        return SimpleConfirmDialog(
+                          title: Text('Global Settings'),
+                          showCancel: false,
+                          showOk: true,
+                          content: GlobalSettingDialog(
+                            playerOptions: playerOptions,
+                            defaultGlobalSync: globalSyncLevel,
+                            onGlobalSyncChange: (v) {
+                              globalSyncLevel = v;
+                              for (final option in nikkeOptions) {
+                                option.syncLevel = v;
+                              }
+                              setState(() {});
+                            },
+                          ),
+                        );
+                      },
+                    );
+                    if (mounted) setState(() {});
+                  },
+                  icon: Icon(Icons.recycling),
+                  label: Text('Global Settings'),
+                ),
+                FilledButton.icon(
+                  onPressed: () async {
+                    await showDialog(
+                      context: context,
+                      useRootNavigator: false,
+                      builder: (ctx) {
+                        return SimpleConfirmDialog(
+                          title: Text('Cube Settings'),
+                          showCancel: false,
+                          showOk: true,
+                          content: CubeSettingDialog(cubes: cubes),
+                        );
+                      },
+                    );
+                    if (mounted) setState(() {});
+                  },
+                  icon: Icon(Icons.grid_view_sharp),
+                  label: Text('Cube Settings'),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class RaptureDisplay extends StatefulWidget {
-  final BattleRaptureOptions options = BattleRaptureOptions();
+  final BattleRaptureOptions option;
 
-  RaptureDisplay({super.key});
+  const RaptureDisplay({super.key, required this.option});
 
   @override
   State<RaptureDisplay> createState() => _RaptureDisplayState();
@@ -69,7 +127,7 @@ class RaptureDisplay extends StatefulWidget {
 class _RaptureDisplayState extends State<RaptureDisplay> {
   static const avatarSize = 100.0;
 
-  BattleRaptureOptions get options => widget.options;
+  BattleRaptureOptions get option => widget.option;
 
   @override
   Widget build(BuildContext context) {
@@ -88,13 +146,13 @@ class _RaptureDisplayState extends State<RaptureDisplay> {
             width: avatarSize,
             height: avatarSize,
             decoration: BoxDecoration(border: Border.all(color: Colors.black), borderRadius: BorderRadius.circular(4)),
-            child: Center(child: Text('${options.name}.png')),
+            child: Center(child: Text('${option.name}.png')),
           ),
-          Text(options.name, maxLines: 1),
-          Text('HP: ${format.format(options.startHp)}'),
-          Text('ATK: ${format.format(options.startAttack)}'),
-          Text('DEF: ${format.format(options.startDefence)}'),
-          Text('Distance: ${format.format(options.startDistance)}'),
+          Text(option.name, maxLines: 1),
+          Text('HP: ${format.format(option.startHp)}'),
+          Text('ATK: ${format.format(option.startAttack)}'),
+          Text('DEF: ${format.format(option.startDefence)}'),
+          Text('Distance: ${format.format(option.startDistance)}'),
         ],
       ),
     );
@@ -102,16 +160,18 @@ class _RaptureDisplayState extends State<RaptureDisplay> {
 }
 
 class NikkeDisplay extends StatefulWidget {
-  final BattleNikkeOptions options = BattleNikkeOptions(nikkeResourceId: -1);
+  final BattleNikkeOptions option;
+  final BattlePlayerOptions playerOptions;
+  final List<BattleHarmonyCube> cubes;
 
-  NikkeDisplay({super.key});
+  const NikkeDisplay({super.key, required this.option, required this.cubes, required this.playerOptions});
 
   @override
   State<NikkeDisplay> createState() => _NikkeDisplayState();
 }
 
 class _NikkeDisplayState extends State<NikkeDisplay> {
-  BattleNikkeOptions get option => widget.options;
+  BattleNikkeOptions get option => widget.option;
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +188,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
 
     final List<Widget> statDisplays = [];
 
-    if (option.nikkeResourceId != -1) {
+    if (characterData != null) {
       final Map<EquipLineType, int> equipLineVals = {};
       for (final equip in option.equips) {
         if (equip == null) continue;
@@ -149,7 +209,66 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
         }
       }
 
+      final baseStat =
+          gameData.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ??
+          CharacterStatData.emptyData;
+      final statEnhanceData =
+          gameData.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
+      final attractiveStat =
+          gameData.attractiveStatTable[option.attractLevel]?.getStatData(characterData.characterClass) ??
+          ClassAttractiveStatData.emptyData;
+
+      final baseHp = BattleUtils.getBaseStat(
+        coreLevel: option.coreLevel,
+        baseStat: baseStat.hp,
+        gradeRatio: statEnhanceData.gradeRatio,
+        gradeEnhanceBase: statEnhanceData.gradeHp,
+        coreEnhanceBaseRatio: statEnhanceData.coreHp,
+        consoleStat: widget.playerOptions.getRecycleHp(characterData.characterClass),
+        bondStat: attractiveStat.hpRate,
+        equipStat: option.equips.fold(
+          0,
+          (sum, equip) => sum + (equip?.getStat(StatType.hp, characterData.corporation) ?? 0),
+        ),
+        cubeStat: option.cube?.getStat(StatType.hp) ?? 0,
+        dollStat: option.favoriteItem?.getStat(StatType.hp) ?? 0,
+      );
+      final baseAtk = BattleUtils.getBaseStat(
+        coreLevel: option.coreLevel,
+        baseStat: baseStat.attack,
+        gradeRatio: statEnhanceData.gradeRatio,
+        gradeEnhanceBase: statEnhanceData.gradeAttack,
+        coreEnhanceBaseRatio: statEnhanceData.coreAttack,
+        consoleStat: widget.playerOptions.getRecycleAttack(characterData.corporation),
+        bondStat: attractiveStat.attackRate,
+        equipStat: option.equips.fold(
+          0,
+          (sum, equip) => sum + (equip?.getStat(StatType.atk, characterData.corporation) ?? 0),
+        ),
+        cubeStat: option.cube?.getStat(StatType.atk) ?? 0,
+        dollStat: option.favoriteItem?.getStat(StatType.atk) ?? 0,
+      );
+      final baseDef = BattleUtils.getBaseStat(
+        coreLevel: option.coreLevel,
+        baseStat: baseStat.defence,
+        gradeRatio: statEnhanceData.gradeRatio,
+        gradeEnhanceBase: statEnhanceData.gradeDefence,
+        coreEnhanceBaseRatio: statEnhanceData.coreDefence,
+        consoleStat: widget.playerOptions.getRecycleDefence(characterData.characterClass, characterData.corporation),
+        bondStat: attractiveStat.defenceRate,
+        equipStat: option.equips.fold(
+          0,
+          (sum, equip) => sum + (equip?.getStat(StatType.defence, characterData.corporation) ?? 0),
+        ),
+        cubeStat: option.cube?.getStat(StatType.defence) ?? 0,
+        dollStat: option.favoriteItem?.getStat(StatType.defence) ?? 0,
+      );
+
       statDisplays.addAll([
+        Text('Base HP: ${format.format(baseHp)}'),
+        Text('Base ATK: ${format.format(baseAtk)}'),
+        Text('Base DEF: ${format.format(baseDef)}'),
+        Divider(),
         Text('Sync: ${option.syncLevel}'),
         Text('Core: ${coreString(option.coreLevel)}'),
         Text('Attract: ${option.attractLevel}'),
@@ -193,10 +312,31 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
             return '${equip.level}';
           }).join('/')}',
         ),
+        TextButton.icon(
+          onPressed: () async {
+            final result = await showDialog<BattleHarmonyCube?>(
+              context: context,
+              builder: (ctx) {
+                return SimpleConfirmDialog(
+                  title: Text('Select Cube'),
+                  showCancel: false,
+                  showOk: false,
+                  content: CubeSettingDialog(cubes: widget.cubes, selectMode: true, currentSelection: option.cube),
+                );
+              },
+            );
+
+            option.cube = result == option.cube ? null : result ?? option.cube;
+            setState(() {});
+          },
+          icon: Icon(Icons.grid_view_sharp, size: 12),
+          label: Text('Cube: ${option.cube != null ? '${option.cube!.type} Lv ${option.cube!.cubeLevel}' : 'None'}'),
+        ),
       ]);
 
       if (WeaponType.chargeWeaponTypes.contains(weapon?.weaponType)) {
         statDisplays.addAll([
+          Divider(),
           Text('Always Focus: ${option.alwaysFocus}'),
           Text('Cancel Charge Delay: ${option.forceCancelShootDelay}'),
           Text('Charge Mode: ${option.chargeMode.name}'),
@@ -222,6 +362,193 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
           ),
           Text(name == null ? 'None' : '$name / ${weapon?.weaponType}', maxLines: 1),
           ...statDisplays,
+        ],
+      ),
+    );
+  }
+}
+
+class CubeSettingDialog extends StatefulWidget {
+  final List<BattleHarmonyCube> cubes;
+  final BattleHarmonyCube? currentSelection;
+  final bool selectMode;
+  const CubeSettingDialog({super.key, required this.cubes, this.selectMode = false, this.currentSelection});
+
+  @override
+  State<CubeSettingDialog> createState() => _CubeSettingDialogState();
+}
+
+class _CubeSettingDialogState extends State<CubeSettingDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        spacing: 3,
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(widget.cubes.length, (index) {
+          final cube = widget.cubes[index];
+          final isSelected = cube == widget.currentSelection;
+          return Row(
+            children: [
+              if (widget.selectMode)
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(cube);
+                    setState(() {});
+                  },
+                  icon: Icon(isSelected ? Icons.remove_circle_outline : Icons.check),
+                ),
+              Flexible(
+                child: SliderWithPrefix(
+                  titled: true,
+                  label: cube.type.toString(),
+                  min: 1,
+                  max: 15,
+                  valueFormatter: (v) => 'Lv $v',
+                  value: cube.cubeLevel,
+                  onChange: (newValue) {
+                    cube.cubeLevel = newValue.round();
+                    if (mounted) setState(() {});
+                  },
+                ),
+              ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class GlobalSettingDialog extends StatefulWidget {
+  final BattlePlayerOptions playerOptions;
+  final int defaultGlobalSync;
+  final void Function(int) onGlobalSyncChange;
+  const GlobalSettingDialog({
+    super.key,
+    required this.playerOptions,
+    required this.defaultGlobalSync,
+    required this.onGlobalSyncChange,
+  });
+
+  @override
+  State<GlobalSettingDialog> createState() => _GlobalSettingDialogState();
+}
+
+class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
+  BattlePlayerOptions get option => widget.playerOptions;
+  int globalSync = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    globalSync = widget.defaultGlobalSync;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        spacing: 3,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            spacing: 5,
+            children: [
+              Text('Global Sync'),
+              SizedBox(
+                width: 100,
+                child: RangedNumberTextField(
+                  maxValue: gameData.maxSyncLevel,
+                  defaultValue: globalSync,
+                  onChangeFunction: (newValue) {
+                    globalSync = newValue;
+                    widget.onGlobalSyncChange(newValue);
+                    if (mounted) setState(() {});
+                  },
+                ),
+              ),
+            ],
+          ),
+          Divider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            spacing: 5,
+            children: [
+              Text('Personal Research'),
+              SizedBox(
+                width: 100,
+                child: RangedNumberTextField(
+                  maxValue: maxResearchLevel(gameData.maxSyncLevel),
+                  defaultValue: option.personalRecycleLevel,
+                  onChangeFunction: (newValue) {
+                    option.personalRecycleLevel = newValue;
+                    if (mounted) setState(() {});
+                  },
+                ),
+              ),
+            ],
+          ),
+          Row(
+            spacing: 5,
+            children: [
+              Icon(Icons.info, size: 12),
+              Text('Max research level for current global sync is ${maxResearchLevel(globalSync)}'),
+            ],
+          ),
+          Divider(),
+          ...List.generate(3, (index) {
+            final type = [NikkeClass.attacker, NikkeClass.defender, NikkeClass.supporter][index];
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              spacing: 5,
+              children: [
+                Text(type.name.toUpperCase()),
+                SizedBox(
+                  width: 100,
+                  child: RangedNumberTextField(
+                    maxValue: maxResearchLevel(gameData.maxSyncLevel),
+                    defaultValue: option.classRecycleLevels[type] ?? 0,
+                    onChangeFunction: (newValue) {
+                      option.classRecycleLevels[type] = newValue;
+                      if (mounted) setState(() {});
+                    },
+                  ),
+                ),
+              ],
+            );
+          }),
+          Divider(),
+          ...List.generate(5, (index) {
+            final type =
+                [
+                  Corporation.elysion,
+                  Corporation.missilis,
+                  Corporation.tetra,
+                  Corporation.pilgrim,
+                  Corporation.abnormal,
+                ][index];
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              spacing: 5,
+              children: [
+                Text(type.name.toUpperCase()),
+                SizedBox(
+                  width: 100,
+                  child: RangedNumberTextField(
+                    maxValue: maxResearchLevel(gameData.maxSyncLevel),
+                    defaultValue: option.corpRecycleLevels[type] ?? 0,
+                    onChangeFunction: (newValue) {
+                      option.corpRecycleLevels[type] = newValue;
+                      if (mounted) setState(() {});
+                    },
+                  ),
+                ),
+              ],
+            );
+          }),
         ],
       ),
     );

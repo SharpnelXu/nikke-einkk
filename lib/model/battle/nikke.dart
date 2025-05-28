@@ -200,8 +200,10 @@ class BattleNikke extends BattleEntity {
       gameData.attractiveStatTable[option.attractLevel]?.getStatData(nikkeClass) ?? ClassAttractiveStatData.emptyData;
 
   @override
-  int get baseHp => getBaseStat(
+  int get baseHp => BattleUtils.getBaseStat(
+    coreLevel: coreLevel,
     baseStat: baseStat.hp,
+    gradeRatio: statEnhanceData.gradeRatio,
     gradeEnhanceBase: statEnhanceData.gradeHp,
     coreEnhanceBaseRatio: statEnhanceData.coreHp,
     consoleStat: playerOptions.getRecycleHp(nikkeClass),
@@ -212,8 +214,10 @@ class BattleNikke extends BattleEntity {
   );
 
   @override
-  int get baseAttack => getBaseStat(
+  int get baseAttack => BattleUtils.getBaseStat(
+    coreLevel: coreLevel,
     baseStat: baseStat.attack,
+    gradeRatio: statEnhanceData.gradeRatio,
     gradeEnhanceBase: statEnhanceData.gradeAttack,
     coreEnhanceBaseRatio: statEnhanceData.coreAttack,
     consoleStat: playerOptions.getRecycleAttack(corporation),
@@ -224,8 +228,10 @@ class BattleNikke extends BattleEntity {
   );
 
   @override
-  int get baseDefence => getBaseStat(
+  int get baseDefence => BattleUtils.getBaseStat(
+    coreLevel: coreLevel,
     baseStat: baseStat.defence,
+    gradeRatio: statEnhanceData.gradeRatio,
     gradeEnhanceBase: statEnhanceData.gradeDefence,
     coreEnhanceBaseRatio: statEnhanceData.coreDefence,
     consoleStat: playerOptions.getRecycleDefence(nikkeClass, corporation),
@@ -283,41 +289,6 @@ class BattleNikke extends BattleEntity {
   BattleNikke({required this.playerOptions, required this.option}) {
     cover = BattleCover(option.syncLevel);
     element = NikkeElement.fromId(characterData.elementId.first);
-  }
-
-  // CharacterStatTable[statEnhanceId = groupId][lv] to get baseStat
-  // CharacterStateEnhanceTable[statEnhanceId = id] to get gradeEnhanceStat
-  // grade is [1, 4]
-  // gradeStat = baseStat * gradeRatio (usually 2%) * (grade - 1) + gradeStat * (grade - 1)
-  // MLBStat = baseStat + gradeStat
-  // core is [1, 7]
-  // coreStat = (MLBStat (which is gradeStat + baseStat) + bond stat + console stat) * coreRatio (2%)
-  // finalStat = baseStat + gradeStat + coreStat + bondStat + consoleStat + cubeStat + gearStat + dollStat
-  // However, it is unclear if this value is stored as int or double
-  int getBaseStat({
-    required int baseStat,
-    required int gradeEnhanceBase,
-    required int coreEnhanceBaseRatio,
-    required int consoleStat,
-    required int bondStat,
-    required int equipStat,
-    required int cubeStat,
-    required int dollStat,
-  }) {
-    final gradeLevel = min(4, coreLevel) - 1;
-    final gradeFlat = gradeLevel * gradeEnhanceBase;
-    final gradeRatioStat = baseStat * gradeLevel * BattleUtils.toModifier(statEnhanceData.gradeRatio);
-    final gradeAddStat = gradeRatioStat + gradeFlat;
-    final gradeStat = baseStat + consoleStat + bondStat + gradeAddStat.floor();
-
-    final coreActualLevel = coreLevel - 4;
-    final coreStat =
-        coreActualLevel > 0 ? gradeStat * coreActualLevel * BattleUtils.toModifier(coreEnhanceBaseRatio) : 0;
-
-    // here it seems to be a simple rounding without roundHalfToEven, tested via Brid's HP stat
-    final result = gradeStat + coreStat.round() + equipStat + cubeStat + dollStat;
-
-    return result;
   }
 
   void init(BattleSimulation simulation, int position) {

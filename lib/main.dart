@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/harmony_cube.dart';
-
 import 'package:nikke_einkk/model/db.dart';
-import 'package:nikke_einkk/module/battle_timeline.dart';
 import 'package:nikke_einkk/temp/my_nikkes.dart';
 
 import 'model/battle/battle_simulator.dart';
@@ -35,9 +33,9 @@ class MyApp extends StatelessWidget {
       },
       classRecycleLevels: {NikkeClass.attacker: 212, NikkeClass.defender: 187, NikkeClass.supporter: 197},
     );
-    final BattleHarmonyCube reloadCube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15);
-    final BattleHarmonyCube gainAmmoCube = BattleHarmonyCube(HarmonyCubeType.gainAmmo.cubeId, 15);
-    final BattleHarmonyCube burstCube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 15);
+    final BattleHarmonyCube reloadCube = BattleHarmonyCube(HarmonyCubeType.reload, 15);
+    final BattleHarmonyCube gainAmmoCube = BattleHarmonyCube(HarmonyCubeType.gainAmmo, 15);
+    final BattleHarmonyCube burstCube = BattleHarmonyCube(HarmonyCubeType.burst, 15);
 
     final simulation = BattleSimulation(
       playerOptions: playerOptions,

@@ -8,7 +8,6 @@ import 'package:nikke_einkk/model/battle/harmony_cube.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
-import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 
 import '../../test_helper.dart';
@@ -79,7 +78,7 @@ void main() async {
     test('Scarlet resourceId 222', () {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
-        nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15)],
+        nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload, 15)],
       );
 
       final rapture =
@@ -154,10 +153,10 @@ void main() async {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
         nikkeOptions: [
-          scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15),
-          scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.gainAmmo.cubeId, 15),
-          scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.ammoCapacity.cubeId, 7),
-          scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
+          scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload, 15),
+          scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.gainAmmo, 15),
+          scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.ammoCapacity, 7),
+          scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst, 7),
         ],
       );
 
@@ -267,10 +266,10 @@ void main() async {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
         nikkeOptions: [
-          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15),
-          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.chargeDamage.cubeId, 7),
-          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.chargeSpeed.cubeId, 7),
-          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
+          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload, 15),
+          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.chargeDamage, 7),
+          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.chargeSpeed, 7),
+          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst, 7),
         ],
       );
 
@@ -342,7 +341,7 @@ void main() async {
     test('Scarlet with emergency max hp cube', () {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
-        nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.emergencyMaxHp.cubeId, 15)],
+        nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.emergencyMaxHp, 15)],
       );
 
       final rapture =
@@ -438,7 +437,7 @@ void main() async {
           corpRecycleLevels: {Corporation.pilgrim: 417},
           classRecycleLevels: {NikkeClass.attacker: 212},
         ),
-        nikkeOptions: [snowWhiteOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15)],
+        nikkeOptions: [snowWhiteOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload, 15)],
       );
 
       final rapture =
@@ -524,15 +523,15 @@ void main() async {
       final simulation = BattleSimulation(
         playerOptions: BattlePlayerOptions(forceFillBurst: true),
         nikkeOptions: [
-          literOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.gainAmmo.cubeId, 15),
+          literOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.gainAmmo, 15),
           BattleNikkeOptions(
             nikkeResourceId: 80,
             coreLevel: 11,
             syncLevel: 884,
             attractLevel: 30,
             skillLevels: [4, 4, 4],
-          )..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
-          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
+          )..cube = BattleHarmonyCube(HarmonyCubeType.burst, 7),
+          aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst, 7),
           scarletOption.copy(),
           BattleNikkeOptions(
             nikkeResourceId: 80,
@@ -540,7 +539,7 @@ void main() async {
             syncLevel: 884,
             attractLevel: 30,
             skillLevels: [4, 4, 4],
-          )..cube = BattleHarmonyCube(HarmonyCubeType.burst.cubeId, 7),
+          )..cube = BattleHarmonyCube(HarmonyCubeType.burst, 7),
         ],
       );
 
@@ -663,8 +662,8 @@ void main() async {
       final simulation = BattleSimulation(
         playerOptions: updatedPlayerOptions,
         nikkeOptions: [
-          literOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.gainAmmo.cubeId, 15),
-          crownOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload.cubeId, 15),
+          literOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.gainAmmo, 15),
+          crownOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload, 15),
           scarletOption.copy(),
           scarletOption.copy(),
         ],

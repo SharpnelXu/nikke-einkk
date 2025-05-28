@@ -320,7 +320,8 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
               spacing: 5,
               children: [
                 Text('Sync'),
-                Expanded(
+                SizedBox(
+                  width: 100,
                   child: RangedNumberTextField(
                     maxValue: gameData.maxSyncLevel,
                     defaultValue: option.syncLevel,
@@ -416,6 +417,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                 children: [
                   Text('Doll'),
                   DropdownMenu<Rarity>(
+                    width: 100,
                     textStyle: TextStyle(fontSize: 12),
                     initialSelection: option.favoriteItem?.rarity ?? Rarity.unknown,
                     onSelected: (Rarity? value) {
@@ -522,6 +524,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
             children: [
               Text('${type.name.toUpperCase()} Gear:'),
               DropdownMenu<EquipRarity>(
+                width: 100,
                 textStyle: TextStyle(fontSize: 12),
                 initialSelection: equipment?.rarity ?? EquipRarity.unknown,
                 onSelected: (EquipRarity? value) {

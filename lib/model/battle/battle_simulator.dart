@@ -11,17 +11,20 @@ import 'package:nikke_einkk/model/common.dart';
 
 class BattlePlayerOptions {
   int personalRecycleLevel;
-  Map<Corporation, int> corpRecycleLevels;
-  Map<NikkeClass, int> classRecycleLevels;
+  Map<Corporation, int> corpRecycleLevels = {};
+  Map<NikkeClass, int> classRecycleLevels = {};
   bool forceFillBurst = false;
   // cube levels
 
   BattlePlayerOptions({
     this.personalRecycleLevel = 0,
-    this.corpRecycleLevels = const {},
-    this.classRecycleLevels = const {},
+    Map<Corporation, int> corpRecycleLevels = const {},
+    Map<NikkeClass, int> classRecycleLevels = const {},
     this.forceFillBurst = false,
-  });
+  }) {
+    this.corpRecycleLevels.addAll(corpRecycleLevels);
+    this.classRecycleLevels.addAll(classRecycleLevels);
+  }
 
   int getRecycleHp(NikkeClass nikkeClass) {
     return personalRecycleLevel * RecycleStat.personal.hp +
