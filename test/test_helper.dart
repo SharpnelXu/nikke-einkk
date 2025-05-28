@@ -4,11 +4,11 @@ class TestHelper {
   TestHelper._();
 
   static Future<bool> loadData() async {
-    if (!gameData.dataLoaded) {
-      await gameData.loadData();
+    if (!db.dataLoaded) {
+      await db.loadData();
     }
 
-    return gameData.dataLoaded;
+    return db.dataLoaded;
   }
 }
 

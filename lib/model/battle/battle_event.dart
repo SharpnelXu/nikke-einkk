@@ -426,8 +426,7 @@ class UseSkillEvent extends BattleEvent {
 
   @override
   Widget buildDisplay() {
-    final skillName =
-        gameData.getTranslation(gameData.skillInfoTable[skillId]?.nameLocalkey)?.zhCN ?? 'Skill $skillNum';
+    final skillName = db.getTranslation(db.skillInfoTable[skillId]?.nameLocalkey)?.zhCN ?? 'Skill $skillNum';
     return Text('$name (Pos $ownerUniqueId) activates $skillName');
   }
 }
@@ -505,7 +504,7 @@ class BuffEvent extends BattleEvent {
             : '${data.functionValue}';
     final funcString =
         '${data.functionType.name} $valueString (${data.functionStandard.name}) $buffCount/${data.fullCount}';
-    final skillName = gameData.getTranslation(data.nameLocalkey)?.zhCN ?? 'Buff';
+    final skillName = db.getTranslation(data.nameLocalkey)?.zhCN ?? 'Buff';
     return Text('$skillName $funcString (to $receiverName by $giverName)');
   }
 }

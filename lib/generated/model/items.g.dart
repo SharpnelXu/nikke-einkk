@@ -107,6 +107,27 @@ Map<String, dynamic> _$OptionSlotToJson(OptionSlot instance) => <String, dynamic
   'option_slot_success_ratio': instance.optionSlotSuccessRatio,
 };
 
+EquipLine _$EquipLineFromJson(Map<String, dynamic> json) =>
+    EquipLine($enumDecode(_$EquipLineTypeEnumMap, json['type']), (json['level'] as num).toInt());
+
+Map<String, dynamic> _$EquipLineToJson(EquipLine instance) => <String, dynamic>{
+  'type': _$EquipLineTypeEnumMap[instance.type]!,
+  'level': instance.level,
+};
+
+const _$EquipLineTypeEnumMap = {
+  EquipLineType.none: 'none',
+  EquipLineType.increaseElementalDamage: 'increaseElementalDamage',
+  EquipLineType.startAccuracyCircle: 'startAccuracyCircle',
+  EquipLineType.statAmmo: 'statAmmo',
+  EquipLineType.statAtk: 'statAtk',
+  EquipLineType.statChargeDamage: 'statChargeDamage',
+  EquipLineType.statChargeTime: 'statChargeTime',
+  EquipLineType.statCriticalDamage: 'statCriticalDamage',
+  EquipLineType.statCritical: 'statCritical',
+  EquipLineType.statDef: 'statDef',
+};
+
 HarmonyCubeSkillGroup _$HarmonyCubeSkillGroupFromJson(Map<String, dynamic> json) =>
     HarmonyCubeSkillGroup(skillGroupId: (json['skill_group_id'] as num?)?.toInt() ?? 0);
 

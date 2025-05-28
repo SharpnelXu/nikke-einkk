@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/battle/barrier.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
@@ -17,6 +18,9 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
+part '../../generated/model/battle/nikke.g.dart';
+
+@JsonSerializable()
 class BattleNikkeOptions {
   int nikkeResourceId;
   int coreLevel;
@@ -47,19 +51,23 @@ class BattleNikkeOptions {
        skillLevels = skillLevels.toList() {
     final favoriteItemNameCode = favoriteItem?.data.nameCode ?? -1;
     if (favoriteItemNameCode > 0 &&
-        favoriteItemNameCode != gameData.characterResourceGardeTable[nikkeResourceId]?[coreLevel]?.nameCode) {
+        favoriteItemNameCode != db.characterResourceGardeTable[nikkeResourceId]?[coreLevel]?.nameCode) {
       favoriteItem = null;
     }
   }
 
+  factory BattleNikkeOptions.fromJson(Map<String, dynamic> json) => _$BattleNikkeOptionsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BattleNikkeOptionsToJson(this);
+
   void errorCorrection() {
-    if (!gameData.characterResourceGardeTable.containsKey(nikkeResourceId)) {
+    if (!db.characterResourceGardeTable.containsKey(nikkeResourceId)) {
       return;
     }
 
-    syncLevel = syncLevel.clamp(1, gameData.maxSyncLevel);
+    syncLevel = syncLevel.clamp(1, db.maxSyncLevel);
 
-    final groupedData = gameData.characterResourceGardeTable[nikkeResourceId]!;
+    final groupedData = db.characterResourceGardeTable[nikkeResourceId]!;
     final coreLevels = groupedData.keys.toList();
     coreLevels.sort();
     coreLevel.clamp(coreLevels.first, coreLevels.last);
@@ -117,10 +125,10 @@ class BattleNikkeOptions {
     }
 
     final doll = favoriteItem;
-    final weapon = gameData.characterShotTable[characterData.shotId]!;
+    final weapon = db.characterShotTable[characterData.shotId]!;
     if (doll != null) {
       doll.weaponType = weapon.weaponType;
-      if (doll.rarity == Rarity.ssr && !gameData.nameCodeFavItemTable.containsKey(characterData.nameCode)) {
+      if (doll.rarity == Rarity.ssr && !db.nameCodeFavItemTable.containsKey(characterData.nameCode)) {
         doll.rarity = Rarity.sr;
         doll.nameCode = 0;
       }
@@ -145,6 +153,22 @@ class BattleNikkeOptions {
       chargeMode: chargeMode,
     );
   }
+
+  void copyFrom(BattleNikkeOptions other) {
+    nikkeResourceId = other.nikkeResourceId;
+    coreLevel = other.coreLevel;
+    syncLevel = other.syncLevel;
+    attractLevel = other.attractLevel;
+    equips.clear();
+    equips.addAll(other.equips.map((equip) => equip?.copy()).toList());
+    skillLevels.clear();
+    skillLevels.addAll(other.skillLevels);
+    cube = other.cube?.copy();
+    favoriteItem = other.favoriteItem?.copy();
+    alwaysFocus = other.alwaysFocus;
+    forceCancelShootDelay = other.forceCancelShootDelay;
+    chargeMode = other.chargeMode;
+  }
 }
 
 enum NikkeFullChargeMode { always, never, whenExitingBurst }
@@ -158,13 +182,13 @@ class BattleCover extends BattleEntity {
   String get name => 'Cover';
 
   @override
-  int get baseHp => gameData.coverStatTable[level]!.levelHp;
+  int get baseHp => db.coverStatTable[level]!.levelHp;
 
   @override
   int get baseAttack => 0;
 
   @override
-  int get baseDefence => gameData.coverStatTable[level]!.levelDefence;
+  int get baseDefence => db.coverStatTable[level]!.levelDefence;
 
   BattleCover(this.level);
 
@@ -180,11 +204,10 @@ class BattleNikke extends BattleEntity {
 
   int fps = 60;
 
-  NikkeCharacterData get characterData =>
-      gameData.characterResourceGardeTable[option.nikkeResourceId]![option.coreLevel]!;
+  NikkeCharacterData get characterData => db.characterResourceGardeTable[option.nikkeResourceId]![option.coreLevel]!;
   @override
-  String get name => gameData.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId.toString();
-  WeaponData get baseWeaponData => gameData.characterShotTable[characterData.shotId]!;
+  String get name => db.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId.toString();
+  WeaponData get baseWeaponData => db.characterShotTable[characterData.shotId]!;
   // skill data
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
@@ -193,11 +216,11 @@ class BattleNikke extends BattleEntity {
   int get coreLevel => characterData.gradeCoreId;
 
   CharacterStatData get baseStat =>
-      gameData.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ?? CharacterStatData.emptyData;
+      db.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ?? CharacterStatData.emptyData;
   CharacterStatEnhanceData get statEnhanceData =>
-      gameData.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
+      db.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
   ClassAttractiveStatData get attractiveStat =>
-      gameData.attractiveStatTable[option.attractLevel]?.getStatData(nikkeClass) ?? ClassAttractiveStatData.emptyData;
+      db.attractiveStatTable[option.attractLevel]?.getStatData(nikkeClass) ?? ClassAttractiveStatData.emptyData;
 
   @override
   int get baseHp => BattleUtils.getBaseStat(

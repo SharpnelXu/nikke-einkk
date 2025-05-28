@@ -11,7 +11,7 @@ void main() async {
     test('funcType & status', () {
       final Set<FunctionType> types = {FunctionType.burstGaugeCharge};
       final Set<StatusTriggerType> statusTriggers = {};
-      for (final function in gameData.functionTable.values) {
+      for (final function in db.functionTable.values) {
         if (types.contains(function.functionType)) {
           statusTriggers.add(function.statusTriggerType);
           statusTriggers.add(function.statusTrigger2Type);

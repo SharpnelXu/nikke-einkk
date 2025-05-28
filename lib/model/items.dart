@@ -200,21 +200,22 @@ enum EquipLineType {
   }
 }
 
+@JsonSerializable()
 class EquipLine {
   EquipLineType type;
   int _level;
   int get level => _level;
   set level(int newLevel) => _level = newLevel.clamp(1, 15);
 
-  EquipLine(this.type, this._level);
+  EquipLine(this.type, int level) : _level = level;
 
   EquipLine.onValue(this.type, int stat) : _level = 1 {
     for (int level = 1; level <= 15; level += 1) {
       _level = level;
-      final stateEffectData = gameData.stateEffectTable[getStateEffectId()]!;
+      final stateEffectData = db.stateEffectTable[getStateEffectId()]!;
       for (final functionId in stateEffectData.functions) {
         if (functionId.function != 0) {
-          final function = gameData.functionTable[functionId.function]!;
+          final function = db.functionTable[functionId.function]!;
           if (stat == function.functionValue) {
             return;
           }
@@ -232,6 +233,10 @@ class EquipLine {
   EquipLine copy() {
     return EquipLine(type, level);
   }
+
+  factory EquipLine.fromJson(Map<String, dynamic> json) => _$EquipLineFromJson(json);
+
+  Map<String, dynamic> toJson() => _$EquipLineToJson(this);
 }
 
 @JsonSerializable()

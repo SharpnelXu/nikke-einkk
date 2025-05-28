@@ -237,7 +237,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                 SliverGrid.extent(
                   maxCrossAxisExtent: 144,
                   children:
-                      gameData.characterResourceGardeTable.values
+                      db.characterResourceGardeTable.values
                           .where((groupedData) => filterData.shouldInclude(groupedData))
                           .map((groupedData) => _buildGrid(groupedData))
                           .toList(),
@@ -249,9 +249,9 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
       ),
     );
 
-    final characterData = gameData.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
-    final weapon = gameData.characterShotTable[characterData?.shotId];
-    final name = gameData.getTranslation(characterData?.nameLocalkey)?.zhCN;
+    final characterData = db.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
+    final weapon = db.characterShotTable[characterData?.shotId];
+    final name = db.getTranslation(characterData?.nameLocalkey)?.zhCN;
     final List<Widget> chargeWeaponAdditionalSettings = [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -323,7 +323,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                 SizedBox(
                   width: 100,
                   child: RangedNumberTextField(
-                    maxValue: gameData.maxSyncLevel,
+                    maxValue: db.maxSyncLevel,
                     defaultValue: option.syncLevel,
                     onChangeFunction:
                         (newValue) => setState(() {
@@ -392,7 +392,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
   Widget _buildDollColumn(int? nameCode, WeaponType? weaponType) {
     final doll = option.favoriteItem;
     final allowedRare = [Rarity.unknown, Rarity.r, Rarity.sr];
-    if (nameCode != null && gameData.nameCodeFavItemTable.containsKey(nameCode)) {
+    if (nameCode != null && db.nameCodeFavItemTable.containsKey(nameCode)) {
       allowedRare.add(Rarity.ssr);
     }
     final entries = UnmodifiableListView<DropdownMenuEntry<Rarity>>(
@@ -431,14 +431,16 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                           rarity: value!,
                           level: 0,
                         );
-                        if (value == Rarity.ssr) {
-                          if (nameCode != null && gameData.nameCodeFavItemTable.containsKey(nameCode)) {
-                            option.favoriteItem!.nameCode = nameCode;
-                          } else {
-                            option.favoriteItem!.nameCode = 0;
-                            option.favoriteItem!.rarity = Rarity.sr;
-                          }
+                      }
+                      if (value == Rarity.ssr) {
+                        if (nameCode != null && db.nameCodeFavItemTable.containsKey(nameCode)) {
+                          option.favoriteItem!.nameCode = nameCode;
+                        } else {
+                          option.favoriteItem!.nameCode = 0;
+                          option.favoriteItem!.rarity = Rarity.sr;
                         }
+                      } else {
+                        option.favoriteItem!.nameCode = 0;
                       }
                       setState(() {});
                     },
@@ -603,14 +605,13 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                           titled: true,
                           label: 'Lv',
                           valueFormatter: (level) {
-                            final stateEffectData =
-                                gameData.stateEffectTable[equipment.equipLines[index].getStateEffectId()];
+                            final stateEffectData = db.stateEffectTable[equipment.equipLines[index].getStateEffectId()];
                             if (stateEffectData == null) {
                               return level.toString();
                             }
                             for (final functionId in stateEffectData.functions) {
                               if (functionId.function != 0) {
-                                final function = gameData.functionTable[functionId.function]!;
+                                final function = db.functionTable[functionId.function]!;
                                 return '$level (${(function.functionValue / 100).toStringAsFixed(2)}%)';
                               }
                             }
@@ -640,6 +641,9 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
     return InkWell(
       onTap: () {
         option.nikkeResourceId = characterData.resourceId;
+        if (db.userData.nikkeOptions.containsKey(option.nikkeResourceId)) {
+          option.copyFrom(db.userData.nikkeOptions[option.nikkeResourceId]!);
+        }
         if (mounted) setState(() {});
       },
       child: buildNikkeIcon(characterData, isSelected),
@@ -671,7 +675,7 @@ class NikkeFilterData {
 
   bool shouldInclude(Map<int, NikkeCharacterData> gradeToCharData) {
     final characterData = gradeToCharData.values.last;
-    final weapon = gameData.characterShotTable[characterData.shotId];
+    final weapon = db.characterShotTable[characterData.shotId];
     return (burstSteps.isEmpty ||
             characterData.useBurstSkill == BurstStep.allStep ||
             burstSteps.contains(characterData.useBurstSkill)) &&

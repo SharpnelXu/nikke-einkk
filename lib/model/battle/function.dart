@@ -437,16 +437,10 @@ class BattleFunction {
           final statusCheck = checkTargetStatus(event, simulation, target);
           if (!statusCheck) continue;
 
-          final skill = gameData.characterSkillTable[data.functionValue];
+          final skill = db.characterSkillTable[data.functionValue];
           if (skill != null) {
             activated = true;
-            BattleSkill.activateSkill(
-              simulation,
-              skill,
-              target.uniqueId,
-              gameData.skillInfoTable[skill.id]!.groupId,
-              -1,
-            );
+            BattleSkill.activateSkill(simulation, skill, target.uniqueId, db.skillInfoTable[skill.id]!.groupId, -1);
           }
         }
         break;
@@ -601,7 +595,7 @@ class BattleFunction {
         }
 
         for (final functionId in functionsToExecute) {
-          final functionData = gameData.functionTable[functionId];
+          final functionData = db.functionTable[functionId];
           if (functionData != null) {
             final connectedFunction = BattleFunction(functionData, ownerUniqueId);
             // connected function likely doesn't check trigger target

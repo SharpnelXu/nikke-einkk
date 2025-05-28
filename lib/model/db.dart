@@ -7,10 +7,11 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/model/translation.dart';
+import 'package:nikke_einkk/model/user_data.dart';
 import 'package:path/path.dart';
 
 /// db object
-final gameData = NikkeDatabase();
+final db = NikkeDatabase();
 
 final Logger logger = Logger();
 
@@ -35,6 +36,8 @@ class NikkeDatabase {
   String get coverStatEnhanceTableFilePath => join(dataPath, 'CoverStatEnhanceTable.json');
   String get localeCharacterFilePath => join(dataPath, 'Locale_Character.json');
   String get localeSkillFilePath => join(dataPath, 'Locale_Skill.json');
+
+  String get userDataFilePath => join(dataPath, 'UserData.json');
 
   final Map<int, NikkeCharacterData> characterData = {}; // maybe not needed
   final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
@@ -68,6 +71,8 @@ class NikkeDatabase {
   final Map<int, Map<int, HarmonyCubeLevelData>> harmonyCubeLevelTable = {};
   final Map<int, Map<int, FavoriteItemLevelData>> favoriteItemLevelTable = {};
 
+  UserData userData = UserData();
+
   bool dataLoaded = false;
   int maxSyncLevel = 1;
 
@@ -94,9 +99,26 @@ class NikkeDatabase {
     result &= await loadFavoriteItemLevelData();
     result &= await loadCoverStatData();
 
+    await loadUserData();
+
     dataLoaded = result;
     logger.i('Loading completed, result: $dataLoaded');
     return result;
+  }
+
+  void writeUserData() async {
+    final file = File(userDataFilePath);
+    await file.writeAsString(jsonEncode(userData.toJson()));
+  }
+
+  Future<bool> loadUserData() async {
+    final file = File(userDataFilePath);
+    final bool exists = await file.exists();
+    if (exists) {
+      final json = jsonDecode(await file.readAsString());
+      userData = UserData.fromJson(json);
+    }
+    return exists;
   }
 
   Future<bool> loadCharacterData() async {

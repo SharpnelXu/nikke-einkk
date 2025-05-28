@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/function.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
@@ -7,13 +8,16 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 
+part '../../generated/model/battle/equipment.g.dart';
+
+@JsonSerializable()
 class BattleEquipment {
   // equipment stat formula: baseStat * (100% + 10% * (level (0~5) + sameCorpFactor (3)))
   // t10 does not have corp label
   EquipType type;
   NikkeClass equipClass;
   EquipRarity rarity;
-  EquipmentData get equipData => gameData.groupedEquipTable[type]![equipClass]![rarity]!;
+  EquipmentData get equipData => db.groupedEquipTable[type]![equipClass]![rarity]!;
   Corporation _corporation = Corporation.none;
   Corporation get corporation => _corporation;
   set corporation(Corporation newCorp) {
@@ -48,6 +52,10 @@ class BattleEquipment {
     if (!rarity.canHaveCorp) _corporation = Corporation.none;
   }
 
+  factory BattleEquipment.fromJson(Map<String, dynamic> json) => _$BattleEquipmentFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BattleEquipmentToJson(this);
+
   void validateLevel(int newLevel) {
     if (newLevel < 0 || newLevel > rarity.maxLevel) {
       throw ArgumentError('New Level: $newLevel, max level: ${rarity.maxLevel}');
@@ -80,11 +88,11 @@ class BattleEquipment {
     for (final equipLine in equipLines) {
       if (equipLine.type == EquipLineType.none) continue;
 
-      final stateEffectData = gameData.stateEffectTable[equipLine.getStateEffectId()]!;
+      final stateEffectData = db.stateEffectTable[equipLine.getStateEffectId()]!;
       wearer.functions.addAll(
         stateEffectData.functions
             .where((data) => data.function != 0)
-            .map((data) => BattleFunction(gameData.functionTable[data.function]!, wearer.uniqueId)),
+            .map((data) => BattleFunction(db.functionTable[data.function]!, wearer.uniqueId)),
       );
     }
   }

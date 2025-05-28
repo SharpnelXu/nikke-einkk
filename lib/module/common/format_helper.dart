@@ -45,8 +45,8 @@ String dollLvString(BattleFavoriteItem? doll, int dollLevel) {
 const avatarSize = 120.0;
 
 Widget buildNikkeIcon(NikkeCharacterData? characterData, bool isSelected, [String defaultText = 'None']) {
-  final name = gameData.getTranslation(characterData?.nameLocalkey)?.zhCN ?? characterData?.resourceId ?? defaultText;
-  final weapon = gameData.characterShotTable[characterData?.shotId];
+  final name = db.getTranslation(characterData?.nameLocalkey)?.zhCN ?? characterData?.resourceId ?? defaultText;
+  final weapon = db.characterShotTable[characterData?.shotId];
 
   final colors =
       characterData?.elementId

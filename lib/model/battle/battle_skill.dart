@@ -15,9 +15,9 @@ import 'package:nikke_einkk/model/skills.dart';
 
 class BattleSkill {
   int skillId;
-  int get skillGroupId => gameData.skillInfoTable[skillId]!.groupId;
-  int? get levelSkillId => gameData.groupedSkillInfoTable[skillGroupId]?[level]?.id;
-  SkillData? get skillData => gameData.characterSkillTable[levelSkillId];
+  int get skillGroupId => db.skillInfoTable[skillId]!.groupId;
+  int? get levelSkillId => db.groupedSkillInfoTable[skillGroupId]?[level]?.id;
+  SkillData? get skillData => db.characterSkillTable[levelSkillId];
   SkillType skillType;
   final int ownerUniqueId;
   final int level;
@@ -39,11 +39,11 @@ class BattleSkill {
     }
 
     if (skillType == SkillType.stateEffect) {
-      final stateEffectData = gameData.stateEffectTable[skillId + level - 1]!;
+      final stateEffectData = db.stateEffectTable[skillId + level - 1]!;
       nikke.functions.addAll(
         stateEffectData.functions
             .where((data) => data.function != 0)
-            .map((data) => BattleFunction(gameData.functionTable[data.function]!, nikke.uniqueId)),
+            .map((data) => BattleFunction(db.functionTable[data.function]!, nikke.uniqueId)),
       );
     }
   }
@@ -97,7 +97,7 @@ class BattleSkill {
     simulation.registerEvent(simulation.currentFrame, event);
 
     for (final beforeFuncId in [...skillData.beforeUseFunctionIdList, ...skillData.beforeHurtFunctionIdList]) {
-      final functionData = gameData.functionTable[beforeFuncId];
+      final functionData = db.functionTable[beforeFuncId];
       if (functionData != null) {
         final function = BattleFunction(functionData, ownerUniqueId);
         // connected function likely doesn't check trigger target
@@ -163,7 +163,7 @@ class BattleSkill {
     }
 
     for (final afterFuncId in [...skillData.afterUseFunctionIdList, ...skillData.afterHurtFunctionIdList]) {
-      final functionData = gameData.functionTable[afterFuncId];
+      final functionData = db.functionTable[afterFuncId];
       if (functionData != null) {
         final function = BattleFunction(functionData, ownerUniqueId);
         // connected function likely doesn't check trigger target

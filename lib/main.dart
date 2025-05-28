@@ -11,7 +11,7 @@ import 'model/items.dart';
 import 'module/battle_setup.dart';
 
 Future<void> main() async {
-  await gameData.loadData();
+  await db.loadData();
   runApp(const MyApp());
 }
 
