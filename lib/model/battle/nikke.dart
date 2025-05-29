@@ -693,8 +693,9 @@ class BattleNikke extends BattleEntity {
   }
 
   bool canTarget(BattleRapture rapture) {
-    return rapture.canBeTargeted ||
-        currentWeaponData.preferTargetCondition == PreferTargetCondition.includeNoneTargetNone;
+    return (rapture.canBeTargeted ||
+            currentWeaponData.preferTargetCondition == PreferTargetCondition.includeNoneTargetNone) &&
+        !rapture.outsideScreen;
   }
 
   void broadcast(BattleEvent event, BattleSimulation simulation) {
