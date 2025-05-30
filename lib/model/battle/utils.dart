@@ -100,7 +100,7 @@ class NikkeDamageParameter {
   int breakDamageBuff = 0;
 
   // receive damage, distribute
-  int receiveDamageBuff = 0;
+  int damageReductionBuff = 0;
   int distributedDamageBuff = 0;
 
   NikkeDamageParameter({
@@ -129,7 +129,7 @@ class NikkeDamageParameter {
     this.sustainedDamageBuff = 0,
     this.pierceDamageBuff = 0,
     this.breakDamageBuff = 0,
-    this.receiveDamageBuff = 0,
+    this.damageReductionBuff = 0,
     this.distributedDamageBuff = 0,
   });
 
@@ -161,7 +161,7 @@ class NikkeDamageParameter {
         'sustainedDamageBuff: $sustainedDamageBuff, '
         'pierceDamageBuff: $pierceDamageBuff, '
         'breakDamageBuff: $breakDamageBuff, '
-        'receiveDamageBuff: $receiveDamageBuff, '
+        'damageReductionBuff: $damageReductionBuff, '
         'distributedDamageBuff: $distributedDamageBuff'
         '}';
   }
@@ -193,7 +193,7 @@ class NikkeDamageParameter {
       sustainedDamageBuff: sustainedDamageBuff,
       pierceDamageBuff: pierceDamageBuff,
       breakDamageBuff: breakDamageBuff,
-      receiveDamageBuff: receiveDamageBuff,
+      damageReductionBuff: damageReductionBuff,
       distributedDamageBuff: distributedDamageBuff,
     );
   }
@@ -242,7 +242,7 @@ class NikkeDamageParameter {
       10000 + addDamageBuff + partDamageBuff + interruptionPartDamageBuff + sustainedDamageBuff + pierceDamageBuff,
     );
 
-    final receiveDamage = BattleUtils.toModifier(10000 + receiveDamageBuff + distributedDamageBuff);
+    final receiveDamage = BattleUtils.toModifier(10000 - damageReductionBuff + distributedDamageBuff);
 
     final nonAttackMultipliers = finalRate * finalCorrection * elementRate * chargeRate * addDamageRate * receiveDamage;
     final totalDamage = finalAttack * nonAttackMultipliers;

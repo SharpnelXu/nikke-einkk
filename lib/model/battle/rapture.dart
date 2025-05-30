@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:nikke_einkk/model/battle/barrier.dart';
+import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
@@ -22,6 +24,8 @@ class BattleRaptureOptions {
   int coreRequiresPierce = 0;
 
   Map<int, List<BattleRaptureAction>> actions = {};
+
+  Map<int, BattleRaptureParts> parts = {};
 }
 
 class BattleRaptureAction {
@@ -73,9 +77,15 @@ class BattleRaptureAction {
       ..sortHigh = high;
   }
 
+  factory BattleRaptureAction.parts(int partId) {
+    return BattleRaptureAction(BattleRaptureActionType.generateParts)
+      ..setParameter = partId;
+  }
+
   factory BattleRaptureAction.setBuff({
     required BattleRaptureActionTarget targetType,
     required FunctionType buffType,
+    required bool isBuff,
     required int buffValue,
     required DurationType durationType,
     required int duration,
@@ -85,6 +95,7 @@ class BattleRaptureAction {
   }) {
     return BattleRaptureAction(BattleRaptureActionType.setBuff)
       ..buffType = buffType
+      ..isBuff = isBuff
       ..setParameter = buffValue
       ..durationType = durationType
       ..timeParameter = duration
@@ -185,6 +196,14 @@ class BattleRaptureParts {
 
   bool canBeDamaged(bool hasPierce) {
     return hp > 0 && (hasPierce || !isBehindBoss);
+  }
+
+  BattleRaptureParts copy() {
+    return BattleRaptureParts(id)
+      ..maxHp = maxHp
+      ..hp = maxHp
+      ..isBehindBoss = isBehindBoss
+      ..isCore = isCore;
   }
 }
 
@@ -359,10 +378,62 @@ class BattleRapture extends BattleEntity {
           barrier = Barrier(action.setParameter!, action.durationType!, action.timeParameter ?? 0);
           break;
         case BattleRaptureActionType.generateParts:
-        case BattleRaptureActionType.attack:
-        case BattleRaptureActionType.setBuff:
-        case BattleRaptureActionType.clearBuff:
+          final partId = action.setParameter!;
+
+          if (options.parts.containsKey(partId) && parts.every((part) => part.id != partId)) {
+            parts.add(options.parts[partId]!.copy());
+          }
+
           break;
+        case BattleRaptureActionType.attack:
+          for (final target in getActionTargets(simulation, action)) {
+            if (target is! BattleNikke) continue;
+
+            simulation.registerEvent(
+              simulation.currentFrame,
+              RaptureDamageEvent(simulation: simulation, rapture: this, nikke: target, damageRate: action.setParameter!),
+            );
+          }
+          break;
+        case BattleRaptureActionType.setBuff:
+          for (final target in getActionTargets(simulation, action)) {
+            final buff = BattleBuff(
+              FunctionData(
+                id: -1,
+                groupId: -(action.setParameter! * 1000 + action.buffType!.index),
+                buff: action.isBuff! ? BuffType.buff : BuffType.deBuff,
+                buffRemove: BuffRemoveType.clear,
+                functionType: action.buffType!,
+                functionValueType: ValueType.percent,
+                functionValue: action.setParameter!,
+                functionStandard: StandardType.user,
+                fullCount: 99,
+                durationType: action.durationType!,
+                durationValue: action.timeParameter!,
+                functionTarget: FunctionTargetType.self,
+                timingTriggerType: TimingTriggerType.none,
+                statusTriggerType: StatusTriggerType.none,
+                statusTrigger2Type: StatusTriggerType.none,
+              ),
+              uniqueId,
+              target.uniqueId,
+              simulation,
+            );
+            target.buffs.add(buff);
+          }
+          break;
+        case BattleRaptureActionType.clearBuff:
+        for (final target in getActionTargets(simulation, action)) {
+          target.buffs.removeWhere(
+                  (buff) {
+                    final canRemove = buff.data.buffRemove == BuffRemoveType.clear;
+                    final isBuff = [BuffType.buff, BuffType.buffEtc].contains(buff.data.buff);
+                    final isDebuff = [BuffType.deBuffEtc, BuffType.deBuff].contains(buff.data.buff);
+                    return canRemove && ((isBuff && action.isBuff!) || (isDebuff && !action.isBuff!));
+                  }
+          );
+        }
+        break;
       }
     }
   }

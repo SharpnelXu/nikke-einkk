@@ -45,7 +45,7 @@ void main() async {
       expect(literHelmBurstParam.calculateDamage(core: true), 651170);
 
       // liter & helm (favorite item helm) & blanc buff
-      final literHelmBlancBurstParam = literHelmBurstParam.copy()..receiveDamageBuff = 3926;
+      final literHelmBlancBurstParam = literHelmBurstParam.copy()..damageReductionBuff = -3926;
       expect(literHelmBlancBurstParam.calculateDamage(), 582956);
       expect(literHelmBlancBurstParam.calculateDamage(critical: true), 744888);
       expect(literHelmBlancBurstParam.calculateDamage(core: true), 906820);
@@ -227,7 +227,7 @@ void main() async {
           param.copy()
             ..attackBuff = equipAtkTotal + totalBuffAtk.round()
             ..addDamageBuff = 3624
-            ..receiveDamageBuff = 1256;
+            ..damageReductionBuff = -1256;
       expect(paramSkill1BossExtra2.calculateDamage(), 56585172);
     });
 
@@ -259,7 +259,7 @@ void main() async {
         isBonusRange: true,
         isFullBurst: true,
         addDamageBuff: 3624,
-        receiveDamageBuff: 1256,
+        damageReductionBuff: -1256,
       );
       expect(param.calculateDamage(critical: true, core: true), moreOrLessEquals(902435165, epsilon: 35));
     });

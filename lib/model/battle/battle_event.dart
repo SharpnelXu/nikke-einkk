@@ -78,6 +78,49 @@ class NikkeReloadStartEvent extends BattleEvent {
   }
 }
 
+class RaptureDamageEvent extends BattleEvent {
+  late int attackerUniqueId;
+  late int targetUniqueId;
+  late String name;
+  late NikkeDamageParameter damageParameter;
+
+  @override
+  int getActivatorUniqueId() {
+    return attackerUniqueId;
+  }
+
+  @override
+  List<int> getTargetUniqueIds() {
+    return [targetUniqueId];
+  }
+
+  RaptureDamageEvent({
+    required BattleSimulation simulation,
+    required BattleRapture rapture,
+    required BattleNikke nikke,
+    required int damageRate,
+  }) {
+    name = nikke.name;
+    attackerUniqueId = rapture.uniqueId;
+    targetUniqueId = nikke.uniqueId;
+
+    damageParameter = NikkeDamageParameter(
+      attack: rapture.baseAttack,
+      attackBuff: rapture.getAttackBuffValues(simulation),
+      defence: nikke.baseDefence,
+      defenceBuff: nikke.getDefenceBuffValues(simulation),
+      damageRate: damageRate,
+      isStrongElement: rapture.element.strongAgainst(nikke.element),
+      damageReductionBuff: nikke.getDamageReductionBuffValues(simulation),
+    );
+  }
+
+  @override
+  Widget buildDisplay() {
+    return Text('$name (pos $attackerUniqueId) received ${damageParameter.calculateExpectedDamage()} damage');
+  }
+}
+
 class NikkeDamageEvent extends BattleEvent {
   late NikkeDamageType type;
   late String name;
@@ -110,11 +153,11 @@ class NikkeDamageEvent extends BattleEvent {
     final pierce = nikke.getPierce(simulation);
     partId = rapture.getPartsInFront();
 
-    // TODO: fill in other buff params
     damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
       defence: rapture.baseDefence,
+      defenceBuff: rapture.getDefenceBuffValues(simulation),
       damageRate: weaponData.damage * weaponData.muzzleCount,
       damageRateBuff: nikke.getNormalDamageRatioChangeBuffValues(simulation),
       coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
@@ -135,6 +178,7 @@ class NikkeDamageEvent extends BattleEvent {
       pierceDamageBuff: pierce > 0 ? nikke.getPierceDamageBuffValues(simulation) : 0,
       addDamageBuff: nikke.getAddDamageBuffValues(simulation),
       breakDamageBuff: partId == null && rapture.hasRedCircle ? nikke.getBreakDamageBuff(simulation) : 0,
+      damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
   }
 
@@ -162,6 +206,7 @@ class NikkeDamageEvent extends BattleEvent {
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
       defence: rapture.baseDefence,
+      defenceBuff: rapture.getDefenceBuffValues(simulation),
       damageRate: weaponData.damage * weaponData.muzzleCount,
       damageRateBuff: nikke.getNormalDamageRatioChangeBuffValues(simulation),
       coreHitRate: part.isCore ? 10000 : 0,
@@ -180,6 +225,7 @@ class NikkeDamageEvent extends BattleEvent {
       partDamageBuff: nikke.getPartsDamageBuffValues(simulation),
       pierceDamageBuff: nikke.getPierceDamageBuffValues(simulation),
       addDamageBuff: nikke.getAddDamageBuffValues(simulation),
+      damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
   }
 
@@ -204,6 +250,7 @@ class NikkeDamageEvent extends BattleEvent {
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
       defence: rapture.baseDefence,
+      defenceBuff: rapture.getDefenceBuffValues(simulation),
       damageRate: damageRate,
       coreHitRate: 0,
       criticalRate: nikke.getCriticalRate(simulation),
@@ -214,6 +261,7 @@ class NikkeDamageEvent extends BattleEvent {
       elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
       addDamageBuff: nikke.getAddDamageBuffValues(simulation),
       distributedDamageBuff: isShareDamage ? nikke.getShareDamageBuffValues(simulation) : 0,
+      damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
   }
 
