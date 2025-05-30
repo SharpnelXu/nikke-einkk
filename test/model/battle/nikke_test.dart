@@ -238,11 +238,12 @@ void main() async {
           ),
         ],
       );
-      final simulation = BattleSimulation(playerOptions: BattlePlayerOptions(), nikkeOptions: [scarletOption]);
+      final simulation = BattleSimulation(
+        playerOptions: BattlePlayerOptions(),
+        nikkeOptions: [scarletOption],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 100)],
+      );
 
-      final rapture = BattleRapture()..uniqueId = 11;
-
-      simulation.raptures.add(rapture);
       simulation.maxSeconds = 1;
       simulation.simulate();
 

@@ -88,8 +88,13 @@ class BattleSimulation {
   bool useCover = false;
   int currentNikke = 3;
 
-  BattleSimulation({required this.playerOptions, required List<BattleNikkeOptions?> nikkeOptions}) {
+  BattleSimulation({
+    required this.playerOptions,
+    required List<BattleNikkeOptions?> nikkeOptions,
+    required List<BattleRaptureOptions> raptureOptions,
+  }) {
     nikkes.addAll(nikkeOptions.nonNulls.map((option) => BattleNikke(playerOptions: playerOptions, option: option)));
+    raptures.addAll(raptureOptions.map((option) => BattleRapture(option)));
   }
 
   void simulate() {
@@ -104,17 +109,15 @@ class BattleSimulation {
     for (int index = 0; index < nikkes.length; index += 1) {
       nikkes[index].init(this, index + 1);
     }
+    for (int index = 0; index < raptures.length; index += 1) {
+      raptures[index].init(this, index + 11);
+    }
 
     currentFrame = maxFrames + 1;
     // BattleStart
     for (final nikke in nikkes) {
       nikke.broadcast(BattleStartEvent.battleStartEvent, this);
     }
-
-    // all onStart functions applied, battleStart
-    // for (final nikke in nikkes) {
-    //   nikke.startBattle(this);
-    // }
 
     for (currentFrame = maxFrames; currentFrame > 0; currentFrame -= 1) {
       for (final entity in [...nikkes, ...raptures]) {
@@ -163,6 +166,10 @@ class BattleSimulation {
 
         for (final nikke in nikkes) {
           nikke.broadcast(event, this);
+        }
+
+        for (final rapture in raptures) {
+          rapture.broadcast(event, this);
         }
       }
 

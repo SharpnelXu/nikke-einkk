@@ -211,7 +211,10 @@ class BattleNikke extends BattleEntity {
   // skill data
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
+  @override
   NikkeElement get element => NikkeElement.fromId(characterData.elementId.first);
+
+  List<NikkeElement> get effectiveElements => characterData.elementId.map((eleId) => NikkeElement.fromId(eleId)).toList();
 
   int get coreLevel => characterData.gradeCoreId;
 
@@ -311,7 +314,6 @@ class BattleNikke extends BattleEntity {
 
   BattleNikke({required this.playerOptions, required this.option}) {
     cover = BattleCover(option.syncLevel);
-    element = NikkeElement.fromId(characterData.elementId.first);
   }
 
   void init(BattleSimulation simulation, int position) {
@@ -726,6 +728,8 @@ class BattleNikke extends BattleEntity {
     if (event is ExitFullBurstEvent) {
       activatedBurstSkillThisCycle = false;
     }
+
+    // todo: defensive shot count buff?
 
     for (final function in functions) {
       function.broadcast(event, simulation);

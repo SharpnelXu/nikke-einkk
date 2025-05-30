@@ -13,19 +13,38 @@ import 'package:nikke_einkk/model/skills.dart';
 import 'battle_entity.dart';
 
 class BattleRaptureOptions {
-  String name = "Rapture";
-  bool isStageTarget = true;
-  bool canBeTargeted = true;
-  int coreSize = 10;
-  int startDistance = 25;
-  int startHp = 1;
-  int startAttack = 0;
-  int startDefence = 100;
-  int coreRequiresPierce = 0;
+  String name;
+  bool isStageTarget;
+  bool canBeTargeted;
+  int coreSize;
+  int startDistance;
+  int startHp;
+  int startAttack;
+  int startDefence;
+  int coreRequiresPierce;
+  NikkeElement element;
 
   Map<int, List<BattleRaptureAction>> actions = {};
 
   Map<int, BattleRaptureParts> parts = {};
+
+  BattleRaptureOptions({
+    this.name = "Rapture",
+    this.isStageTarget = true,
+    this.canBeTargeted = true,
+    this.coreRequiresPierce = 0,
+    this.coreSize = 10,
+    this.startDistance = 25,
+    this.startHp = 1,
+    this.startAttack = 1,
+    this.startDefence = 140,
+    this.element = NikkeElement.unknown,
+    Map<int, List<BattleRaptureAction>> actions = const {},
+    Map<int, BattleRaptureParts> parts = const {},
+  }) {
+    this.actions.addAll(actions);
+    this.parts.addAll(parts);
+  }
 }
 
 class BattleRaptureAction {
@@ -78,8 +97,7 @@ class BattleRaptureAction {
   }
 
   factory BattleRaptureAction.parts(int partId) {
-    return BattleRaptureAction(BattleRaptureActionType.generateParts)
-      ..setParameter = partId;
+    return BattleRaptureAction(BattleRaptureActionType.generateParts)..setParameter = partId;
   }
 
   factory BattleRaptureAction.setBuff({
@@ -234,10 +252,10 @@ class BattleRapture extends BattleEntity {
   int get baseHp => options.startHp;
 
   @override
-  int get baseDefence => options.startDefence;
+  int get baseDefence => defence;
 
   @override
-  int get baseAttack => options.startAttack;
+  int get baseAttack => attack;
 
   List<BattleRaptureParts> parts = [];
 
@@ -245,11 +263,13 @@ class BattleRapture extends BattleEntity {
 
   Map<int, List<BattleRaptureAction>> endActions = {};
 
-  BattleRapture({BattleRaptureOptions? options}) {
-    this.options = options ?? BattleRaptureOptions();
-  }
+  @override
+  NikkeElement get element => options.element;
 
-  void init() {
+  BattleRapture(this.options);
+
+  void init(BattleSimulation simulation, int uniqueId) {
+    this.uniqueId = uniqueId;
     currentHp = options.startHp;
     coreSize = options.coreSize;
     defence = options.startDefence;
@@ -391,7 +411,12 @@ class BattleRapture extends BattleEntity {
 
             simulation.registerEvent(
               simulation.currentFrame,
-              RaptureDamageEvent(simulation: simulation, rapture: this, nikke: target, damageRate: action.setParameter!),
+              RaptureDamageEvent(
+                simulation: simulation,
+                rapture: this,
+                nikke: target,
+                damageRate: action.setParameter!,
+              ),
             );
           }
           break;
@@ -423,17 +448,15 @@ class BattleRapture extends BattleEntity {
           }
           break;
         case BattleRaptureActionType.clearBuff:
-        for (final target in getActionTargets(simulation, action)) {
-          target.buffs.removeWhere(
-                  (buff) {
-                    final canRemove = buff.data.buffRemove == BuffRemoveType.clear;
-                    final isBuff = [BuffType.buff, BuffType.buffEtc].contains(buff.data.buff);
-                    final isDebuff = [BuffType.deBuffEtc, BuffType.deBuff].contains(buff.data.buff);
-                    return canRemove && ((isBuff && action.isBuff!) || (isDebuff && !action.isBuff!));
-                  }
-          );
-        }
-        break;
+          for (final target in getActionTargets(simulation, action)) {
+            target.buffs.removeWhere((buff) {
+              final canRemove = buff.data.buffRemove == BuffRemoveType.clear;
+              final isBuff = [BuffType.buff, BuffType.buffEtc].contains(buff.data.buff);
+              final isDebuff = [BuffType.deBuffEtc, BuffType.deBuff].contains(buff.data.buff);
+              return canRemove && ((isBuff && action.isBuff!) || (isDebuff && !action.isBuff!));
+            });
+          }
+          break;
       }
     }
   }
@@ -457,6 +480,16 @@ class BattleRapture extends BattleEntity {
 
         final countList = action.sortHigh! ? nikkes.reversed.toList() : nikkes;
         return countList.sublist(0, min(countList.length, action.targetCount!));
+    }
+  }
+
+  void broadcast(BattleEvent event, BattleSimulation simulation) {
+    if (event is NikkeDamageEvent && event.targetUniqueId == uniqueId) {
+      for (final buff in buffs) {
+        if (buff.data.durationType == DurationType.shots) {
+          buff.duration -= 1;
+        }
+      }
     }
   }
 }

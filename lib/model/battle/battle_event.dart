@@ -83,6 +83,7 @@ class RaptureDamageEvent extends BattleEvent {
   late int targetUniqueId;
   late String name;
   late NikkeDamageParameter damageParameter;
+  late bool invalid;
 
   @override
   int getActivatorUniqueId() {
@@ -113,6 +114,7 @@ class RaptureDamageEvent extends BattleEvent {
       isStrongElement: rapture.element.strongAgainst(nikke.element),
       damageReductionBuff: nikke.getDamageReductionBuffValues(simulation),
     );
+    invalid = nikke.buffs.any((buff) => buff.data.functionType == FunctionType.immuneDamage);
   }
 
   @override
@@ -131,6 +133,8 @@ class NikkeDamageEvent extends BattleEvent {
   bool isShareDamage = false;
   int shareCount = 0;
   int? partId;
+
+  bool invalid = true;
 
   late NikkeDamageParameter damageParameter;
 
@@ -168,7 +172,7 @@ class NikkeDamageEvent extends BattleEvent {
       criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
       isBonusRange: nikke.isBonusRange(rapture.distance),
       isFullBurst: simulation.burstStage == 4,
-      isStrongElement: nikke.element.strongAgainst(rapture.element),
+      isStrongElement: nikke.effectiveElements.any((ele) => ele.strongAgainst(rapture.element)),
       elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
       chargeDamageRate: weaponData.fullChargeDamage,
       chargeDamageBuff: nikke.getChargeDamageBuffValues(simulation),
@@ -180,6 +184,8 @@ class NikkeDamageEvent extends BattleEvent {
       breakDamageBuff: partId == null && rapture.hasRedCircle ? nikke.getBreakDamageBuff(simulation) : 0,
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
+
+    invalid = rapture.invincible || rapture.outsideScreen || nikke.effectiveElements.every((ele) => !rapture.elementalShield.contains(ele));
   }
 
   NikkeDamageEvent.piercePart({
@@ -227,6 +233,8 @@ class NikkeDamageEvent extends BattleEvent {
       addDamageBuff: nikke.getAddDamageBuffValues(simulation),
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
+
+    invalid = rapture.invincible || rapture.outsideScreen || nikke.effectiveElements.every((ele) => !rapture.elementalShield.contains(ele));
   }
 
   NikkeDamageEvent.skill({
@@ -263,6 +271,8 @@ class NikkeDamageEvent extends BattleEvent {
       distributedDamageBuff: isShareDamage ? nikke.getShareDamageBuffValues(simulation) : 0,
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
+
+    invalid = rapture.invincible || nikke.effectiveElements.every((ele) => !rapture.elementalShield.contains(ele));
   }
 
   int calculateCoreHitRate(BattleSimulation simulation, BattleNikke nikke, BattleRapture rapture) {

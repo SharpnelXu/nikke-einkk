@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:nikke_einkk/model/battle/harmony_cube.dart';
 import 'package:nikke_einkk/model/db.dart';
-import 'package:nikke_einkk/temp/my_nikkes.dart';
 
-import 'model/battle/battle_simulator.dart';
-import 'model/battle/nikke.dart';
-import 'model/battle/rapture.dart';
-import 'model/common.dart';
-import 'model/items.dart';
 import 'module/battle_setup.dart';
 
 Future<void> main() async {
@@ -21,59 +14,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final sync = 885;
-    final BattlePlayerOptions playerOptions = BattlePlayerOptions(
-      personalRecycleLevel: 420,
-      corpRecycleLevels: {
-        Corporation.elysion: 201,
-        Corporation.tetra: 226,
-        Corporation.missilis: 199,
-        Corporation.pilgrim: 418,
-        Corporation.abnormal: 156,
-      },
-      classRecycleLevels: {NikkeClass.attacker: 212, NikkeClass.defender: 187, NikkeClass.supporter: 197},
-    );
-    final BattleHarmonyCube reloadCube = BattleHarmonyCube(HarmonyCubeType.reload, 15);
-    final BattleHarmonyCube gainAmmoCube = BattleHarmonyCube(HarmonyCubeType.gainAmmo, 15);
-    final BattleHarmonyCube burstCube = BattleHarmonyCube(HarmonyCubeType.burst, 15);
-
-    final simulation = BattleSimulation(
-      playerOptions: playerOptions,
-      nikkeOptions: [
-        literOption.copy()
-          ..syncLevel = sync
-          ..cube = burstCube,
-        crownOption.copy()
-          ..syncLevel = sync
-          ..cube = reloadCube,
-        scarletBlackShadow.copy()
-          ..syncLevel = sync
-          ..cube = gainAmmoCube,
-        aliceOption.copy()
-          ..syncLevel = sync
-          ..cube = reloadCube
-          ..forceCancelShootDelay = true
-          ..alwaysFocus = true
-          ..chargeMode = NikkeFullChargeMode.whenExitingBurst,
-        helm.copy()
-          ..syncLevel = sync
-          ..cube = reloadCube
-          ..forceCancelShootDelay = true
-          ..alwaysFocus = true
-          ..chargeMode = NikkeFullChargeMode.always,
-      ],
-    );
-
-    final rapture =
-        BattleRapture()
-          ..uniqueId = 11
-          ..distance = 30
-          ..element = NikkeElement.water
-          ..defence = 140;
-
-    simulation.raptures.add(rapture);
-    simulation.maxSeconds = 90;
-
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(

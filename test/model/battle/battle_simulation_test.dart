@@ -79,16 +79,9 @@ void main() async {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
         nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload, 15)],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
 
-      final rapture =
-          BattleRapture()
-            ..uniqueId = 11
-            ..distance = 30
-            ..element = NikkeElement.water
-            ..defence = 140;
-
-      simulation.raptures.add(rapture);
       simulation.maxSeconds = 15;
       simulation.simulate();
 
@@ -158,16 +151,9 @@ void main() async {
           scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.ammoCapacity, 7),
           scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst, 7),
         ],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
 
-      final rapture =
-          BattleRapture()
-            ..uniqueId = 11
-            ..distance = 30
-            ..element = NikkeElement.water
-            ..defence = 140;
-
-      simulation.raptures.add(rapture);
       simulation.maxSeconds = 15;
       simulation.simulate();
 
@@ -271,16 +257,9 @@ void main() async {
           aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.chargeSpeed, 7),
           aliceOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.burst, 7),
         ],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
 
-      final rapture =
-          BattleRapture()
-            ..uniqueId = 11
-            ..distance = 30
-            ..element = NikkeElement.water
-            ..defence = 140;
-
-      simulation.raptures.add(rapture);
       simulation.maxSeconds = 15;
       simulation.simulate();
 
@@ -320,16 +299,9 @@ void main() async {
             equips: [],
           ),
         ],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
 
-      final rapture =
-          BattleRapture()
-            ..uniqueId = 11
-            ..distance = 30
-            ..element = NikkeElement.water
-            ..defence = 140;
-
-      simulation.raptures.add(rapture);
       simulation.maxSeconds = 15;
       simulation.simulate();
 
@@ -342,16 +314,9 @@ void main() async {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
         nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.emergencyMaxHp, 15)],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
 
-      final rapture =
-          BattleRapture()
-            ..uniqueId = 11
-            ..distance = 30
-            ..element = NikkeElement.water
-            ..defence = 140;
-
-      simulation.raptures.add(rapture);
       simulation.maxSeconds = 180;
       simulation.simulate();
 
@@ -438,16 +403,9 @@ void main() async {
           classRecycleLevels: {NikkeClass.attacker: 212},
         ),
         nikkeOptions: [snowWhiteOption.copy()..cube = BattleHarmonyCube(HarmonyCubeType.reload, 15)],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.electric, startDefence: 140)],
       );
 
-      final rapture =
-          BattleRapture()
-            ..uniqueId = 11
-            ..distance = 30
-            ..element = NikkeElement.electric
-            ..defence = 140;
-
-      simulation.raptures.add(rapture);
       simulation.maxSeconds = 90;
       simulation.simulate();
 
@@ -541,16 +499,9 @@ void main() async {
             skillLevels: [4, 4, 4],
           )..cube = BattleHarmonyCube(HarmonyCubeType.burst, 7),
         ],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
 
-      final rapture =
-          BattleRapture()
-            ..uniqueId = 11
-            ..distance = 30
-            ..element = NikkeElement.water
-            ..defence = 140;
-
-      simulation.raptures.add(rapture);
       simulation.maxSeconds = 180;
       simulation.simulate();
 
@@ -667,16 +618,9 @@ void main() async {
           scarletOption.copy(),
           scarletOption.copy(),
         ],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
 
-      final rapture =
-          BattleRapture()
-            ..uniqueId = 11
-            ..distance = 30
-            ..element = NikkeElement.water
-            ..defence = 140;
-
-      simulation.raptures.add(rapture);
       simulation.maxSeconds = 90;
       simulation.simulate();
 

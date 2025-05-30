@@ -16,7 +16,7 @@ abstract class BattleEntity {
   int get baseDefence;
   int get baseHp;
 
-  NikkeElement element = NikkeElement.unknown;
+  NikkeElement get element => NikkeElement.unknown;
 
   void changeHp(BattleSimulation simulation, int changeValue, [bool isHeal = false]) {
     currentHp = (currentHp + changeValue).clamp(1, getMaxHp(simulation));
