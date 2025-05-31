@@ -71,6 +71,9 @@ class NikkeDatabase {
   final Map<int, Map<int, HarmonyCubeLevelData>> harmonyCubeLevelTable = {};
   final Map<int, Map<int, FavoriteItemLevelData>> favoriteItemLevelTable = {};
 
+  final Set<FunctionType> onShotFunctionTypes = {};
+  final Set<FunctionType> onHitFunctionTypes = {};
+
   UserData userData = UserData();
 
   bool dataLoaded = false;
@@ -278,6 +281,13 @@ class NikkeDatabase {
       for (final record in json['records']) {
         final function = FunctionData.fromJson(record);
         functionTable[function.id] = function;
+
+        if (function.durationType == DurationType.shots) {
+          onShotFunctionTypes.add(function.functionType);
+        }
+        if (function.durationType == DurationType.hits) {
+          onHitFunctionTypes.add(function.functionType);
+        }
       }
     }
     return exists;

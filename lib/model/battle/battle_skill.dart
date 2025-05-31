@@ -138,6 +138,7 @@ class BattleSkill {
         for (final target in skillTargets) {
           final barrierHp = owner.getMaxHp(simulation) * BattleUtils.toModifier(skillData.skillValueData[1].skillValue);
           final barrier = Barrier(
+            skillData.id,
             barrierHp.round(),
             skillData.durationType,
             BattleUtils.timeDataToFrame(skillData.durationValue, simulation.fps),
@@ -145,7 +146,8 @@ class BattleSkill {
           if (target is BattleRapture) {
             target.barrier = barrier;
           } else if (target is BattleNikke) {
-            target.barrier = barrier;
+            target.barriers.removeWhere((oldBarrier) => oldBarrier.id == skillData.id);
+            target.barriers.add(barrier);
           }
         }
         break;

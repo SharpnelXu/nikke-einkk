@@ -268,7 +268,7 @@ class BattleNikke extends BattleEntity {
   );
 
   late BattleCover cover;
-  Barrier? barrier;
+  List<Barrier> barriers = [];
   int currentAmmo = 0;
 
   WeaponType get currentWeaponType => currentWeaponData.weaponType;
@@ -332,7 +332,7 @@ class BattleNikke extends BattleEntity {
     currentAmmo = baseWeaponData.maxAmmo;
     cover.uniqueId = position + 5;
     cover.init(simulation);
-    barrier = null;
+    barriers.clear();
 
     totalBulletsFired = 0;
     totalFullChargeFired = 0;
@@ -403,19 +403,12 @@ class BattleNikke extends BattleEntity {
       skill.processFrame(simulation);
     }
 
-    final barrier = this.barrier;
-    if (barrier != null) {
+    for (final barrier in barriers) {
       if (barrier.durationType == DurationType.timeSec) {
         barrier.duration -= 1;
-        if (barrier.duration == 0) {
-          this.barrier = null;
-        }
-      }
-
-      if (barrier.hp <= 0) {
-        this.barrier = null;
       }
     }
+    barriers.removeWhere((barrier) => barrier.hp <= 0 || (barrier.duration == 0 && barrier.durationType == DurationType.timeSec));
   }
 
   void processBehindCoverStatus(BattleSimulation simulation) {
@@ -710,7 +703,7 @@ class BattleNikke extends BattleEntity {
       }
 
       for (final buff in buffs) {
-        if (buff.data.durationType == DurationType.shots) {
+        if (buff.data.durationType == DurationType.shots && db.onShotFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }
@@ -729,7 +722,13 @@ class BattleNikke extends BattleEntity {
       activatedBurstSkillThisCycle = false;
     }
 
-    // todo: defensive shot count buff?
+    if (event is RaptureDamageEvent && event.targetUniqueId == uniqueId) {
+      for (final buff in buffs) {
+        if (buff.data.durationType == DurationType.shots && db.onHitFunctionTypes.contains(buff.data.functionType)) {
+          buff.duration -= 1;
+        }
+      }
+    }
 
     for (final function in functions) {
       function.broadcast(event, simulation);

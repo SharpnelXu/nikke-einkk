@@ -8,6 +8,7 @@ import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 import 'battle_entity.dart';
@@ -395,7 +396,7 @@ class BattleRapture extends BattleEntity {
           elementalShield.clear();
           break;
         case BattleRaptureActionType.generateBarrier:
-          barrier = Barrier(action.setParameter!, action.durationType!, action.timeParameter ?? 0);
+          barrier = Barrier(-1, action.setParameter!, action.durationType!, action.timeParameter ?? 0);
           break;
         case BattleRaptureActionType.generateParts:
           final partId = action.setParameter!;
@@ -486,7 +487,7 @@ class BattleRapture extends BattleEntity {
   void broadcast(BattleEvent event, BattleSimulation simulation) {
     if (event is NikkeDamageEvent && event.targetUniqueId == uniqueId) {
       for (final buff in buffs) {
-        if (buff.data.durationType == DurationType.shots) {
+        if (buff.data.durationType == DurationType.shots && db.onHitFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }
