@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/favorite_item.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
+import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 
@@ -101,4 +102,12 @@ Widget buildRaptureIcon(BattleRaptureOptions option) {
     ),
     child: Stack(alignment: Alignment.center, fit: StackFit.loose, children: [Text(option.name, style: textStyle)]),
   );
+}
+
+String frameDataToNiceTimeString(int frame, int fps) {
+  final timeData = BattleUtils.frameToTimeData(frame, fps);
+  final seconds = timeData % 6000 / 100;
+  return '${timeData ~/ 6000}:'
+      '${seconds < 10 ? '0' : ''}'
+      '${(timeData % 6000 / 100).toStringAsFixed(3)}';
 }

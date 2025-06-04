@@ -5,6 +5,7 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/simple_dialog.dart';
+import 'package:nikke_einkk/module/rapture_action_setup.dart';
 
 class RaptureSetupPage extends StatefulWidget {
   final BattleRaptureOptions option;
@@ -188,10 +189,42 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
   Widget buildActionRow() {
     return Column(
       spacing: 3,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children:
           [
             Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+            buildActionButtonRow(),
           ].map((widget) => Padding(padding: const EdgeInsets.only(left: 8.0), child: widget)).toList(),
+    );
+  }
+
+  Widget buildActionButtonRow() {
+    return Row(
+      spacing: 3,
+      children: [
+        // remove All button
+        // shift all timestamps button
+        // clear selection button
+        // copy button
+        // add new action button
+        IconButton.filled(
+          onPressed: () async {
+            final addAction = await showDialog<bool>(
+              context: context,
+              barrierDismissible: false,
+              builder: (ctx) {
+                return SimpleConfirmDialog(
+                  title: Text('Add Rapture Action'),
+                  showCancel: true,
+                  showOk: true,
+                  content: RaptureActionSetupDialog(maxFrame: 180 * 60, fps: 60),
+                );
+              },
+            );
+          },
+          icon: Icon(Icons.add),
+        ),
+      ],
     );
   }
 

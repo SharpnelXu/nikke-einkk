@@ -18,7 +18,6 @@ class BattlePlayerOptions {
   Map<Corporation, int> corpRecycleLevels = {};
   Map<NikkeClass, int> classRecycleLevels = {};
   bool forceFillBurst = false;
-  // cube levels
 
   BattlePlayerOptions({
     this.personalRecycleLevel = 0,

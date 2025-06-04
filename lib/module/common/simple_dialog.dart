@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 /// copied from Chaldea
 class SimpleConfirmDialog extends StatelessWidget {
@@ -72,6 +74,129 @@ class SimpleConfirmDialog extends StatelessWidget {
       scrollable: scrollable,
       actions: children,
       insetPadding: insetPadding,
+    );
+  }
+}
+
+class TimeframeSetupDialog extends StatefulWidget {
+  final int maxFrame;
+  final int fps;
+  final int? defaultFrame;
+
+  const TimeframeSetupDialog({super.key, required this.maxFrame, required this.fps, this.defaultFrame});
+
+  @override
+  State<TimeframeSetupDialog> createState() => _TimeframeSetupDialogState();
+}
+
+class _TimeframeSetupDialogState extends State<TimeframeSetupDialog> {
+  TextEditingController timeInputController = TextEditingController();
+  int get maxFrame => widget.maxFrame;
+  String get maxSeconds => (maxFrame / fps).toStringAsFixed(3);
+  int get fps => widget.fps;
+
+  bool useFrame = true;
+  int frame = 0;
+  String? errorText;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.defaultFrame != null) {
+      frame = widget.defaultFrame!;
+    }
+    timeInputController.text = frame.toString();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    timeInputController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> actions = [
+      TextButton(
+        child: Text('Cancel'),
+        onPressed: () {
+          Navigator.of(context).pop(null);
+        },
+      ),
+      TextButton(
+        child: Text('Confirm'),
+        onPressed: () {
+          final num = double.tryParse(timeInputController.text);
+          if (num != null) {
+            final nearestFrame = useFrame ? num.round() : (num * fps).round();
+            if (nearestFrame > 0 && nearestFrame <= maxFrame) {
+              Navigator.of(context).pop(nearestFrame);
+            } else {
+              errorText = "Input outside valid range [${useFrame ? maxFrame : maxSeconds}, 0).";
+              if (mounted) setState(() {});
+            }
+          }
+        },
+      ),
+    ];
+
+    return AlertDialog(
+      title: Text('Select a timeframe'),
+      content: Column(
+        spacing: 3,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            spacing: 5,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Input with frame data'),
+              Switch(
+                value: useFrame,
+                onChanged: (v) {
+                  useFrame = v;
+                  timeInputController.text = useFrame ? frame.toString() : (frame / fps).toStringAsFixed(3);
+                  if (mounted) setState(() {});
+                },
+              ),
+            ],
+          ),
+          if (useFrame) Text('Frame starts at $maxFrame (inclusive) and ends at 0 (exclusive).'),
+          if (!useFrame) Text('Time starts at $maxSeconds seconds and ends at 0 seconds.'),
+          if (!useFrame) Text('Please input only seconds (E.g. 180 for 3:00)'),
+          TextField(
+            decoration: InputDecoration(border: const OutlineInputBorder()),
+            controller: timeInputController,
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'\d+.?\d*'))],
+            onChanged: (v) {
+              final num = double.tryParse(v);
+              if (num != null) {
+                final nearestFrame = useFrame ? num.round() : (num * fps).round();
+                if (nearestFrame > 0 && nearestFrame <= maxFrame) {
+                  frame = nearestFrame;
+                  errorText = null;
+                } else {
+                  errorText = "Input outside valid range [${useFrame ? maxFrame : maxSeconds}, 0).";
+                }
+              } else {
+                errorText = "Input is not a valid number";
+              }
+              if (mounted) setState(() {});
+            },
+          ),
+          if (errorText != null) Text(errorText!, style: TextStyle(color: Colors.red)),
+          Text(
+            'Current input: Frame $frame,'
+            ' Time: ${frameDataToNiceTimeString(frame, fps)}'
+            ' (Elapsed time: ${frameDataToNiceTimeString(maxFrame - frame, fps)})',
+          ),
+        ],
+      ),
+      contentPadding: const EdgeInsetsDirectional.fromSTEB(24.0, 20.0, 24.0, 24.0),
+      scrollable: false,
+      actions: actions,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
     );
   }
 }
