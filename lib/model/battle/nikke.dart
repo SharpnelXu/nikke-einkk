@@ -214,7 +214,8 @@ class BattleNikke extends BattleEntity {
   @override
   NikkeElement get element => NikkeElement.fromId(characterData.elementId.first);
 
-  List<NikkeElement> get effectiveElements => characterData.elementId.map((eleId) => NikkeElement.fromId(eleId)).toList();
+  List<NikkeElement> get effectiveElements =>
+      characterData.elementId.map((eleId) => NikkeElement.fromId(eleId)).toList();
 
   int get coreLevel => characterData.gradeCoreId;
 
@@ -408,7 +409,9 @@ class BattleNikke extends BattleEntity {
         barrier.duration -= 1;
       }
     }
-    barriers.removeWhere((barrier) => barrier.hp <= 0 || (barrier.duration == 0 && barrier.durationType == DurationType.timeSec));
+    barriers.removeWhere(
+      (barrier) => barrier.hp <= 0 || (barrier.duration == 0 && barrier.durationType == DurationType.timeSec),
+    );
   }
 
   void processBehindCoverStatus(BattleSimulation simulation) {

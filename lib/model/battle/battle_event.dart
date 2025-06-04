@@ -185,7 +185,10 @@ class NikkeDamageEvent extends BattleEvent {
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
 
-    invalid = rapture.invincible || rapture.outsideScreen || nikke.effectiveElements.every((ele) => !rapture.elementalShield.contains(ele));
+    invalid =
+        rapture.invincible ||
+        rapture.outsideScreen ||
+        nikke.effectiveElements.every((ele) => !rapture.elementalShield.contains(ele));
   }
 
   NikkeDamageEvent.piercePart({
@@ -234,7 +237,10 @@ class NikkeDamageEvent extends BattleEvent {
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
 
-    invalid = rapture.invincible || rapture.outsideScreen || nikke.effectiveElements.every((ele) => !rapture.elementalShield.contains(ele));
+    invalid =
+        rapture.invincible ||
+        rapture.outsideScreen ||
+        nikke.effectiveElements.every((ele) => !rapture.elementalShield.contains(ele));
   }
 
   NikkeDamageEvent.skill({

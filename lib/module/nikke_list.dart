@@ -1,13 +1,13 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:nikke_einkk/model/battle/equipment.dart';
 import 'package:nikke_einkk/model/battle/favorite_item.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
 
@@ -323,6 +323,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                 SizedBox(
                   width: 100,
                   child: RangedNumberTextField(
+                    minValue: 1,
                     maxValue: db.maxSyncLevel,
                     defaultValue: option.syncLevel,
                     onChangeFunction:
@@ -694,106 +695,5 @@ class NikkeFilterData {
     weaponTypes.clear();
     rarity.clear();
     rarity.add(Rarity.ssr);
-  }
-}
-
-class RangedNumberTextField extends StatefulWidget {
-  final int defaultValue;
-  final int minValue;
-  final int maxValue;
-  final void Function(int newValue)? onChangeFunction;
-
-  const RangedNumberTextField({
-    super.key,
-    this.defaultValue = 1, // Default value when empty
-    this.minValue = 1,
-    required this.maxValue,
-    this.onChangeFunction,
-  });
-
-  @override
-  State<RangedNumberTextField> createState() => _RangedNumberTextFieldState();
-}
-
-class _RangedNumberTextFieldState extends State<RangedNumberTextField> {
-  String? _errorText;
-  final TextEditingController controller = TextEditingController();
-  int get minLevel => widget.minValue;
-  int get maxLevel => widget.maxValue;
-  int get defaultValue => widget.defaultValue;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize with default value if empty
-    if (controller.text.isEmpty) {
-      controller.text = defaultValue.toString();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: TextInputType.number,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-        _NumberRangeInputFormatter(min: minLevel, max: maxLevel, defaultValue: defaultValue),
-      ],
-      decoration: InputDecoration(
-        hintText: 'Enter a number ($minLevel-$maxLevel)',
-        errorText: _errorText,
-        border: const OutlineInputBorder(),
-      ),
-      onChanged: (value) {
-        if (value.isEmpty) {
-          // Immediately restore default value when empty
-          controller.text = defaultValue.toString();
-          controller.selection = TextSelection.fromPosition(TextPosition(offset: controller.text.length));
-        }
-
-        final numValue = int.tryParse(value);
-        if (numValue == null || numValue < minLevel || numValue > maxLevel) {
-          setState(() => _errorText = 'Number must be between $minLevel and $maxLevel');
-        } else {
-          setState(() {
-            _errorText = null;
-            if (widget.onChangeFunction != null) widget.onChangeFunction!(numValue);
-          });
-        }
-      },
-    );
-  }
-}
-
-class _NumberRangeInputFormatter extends TextInputFormatter {
-  final int min;
-  final int max;
-  final int defaultValue;
-
-  _NumberRangeInputFormatter({required this.min, required this.max, this.defaultValue = 1});
-
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    // If text is empty, return default value
-    if (newValue.text.isEmpty) {
-      return TextEditingValue(
-        text: defaultValue.toString(),
-        selection: TextSelection.collapsed(offset: defaultValue.toString().length),
-      );
-    }
-
-    final number = int.tryParse(newValue.text);
-    if (number == null) {
-      return oldValue;
-    }
-
-    if (number < min) {
-      return TextEditingValue(text: min.toString(), selection: TextSelection.collapsed(offset: min.toString().length));
-    } else if (number > max) {
-      return TextEditingValue(text: max.toString(), selection: TextSelection.collapsed(offset: max.toString().length));
-    }
-
-    return newValue;
   }
 }

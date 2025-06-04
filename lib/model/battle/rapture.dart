@@ -14,7 +14,7 @@ import 'package:nikke_einkk/model/skills.dart';
 import 'battle_entity.dart';
 
 class BattleRaptureOptions {
-  String name;
+  String name = 'Rapture';
   bool isStageTarget;
   bool canBeTargeted;
   int coreSize;
@@ -206,21 +206,22 @@ int getSortingStat(BattleSimulation simulation, BattleNikke nikke, BattleRapture
 
 class BattleRaptureParts {
   int id;
+  String name;
   int maxHp = 10000;
   int hp = 10000;
   bool isBehindBoss = true;
   bool isCore = false;
 
-  BattleRaptureParts(this.id);
+  BattleRaptureParts({required this.id, this.name = 'Part'});
 
   bool canBeDamaged(bool hasPierce) {
     return hp > 0 && (hasPierce || !isBehindBoss);
   }
 
   BattleRaptureParts copy() {
-    return BattleRaptureParts(id)
+    return BattleRaptureParts(id: id, name: name)
       ..maxHp = maxHp
-      ..hp = maxHp
+      ..hp = hp
       ..isBehindBoss = isBehindBoss
       ..isCore = isCore;
   }

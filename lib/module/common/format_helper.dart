@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/favorite_item.dart';
+import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 
@@ -83,5 +84,21 @@ Widget buildNikkeIcon(NikkeCharacterData? characterData, bool isSelected, [Strin
           Positioned(bottom: 2, right: 2, child: Text(characterData.useBurstSkill.toString(), style: textStyle)),
       ],
     ),
+  );
+}
+
+Widget buildRaptureIcon(BattleRaptureOptions option) {
+  final textStyle = TextStyle(fontSize: 15, color: Colors.white);
+  return Container(
+    width: avatarSize,
+    height: avatarSize,
+    margin: const EdgeInsets.all(5.0),
+    padding: const EdgeInsets.all(3.0),
+    decoration: BoxDecoration(
+      border: Border.all(color: Colors.black, width: 3),
+      borderRadius: BorderRadius.circular(5),
+      color: option.element.color,
+    ),
+    child: Stack(alignment: Alignment.center, fit: StackFit.loose, children: [Text(option.name, style: textStyle)]),
   );
 }

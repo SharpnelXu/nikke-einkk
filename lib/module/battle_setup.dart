@@ -8,10 +8,12 @@ import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/simple_dialog.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
 import 'package:nikke_einkk/module/nikke_list.dart';
+import 'package:nikke_einkk/module/rapture_setup.dart';
 
 class BattleSetupPage extends StatefulWidget {
   const BattleSetupPage({super.key});
@@ -160,8 +162,6 @@ class RaptureDisplay extends StatefulWidget {
 }
 
 class _RaptureDisplayState extends State<RaptureDisplay> {
-  static const avatarSize = 100.0;
-
   BattleRaptureOptions get option => widget.option;
 
   @override
@@ -177,17 +177,20 @@ class _RaptureDisplayState extends State<RaptureDisplay> {
         verticalDirection: VerticalDirection.down,
         spacing: 5,
         children: [
-          Container(
-            width: avatarSize,
-            height: avatarSize,
-            decoration: BoxDecoration(border: Border.all(color: Colors.black), borderRadius: BorderRadius.circular(4)),
-            child: Center(child: Text('${option.name}.png')),
-          ),
+          buildRaptureIcon(option),
           Text(option.name, maxLines: 1),
           Text('HP: ${format.format(option.startHp)}'),
           Text('ATK: ${format.format(option.startAttack)}'),
           Text('DEF: ${format.format(option.startDefence)}'),
           Text('Distance: ${format.format(option.startDistance)}'),
+          FilledButton.icon(
+            onPressed: () async {
+              await Navigator.push(context, MaterialPageRoute(builder: (context) => RaptureSetupPage(option: option)));
+              if (mounted) setState(() {});
+            },
+            label: Text('Configure'),
+            icon: Icon(Icons.settings),
+          ),
         ],
       ),
     );
@@ -495,6 +498,7 @@ class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
               SizedBox(
                 width: 100,
                 child: RangedNumberTextField(
+                  minValue: 1,
                   maxValue: db.maxSyncLevel,
                   defaultValue: globalSync,
                   onChangeFunction: (newValue) {
@@ -515,6 +519,7 @@ class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
               SizedBox(
                 width: 100,
                 child: RangedNumberTextField(
+                  minValue: 1,
                   maxValue: maxResearchLevel(db.maxSyncLevel),
                   defaultValue: option.personalRecycleLevel,
                   onChangeFunction: (newValue) {
@@ -543,6 +548,7 @@ class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
                 SizedBox(
                   width: 100,
                   child: RangedNumberTextField(
+                    minValue: 1,
                     maxValue: maxResearchLevel(db.maxSyncLevel),
                     defaultValue: option.classRecycleLevels[type] ?? 0,
                     onChangeFunction: (newValue) {
