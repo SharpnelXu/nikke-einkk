@@ -57,7 +57,7 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
       spacing: 3,
       children:
           [
-            Text('Parts', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+            Text('Parts', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
             Scrollbar(
               thumbVisibility: true,
               trackVisibility: true,
@@ -121,7 +121,7 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             spacing: 5,
             children: [
-              Text('Part HP', ),
+              Text('Part HP'),
               FilledButton(
                 onPressed: () async {
                   int newHp = part.maxHp;
@@ -140,7 +140,8 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
                           },
                         ),
                       );
-                    });
+                    },
+                  );
 
                   if (changed == true) {
                     part.maxHp = newHp;
@@ -188,7 +189,9 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
     return Column(
       spacing: 3,
       children:
-          [Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)].map((widget) => Padding(padding: const EdgeInsets.only(left: 8.0), child: widget)).toList(),
+          [
+            Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+          ].map((widget) => Padding(padding: const EdgeInsets.only(left: 8.0), child: widget)).toList(),
     );
   }
 
