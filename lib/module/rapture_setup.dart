@@ -209,16 +209,11 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
         // add new action button
         IconButton.filled(
           onPressed: () async {
-            final addAction = await showDialog<bool>(
+            final action = await showDialog<BattleRaptureAction?>(
               context: context,
               barrierDismissible: false,
               builder: (ctx) {
-                return SimpleConfirmDialog(
-                  title: Text('Add Rapture Action'),
-                  showCancel: true,
-                  showOk: true,
-                  content: RaptureActionSetupDialog(maxFrame: 180 * 60, fps: 60),
-                );
+                return RaptureActionSetupDialog(maxFrame: 180 * 60, fps: 60);
               },
             );
           },

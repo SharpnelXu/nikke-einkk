@@ -167,7 +167,46 @@ enum BattleRaptureActionType {
   jumpEnd,
   invincibleEnd,
   redCircleEnd,
-  elementalShieldEnd,
+  elementalShieldEnd;
+
+  @override
+  String toString() {
+    switch (this) {
+      case BattleRaptureActionType.setAtk:
+        return 'Set ATK';
+      case BattleRaptureActionType.setDef:
+        return 'Set DEF';
+      case BattleRaptureActionType.setDistance:
+        return 'Set Distance';
+      case BattleRaptureActionType.setCoreSize:
+        return 'Set Core Status';
+      case BattleRaptureActionType.setCorePierce:
+        return 'Set Core Pierce Status';
+      case BattleRaptureActionType.jump:
+        return 'Jump';
+      case BattleRaptureActionType.invincible:
+        return 'Set Invincibility';
+      case BattleRaptureActionType.redCircle:
+        return 'Start Special Interruption';
+      case BattleRaptureActionType.elementalShield:
+        return 'Generate Code Barrier';
+      case BattleRaptureActionType.generateBarrier:
+        return 'Generate Barrier';
+      case BattleRaptureActionType.generateParts:
+        return 'Generate Parts';
+      case BattleRaptureActionType.attack:
+        return 'Execute Attack';
+      case BattleRaptureActionType.setBuff:
+        return 'Set Buff';
+      case BattleRaptureActionType.clearBuff:
+        return 'Remove Buff';
+      case BattleRaptureActionType.jumpEnd:
+      case BattleRaptureActionType.invincibleEnd:
+      case BattleRaptureActionType.redCircleEnd:
+      case BattleRaptureActionType.elementalShieldEnd:
+        return name;
+    }
+  }
 }
 
 enum BattleRaptureActionTarget {
@@ -434,7 +473,7 @@ class BattleRapture extends BattleEntity {
                 functionValueType: ValueType.percent,
                 functionValue: action.setParameter!,
                 functionStandard: StandardType.user,
-                fullCount: 99,
+                fullCount: 999,
                 durationType: action.durationType!,
                 durationValue: action.timeParameter!,
                 functionTarget: FunctionTargetType.self,

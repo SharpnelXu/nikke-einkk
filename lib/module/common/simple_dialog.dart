@@ -82,8 +82,15 @@ class TimeframeSetupDialog extends StatefulWidget {
   final int maxFrame;
   final int fps;
   final int? defaultFrame;
+  final bool timestampMode;
 
-  const TimeframeSetupDialog({super.key, required this.maxFrame, required this.fps, this.defaultFrame});
+  const TimeframeSetupDialog({
+    super.key,
+    required this.maxFrame,
+    required this.fps,
+    this.defaultFrame,
+    this.timestampMode = true,
+  });
 
   @override
   State<TimeframeSetupDialog> createState() => _TimeframeSetupDialogState();
@@ -94,6 +101,7 @@ class _TimeframeSetupDialogState extends State<TimeframeSetupDialog> {
   int get maxFrame => widget.maxFrame;
   String get maxSeconds => (maxFrame / fps).toStringAsFixed(3);
   int get fps => widget.fps;
+  bool get timestampMode => widget.timestampMode;
 
   bool useFrame = true;
   int frame = 0;
@@ -129,7 +137,7 @@ class _TimeframeSetupDialogState extends State<TimeframeSetupDialog> {
           final num = double.tryParse(timeInputController.text);
           if (num != null) {
             final nearestFrame = useFrame ? num.round() : (num * fps).round();
-            if (nearestFrame > 0 && nearestFrame <= maxFrame) {
+            if (nearestFrame > 0 && nearestFrame <= maxFrame || !timestampMode) {
               Navigator.of(context).pop(nearestFrame);
             } else {
               errorText = "Input outside valid range [${useFrame ? maxFrame : maxSeconds}, 0).";
@@ -162,9 +170,9 @@ class _TimeframeSetupDialogState extends State<TimeframeSetupDialog> {
               ),
             ],
           ),
-          if (useFrame) Text('Frame starts at $maxFrame (inclusive) and ends at 0 (exclusive).'),
-          if (!useFrame) Text('Time starts at $maxSeconds seconds and ends at 0 seconds.'),
-          if (!useFrame) Text('Please input only seconds (E.g. 180 for 3:00)'),
+          if (useFrame && timestampMode) Text('Frame starts at $maxFrame (inclusive) and ends at 0 (exclusive).'),
+          if (!useFrame && timestampMode) Text('Time starts at $maxSeconds seconds and ends at 0 seconds.'),
+          if (!useFrame && timestampMode) Text('Please input only seconds (E.g. 180 for 3:00)'),
           TextField(
             decoration: InputDecoration(border: const OutlineInputBorder()),
             controller: timeInputController,
@@ -173,7 +181,7 @@ class _TimeframeSetupDialogState extends State<TimeframeSetupDialog> {
               final num = double.tryParse(v);
               if (num != null) {
                 final nearestFrame = useFrame ? num.round() : (num * fps).round();
-                if (nearestFrame > 0 && nearestFrame <= maxFrame) {
+                if (nearestFrame > 0 && nearestFrame <= maxFrame || !timestampMode) {
                   frame = nearestFrame;
                   errorText = null;
                 } else {
@@ -186,11 +194,13 @@ class _TimeframeSetupDialogState extends State<TimeframeSetupDialog> {
             },
           ),
           if (errorText != null) Text(errorText!, style: TextStyle(color: Colors.red)),
-          Text(
-            'Current input: Frame $frame,'
-            ' Time: ${frameDataToNiceTimeString(frame, fps)}'
-            ' (Elapsed time: ${frameDataToNiceTimeString(maxFrame - frame, fps)})',
-          ),
+          if (timestampMode)
+            Text(
+              'Current input: Frame $frame,'
+              ' Time: ${frameDataToNiceTimeString(frame, fps)}'
+              ' (Elapsed time: ${frameDataToNiceTimeString(maxFrame - frame, fps)})',
+            ),
+          if (!timestampMode) Text('Current duration: $frame frames, ${(frame / fps).toStringAsFixed(3)} seconds'),
         ],
       ),
       contentPadding: const EdgeInsetsDirectional.fromSTEB(24.0, 20.0, 24.0, 24.0),
