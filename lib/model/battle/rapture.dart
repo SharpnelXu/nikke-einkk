@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
@@ -25,7 +26,7 @@ class BattleRaptureOptions {
   int coreRequiresPierce;
   NikkeElement element;
 
-  Map<int, List<BattleRaptureAction>> actions = {};
+  Map<int, List<BattleRaptureAction>> actions = SplayTreeMap((a, b) => b.compareTo(a));
 
   Map<int, BattleRaptureParts> parts = {};
 
@@ -50,6 +51,7 @@ class BattleRaptureOptions {
 
 class BattleRaptureAction {
   final BattleRaptureActionType type;
+  final int frame;
   int? setParameter;
   int? timeParameter;
   DurationType? durationType;
@@ -57,51 +59,56 @@ class BattleRaptureAction {
 
   BattleRaptureActionTarget? targetType;
   BattleRaptureActionTargetSubtype? targetSubtype;
+  int? position;
   int? targetCount;
-  bool? sortHigh;
+  bool? highToLow;
 
   FunctionType? buffType;
   bool? isBuff;
 
-  BattleRaptureAction(this.type);
+  BattleRaptureAction(this.type, this.frame);
 
-  BattleRaptureAction.set(this.type, this.setParameter);
+  BattleRaptureAction.set(this.type, this.frame, this.setParameter);
 
-  BattleRaptureAction.timed(this.type, this.timeParameter);
+  BattleRaptureAction.timed(this.type, this.frame, this.timeParameter);
 
-  factory BattleRaptureAction.barrier(int hp, DurationType durationType, int? duration) {
-    return BattleRaptureAction(BattleRaptureActionType.generateBarrier)
+  factory BattleRaptureAction.barrier(int frame, int hp, DurationType durationType, int? duration) {
+    return BattleRaptureAction(BattleRaptureActionType.generateBarrier, frame)
       ..setParameter = hp
       ..durationType = durationType
       ..timeParameter = duration;
   }
 
-  factory BattleRaptureAction.eleShield(List<NikkeElement> eleShields, int duration) {
-    return BattleRaptureAction(BattleRaptureActionType.elementalShield)
+  factory BattleRaptureAction.eleShield(int frame, List<NikkeElement> eleShields, int duration) {
+    return BattleRaptureAction(BattleRaptureActionType.elementalShield, frame)
       ..eleShields = eleShields
       ..timeParameter = duration;
   }
 
-  factory BattleRaptureAction.attack(
-    BattleRaptureActionTarget targetType,
-    int damageRate, [
+  factory BattleRaptureAction.attack({
+    required int frame,
+    required BattleRaptureActionTarget targetType,
+    required int damageRate,
     BattleRaptureActionTargetSubtype? targetSubtype,
     int? targetCount,
     bool? high,
-  ]) {
-    return BattleRaptureAction(BattleRaptureActionType.attack)
+    int? position,
+  }) {
+    return BattleRaptureAction(BattleRaptureActionType.attack, frame)
       ..setParameter = damageRate
       ..targetType = targetType
       ..targetSubtype = targetSubtype
       ..targetCount = targetCount
-      ..sortHigh = high;
+      ..highToLow = high
+      ..position = position;
   }
 
-  factory BattleRaptureAction.parts(int partId) {
-    return BattleRaptureAction(BattleRaptureActionType.generateParts)..setParameter = partId;
+  factory BattleRaptureAction.parts(int frame, int partId) {
+    return BattleRaptureAction(BattleRaptureActionType.generateParts, frame)..setParameter = partId;
   }
 
   factory BattleRaptureAction.setBuff({
+    required int frame,
     required BattleRaptureActionTarget targetType,
     required FunctionType buffType,
     required bool isBuff,
@@ -111,8 +118,9 @@ class BattleRaptureAction {
     BattleRaptureActionTargetSubtype? targetSubtype,
     int? targetCount,
     bool? sortHigh,
+    int? position,
   }) {
-    return BattleRaptureAction(BattleRaptureActionType.setBuff)
+    return BattleRaptureAction(BattleRaptureActionType.setBuff, frame)
       ..buffType = buffType
       ..isBuff = isBuff
       ..setParameter = buffValue
@@ -121,22 +129,26 @@ class BattleRaptureAction {
       ..targetType = targetType
       ..targetSubtype = targetSubtype
       ..targetCount = targetCount
-      ..sortHigh = sortHigh;
+      ..highToLow = sortHigh
+      ..position = position;
   }
 
   factory BattleRaptureAction.clearBuff({
+    required int frame,
     required BattleRaptureActionTarget targetType,
     required bool isBuff,
     BattleRaptureActionTargetSubtype? targetSubtype,
     int? targetCount,
     bool? sortHigh,
+    int? position,
   }) {
-    return BattleRaptureAction(BattleRaptureActionType.clearBuff)
+    return BattleRaptureAction(BattleRaptureActionType.clearBuff, frame)
       ..isBuff = isBuff
       ..targetType = targetType
       ..targetSubtype = targetSubtype
       ..targetCount = targetCount
-      ..sortHigh = sortHigh;
+      ..highToLow = sortHigh
+      ..position = position;
   }
 }
 
@@ -220,7 +232,17 @@ enum BattleRaptureActionTarget {
   targetedNikkes,
 }
 
-enum BattleRaptureActionTargetSubtype { attack, defence, hp, hpRatio, maxHp, hpCover, hpCoverRatio, maxHpCover }
+enum BattleRaptureActionTargetSubtype {
+  attack,
+  defence,
+  hp,
+  hpRatio,
+  maxHp,
+  hpCover,
+  hpCoverRatio,
+  maxHpCover,
+  position,
+}
 
 int getSortingStat(BattleSimulation simulation, BattleNikke nikke, BattleRaptureActionTargetSubtype type) {
   switch (type) {
@@ -240,6 +262,8 @@ int getSortingStat(BattleSimulation simulation, BattleNikke nikke, BattleRapture
       return (10000 * nikke.cover.currentHp / nikke.cover.getMaxHp(simulation)).round();
     case BattleRaptureActionTargetSubtype.maxHpCover:
       return nikke.cover.getMaxHp(simulation);
+    case BattleRaptureActionTargetSubtype.position:
+      return 0;
   }
 }
 
@@ -393,7 +417,7 @@ class BattleRapture extends BattleEntity {
             final endFrame =
                 simulation.currentFrame - BattleUtils.timeDataToFrame(action.timeParameter!, simulation.fps);
             endActions.putIfAbsent(endFrame, () => []);
-            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.jumpEnd));
+            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.jumpEnd, endFrame));
           }
           break;
         case BattleRaptureActionType.jumpEnd:
@@ -405,7 +429,7 @@ class BattleRapture extends BattleEntity {
             final endFrame =
                 simulation.currentFrame - BattleUtils.timeDataToFrame(action.timeParameter!, simulation.fps);
             endActions.putIfAbsent(endFrame, () => []);
-            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.invincibleEnd));
+            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.invincibleEnd, endFrame));
           }
           break;
         case BattleRaptureActionType.invincibleEnd:
@@ -417,7 +441,7 @@ class BattleRapture extends BattleEntity {
             final endFrame =
                 simulation.currentFrame - BattleUtils.timeDataToFrame(action.timeParameter!, simulation.fps);
             endActions.putIfAbsent(endFrame, () => []);
-            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.redCircleEnd));
+            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.redCircleEnd, endFrame));
           }
           break;
         case BattleRaptureActionType.redCircleEnd:
@@ -429,7 +453,7 @@ class BattleRapture extends BattleEntity {
             final endFrame =
                 simulation.currentFrame - BattleUtils.timeDataToFrame(action.timeParameter!, simulation.fps);
             endActions.putIfAbsent(endFrame, () => []);
-            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.elementalShieldEnd));
+            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.elementalShieldEnd, endFrame));
           }
           break;
         case BattleRaptureActionType.elementalShieldEnd:
@@ -517,9 +541,14 @@ class BattleRapture extends BattleEntity {
       case BattleRaptureActionTarget.targetedNikkes:
         final nikkes = simulation.nikkes.toList();
         final subtype = action.targetSubtype!;
+        if (subtype == BattleRaptureActionTargetSubtype.position) {
+          int position = action.position!;
+          return [if (simulation.nikkes.length >= position) simulation.nikkes[position - 1]];
+        }
+
         nikkes.sort((a, b) => getSortingStat(simulation, a, subtype) - getSortingStat(simulation, b, subtype));
 
-        final countList = action.sortHigh! ? nikkes.reversed.toList() : nikkes;
+        final countList = action.highToLow! ? nikkes.reversed.toList() : nikkes;
         return countList.sublist(0, min(countList.length, action.targetCount!));
     }
   }

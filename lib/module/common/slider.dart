@@ -15,6 +15,7 @@ class SliderWithPrefix extends StatelessWidget {
   final double leadingWidth;
   final EdgeInsetsGeometry? padding;
   final TextStyle? labelStyle;
+  final bool? constraint;
 
   const SliderWithPrefix({
     super.key,
@@ -30,6 +31,7 @@ class SliderWithPrefix extends StatelessWidget {
     this.leadingWidth = 48,
     this.padding,
     this.labelStyle,
+    this.constraint,
   });
 
   @override
@@ -75,7 +77,9 @@ class SliderWithPrefix extends StatelessWidget {
         },
       ),
     );
-    slider = ConstrainedBox(constraints: const BoxConstraints(maxWidth: 320, maxHeight: 24), child: slider);
+    if (constraint != false) {
+      slider = ConstrainedBox(constraints: const BoxConstraints(maxWidth: 320, maxHeight: 24), child: slider);
+    }
 
     Widget child;
     if (titled) {

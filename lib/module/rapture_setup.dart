@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/simple_dialog.dart';
@@ -21,6 +22,9 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
   final TextEditingController nameController = TextEditingController();
   final ScrollController partScrollController = ScrollController();
   int nextPartId = 1;
+
+  int fps = 60;
+  int maxSeconds = 180;
 
   @override
   void initState() {
@@ -44,21 +48,30 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Rapture Options')),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 3,
-        children: [buildSettingRow(), Divider(), buildPartRow(), Divider(), Expanded(child: buildActionRow())],
-      ),
-    );
-  }
-
-  Widget buildPartRow() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 3,
-      children:
-          [
-            Text('Parts', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 3,
+          children: [
+            buildSettingRow(),
+            Divider(),
+            Row(
+              spacing: 5,
+              children: [
+                Text('Parts', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                FilledButton.icon(
+                  onPressed: () {
+                    option.parts[nextPartId] = BattleRaptureParts(id: nextPartId);
+                    nextPartId += 1;
+                    setState(() {});
+                  },
+                  label: Text('Add Part'),
+                  icon: Icon(Icons.add_circle),
+                ),
+              ],
+            ),
             Scrollbar(
               thumbVisibility: true,
               trackVisibility: true,
@@ -78,16 +91,43 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
                 ),
               ),
             ),
-            FilledButton.icon(
-              onPressed: () {
-                option.parts[nextPartId] = BattleRaptureParts(id: nextPartId);
-                nextPartId += 1;
-                setState(() {});
-              },
-              label: Text('Add Part'),
-              icon: Icon(Icons.add_circle),
+            Divider(),
+            Row(
+              spacing: 5,
+              children: [
+                Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                // remove All button
+                // shift all timestamps button
+                // clear selection button
+                // copy button
+                // add new action button
+                IconButton.filled(
+                  onPressed: () async {
+                    final action = await showDialog<BattleRaptureAction?>(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (ctx) {
+                        return RaptureActionSetupDialog(
+                          maxFrame: maxSeconds * fps,
+                          fps: fps,
+                          validParts: option.parts.keys.toList(),
+                        );
+                      },
+                    );
+                    if (action != null) {
+                      option.actions.putIfAbsent(action.frame, () => []);
+                      option.actions[action.frame]!.add(action);
+                      setState(() {});
+                    }
+                  },
+                  icon: Icon(Icons.add),
+                ),
+              ],
             ),
-          ].map((widget) => Padding(padding: const EdgeInsets.only(left: 8.0), child: widget)).toList(),
+            Expanded(child: ListView(children: buildActionWidgets())),
+          ],
+        ),
+      ),
     );
   }
 
@@ -186,41 +226,132 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
     );
   }
 
-  Widget buildActionRow() {
-    return Column(
-      spacing: 3,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          [
-            Text('Actions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-            buildActionButtonRow(),
-          ].map((widget) => Padding(padding: const EdgeInsets.only(left: 8.0), child: widget)).toList(),
-    );
+  List<Widget> buildActionWidgets() {
+    final List<Widget> widgets = [];
+
+    for (final frame in option.actions.keys) {
+      widgets.add(
+        Container(
+          decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: BorderRadius.circular(8)),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              spacing: 5,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Timestamp: ${frameDataToNiceTimeString(frame, fps)} (frame $frame)'),
+                ...option.actions[frame]!.map((action) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Padding(padding: const EdgeInsets.all(8.0), child: convertActionToWidget(action)),
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return widgets;
   }
 
-  Widget buildActionButtonRow() {
-    return Row(
-      spacing: 3,
-      children: [
-        // remove All button
-        // shift all timestamps button
-        // clear selection button
-        // copy button
-        // add new action button
-        IconButton.filled(
-          onPressed: () async {
-            final action = await showDialog<BattleRaptureAction?>(
-              context: context,
-              barrierDismissible: false,
-              builder: (ctx) {
-                return RaptureActionSetupDialog(maxFrame: 180 * 60, fps: 60);
-              },
-            );
-          },
-          icon: Icon(Icons.add),
-        ),
-      ],
-    );
+  Widget convertActionToWidget(BattleRaptureAction action) {
+    switch (action.type) {
+      case BattleRaptureActionType.setAtk:
+      case BattleRaptureActionType.setDef:
+      case BattleRaptureActionType.setDistance:
+        return Text('${action.type} - ${action.setParameter}');
+      case BattleRaptureActionType.setCoreSize:
+      case BattleRaptureActionType.setCorePierce:
+        return Text('${action.type} - ${action.setParameter != 0}');
+      case BattleRaptureActionType.jump:
+      case BattleRaptureActionType.invincible:
+      case BattleRaptureActionType.redCircle:
+        return Text(
+          '${action.type} - '
+          'Duration: ${action.timeParameter} frames,'
+          ' ${(action.timeParameter! / fps).toStringAsFixed(3)} seconds',
+        );
+      case BattleRaptureActionType.elementalShield:
+        return Text(
+          '${action.type} - '
+          'Elements: ${action.eleShields!.map((ele) => ele.name.toUpperCase()).toList()} - '
+          'Duration: ${action.timeParameter} frames,'
+          ' ${(action.timeParameter! / fps).toStringAsFixed(3)} seconds',
+        );
+      case BattleRaptureActionType.generateBarrier:
+        return Text(
+          '${action.type} - '
+          'HP: ${action.setParameter} - '
+          'Duration: ${action.timeParameter} frames,'
+          ' ${(action.timeParameter! / fps).toStringAsFixed(3)} seconds',
+        );
+      case BattleRaptureActionType.generateParts:
+        return Text(
+          '${action.type} - Part ID: ${action.setParameter}'
+          '${!option.parts.keys.contains(action.setParameter) ? ' Invalid' : ''}',
+          style: TextStyle(color: option.parts.keys.contains(action.setParameter) ? Colors.black : Colors.red),
+        );
+      case BattleRaptureActionType.attack:
+        String text =
+            '${action.type} - '
+            'Damage Rate: ${action.setParameter} - '
+            'Target Type: ${action.targetType!.name}';
+        if (action.targetType == BattleRaptureActionTarget.targetedNikkes) {
+          text += ' - Subtype: ${action.targetSubtype!.name}';
+          if (action.targetSubtype == BattleRaptureActionTargetSubtype.position) {
+            text += ', Position ${action.position}';
+          } else {
+            text += ', ${action.targetCount} Nikkes Sort ${action.highToLow! ? 'High to Low' : 'Low to High'}';
+          }
+        }
+        return Text(text);
+      case BattleRaptureActionType.setBuff:
+        String text =
+            '${action.type} - '
+            'Buff Type: ${action.buffType!.name} - '
+            'Buff Value: ${action.setParameter} '
+            '(Treat as ${action.isBuff! ? 'Buff' : 'Debuff'}) - '
+            'Duration Type: ${action.durationType!.name} ';
+        if (action.durationType == DurationType.timeSec) {
+          text +=
+              'Duration: ${action.timeParameter} frames,'
+              ' ${(action.timeParameter! / fps).toStringAsFixed(3)} seconds ';
+        }
+        text += '- Target Type: ${action.targetType!.name}';
+        if (action.targetType == BattleRaptureActionTarget.targetedNikkes) {
+          text += ' - Subtype: ${action.targetSubtype!.name}';
+          if (action.targetSubtype == BattleRaptureActionTargetSubtype.position) {
+            text += ', Position ${action.position}';
+          } else {
+            text += ', ${action.targetCount} Nikkes Sort ${action.highToLow! ? 'High to Low' : 'Low to High'}';
+          }
+        }
+        return Text(text);
+      case BattleRaptureActionType.clearBuff:
+        String text =
+            '${action.type} - '
+            'Clear ${action.isBuff! ? 'Buff' : 'Debuff'} - '
+            'Target Type: ${action.targetType!.name}';
+        if (action.targetType == BattleRaptureActionTarget.targetedNikkes) {
+          text += ' - Subtype: ${action.targetSubtype!.name}';
+          if (action.targetSubtype == BattleRaptureActionTargetSubtype.position) {
+            text += ', Position ${action.position}';
+          } else {
+            text += ', ${action.targetCount} Nikkes Sort ${action.highToLow! ? 'High to Low' : 'Low to High'}';
+          }
+        }
+        return Text(text);
+      case BattleRaptureActionType.jumpEnd:
+      case BattleRaptureActionType.invincibleEnd:
+      case BattleRaptureActionType.redCircleEnd:
+      case BattleRaptureActionType.elementalShieldEnd:
+        return Text('${action.type} - invalid');
+    }
   }
 
   Widget buildSettingRow() {
