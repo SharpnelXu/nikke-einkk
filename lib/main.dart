@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:nikke_einkk/model/db.dart';
-
-import 'module/battle_setup.dart';
+import 'package:nikke_einkk/module/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Einkk',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -35,7 +35,8 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: BattleSetupPage(),
+      home: EinkkHomePage(),
+      builder: EasyLoading.init(),
     );
   }
 }

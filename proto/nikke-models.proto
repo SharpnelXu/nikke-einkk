@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package nikke.einkk.models;
+
+option optimize_for = SPEED;
+
+message ResStaticDataPackInfo {
+  string url = 1;
+  uint64 size = 2;
+  bytes sha256Sum = 3;
+  bytes salt1 = 4;
+  bytes salt2 = 5;
+  string version = 6;
+}
+
+message ResGetResourceHosts2 {
+  string version = 1;
+  string baseUrl = 2;
+  map<string, string> coreVersionMap = 3;
+  map<string, string> dataPackVersionMap = 4;
+}

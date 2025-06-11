@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/module/battle/rapture_action_setup.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/simple_dialog.dart';
-import 'package:nikke_einkk/module/rapture_action_setup.dart';
 
 class RaptureSetupPage extends StatefulWidget {
   final BattleRaptureOptions option;

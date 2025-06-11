@@ -20,6 +20,8 @@ class NikkeDatabase {
 
   String get userDataPath => join(appPath, 'userData');
 
+  String get userDataFilePath => join(userDataPath, 'UserData.json');
+
   String get dataPath => join(appPath, 'data');
   String get characterTableFilePath => join(dataPath, 'CharacterTable.json');
   String get characterShotTableFilePath => join(dataPath, 'CharacterShotTable.json');
@@ -38,8 +40,6 @@ class NikkeDatabase {
   String get coverStatEnhanceTableFilePath => join(dataPath, 'CoverStatEnhanceTable.json');
   String get localeCharacterFilePath => join(dataPath, 'Locale_Character.json');
   String get localeSkillFilePath => join(dataPath, 'Locale_Skill.json');
-
-  String get userDataFilePath => join(dataPath, 'UserData.json');
 
   final Map<int, NikkeCharacterData> characterData = {}; // maybe not needed
   final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};

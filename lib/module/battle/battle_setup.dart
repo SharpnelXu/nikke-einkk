@@ -13,12 +13,12 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/user_data.dart';
+import 'package:nikke_einkk/module/battle/nikke_list.dart';
+import 'package:nikke_einkk/module/battle/rapture_setup.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/simple_dialog.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
-import 'package:nikke_einkk/module/nikke_list.dart';
-import 'package:nikke_einkk/module/rapture_setup.dart';
 
 class BattleSetupPage extends StatefulWidget {
   const BattleSetupPage({super.key});
@@ -233,7 +233,7 @@ class _RaptureDisplayState extends State<RaptureDisplay> {
           Text('Distance: ${format.format(option.startDistance)}'),
           FilledButton.icon(
             onPressed: () async {
-              await Navigator.push(context, MaterialPageRoute(builder: (context) => RaptureSetupPage(option: option)));
+              await Navigator.push(context, MaterialPageRoute(builder: (ctx) => RaptureSetupPage(option: option)));
               if (mounted) setState(() {});
             },
             label: Text('Configure'),
@@ -440,7 +440,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
         children: [
           InkWell(
             onTap: () async {
-              await Navigator.push(context, MaterialPageRoute(builder: (context) => NikkeSelectorPage(option: option)));
+              await Navigator.push(context, MaterialPageRoute(builder: (ctx) => NikkeSelectorPage(option: option)));
               if (mounted) setState(() {});
             },
             child: buildNikkeIcon(characterData, true, 'Tap to select'),

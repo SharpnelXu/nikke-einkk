@@ -15,6 +15,7 @@
 allTests.run/
 
 data/
+userData/
 
 
 # Flutter repo-specific
