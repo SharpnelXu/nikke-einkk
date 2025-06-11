@@ -173,7 +173,7 @@ class _RaptureActionSetupDialogState extends State<RaptureActionSetupDialog> {
                 damageRate: damageRate,
                 targetSubtype: targetSubtype,
                 targetCount: targetCount,
-                high: highToLow,
+                sortHighToLow: highToLow,
                 position: position,
               );
               break;
@@ -184,13 +184,13 @@ class _RaptureActionSetupDialogState extends State<RaptureActionSetupDialog> {
                   frame: frame,
                   targetType: actionTarget,
                   buffType: buffType,
-                  isBuff: isBuff,
+                  treatAsBuff: isBuff,
                   buffValue: buffValue,
                   durationType: durationType,
                   duration: duration,
                   targetSubtype: targetSubtype,
                   targetCount: targetCount,
-                  sortHigh: highToLow,
+                  sortHighToLow: highToLow,
                   position: position,
                 );
               } else {
@@ -201,10 +201,10 @@ class _RaptureActionSetupDialogState extends State<RaptureActionSetupDialog> {
               action = BattleRaptureAction.clearBuff(
                 frame: frame,
                 targetType: actionTarget,
-                isBuff: isBuff,
+                isClearBuff: isBuff,
                 targetSubtype: targetSubtype,
                 targetCount: targetCount,
-                sortHigh: highToLow,
+                sortHighToLow: highToLow,
                 position: position,
               );
               break;

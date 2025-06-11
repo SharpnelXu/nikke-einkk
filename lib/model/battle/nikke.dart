@@ -47,7 +47,7 @@ class BattleNikkeOptions {
     this.alwaysFocus = false,
     this.forceCancelShootDelay = false,
     this.chargeMode = NikkeFullChargeMode.always,
-  }) : equips = equips.toList(),
+  }) : equips = equips.map((equip) => equip?.copy()).toList(),
        skillLevels = skillLevels.toList() {
     final favoriteItemNameCode = favoriteItem?.data.nameCode ?? -1;
     if (favoriteItemNameCode > 0 &&
@@ -144,7 +144,7 @@ class BattleNikkeOptions {
       coreLevel: coreLevel,
       syncLevel: syncLevel,
       attractLevel: attractLevel,
-      equips: equips.map((equip) => equip?.copy()).toList(),
+      equips: equips,
       skillLevels: skillLevels.toList(),
       cube: cube?.copy(),
       favoriteItem: favoriteItem?.copy(),

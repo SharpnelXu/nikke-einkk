@@ -4,6 +4,7 @@ import 'package:nikke_einkk/model/db.dart';
 import 'module/battle_setup.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await db.loadData();
   runApp(const MyApp());
 }

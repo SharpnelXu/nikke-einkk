@@ -2,7 +2,9 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/battle/barrier.dart';
+import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
@@ -12,8 +14,9 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
-import 'battle_entity.dart';
+part '../../generated/model/battle/rapture.g.dart';
 
+@JsonSerializable()
 class BattleRaptureOptions {
   String name = 'Rapture';
   bool isStageTarget;
@@ -30,6 +33,23 @@ class BattleRaptureOptions {
 
   Map<int, BattleRaptureParts> parts = {};
 
+  BattleRaptureOptions copy() {
+    return BattleRaptureOptions(
+      name: name,
+      isStageTarget: isStageTarget,
+      canBeTargeted: canBeTargeted,
+      coreRequiresPierce: coreRequiresPierce,
+      coreSize: coreSize,
+      startDistance: startDistance,
+      startHp: startHp,
+      startAttack: startAttack,
+      startDefence: startDefence,
+      element: element,
+      actions: actions,
+      parts: parts,
+    );
+  }
+
   BattleRaptureOptions({
     this.name = "Rapture",
     this.isStageTarget = true,
@@ -44,45 +64,110 @@ class BattleRaptureOptions {
     Map<int, List<BattleRaptureAction>> actions = const {},
     Map<int, BattleRaptureParts> parts = const {},
   }) {
-    this.actions.addAll(actions);
-    this.parts.addAll(parts);
+    for (final frame in actions.keys) {
+      this.actions[frame] = [];
+      this.actions[frame]!.addAll(actions[frame]!.map((action) => action.copy()));
+    }
+    for (final partId in parts.keys) {
+      this.parts[partId] = parts[partId]!.copy();
+    }
   }
+
+  factory BattleRaptureOptions.fromJson(Map<String, dynamic> json) => _$BattleRaptureOptionsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BattleRaptureOptionsToJson(this);
 }
 
+@JsonSerializable()
 class BattleRaptureAction {
   final BattleRaptureActionType type;
   final int frame;
   int? setParameter;
-  int? timeParameter;
+  int? frameDuration;
   DurationType? durationType;
   List<NikkeElement>? eleShields;
+  int? barrierHp;
 
+  int? damageRate;
   BattleRaptureActionTarget? targetType;
   BattleRaptureActionTargetSubtype? targetSubtype;
   int? position;
   int? targetCount;
-  bool? highToLow;
+  bool? sortHighToLow;
 
+  int? buffValue;
   FunctionType? buffType;
   bool? isBuff;
 
-  BattleRaptureAction(this.type, this.frame);
+  int? partId;
+
+  BattleRaptureAction copy() {
+    return BattleRaptureAction(
+      type: type,
+      frame: frame,
+      setParameter: setParameter,
+      frameDuration: frameDuration,
+      durationType: durationType,
+      eleShields: eleShields,
+      targetType: targetType,
+      targetSubtype: targetSubtype,
+      position: position,
+      targetCount: targetCount,
+      sortHighToLow: sortHighToLow,
+      buffType: buffType,
+      isBuff: isBuff,
+      buffValue: buffValue,
+      partId: partId,
+      damageRate: damageRate,
+      barrierHp: barrierHp,
+    );
+  }
+
+  BattleRaptureAction({
+    required this.type,
+    required this.frame,
+    this.setParameter,
+    this.frameDuration,
+    this.durationType,
+    List<NikkeElement>? eleShields,
+    this.targetType,
+    this.targetSubtype,
+    this.position,
+    this.targetCount,
+    this.sortHighToLow,
+    this.buffType,
+    this.isBuff,
+    this.buffValue,
+    this.partId,
+    this.damageRate,
+    this.barrierHp,
+  }) : eleShields = eleShields?.toList();
+
+  factory BattleRaptureAction.fromJson(Map<String, dynamic> json) => _$BattleRaptureActionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BattleRaptureActionToJson(this);
 
   BattleRaptureAction.set(this.type, this.frame, this.setParameter);
 
-  BattleRaptureAction.timed(this.type, this.frame, this.timeParameter);
+  BattleRaptureAction.timed(this.type, this.frame, this.frameDuration);
 
   factory BattleRaptureAction.barrier(int frame, int hp, DurationType durationType, int? duration) {
-    return BattleRaptureAction(BattleRaptureActionType.generateBarrier, frame)
-      ..setParameter = hp
-      ..durationType = durationType
-      ..timeParameter = duration;
+    return BattleRaptureAction(
+      type: BattleRaptureActionType.generateBarrier,
+      frame: frame,
+      barrierHp: hp,
+      durationType: durationType,
+      frameDuration: duration,
+    );
   }
 
   factory BattleRaptureAction.eleShield(int frame, List<NikkeElement> eleShields, int duration) {
-    return BattleRaptureAction(BattleRaptureActionType.elementalShield, frame)
-      ..eleShields = eleShields
-      ..timeParameter = duration;
+    return BattleRaptureAction(
+      type: BattleRaptureActionType.elementalShield,
+      frame: frame,
+      eleShields: eleShields,
+      frameDuration: duration,
+    );
   }
 
   factory BattleRaptureAction.attack({
@@ -91,64 +176,73 @@ class BattleRaptureAction {
     required int damageRate,
     BattleRaptureActionTargetSubtype? targetSubtype,
     int? targetCount,
-    bool? high,
+    bool? sortHighToLow,
     int? position,
   }) {
-    return BattleRaptureAction(BattleRaptureActionType.attack, frame)
-      ..setParameter = damageRate
-      ..targetType = targetType
-      ..targetSubtype = targetSubtype
-      ..targetCount = targetCount
-      ..highToLow = high
-      ..position = position;
+    return BattleRaptureAction(
+      type: BattleRaptureActionType.attack,
+      frame: frame,
+      damageRate: damageRate,
+      targetType: targetType,
+      targetSubtype: targetSubtype,
+      targetCount: targetCount,
+      sortHighToLow: sortHighToLow,
+      position: position,
+    );
   }
 
   factory BattleRaptureAction.parts(int frame, int partId) {
-    return BattleRaptureAction(BattleRaptureActionType.generateParts, frame)..setParameter = partId;
+    return BattleRaptureAction(type: BattleRaptureActionType.generateParts, frame: frame, partId: partId);
   }
 
   factory BattleRaptureAction.setBuff({
     required int frame,
     required BattleRaptureActionTarget targetType,
     required FunctionType buffType,
-    required bool isBuff,
+    required bool treatAsBuff,
     required int buffValue,
     required DurationType durationType,
     required int duration,
     BattleRaptureActionTargetSubtype? targetSubtype,
     int? targetCount,
-    bool? sortHigh,
+    bool? sortHighToLow,
     int? position,
   }) {
-    return BattleRaptureAction(BattleRaptureActionType.setBuff, frame)
-      ..buffType = buffType
-      ..isBuff = isBuff
-      ..setParameter = buffValue
-      ..durationType = durationType
-      ..timeParameter = duration
-      ..targetType = targetType
-      ..targetSubtype = targetSubtype
-      ..targetCount = targetCount
-      ..highToLow = sortHigh
-      ..position = position;
+    return BattleRaptureAction(
+      type: BattleRaptureActionType.setBuff,
+      frame: frame,
+      buffType: buffType,
+      isBuff: treatAsBuff,
+      buffValue: buffValue,
+      durationType: durationType,
+      frameDuration: duration,
+      targetType: targetType,
+      targetSubtype: targetSubtype,
+      targetCount: targetCount,
+      sortHighToLow: sortHighToLow,
+      position: position,
+    );
   }
 
   factory BattleRaptureAction.clearBuff({
     required int frame,
     required BattleRaptureActionTarget targetType,
-    required bool isBuff,
+    required bool isClearBuff,
     BattleRaptureActionTargetSubtype? targetSubtype,
     int? targetCount,
-    bool? sortHigh,
+    bool? sortHighToLow,
     int? position,
   }) {
-    return BattleRaptureAction(BattleRaptureActionType.clearBuff, frame)
-      ..isBuff = isBuff
-      ..targetType = targetType
-      ..targetSubtype = targetSubtype
-      ..targetCount = targetCount
-      ..highToLow = sortHigh
-      ..position = position;
+    return BattleRaptureAction(
+      type: BattleRaptureActionType.clearBuff,
+      frame: frame,
+      isBuff: isClearBuff,
+      targetType: targetType,
+      targetSubtype: targetSubtype,
+      targetCount: targetCount,
+      sortHighToLow: sortHighToLow,
+      position: position,
+    );
   }
 }
 
@@ -267,26 +361,35 @@ int getSortingStat(BattleSimulation simulation, BattleNikke nikke, BattleRapture
   }
 }
 
+@JsonSerializable()
 class BattleRaptureParts {
   int id;
   String name;
   int maxHp = 10000;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   int hp = 10000;
   bool isBehindBoss = true;
   bool isCore = false;
 
-  BattleRaptureParts({required this.id, this.name = 'Part'});
+  BattleRaptureParts({
+    required this.id,
+    this.name = 'Part',
+    this.maxHp = 10000,
+    this.hp = 10000,
+    this.isBehindBoss = true,
+    this.isCore = false,
+  });
+
+  factory BattleRaptureParts.fromJson(Map<String, dynamic> json) => _$BattleRapturePartsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BattleRapturePartsToJson(this);
 
   bool canBeDamaged(bool hasPierce) {
     return hp > 0 && (hasPierce || !isBehindBoss);
   }
 
   BattleRaptureParts copy() {
-    return BattleRaptureParts(id: id, name: name)
-      ..maxHp = maxHp
-      ..hp = hp
-      ..isBehindBoss = isBehindBoss
-      ..isCore = isCore;
+    return BattleRaptureParts(id: id, name: name, maxHp: maxHp, hp: hp, isBehindBoss: isBehindBoss, isCore: isCore);
   }
 }
 
@@ -413,11 +516,10 @@ class BattleRapture extends BattleEntity {
           break;
         case BattleRaptureActionType.jump:
           outsideScreen = true;
-          if (action.timeParameter != null) {
-            final endFrame =
-                simulation.currentFrame - BattleUtils.timeDataToFrame(action.timeParameter!, simulation.fps);
+          if (action.frameDuration != null) {
+            final endFrame = simulation.currentFrame - action.frameDuration!;
             endActions.putIfAbsent(endFrame, () => []);
-            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.jumpEnd, endFrame));
+            endActions[endFrame]!.add(BattleRaptureAction(type: BattleRaptureActionType.jumpEnd, frame: endFrame));
           }
           break;
         case BattleRaptureActionType.jumpEnd:
@@ -425,11 +527,12 @@ class BattleRapture extends BattleEntity {
           break;
         case BattleRaptureActionType.invincible:
           invincible = true;
-          if (action.timeParameter != null) {
-            final endFrame =
-                simulation.currentFrame - BattleUtils.timeDataToFrame(action.timeParameter!, simulation.fps);
+          if (action.frameDuration != null) {
+            final endFrame = simulation.currentFrame - action.frameDuration!;
             endActions.putIfAbsent(endFrame, () => []);
-            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.invincibleEnd, endFrame));
+            endActions[endFrame]!.add(
+              BattleRaptureAction(type: BattleRaptureActionType.invincibleEnd, frame: endFrame),
+            );
           }
           break;
         case BattleRaptureActionType.invincibleEnd:
@@ -437,11 +540,10 @@ class BattleRapture extends BattleEntity {
           break;
         case BattleRaptureActionType.redCircle:
           hasRedCircle = true;
-          if (action.timeParameter != null) {
-            final endFrame =
-                simulation.currentFrame - BattleUtils.timeDataToFrame(action.timeParameter!, simulation.fps);
+          if (action.frameDuration != null) {
+            final endFrame = simulation.currentFrame - action.frameDuration!;
             endActions.putIfAbsent(endFrame, () => []);
-            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.redCircleEnd, endFrame));
+            endActions[endFrame]!.add(BattleRaptureAction(type: BattleRaptureActionType.redCircleEnd, frame: endFrame));
           }
           break;
         case BattleRaptureActionType.redCircleEnd:
@@ -449,21 +551,22 @@ class BattleRapture extends BattleEntity {
           break;
         case BattleRaptureActionType.elementalShield:
           elementalShield.addAll(action.eleShields!);
-          if (action.timeParameter != null) {
-            final endFrame =
-                simulation.currentFrame - BattleUtils.timeDataToFrame(action.timeParameter!, simulation.fps);
+          if (action.frameDuration != null) {
+            final endFrame = simulation.currentFrame - action.frameDuration!;
             endActions.putIfAbsent(endFrame, () => []);
-            endActions[endFrame]!.add(BattleRaptureAction(BattleRaptureActionType.elementalShieldEnd, endFrame));
+            endActions[endFrame]!.add(
+              BattleRaptureAction(type: BattleRaptureActionType.elementalShieldEnd, frame: endFrame),
+            );
           }
           break;
         case BattleRaptureActionType.elementalShieldEnd:
           elementalShield.clear();
           break;
         case BattleRaptureActionType.generateBarrier:
-          barrier = Barrier(-1, action.setParameter!, action.durationType!, action.timeParameter ?? 0);
+          barrier = Barrier(-1, action.barrierHp!, action.durationType!, action.frameDuration ?? 0);
           break;
         case BattleRaptureActionType.generateParts:
-          final partId = action.setParameter!;
+          final partId = action.partId!;
 
           if (options.parts.containsKey(partId) && parts.every((part) => part.id != partId)) {
             parts.add(options.parts[partId]!.copy());
@@ -476,12 +579,7 @@ class BattleRapture extends BattleEntity {
 
             simulation.registerEvent(
               simulation.currentFrame,
-              RaptureDamageEvent(
-                simulation: simulation,
-                rapture: this,
-                nikke: target,
-                damageRate: action.setParameter!,
-              ),
+              RaptureDamageEvent(simulation: simulation, rapture: this, nikke: target, damageRate: action.damageRate!),
             );
           }
           break;
@@ -495,11 +593,11 @@ class BattleRapture extends BattleEntity {
                 buffRemove: BuffRemoveType.clear,
                 functionType: action.buffType!,
                 functionValueType: ValueType.percent,
-                functionValue: action.setParameter!,
+                functionValue: action.buffValue!,
                 functionStandard: StandardType.user,
                 fullCount: 999,
                 durationType: action.durationType!,
-                durationValue: action.timeParameter!,
+                durationValue: BattleUtils.frameToTimeData(action.frameDuration!, simulation.fps),
                 functionTarget: FunctionTargetType.self,
                 timingTriggerType: TimingTriggerType.none,
                 statusTriggerType: StatusTriggerType.none,
@@ -548,7 +646,7 @@ class BattleRapture extends BattleEntity {
 
         nikkes.sort((a, b) => getSortingStat(simulation, a, subtype) - getSortingStat(simulation, b, subtype));
 
-        final countList = action.highToLow! ? nikkes.reversed.toList() : nikkes;
+        final countList = action.sortHighToLow! ? nikkes.reversed.toList() : nikkes;
         return countList.sublist(0, min(countList.length, action.targetCount!));
     }
   }

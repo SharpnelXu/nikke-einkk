@@ -273,40 +273,40 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
       case BattleRaptureActionType.redCircle:
         return Text(
           '${action.type} - '
-          'Duration: ${action.timeParameter} frames,'
-          ' ${(action.timeParameter! / fps).toStringAsFixed(3)} seconds',
+          'Duration: ${action.frameDuration} frames,'
+          ' ${(action.frameDuration! / fps).toStringAsFixed(3)} seconds',
         );
       case BattleRaptureActionType.elementalShield:
         return Text(
           '${action.type} - '
           'Elements: ${action.eleShields!.map((ele) => ele.name.toUpperCase()).toList()} - '
-          'Duration: ${action.timeParameter} frames,'
-          ' ${(action.timeParameter! / fps).toStringAsFixed(3)} seconds',
+          'Duration: ${action.frameDuration} frames,'
+          ' ${(action.frameDuration! / fps).toStringAsFixed(3)} seconds',
         );
       case BattleRaptureActionType.generateBarrier:
         return Text(
           '${action.type} - '
-          'HP: ${action.setParameter} - '
-          'Duration: ${action.timeParameter} frames,'
-          ' ${(action.timeParameter! / fps).toStringAsFixed(3)} seconds',
+          'HP: ${action.barrierHp} - '
+          'Duration: ${action.frameDuration} frames,'
+          ' ${(action.frameDuration! / fps).toStringAsFixed(3)} seconds',
         );
       case BattleRaptureActionType.generateParts:
         return Text(
-          '${action.type} - Part ID: ${action.setParameter}'
-          '${!option.parts.keys.contains(action.setParameter) ? ' Invalid' : ''}',
-          style: TextStyle(color: option.parts.keys.contains(action.setParameter) ? Colors.black : Colors.red),
+          '${action.type} - Part ID: ${action.partId}'
+          '${!option.parts.keys.contains(action.partId) ? ' Invalid' : ''}',
+          style: TextStyle(color: option.parts.keys.contains(action.partId) ? Colors.black : Colors.red),
         );
       case BattleRaptureActionType.attack:
         String text =
             '${action.type} - '
-            'Damage Rate: ${action.setParameter} - '
+            'Damage Rate: ${action.damageRate} - '
             'Target Type: ${action.targetType!.name}';
         if (action.targetType == BattleRaptureActionTarget.targetedNikkes) {
           text += ' - Subtype: ${action.targetSubtype!.name}';
           if (action.targetSubtype == BattleRaptureActionTargetSubtype.position) {
             text += ', Position ${action.position}';
           } else {
-            text += ', ${action.targetCount} Nikkes Sort ${action.highToLow! ? 'High to Low' : 'Low to High'}';
+            text += ', ${action.targetCount} Nikkes Sort ${action.sortHighToLow! ? 'High to Low' : 'Low to High'}';
           }
         }
         return Text(text);
@@ -314,13 +314,13 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
         String text =
             '${action.type} - '
             'Buff Type: ${action.buffType!.name} - '
-            'Buff Value: ${action.setParameter} '
+            'Buff Value: ${action.buffValue} '
             '(Treat as ${action.isBuff! ? 'Buff' : 'Debuff'}) - '
             'Duration Type: ${action.durationType!.name} ';
         if (action.durationType == DurationType.timeSec) {
           text +=
-              'Duration: ${action.timeParameter} frames,'
-              ' ${(action.timeParameter! / fps).toStringAsFixed(3)} seconds ';
+              'Duration: ${action.frameDuration} frames,'
+              ' ${(action.frameDuration! / fps).toStringAsFixed(3)} seconds ';
         }
         text += '- Target Type: ${action.targetType!.name}';
         if (action.targetType == BattleRaptureActionTarget.targetedNikkes) {
@@ -328,7 +328,7 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
           if (action.targetSubtype == BattleRaptureActionTargetSubtype.position) {
             text += ', Position ${action.position}';
           } else {
-            text += ', ${action.targetCount} Nikkes Sort ${action.highToLow! ? 'High to Low' : 'Low to High'}';
+            text += ', ${action.targetCount} Nikkes Sort ${action.sortHighToLow! ? 'High to Low' : 'Low to High'}';
           }
         }
         return Text(text);
@@ -342,7 +342,7 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
           if (action.targetSubtype == BattleRaptureActionTargetSubtype.position) {
             text += ', Position ${action.position}';
           } else {
-            text += ', ${action.targetCount} Nikkes Sort ${action.highToLow! ? 'High to Low' : 'Low to High'}';
+            text += ', ${action.targetCount} Nikkes Sort ${action.sortHighToLow! ? 'High to Low' : 'Low to High'}';
           }
         }
         return Text(text);

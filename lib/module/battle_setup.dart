@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
@@ -8,6 +12,7 @@ import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/simple_dialog.dart';
@@ -126,22 +131,65 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                 ),
                 FilledButton.icon(
                   onPressed: () async {
-                    final userData = db.userData;
-                    userData.cubes.clear();
-                    userData.cubes.addAll(cubes);
+                    String? outputFile = await FilePicker.platform.saveFile(
+                      dialogTitle: 'Save battle setup',
+                      fileName: 'battleSetup.json',
+                      initialDirectory: db.userDataPath,
+                      type: FileType.custom,
+                      allowedExtensions: ['json'],
+                    );
+                    if (outputFile != null) {
+                      final battleSetup = BattleSetup(
+                        nikkeOptions: nikkeOptions,
+                        raptureOptions: raptureOption,
+                        playerOptions: playerOptions,
+                      );
+                      final file = File(outputFile);
+                      await file.writeAsString(jsonEncode(battleSetup.toJson()), encoding: utf8);
 
-                    userData.playerOptions = playerOptions.copy();
-                    for (final nikkeOption in nikkeOptions) {
-                      if (nikkeOption.nikkeResourceId != -1) {
-                        userData.nikkeOptions[nikkeOption.nikkeResourceId] = nikkeOption.copy()..cube = null;
+                      final userData = db.userData;
+                      userData.cubes.clear();
+                      userData.cubes.addAll(cubes);
+
+                      userData.playerOptions = playerOptions.copy();
+                      for (final nikkeOption in nikkeOptions) {
+                        if (nikkeOption.nikkeResourceId != -1) {
+                          userData.nikkeOptions[nikkeOption.nikkeResourceId] = nikkeOption.copy()..cube = null;
+                        }
                       }
+                      db.writeUserData();
                     }
 
-                    db.writeUserData();
                     if (mounted) setState(() {});
                   },
                   icon: Icon(Icons.save),
                   label: Text('Save Settings'),
+                ),
+                FilledButton.icon(
+                  onPressed: () async {
+                    final selectResult = await FilePicker.platform.pickFiles(
+                      dialogTitle: 'Load battle setup',
+                      initialDirectory: db.userDataPath,
+                      type: FileType.custom,
+                      allowedExtensions: ['json'],
+                      allowMultiple: false,
+                      withData: true,
+                    );
+                    final bytes = selectResult?.files.firstOrNull?.bytes;
+                    if (bytes != null) {
+                      final battleSetup = BattleSetup.fromJson(jsonDecode(utf8.decode(bytes)));
+                      playerOptions = battleSetup.playerOptions;
+                      raptureOption = battleSetup.raptureOptions;
+                      nikkeOptions = battleSetup.nikkeOptions;
+                      while (nikkeOptions.length < 5) {
+                        nikkeOptions.add(BattleNikkeOptions(nikkeResourceId: -1));
+                      }
+                      nikkeOptions = nikkeOptions.sublist(0, 5);
+                    }
+                    if (mounted) setState(() {});
+                  },
+                  icon: Icon(Icons.file_open),
+                  label: Text('Load Settings'),
                 ),
               ],
             ),

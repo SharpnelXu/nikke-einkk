@@ -18,6 +18,8 @@ final Logger logger = Logger();
 class NikkeDatabase {
   static const String appPath = '.';
 
+  String get userDataPath => join(appPath, 'userData');
+
   String get dataPath => join(appPath, 'data');
   String get characterTableFilePath => join(dataPath, 'CharacterTable.json');
   String get characterShotTableFilePath => join(dataPath, 'CharacterShotTable.json');

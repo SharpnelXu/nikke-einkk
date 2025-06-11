@@ -47,7 +47,7 @@ class BattleEquipment {
       throw ArgumentError('Too many lines: ${equipLines.length}');
     }
 
-    this.equipLines.addAll(equipLines);
+    this.equipLines.addAll(equipLines.map((equipLine) => equipLine.copy()));
     validateLevel(level);
     if (!rarity.canHaveCorp) _corporation = Corporation.none;
   }
