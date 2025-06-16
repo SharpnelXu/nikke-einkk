@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/data_path.dart' as data;
 import 'package:pointycastle/export.dart';
 import 'package:path/path.dart' as path;
 
@@ -443,8 +444,8 @@ class GameDataUnpacker {
 
       // Verify signature
       final rsaKey = RSAPublicKey(
-        BigInt.parse(toHexString(rsaExponent), radix: 16),
         BigInt.parse(toHexString(rsaModulus), radix: 16),
+        BigInt.parse(toHexString(rsaExponent), radix: 16),
       );
 
       final verifier = Signer('SHA-256/RSA')..init(false, PublicKeyParameter<RSAPublicKey>(rsaKey));
@@ -505,7 +506,7 @@ class GameDataUnpacker {
     return output;
   }
 
-  bool extractFiles({required String outputDir}) {
+  bool extractFiles(String outputDir) {
     if (_mainZip == null) {
       return false;
     }
@@ -520,7 +521,7 @@ class GameDataUnpacker {
       final file = zip.files[i];
 
       // Create directory structure if needed
-      final filePath = path.join(outputDir, file.name);
+      final filePath = data.getDesignatedDirectory(outputDir, file.name);
       final directory = path.dirname(filePath);
       if (directory.isNotEmpty) {
         Directory(directory).createSync(recursive: true);

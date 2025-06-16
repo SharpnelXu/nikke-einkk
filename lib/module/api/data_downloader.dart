@@ -105,7 +105,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
 
           unpacker = GameDataUnpacker(savePath, Uint8List.fromList(pack!.salt1), Uint8List.fromList(pack!.salt2));
           unpacker!.loadGameData();
-          unpacker!.extractFiles(outputDir: extractFolder);
+          unpacker!.extractFiles(extractFolder);
 
           await EasyLoading.dismiss();
 
@@ -114,7 +114,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
         label: Text('Extract'),
         icon: Icon(Icons.file_upload_outlined),
       ),
-      if (unpacker != null) Text('Extracted ${unpacker!.totalFileCount} files to $extractFolder'),
+      if (unpacker != null) Text('Extracted ${unpacker!.totalFileCount} files to saved folder'),
     ];
   }
 

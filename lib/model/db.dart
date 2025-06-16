@@ -13,7 +13,7 @@ import 'package:path/path.dart';
 /// db object
 final db = NikkeDatabase();
 
-final Logger logger = Logger(printer: SimplePrinter());
+final Logger logger = Logger();
 
 class NikkeDatabase {
   static const String appPath = '.';
