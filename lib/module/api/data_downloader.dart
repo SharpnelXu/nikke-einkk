@@ -6,10 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'package:nikke_einkk/generated/proto/nikke-models.pb.dart';
+import 'package:nikke_einkk/model/data_path.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/module/api/data_unpacker.dart';
 import 'package:nikke_einkk/module/common/easy_loading.dart';
-import 'package:path/path.dart';
 
 /// Downloader logic copied from EpinelPS
 class StaticDataDownloadPage extends StatefulWidget {
@@ -22,17 +22,13 @@ class StaticDataDownloadPage extends StatefulWidget {
 class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
   final TextEditingController downloadHtmlController = TextEditingController();
   bool useGlobal = true;
-  String? downloadedRegion;
+  bool downloadedGlobal = true;
   String? errorText;
   bool staticDataDownloaded = false;
   ResStaticDataPackInfo? pack;
   GameDataUnpacker? unpacker;
   static const globalStaticDataUrl = "https://global-lobby.nikke-kr.com/v1/staticdatapack";
   static const cnStaticDataUrl = "https://qq.nikkecn.qq.com:12001/v1/staticdatapack";
-
-  String get saveFolder => join(db.dataPath, useGlobal ? 'global' : 'cn');
-  String get savePath => join(saveFolder, 'StaticData.pack');
-  String get extractFolder => join(saveFolder, 'extract');
 
   @override
   void initState() {
@@ -68,7 +64,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
                 ),
               ],
             ),
-            Row(spacing: 5, children: [Text('Save Location: '), Text(savePath)]),
+            Row(spacing: 5, children: [Text('Save Location: '), Text(getStaticDataPath(useGlobal))]),
             Row(
               spacing: 5,
               children: [
@@ -103,9 +99,19 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
         onPressed: () async {
           await EasyLoading.showInfo('This will take a while...', maskType: EasyLoadingMaskType.clear);
 
-          unpacker = GameDataUnpacker(savePath, Uint8List.fromList(pack!.salt1), Uint8List.fromList(pack!.salt2));
+          unpacker = GameDataUnpacker(
+            getStaticDataPath(downloadedGlobal),
+            Uint8List.fromList(pack!.salt1),
+            Uint8List.fromList(pack!.salt2),
+          );
           unpacker!.loadGameData();
-          unpacker!.extractFiles(extractFolder);
+          unpacker!.extractFiles(getExtractDataFolderPath(downloadedGlobal));
+
+          if (downloadedGlobal) {
+            global.init();
+          } else if (!downloadedGlobal) {
+            cn.init();
+          }
 
           await EasyLoading.dismiss();
 
@@ -122,7 +128,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
     final pack = this.pack!;
     return [
       const Divider(),
-      Text('Download Result ($downloadedRegion)', style: TextStyle(fontSize: 20)),
+      Text('Download Result (${downloadedGlobal ? 'global' : 'cn'})', style: TextStyle(fontSize: 20)),
       clipboardText('Url: ${pack.url}', pack.url),
       clipboardText('Salt1: ${base64Encode(pack.salt1)}', base64Encode(pack.salt1)),
       clipboardText('Salt2: ${base64Encode(pack.salt2)}', base64Encode(pack.salt2)),
@@ -168,7 +174,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
 
     try {
       pack = ResStaticDataPackInfo.fromBuffer(packResponse.bodyBytes);
-      downloadedRegion = useGlobal ? 'Global' : 'CN';
+      downloadedGlobal = useGlobal;
     } catch (e) {
       errorText = 'Error parsing response: $e';
       setState(() {});
@@ -184,7 +190,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
 
     try {
       http.Response dataResponse = await client.get(staticDataUri);
-      File dataFile = await File(savePath).create(recursive: true);
+      File dataFile = await File(getStaticDataPath(downloadedGlobal)).create(recursive: true);
       await dataFile.writeAsBytes(dataResponse.bodyBytes);
     } catch (e) {
       errorText = 'Error parsing data response: $e';

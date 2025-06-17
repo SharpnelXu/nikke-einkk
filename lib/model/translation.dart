@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:nikke_einkk/model/db.dart';
 
 part '../generated/model/translation.g.dart';
 
@@ -35,4 +36,27 @@ class Translation {
   factory Translation.fromJson(Map<String, dynamic> json) => _$TranslationFromJson(json);
 
   Map<String, dynamic> toJson() => _$TranslationToJson(this);
+
+  String forLanguage(Language language) {
+    switch (language) {
+      case Language.ko:
+        return ko;
+      case Language.en:
+        return en;
+      case Language.ja:
+        return ja;
+      case Language.zhTW:
+        return zhTW;
+      case Language.zhCN:
+        return zhCN;
+      case Language.th:
+        return th;
+      case Language.de:
+        return de;
+      case Language.fr:
+        return fr;
+      default:
+        return en;
+    }
+  }
 }

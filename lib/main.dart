@@ -6,11 +6,16 @@ import 'package:nikke_einkk/module/home_page.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await db.loadData();
-  runApp(const MyApp());
+
+  locale.init();
+  global.init();
+  cn.init();
+
+  runApp(const Einkk());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Einkk extends StatelessWidget {
+  const Einkk({super.key});
 
   // This widget is the root of your application.
   @override

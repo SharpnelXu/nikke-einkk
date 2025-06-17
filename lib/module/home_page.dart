@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/module/api/data_downloader.dart';
 import 'package:nikke_einkk/module/battle/battle_setup.dart';
+import 'package:nikke_einkk/module/unionraid/union_raid_presets.dart';
 
 class EinkkHomePage extends StatelessWidget {
   @override
@@ -33,6 +34,19 @@ class EinkkHomePage extends StatelessWidget {
         },
         icon: Icon(Icons.download),
         label: Text('Static Data Download'),
+      ),
+      TextButton.icon(
+        style: TextButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          iconAlignment: IconAlignment.start,
+          textStyle: TextStyle(fontSize: 30),
+          iconSize: 30,
+        ),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => UnionRaidPresetPage()));
+        },
+        icon: Icon(Icons.groups),
+        label: Text('Union Raid Data'),
       ),
     ];
     return Scaffold(

@@ -1,6 +1,17 @@
 import 'package:path/path.dart' as path;
 
 const appPath = '.';
+final localePath = path.join(appPath, 'Locale');
+
+String getStaticDataPath(bool global) {
+  final server = global ? 'global' : 'cn';
+  return path.join(appPath, 'data', server, 'StaticData.pack');
+}
+
+String getExtractDataFolderPath(bool global) {
+  final server = global ? 'global' : 'cn';
+  return path.join(appPath, 'data', server, 'extract');
+}
 
 enum DataDirectory {
   album('Album', 'Album'),
@@ -44,7 +55,7 @@ enum DataDirectory {
   simulationRoom('SimulationRoom', 'SimulationRoom'),
   soloRaid('SoloRaid', 'Raid'),
   stepUp('StepUp', 'Shop'),
-  supportCharacter('SupportCharacter', 'Raid'),
+  supportCharacter('SupportCharacter', 'Event'),
   tacticAcademy('TacticAcademy', 'Outpost'),
   unionRaid('UnionRaid', 'Raid'),
   user('User', 'Cosmetics'),

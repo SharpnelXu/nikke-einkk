@@ -4,8 +4,10 @@ import 'dart:math';
 
 import 'package:logger/logger.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/data_path.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/model/stages.dart';
 import 'package:nikke_einkk/model/translation.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 import 'package:path/path.dart';
@@ -13,8 +15,117 @@ import 'package:path/path.dart';
 /// db object
 final db = NikkeDatabase();
 
+final locale = Locale();
+final global = NikkeDatabaseV2(true);
+final cn = NikkeDatabaseV2(false);
+
 final Logger logger = Logger();
 
+enum Language { unknown, ko, en, ja, zhTW, zhCN, th, de, fr }
+
+class Locale {
+  Language language = Language.en;
+
+  final Map<String, Map<String, Translation>> locale = {};
+
+  bool init() {
+    locale.clear();
+
+    bool result = true;
+    result &= loadLocaleCharacter();
+    result &= loadGeneral('LocaleSkill');
+    result &= loadGeneral('LocaleSystem');
+
+    logger.i('Locale init result: $result');
+
+    return result;
+  }
+
+  bool loadLocaleCharacter() {
+    final type = 'LocaleCharacter';
+    final file = File(join(localePath, type, '$type.json'));
+    final bool exists = file.existsSync();
+    if (exists) {
+      locale[type] = {};
+      final jsonList = jsonDecode(file.readAsStringSync());
+      final regex = RegExp(r'^\d+_name');
+      for (final record in jsonList) {
+        final translation = Translation.fromJson(record);
+        final match = regex.hasMatch(translation.key);
+        if (match) {
+          locale[type]![translation.key] = translation;
+        }
+      }
+    }
+    return exists;
+  }
+
+  bool loadGeneral(String type) {
+    final file = File(join(localePath, type, '$type.json'));
+    final bool exists = file.existsSync();
+    if (exists) {
+      locale[type] = {};
+      final jsonList = jsonDecode(file.readAsStringSync());
+      for (final record in jsonList) {
+        final translation = Translation.fromJson(record);
+        locale[type]![translation.key] = translation;
+      }
+    }
+    return exists;
+  }
+
+  String? getTranslation(String? joinedKey) {
+    if (joinedKey == null) return null;
+
+    final splits = joinedKey.split(':');
+    if (splits.length != 2) return null;
+
+    final tableType = splits[0];
+    final key = splits[1];
+    return locale[tableType]?[key]?.forLanguage(language);
+  }
+}
+
+class NikkeDatabaseV2 {
+  bool isGlobal = true;
+  bool initialized = false;
+
+  NikkeDatabaseV2(this.isGlobal);
+
+  // key is presetId
+  final Map<int, List<UnionRaidWaveData>> unionRaidData = {};
+
+  void init() {
+    unionRaidData.clear();
+
+    final extractFolderPath = getExtractDataFolderPath(isGlobal);
+    initialized = true;
+    initialized &= loadData(
+      getDesignatedDirectory(extractFolderPath, 'UnionRaidPresetTable.json'),
+      processUnionRaidWaveData,
+    );
+  }
+
+  bool loadData(String filePath, void Function(dynamic) process) {
+    final table = File(filePath);
+    final bool exists = table.existsSync();
+    if (exists) {
+      final json = jsonDecode(table.readAsStringSync());
+      for (final record in json['records']) {
+        process(record);
+      }
+    }
+    return exists;
+  }
+
+  void processUnionRaidWaveData(dynamic record) {
+    final data = UnionRaidWaveData.fromJson(record);
+    unionRaidData.putIfAbsent(data.presetGroupId, () => []);
+    unionRaidData[data.presetGroupId]!.add(data);
+  }
+}
+
+/// will be deprecated i guess
 class NikkeDatabase {
   static const String appPath = '.';
 
