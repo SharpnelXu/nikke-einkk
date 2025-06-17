@@ -33,8 +33,8 @@ class Locale {
 
     bool result = true;
     result &= loadLocaleCharacter();
-    result &= loadGeneral('LocaleSkill');
-    result &= loadGeneral('LocaleSystem');
+    result &= loadGeneral('Locale_Skill');
+    result &= loadGeneral('Locale_System');
 
     logger.i('Locale init result: $result');
 
@@ -42,7 +42,7 @@ class Locale {
   }
 
   bool loadLocaleCharacter() {
-    final type = 'LocaleCharacter';
+    final type = 'Locale_Character';
     final file = File(join(localePath, type, '$type.json'));
     final bool exists = file.existsSync();
     if (exists) {

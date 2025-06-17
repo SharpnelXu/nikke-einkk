@@ -1,7 +1,7 @@
 import 'package:path/path.dart' as path;
 
 const appPath = '.';
-final localePath = path.join(appPath, 'Locale');
+final localePath = path.join(appPath, 'data', 'Locale');
 
 String getStaticDataPath(bool global) {
   final server = global ? 'global' : 'cn';
