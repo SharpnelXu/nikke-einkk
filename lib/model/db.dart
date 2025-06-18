@@ -6,6 +6,7 @@ import 'package:logger/logger.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/data_path.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/monster.dart';
 import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/model/stages.dart';
 import 'package:nikke_einkk/model/translation.dart';
@@ -35,6 +36,7 @@ class Locale {
     result &= loadLocaleCharacter();
     result &= loadGeneral('Locale_Skill');
     result &= loadGeneral('Locale_System');
+    result &= loadGeneral('Locale_Monster');
 
     logger.i('Locale init result: $result');
 
@@ -44,7 +46,7 @@ class Locale {
   bool loadLocaleCharacter() {
     final type = 'Locale_Character';
     final file = File(join(localePath, type, '$type.json'));
-    final bool exists = file.existsSync();
+    final exists = file.existsSync();
     if (exists) {
       locale[type] = {};
       final jsonList = jsonDecode(file.readAsStringSync());
@@ -62,7 +64,7 @@ class Locale {
 
   bool loadGeneral(String type) {
     final file = File(join(localePath, type, '$type.json'));
-    final bool exists = file.existsSync();
+    final exists = file.existsSync();
     if (exists) {
       locale[type] = {};
       final jsonList = jsonDecode(file.readAsStringSync());
@@ -92,11 +94,22 @@ class NikkeDatabaseV2 {
 
   NikkeDatabaseV2(this.isGlobal);
 
-  // key is presetId
-  final Map<int, List<UnionRaidWaveData>> unionRaidData = {};
+  final Map<int, List<UnionRaidWaveData>> unionRaidData = {}; // key is presetId
+  final Map<int, String> waveGroupDict = {};
+  final Map<String, Map<int, WaveData>> waveData = {};
+  final Map<int, MonsterData> raptureData = {};
+  final Map<int, List<MonsterPartData>> rapturePartData = {}; // key is modelId
+  final Map<int, Map<int, MonsterStatEnhanceData>> monsterStatEnhanceData = {}; // key is groupId, lv
+  final Map<int, List<MonsterStageLevelChangeData>> monsterStageLvChangeData = {};
 
   void init() {
     unionRaidData.clear();
+    waveGroupDict.clear();
+    waveData.clear();
+    raptureData.clear();
+    rapturePartData.clear();
+    monsterStatEnhanceData.clear();
+    monsterStageLvChangeData.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     initialized = true;
@@ -104,11 +117,56 @@ class NikkeDatabaseV2 {
       getDesignatedDirectory(extractFolderPath, 'UnionRaidPresetTable.json'),
       processUnionRaidWaveData,
     );
+    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'MonsterTable.json'), processRaptureData);
+    initialized &= loadData(
+      getDesignatedDirectory(extractFolderPath, 'MonsterPartsTable.json'),
+      processRapturePartData,
+    );
+    initialized &= loadData(
+      getDesignatedDirectory(extractFolderPath, 'MonsterStatEnhanceTable.json'),
+      processMonsterStatEnhanceData,
+    );
+    initialized &= loadData(
+      getDesignatedDirectory(extractFolderPath, 'MonsterStageLvChangeTable.json'),
+      processMonsterStageLvChangeData,
+    );
+
+    initialized &= loadCsv(getDesignatedDirectory(extractFolderPath, 'WaveData.GroupDict.csv'), processWaveDict);
+  }
+
+  WaveData? getWaveData(int stageId) {
+    final extractFolderPath = getExtractDataFolderPath(isGlobal);
+    final group = waveGroupDict[stageId];
+    if (group == null) {
+      return null;
+    }
+
+    if (!waveData.containsKey(group)) {
+      final loaded = loadData(getDesignatedDirectory(extractFolderPath, 'WaveDataTable.$group.json'), processWaveData);
+      if (!loaded) {
+        logger.w('Tried to load wave $group based on stage $stageId, but failed');
+      }
+    }
+
+    return waveData[group]?[stageId];
+  }
+
+  bool loadCsv(String filePath, void Function(List<String>) process) {
+    final csv = File(filePath);
+    final exists = csv.existsSync();
+
+    final lines = csv.readAsLinesSync();
+    for (int idx = 1; idx < lines.length; idx += 1) {
+      final line = lines[idx];
+      process(line.split(', '));
+    }
+
+    return exists;
   }
 
   bool loadData(String filePath, void Function(dynamic) process) {
     final table = File(filePath);
-    final bool exists = table.existsSync();
+    final exists = table.existsSync();
     if (exists) {
       final json = jsonDecode(table.readAsStringSync());
       for (final record in json['records']) {
@@ -118,10 +176,47 @@ class NikkeDatabaseV2 {
     return exists;
   }
 
+  void processWaveDict(List<String> data) {
+    if (data.length == 2) {
+      final wave = int.parse(data.first);
+      final group = data.last;
+      waveGroupDict[wave] = group;
+    }
+  }
+
   void processUnionRaidWaveData(dynamic record) {
     final data = UnionRaidWaveData.fromJson(record);
     unionRaidData.putIfAbsent(data.presetGroupId, () => []);
     unionRaidData[data.presetGroupId]!.add(data);
+  }
+
+  void processWaveData(dynamic record) {
+    final data = WaveData.fromJson(record);
+    waveData.putIfAbsent(data.groupId, () => {});
+    waveData[data.groupId]![data.stageId] = data;
+  }
+
+  void processRaptureData(dynamic record) {
+    final data = MonsterData.fromJson(record);
+    raptureData[data.id] = data;
+  }
+
+  void processRapturePartData(dynamic record) {
+    final data = MonsterPartData.fromJson(record);
+    rapturePartData.putIfAbsent(data.monsterModelId, () => []);
+    rapturePartData[data.monsterModelId]!.add(data);
+  }
+
+  void processMonsterStatEnhanceData(dynamic record) {
+    final data = MonsterStatEnhanceData.fromJson(record);
+    monsterStatEnhanceData.putIfAbsent(data.groupId, () => {});
+    monsterStatEnhanceData[data.groupId]![data.lv] = data;
+  }
+
+  void processMonsterStageLvChangeData(dynamic record) {
+    final data = MonsterStageLevelChangeData.fromJson(record);
+    monsterStageLvChangeData.putIfAbsent(data.group, () => []);
+    monsterStageLvChangeData[data.group]!.add(data);
   }
 }
 

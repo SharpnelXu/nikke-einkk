@@ -1,0 +1,137 @@
+import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:nikke_einkk/model/battle/utils.dart' as utils;
+import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/monster.dart';
+
+class RaptureDataDisplay extends StatelessWidget {
+  final bool useGlobal;
+  final MonsterData data;
+  final int stageLv;
+  final int stageLvChangeGroup;
+
+  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+
+  const RaptureDataDisplay({
+    super.key,
+    required this.useGlobal,
+    required this.data,
+    required this.stageLv,
+    required this.stageLvChangeGroup,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final format = NumberFormat.decimalPattern();
+    final statEnhanceData = db.monsterStatEnhanceData[data.statEnhanceId]?[stageLv];
+
+    final List<Widget> children = [
+      Text(locale.getTranslation(data.nameKey) ?? data.nameKey),
+      Text('Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}'),
+    ];
+    if (statEnhanceData != null) {
+      children.addAll([
+        Text('HP: ${format.format((utils.toModifier(data.hpRatio) * statEnhanceData.levelHp).round())}'),
+        Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * statEnhanceData.levelAttack).round())}'),
+        Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * statEnhanceData.levelDefence).round())}'),
+      ]);
+
+      final parts = db.rapturePartData[data.monsterModelId] ?? [];
+      for (final part in parts) {
+        if (part.partsNameKey == null && part.hpRatio == 10000) continue;
+
+        children.add(
+          Container(
+            padding: const EdgeInsets.all(3.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 2),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 3,
+              children: [
+                Text(locale.getTranslation(part.partsNameKey) ?? 'Unknown Part'),
+                Row(
+                  spacing: 3,
+                  children: [
+                    Text('HP: ${format.format((utils.toModifier(part.hpRatio) * statEnhanceData.levelHp).round())}'),
+                    Tooltip(
+                      message:
+                          'Damage Ratio HP: '
+                          '${format.format((utils.toModifier(part.damageHpRatio) * statEnhanceData.levelHp).round())}'
+                          '\n'
+                          '(${(part.damageHpRatio / 100).toStringAsFixed(2)}%)',
+                      child: Icon(Icons.info_outline, size: 16),
+                    ),
+                  ],
+                ),
+                Text('(${(part.hpRatio / 100).toStringAsFixed(2)}%)'),
+                if (part.defenceRatio != 10000)
+                  Text(
+                    'DEF: '
+                    '${format.format((utils.toModifier(part.defenceRatio) * statEnhanceData.levelDefence).round())}',
+                  ),
+              ],
+            ),
+          ),
+        );
+      }
+    }
+
+    if (stageLvChangeGroup != 0) {
+      final stageLvChanges =
+          db.monsterStageLvChangeData[stageLvChangeGroup]?.sorted((a, b) => a.step.compareTo(b.step)).toList() ?? [];
+
+      for (final stageLvChange in stageLvChanges) {
+        final changedStat = db.monsterStatEnhanceData[data.statEnhanceId]?[stageLvChange.monsterStageLv];
+        final hasChange =
+            changedStat?.levelAttack != statEnhanceData?.levelAttack ||
+            changedStat?.levelDefence != statEnhanceData?.levelDefence;
+        if (changedStat == null || !hasChange) continue;
+
+        children.add(
+          Container(
+            padding: const EdgeInsets.all(3.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 2),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 3,
+              children: [
+                Text('Stat Change: ${shortenConditionType(stageLvChange.conditionType)}'),
+                Text(
+                  'Range: ${format.format(stageLvChange.conditionValueMin)}-'
+                  '${stageLvChange.conditionValueMax == 0 ? '∞' : format.format(stageLvChange.conditionValueMax)}',
+                ),
+                Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * changedStat.levelAttack).round())}'),
+                Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * changedStat.levelDefence).round())}'),
+              ],
+            ),
+          ),
+        );
+      }
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(3.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: NikkeElement.fromId(data.elementIds.firstOrNull).color, width: 3),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children),
+    );
+  }
+
+  String shortenConditionType(String condition) {
+    if (condition == 'DamageDoneToTargetMonster') {
+      return 'Damage';
+    }
+
+    return condition;
+  }
+}

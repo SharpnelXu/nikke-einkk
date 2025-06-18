@@ -1,8 +1,13 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:nikke_einkk/model/battle/utils.dart' as utils;
+import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/monster.dart';
 import 'package:nikke_einkk/model/stages.dart';
 import 'package:nikke_einkk/module/api/data_downloader.dart';
+import 'package:nikke_einkk/module/common/rapture_display.dart';
 
 class UnionRaidPresetPage extends StatefulWidget {
   const UnionRaidPresetPage({super.key});
@@ -68,7 +73,11 @@ class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
           child: Text('Data not initialized! Click to download'),
         ),
       for (final difficulty in difficultyToWaveChangeStep.keys)
-        UnionRaidDataDisplay(difficulty: difficulty, raidData: difficultyToWaveChangeStep[difficulty]!),
+        UnionRaidDataDisplay(
+          difficulty: difficulty,
+          raidData: difficultyToWaveChangeStep[difficulty]!,
+          useGlobal: useGlobal,
+        ),
     ];
 
     final languageDropDown =
@@ -118,10 +127,11 @@ class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
 
 class UnionRaidDataDisplay extends StatefulWidget {
   final String difficulty;
+  final bool useGlobal;
   // grouped by waveChangeStep
   final Map<int, List<UnionRaidWaveData>> raidData;
 
-  const UnionRaidDataDisplay({super.key, required this.difficulty, required this.raidData});
+  const UnionRaidDataDisplay({super.key, required this.difficulty, required this.raidData, required this.useGlobal});
 
   @override
   State<UnionRaidDataDisplay> createState() => _UnionRaidDataDisplayState();
@@ -145,7 +155,7 @@ class _UnionRaidDataDisplayState extends State<UnionRaidDataDisplay> {
     final sortedCurrentWave = raidData[selectedWave]!.sorted((a, b) => a.waveOrder.compareTo(b.waveOrder)).toList();
 
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(5.0),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey, width: 3),
         borderRadius: BorderRadius.circular(5),
@@ -173,7 +183,13 @@ class _UnionRaidDataDisplayState extends State<UnionRaidDataDisplay> {
               ),
             ],
           ),
-          Row(spacing: 5, children: [for (final data in sortedCurrentWave) UnionRaidBossDisplay(data: data)]),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 5,
+            children: [
+              for (final data in sortedCurrentWave) UnionRaidBossDisplay(data: data, useGlobal: widget.useGlobal),
+            ],
+          ),
         ],
       ),
     );
@@ -182,25 +198,44 @@ class _UnionRaidDataDisplayState extends State<UnionRaidDataDisplay> {
 
 class UnionRaidBossDisplay extends StatelessWidget {
   final UnionRaidWaveData data;
+  final bool useGlobal;
+  NikkeDatabaseV2 get db => useGlobal ? global : cn;
 
-  const UnionRaidBossDisplay({super.key, required this.data});
+  const UnionRaidBossDisplay({super.key, required this.data, required this.useGlobal});
 
   @override
   Widget build(BuildContext context) {
+    final waveData = db.getWaveData(data.wave);
+    final targets = waveData?.targetList.map((targetId) => db.raptureData[targetId]).nonNulls.toList() ?? [];
+
     return Container(
-      padding: const EdgeInsets.all(5.0),
+      padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey, width: 2),
+        border: Border.all(color: Colors.grey, width: 3),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         spacing: 5,
         children: [
-          Tooltip(
-            message: locale.getTranslation(data.waveDescription) ?? '',
-            child: Text('Wave ${data.waveOrder}: ${locale.getTranslation(data.waveName)}'),
+          Row(
+            spacing: 3,
+            children: [
+              Text('Boss ${data.waveOrder}: ${locale.getTranslation(data.waveName)}'),
+              Tooltip(
+                message: locale.getTranslation(data.waveDescription) ?? '',
+                child: Icon(Icons.info_outline, size: 16),
+              ),
+            ],
           ),
+          Text('Time Limit: ${waveData?.battleTime} s'),
+          for (final target in targets)
+            RaptureDataDisplay(
+              useGlobal: useGlobal,
+              data: target,
+              stageLv: data.monsterStageLevel,
+              stageLvChangeGroup: data.monsterStageLevelChangeGroup,
+            ),
         ],
       ),
     );

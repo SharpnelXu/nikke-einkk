@@ -1,5 +1,9 @@
 import 'dart:math';
 
+double toModifier(int ratio) {
+  return ratio / 10000;
+}
+
 class BattleUtils {
   static const rangeCorrection = 3000;
   static const fullBurstCorrection = 5000;

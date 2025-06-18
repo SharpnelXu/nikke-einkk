@@ -703,7 +703,7 @@ enum NikkeElement {
 
   const NikkeElement(this.id);
 
-  static NikkeElement fromId(final int id) {
+  static NikkeElement fromId(int? id) {
     return values.firstWhere(
       (e) => e.id == id,
       orElse: () => NikkeElement.unknown, // default value if not found
