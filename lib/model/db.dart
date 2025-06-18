@@ -161,10 +161,12 @@ class NikkeDatabaseV2 {
     final csv = File(filePath);
     final exists = csv.existsSync();
 
-    final lines = csv.readAsLinesSync();
-    for (int idx = 1; idx < lines.length; idx += 1) {
-      final line = lines[idx];
-      process(line.split(', '));
+    if (exists) {
+      final lines = csv.readAsLinesSync();
+      for (int idx = 1; idx < lines.length; idx += 1) {
+        final line = lines[idx];
+        process(line.split(', '));
+      }
     }
 
     return exists;
