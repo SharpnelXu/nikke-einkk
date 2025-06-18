@@ -1,5 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nikke_einkk/model/db.dart';
 
 class RangedNumberTextField extends StatefulWidget {
   final int defaultValue;
@@ -99,4 +101,31 @@ class _NumberRangeInputFormatter extends TextInputFormatter {
 
     return newValue;
   }
+}
+
+Widget commonBottomNavigationBar(void Function() setState) {
+  final languageDropDown =
+      Language.values
+          .whereNot((lang) => lang == Language.unknown)
+          .map((lang) => DropdownMenuEntry(value: lang, label: lang.name))
+          .toList();
+
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      spacing: 5,
+      children: [
+        Text('Language: '),
+        DropdownMenu(
+          initialSelection: locale.language,
+          onSelected: (v) {
+            locale.language = v!;
+            setState();
+          },
+          dropdownMenuEntries: languageDropDown,
+        ),
+      ],
+    ),
+  );
 }

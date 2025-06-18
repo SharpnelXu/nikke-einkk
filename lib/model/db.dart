@@ -101,6 +101,7 @@ class NikkeDatabaseV2 {
   final Map<int, List<MonsterPartData>> rapturePartData = {}; // key is modelId
   final Map<int, Map<int, MonsterStatEnhanceData>> monsterStatEnhanceData = {}; // key is groupId, lv
   final Map<int, List<MonsterStageLevelChangeData>> monsterStageLvChangeData = {};
+  final Map<int, List<SoloRaidWaveData>> soloRaidData = {}; // key is presetId
 
   void init() {
     unionRaidData.clear();
@@ -110,6 +111,7 @@ class NikkeDatabaseV2 {
     rapturePartData.clear();
     monsterStatEnhanceData.clear();
     monsterStageLvChangeData.clear();
+    soloRaidData.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     initialized = true;
@@ -129,6 +131,10 @@ class NikkeDatabaseV2 {
     initialized &= loadData(
       getDesignatedDirectory(extractFolderPath, 'MonsterStageLvChangeTable.json'),
       processMonsterStageLvChangeData,
+    );
+    initialized &= loadData(
+      getDesignatedDirectory(extractFolderPath, 'SoloRaidPresetTable.json'),
+      processSoloRaidWaveData,
     );
 
     initialized &= loadCsv(getDesignatedDirectory(extractFolderPath, 'WaveData.GroupDict.csv'), processWaveDict);
@@ -182,6 +188,12 @@ class NikkeDatabaseV2 {
       final group = data.last;
       waveGroupDict[wave] = group;
     }
+  }
+
+  void processSoloRaidWaveData(dynamic record) {
+    final data = SoloRaidWaveData.fromJson(record);
+    soloRaidData.putIfAbsent(data.presetGroupId, () => []);
+    soloRaidData[data.presetGroupId]!.add(data);
   }
 
   void processUnionRaidWaveData(dynamic record) {

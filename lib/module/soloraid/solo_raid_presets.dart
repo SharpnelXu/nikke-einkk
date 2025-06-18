@@ -6,34 +6,34 @@ import 'package:nikke_einkk/module/api/data_downloader.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/rapture_display.dart';
 
-class UnionRaidPresetPage extends StatefulWidget {
-  const UnionRaidPresetPage({super.key});
+class SoloRaidPresetPage extends StatefulWidget {
+  const SoloRaidPresetPage({super.key});
 
   @override
-  State<UnionRaidPresetPage> createState() => _UnionRaidPresetPageState();
+  State<SoloRaidPresetPage> createState() => _SoloRaidPresetPageState();
 }
 
-class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
+class _SoloRaidPresetPageState extends State<SoloRaidPresetPage> {
   bool useGlobal = true;
-  int? urPreset;
+  int? srPreset;
 
   NikkeDatabaseV2 get db => useGlobal ? global : cn;
 
   @override
   Widget build(BuildContext context) {
-    final urNumberDropdowns =
-        db.unionRaidData.keys
+    final srNumDropdowns =
+        db.soloRaidData.keys
             .sorted((a, b) => a.compareTo(b))
-            .map((presetId) => DropdownMenuEntry(value: presetId, label: 'UR ${presetId - 10000}'))
+            .map((presetId) => DropdownMenuEntry(value: presetId, label: 'SR ${presetId - 10000}'))
             .toList();
 
-    final unionRaidData = db.unionRaidData[urPreset ?? urNumberDropdowns.lastOrNull?.value];
-    final Map<String, Map<int, List<UnionRaidWaveData>>> difficultyToWaveChangeStep = {};
-    if (unionRaidData != null) {
-      for (final data in unionRaidData) {
-        difficultyToWaveChangeStep.putIfAbsent(data.difficultyType, () => {});
-        difficultyToWaveChangeStep[data.difficultyType]!.putIfAbsent(data.waveChangeStep, () => []);
-        difficultyToWaveChangeStep[data.difficultyType]![data.waveChangeStep]!.add(data);
+    final srRaidData = db.soloRaidData[srPreset ?? srNumDropdowns.lastOrNull?.value];
+    final Map<String, Map<int, List<SoloRaidWaveData>>> difficultyToWaveOrder = {};
+    if (srRaidData != null) {
+      for (final data in srRaidData) {
+        difficultyToWaveOrder.putIfAbsent(data.difficultyType, () => {});
+        difficultyToWaveOrder[data.difficultyType]!.putIfAbsent(data.waveOrder, () => []);
+        difficultyToWaveOrder[data.difficultyType]![data.waveOrder]!.add(data);
       }
     }
 
@@ -48,15 +48,15 @@ class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
           Radio(value: false, groupValue: useGlobal, onChanged: serverRadioChange),
           Text('CN', style: TextStyle(fontWeight: !useGlobal ? FontWeight.bold : null)),
           SizedBox(width: 15),
-          Text('Select UR: ', style: TextStyle(fontSize: 20)),
+          Text('Select SR: ', style: TextStyle(fontSize: 20)),
           DropdownMenu(
             textStyle: TextStyle(fontSize: 20),
-            initialSelection: urPreset ?? urNumberDropdowns.lastOrNull?.value,
+            initialSelection: srPreset ?? srNumDropdowns.lastOrNull?.value,
             onSelected: (v) {
-              urPreset = v;
+              srPreset = v;
               setState(() {});
             },
-            dropdownMenuEntries: urNumberDropdowns,
+            dropdownMenuEntries: srNumDropdowns,
           ),
         ],
       ),
@@ -69,16 +69,22 @@ class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
           },
           child: Text('Data not initialized! Click to download'),
         ),
-      for (final difficulty in difficultyToWaveChangeStep.keys)
-        UnionRaidDataDisplay(
-          difficulty: difficulty,
-          raidData: difficultyToWaveChangeStep[difficulty]!,
-          useGlobal: useGlobal,
-        ),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 3,
+        children: [
+          for (final difficulty in difficultyToWaveOrder.keys)
+            SoloRaidDataDisplay(
+              difficulty: difficulty,
+              raidData: difficultyToWaveOrder[difficulty]!,
+              useGlobal: useGlobal,
+            ),
+        ],
+      ),
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text('Union Raid Data')),
+      appBar: AppBar(title: Text('Solo Raid Data')),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView.separated(
@@ -93,28 +99,28 @@ class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
 
   void serverRadioChange(bool? v) {
     useGlobal = v ?? useGlobal;
-    if (!db.unionRaidData.keys.contains(urPreset)) {
-      urPreset = null;
+    if (!db.soloRaidData.keys.contains(srPreset)) {
+      srPreset = null;
     }
     if (mounted) setState(() {});
   }
 }
 
-class UnionRaidDataDisplay extends StatefulWidget {
+class SoloRaidDataDisplay extends StatefulWidget {
   final String difficulty;
   final bool useGlobal;
   // grouped by waveChangeStep
-  final Map<int, List<UnionRaidWaveData>> raidData;
+  final Map<int, List<SoloRaidWaveData>> raidData;
 
-  const UnionRaidDataDisplay({super.key, required this.difficulty, required this.raidData, required this.useGlobal});
+  const SoloRaidDataDisplay({super.key, required this.difficulty, required this.raidData, required this.useGlobal});
 
   @override
-  State<UnionRaidDataDisplay> createState() => _UnionRaidDataDisplayState();
+  State<SoloRaidDataDisplay> createState() => _SoloRaidDataDisplayState();
 }
 
-class _UnionRaidDataDisplayState extends State<UnionRaidDataDisplay> {
+class _SoloRaidDataDisplayState extends State<SoloRaidDataDisplay> {
   int? currentWave;
-  Map<int, List<UnionRaidWaveData>> get raidData => widget.raidData;
+  Map<int, List<SoloRaidWaveData>> get raidData => widget.raidData;
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +168,7 @@ class _UnionRaidDataDisplayState extends State<UnionRaidDataDisplay> {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 5,
             children: [
-              for (final data in sortedCurrentWave) UnionRaidBossDisplay(data: data, useGlobal: widget.useGlobal),
+              for (final data in sortedCurrentWave) SoloRaidBossDisplay(data: data, useGlobal: widget.useGlobal),
             ],
           ),
         ],
@@ -171,12 +177,12 @@ class _UnionRaidDataDisplayState extends State<UnionRaidDataDisplay> {
   }
 }
 
-class UnionRaidBossDisplay extends StatelessWidget {
-  final UnionRaidWaveData data;
+class SoloRaidBossDisplay extends StatelessWidget {
+  final SoloRaidWaveData data;
   final bool useGlobal;
   NikkeDatabaseV2 get db => useGlobal ? global : cn;
 
-  const UnionRaidBossDisplay({super.key, required this.data, required this.useGlobal});
+  const SoloRaidBossDisplay({super.key, required this.data, required this.useGlobal});
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +202,7 @@ class UnionRaidBossDisplay extends StatelessWidget {
           Row(
             spacing: 3,
             children: [
-              Text('Boss ${data.waveOrder}: ${locale.getTranslation(data.waveName)}'),
+              Text('Boss: ${locale.getTranslation(data.waveName) ?? data.waveName}'),
               Tooltip(
                 message: locale.getTranslation(data.waveDescription) ?? '',
                 child: Icon(Icons.info_outline, size: 16),
