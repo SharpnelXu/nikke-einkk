@@ -29,7 +29,11 @@ class RaptureDataDisplay extends StatelessWidget {
 
     final List<Widget> children = [
       Tooltip(
-        message: 'Target Id: ${data.id}\nModel Id: ${data.monsterModelId}',
+        message: 'Target Id: ${data.id}'
+            '\nModel Id: ${data.monsterModelId}'
+            '\nNormal Stage AI: ${data.spotAi}'
+            '\nDefence Stage AI: ${data.spotAiDefense}'
+            '\nBase Defence Stage AI: ${data.spotAiBaseDefense}',
         child: Text(locale.getTranslation(data.nameKey) ?? data.nameKey),
       ),
       Text('Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}'),

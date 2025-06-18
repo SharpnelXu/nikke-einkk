@@ -19,6 +19,7 @@ final db = NikkeDatabase();
 final locale = Locale();
 final global = NikkeDatabaseV2(true);
 final cn = NikkeDatabaseV2(false);
+final userDb = UserDatabase();
 
 final Logger logger = Logger();
 
@@ -157,33 +158,6 @@ class NikkeDatabaseV2 {
     return waveData[group]?[stageId];
   }
 
-  bool loadCsv(String filePath, void Function(List<String>) process) {
-    final csv = File(filePath);
-    final exists = csv.existsSync();
-
-    if (exists) {
-      final lines = csv.readAsLinesSync();
-      for (int idx = 1; idx < lines.length; idx += 1) {
-        final line = lines[idx];
-        process(line.split(', '));
-      }
-    }
-
-    return exists;
-  }
-
-  bool loadData(String filePath, void Function(dynamic) process) {
-    final table = File(filePath);
-    final exists = table.existsSync();
-    if (exists) {
-      final json = jsonDecode(table.readAsStringSync());
-      for (final record in json['records']) {
-        process(record);
-      }
-    }
-    return exists;
-  }
-
   void processWaveDict(List<String> data) {
     if (data.length == 2) {
       final wave = int.parse(data.first);
@@ -232,6 +206,54 @@ class NikkeDatabaseV2 {
     monsterStageLvChangeData.putIfAbsent(data.group, () => []);
     monsterStageLvChangeData[data.group]!.add(data);
   }
+}
+
+class UserDatabase {
+  bool initialized = false;
+  final Map<String, String> customizeDirectory = {};
+
+
+  void init() {
+    customizeDirectory.clear();
+
+    initialized = true;
+    initialized &= loadCsv(join(userDataPath, 'DataDirectory.csv'), processCustomizeDirectory);
+  }
+
+  void processCustomizeDirectory(List<String> data) {
+    if (data.length == 2) {
+      final prefix = data.first;
+      final folder = data.last;
+      customizeDirectory[prefix] = folder;
+    }
+  }
+}
+
+bool loadCsv(String filePath, void Function(List<String>) process) {
+  final csv = File(filePath);
+  final exists = csv.existsSync();
+
+  if (exists) {
+    final lines = csv.readAsLinesSync();
+    for (int idx = 1; idx < lines.length; idx += 1) {
+      final line = lines[idx];
+      process(line.split(', '));
+    }
+  }
+
+  return exists;
+}
+
+bool loadData(String filePath, void Function(dynamic) process) {
+  final table = File(filePath);
+  final exists = table.existsSync();
+  if (exists) {
+    final json = jsonDecode(table.readAsStringSync());
+    for (final record in json['records']) {
+      process(record);
+    }
+  }
+  return exists;
 }
 
 /// will be deprecated i guess

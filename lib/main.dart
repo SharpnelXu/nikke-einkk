@@ -8,6 +8,7 @@ Future<void> main() async {
   await db.loadData();
 
   locale.init();
+  userDb.init();
   global.init();
   cn.init();
 
