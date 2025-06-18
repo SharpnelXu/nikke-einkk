@@ -28,7 +28,10 @@ class RaptureDataDisplay extends StatelessWidget {
     final statEnhanceData = db.monsterStatEnhanceData[data.statEnhanceId]?[stageLv];
 
     final List<Widget> children = [
-      Text(locale.getTranslation(data.nameKey) ?? data.nameKey),
+      Tooltip(
+        message: 'Target Id: ${data.id}\nModel Id: ${data.monsterModelId}',
+        child: Text(locale.getTranslation(data.nameKey) ?? data.nameKey),
+      ),
       Text('Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}'),
     ];
     if (statEnhanceData != null) {
@@ -53,7 +56,10 @@ class RaptureDataDisplay extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               spacing: 3,
               children: [
-                Text(locale.getTranslation(part.partsNameKey) ?? 'Unknown Part'),
+                Tooltip(
+                  message: 'Type: ${part.partsType}',
+                  child: Text(locale.getTranslation(part.partsNameKey) ?? part.partsNameKey ?? 'Unknown Part'),
+                ),
                 Row(
                   spacing: 3,
                   children: [
