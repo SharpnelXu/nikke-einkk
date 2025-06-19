@@ -72,10 +72,10 @@ HarmonyCubeData _$HarmonyCubeDataFromJson(Map<String, dynamic> json) => HarmonyC
   resourceId: (json['resource_id'] as num?)?.toInt() ?? 0,
   bg: json['bg'] as String? ?? '',
   bgColor: json['bg_color'] as String? ?? '',
-  itemType: $enumDecodeNullable(_$ItemTypeEnumMap, json['item_type']) ?? ItemType.harmonyCube,
+  rawItemType: json['item_type'] as String? ?? '',
   itemSubType: json['item_sub_type'] as String? ?? '',
-  itemRare: $enumDecodeNullable(_$RarityEnumMap, json['item_rare']) ?? Rarity.ssr,
-  characterClass: $enumDecodeNullable(_$NikkeClassEnumMap, json['class']) ?? NikkeClass.all,
+  rawItemRare: json['item_rare'] as String? ?? '',
+  rawCharacterClass: json['class'] as String? ?? '',
   levelEnhanceId: (json['level_enhance_id'] as num?)?.toInt() ?? 0,
   harmonyCubeSkillGroups:
       (json['harmonycube_skill_group'] as List<dynamic>?)
@@ -83,18 +83,6 @@ HarmonyCubeData _$HarmonyCubeDataFromJson(Map<String, dynamic> json) => HarmonyC
           .toList() ??
       const [],
 );
-
-const _$ItemTypeEnumMap = {ItemType.unknown: 'Unknown', ItemType.equip: 'Equip', ItemType.harmonyCube: 'HarmonyCube'};
-
-const _$RarityEnumMap = {Rarity.unknown: 'UNKNOWN', Rarity.ssr: 'SSR', Rarity.sr: 'SR', Rarity.r: 'R'};
-
-const _$NikkeClassEnumMap = {
-  NikkeClass.unknown: 'Unknown',
-  NikkeClass.attacker: 'Attacker',
-  NikkeClass.defender: 'Defender',
-  NikkeClass.supporter: 'Supporter',
-  NikkeClass.all: 'All',
-};
 
 HarmonyCubeSkillLevel _$HarmonyCubeSkillLevelFromJson(Map<String, dynamic> json) =>
     HarmonyCubeSkillLevel(level: (json['skill_level'] as num?)?.toInt() ?? 0);

@@ -300,13 +300,16 @@ class HarmonyCubeData {
   @JsonKey(name: 'bg_color')
   final String bgColor;
   @JsonKey(name: 'item_type')
-  final ItemType itemType;
+  final String rawItemType;
+  ItemType get itemType => ItemType.fromName(rawItemType);
   @JsonKey(name: 'item_sub_type')
   final String itemSubType;
   @JsonKey(name: 'item_rare')
-  final Rarity itemRare;
+  final String rawItemRare;
+  Rarity get itemRare => Rarity.fromName(rawItemRare);
   @JsonKey(name: 'class')
-  final NikkeClass characterClass;
+  final String rawCharacterClass;
+  NikkeClass get characterClass => NikkeClass.fromName(rawCharacterClass);
   @JsonKey(name: 'level_enhance_id')
   final int levelEnhanceId;
   @JsonKey(name: 'harmonycube_skill_group')
@@ -322,10 +325,10 @@ class HarmonyCubeData {
     this.resourceId = 0,
     this.bg = '',
     this.bgColor = '',
-    this.itemType = ItemType.harmonyCube,
+    this.rawItemType = '',
     this.itemSubType = '',
-    this.itemRare = Rarity.ssr,
-    this.characterClass = NikkeClass.all,
+    this.rawItemRare = '',
+    this.rawCharacterClass = '',
     this.levelEnhanceId = 0,
     this.harmonyCubeSkillGroups = const [],
   });
@@ -389,6 +392,22 @@ class HarmonyCubeLevelData {
   factory HarmonyCubeLevelData.fromJson(Map<String, dynamic> json) => _$HarmonyCubeLevelDataFromJson(json);
 }
 
+@JsonEnum(fieldRename: FieldRename.pascal)
+enum FavoriteItemType {
+  unknown,
+  collection,
+  favorite;
+
+  static final Map<String, FavoriteItemType> _reverseMap = Map.fromIterable(
+    FavoriteItemType.values,
+    key: (v) => (v as FavoriteItemType).name.pascal,
+  );
+
+  static FavoriteItemType fromName(String? name) {
+    return _reverseMap[name] ?? FavoriteItemType.unknown;
+  }
+}
+
 @JsonSerializable(createToJson: false)
 class CollectionItemSkillGroup {
   @JsonKey(name: 'collection_skill_id')
@@ -412,22 +431,6 @@ class FavoriteItemSkillGroup {
   FavoriteItemSkillGroup({this.skillId = 0, this.rawSkillTable = '', this.skillChangeSlot = 0});
 
   factory FavoriteItemSkillGroup.fromJson(Map<String, dynamic> json) => _$FavoriteItemSkillGroupFromJson(json);
-}
-
-@JsonEnum(fieldRename: FieldRename.pascal)
-enum FavoriteItemType {
-  unknown,
-  collection,
-  favorite;
-
-  static final Map<String, FavoriteItemType> _reverseMap = Map.fromIterable(
-    FavoriteItemType.values,
-    key: (v) => (v as FavoriteItemType).name.pascal,
-  );
-
-  static FavoriteItemType fromName(String? name) {
-    return _reverseMap[name] ?? FavoriteItemType.unknown;
-  }
 }
 
 @JsonSerializable(createToJson: false)

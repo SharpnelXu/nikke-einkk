@@ -406,8 +406,8 @@ void main() async {
           }
 
           // Validate EquipmentStat objects
-          for (final statJson in record['stat']) {
-            final statKeys = statJson.keys.toSet();
+          for (final statJson in record['stat'] as List) {
+            final statKeys = (statJson as Map<String, dynamic>).keys.toSet();
             final stat = EquipmentStat.fromJson(statJson);
             if (stat.statType == StatType.unknown) {
               unknownStatTypes.add(stat.rawStatType);
@@ -419,8 +419,8 @@ void main() async {
           }
 
           // Validate OptionSlot objects
-          for (final slotJson in record['option_slot']) {
-            final slotKeys = slotJson.keys.toSet();
+          for (final slotJson in record['option_slot'] as List) {
+            final slotKeys = (slotJson as Map<String, dynamic>).keys.toSet();
             slotKeys.removeAll(optionSlotExpectedKeys);
             if (slotKeys.isNotEmpty) {
               extraOptionSlotKeys.addAll(slotKeys);
@@ -445,6 +445,325 @@ void main() async {
         expect(unknownStatTypes, emptySet, reason: 'Unknown stat types found');
         expect(extraStatKeys, emptySet, reason: 'Extra fields in EquipmentStat');
         expect(extraOptionSlotKeys, emptySet, reason: 'Extra fields in OptionSlot');
+      }
+    });
+
+    test('Check HarmonyCubeData with nested objects', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'name_localkey',
+          'description_localkey',
+          'location_id',
+          'location_localkey',
+          'order',
+          'resource_id',
+          'bg',
+          'bg_color',
+          'item_type',
+          'item_sub_type',
+          'item_rare',
+          'class',
+          'level_enhance_id',
+          'harmonycube_skill_group',
+        };
+
+        // For HarmonyCubeSkillGroup validation
+        final skillGroupExpectedKeys = {'skill_group_id'};
+        final Set<String> extraSkillGroupKeys = {};
+
+        // Main object validations
+        final Set<String?> unknownItemType = {};
+        final Set<String?> unknownRarity = {};
+        final Set<String?> unknownCharacterClass = {};
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'ItemHarmonyCubeTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          final data = HarmonyCubeData.fromJson(record);
+
+          // Validate main object
+          if (data.itemType == ItemType.unknown) {
+            unknownItemType.add(data.rawItemType);
+          }
+          if (data.itemRare == Rarity.unknown) {
+            unknownRarity.add(data.rawItemRare);
+          }
+          if (data.characterClass == NikkeClass.unknown) {
+            unknownCharacterClass.add(data.rawCharacterClass);
+          }
+
+          // Validate HarmonyCubeSkillGroup objects
+          for (final skillGroupJson in record['harmonycube_skill_group'] as List) {
+            final skillGroupKeys = (skillGroupJson as Map<String, dynamic>).keys.toSet();
+            skillGroupKeys.removeAll(skillGroupExpectedKeys);
+            if (skillGroupKeys.isNotEmpty) {
+              extraSkillGroupKeys.addAll(skillGroupKeys);
+            }
+          }
+
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        logger.d('Folder: $folder');
+        expect(loaded, true);
+        expect(unknownItemType, emptySet);
+        expect(unknownRarity, emptySet);
+        expect(unknownCharacterClass, emptySet);
+        expect(extraKeys, emptySet);
+        expect(extraSkillGroupKeys, emptySet, reason: 'Extra fields in HarmonyCubeSkillGroup');
+      }
+    });
+
+    test('Check HarmonyCubeLevelData with nested objects', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'level_enhance_id',
+          'level',
+          'skill_levels',
+          'material_id',
+          'material_value',
+          'gold_value',
+          'slot',
+          'harmonycube_stats',
+        };
+
+        // For HarmonyCubeSkillLevel validation
+        final skillLevelExpectedKeys = {'skill_level'};
+        final Set<String> extraSkillLevelKeys = {};
+
+        // For HarmonyCubeStat validation
+        final statExpectedKeys = {'stat_type', 'stat_rate'};
+        final Set<String?> unknownStatTypes = {};
+        final Set<String> extraStatKeys = {};
+
+        // Main object validations
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(
+          getDesignatedDirectory(folder, 'ItemHarmonyCubeLevelTable.json'),
+              (record) {
+            final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+            // Validate HarmonyCubeSkillLevel objects
+            for (final skillLevelJson in record['skill_levels'] as List) {
+              final skillLevelKeys = (skillLevelJson as Map<String, dynamic>).keys.toSet();
+              skillLevelKeys.removeAll(skillLevelExpectedKeys);
+              if (skillLevelKeys.isNotEmpty) {
+                extraSkillLevelKeys.addAll(skillLevelKeys);
+              }
+            }
+
+            // Validate HarmonyCubeStat objects
+            for (final statJson in record['harmonycube_stats'] as List) {
+              final statKeys = (statJson as Map<String, dynamic>).keys.toSet();
+              final stat = HarmonyCubeStat.fromJson(statJson);
+              if (stat.type == StatType.unknown) {
+                unknownStatTypes.add(stat.rawType);
+              }
+              statKeys.removeAll(statExpectedKeys);
+              if (statKeys.isNotEmpty) {
+                extraStatKeys.addAll(statKeys);
+              }
+            }
+
+            recordKeys.removeAll(expectedKeys);
+            if (recordKeys.isNotEmpty) {
+              extraKeys.addAll(recordKeys);
+            }
+          },
+        );
+
+        logger.d('Folder: $folder');
+        expect(loaded, true);
+        expect(extraKeys, emptySet);
+
+        // Nested object assertions
+        expect(extraSkillLevelKeys, emptySet,
+            reason: 'Extra fields in HarmonyCubeSkillLevel');
+        expect(unknownStatTypes, emptySet,
+            reason: 'Unknown stat types in HarmonyCubeStat');
+        expect(extraStatKeys, emptySet,
+            reason: 'Extra fields in HarmonyCubeStat');
+      }
+    });
+
+    test('Check FavoriteItemData with nested objects', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'name_localkey',
+          'description_localkey',
+          'icon_resource_id',
+          'img_resource_id',
+          'prop_resource_id',
+          'order',
+          'favorite_rare',
+          'favorite_type',
+          'weapon_type',
+          'name_code',
+          'max_level',
+          'level_enhance_id',
+          'probability_group',
+          'collection_skill_group_data',
+          'favoriteitem_skill_group_data',
+          'albumcategory_id',
+        };
+
+        // For CollectionItemSkillGroup validation
+        final collectionSkillExpectedKeys = {'collection_skill_id'};
+        final Set<String> extraCollectionSkillKeys = {};
+
+        // For FavoriteItemSkillGroup validation
+        final favoriteSkillExpectedKeys = {
+          'favorite_skill_id',
+          'skill_table',
+          'skill_change_slot',
+        };
+        final Set<String?> unknownSkillTables = {};
+        final Set<String> extraFavoriteSkillKeys = {};
+
+        // Main object validations
+        final Set<String?> unknownRarity = {};
+        final Set<String?> unknownFavoriteType = {};
+        final Set<String?> unknownWeaponType = {};
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(
+          getDesignatedDirectory(folder, 'FavoriteItemTable.json'),
+              (record) {
+            final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+            final data = FavoriteItemData.fromJson(record);
+
+            // Validate main object enums
+            if (data.favoriteRare == Rarity.unknown) {
+              unknownRarity.add(data.rawFavoriteRare);
+            }
+            if (data.favoriteType == FavoriteItemType.unknown) {
+              unknownFavoriteType.add(data.rawFavoriteType);
+            }
+            if (data.weaponType == WeaponType.unknown) {
+              unknownWeaponType.add(data.rawWeaponType);
+            }
+
+            // Validate CollectionItemSkillGroup objects
+            for (final skillJson in record['collection_skill_group_data'] as List) {
+              final skillKeys = (skillJson as Map<String, dynamic>).keys.toSet();
+              skillKeys.removeAll(collectionSkillExpectedKeys);
+              if (skillKeys.isNotEmpty) {
+                extraCollectionSkillKeys.addAll(skillKeys);
+              }
+            }
+
+            // Validate FavoriteItemSkillGroup objects
+            for (final skillJson in record['favoriteitem_skill_group_data'] as List) {
+              final skillKeys = (skillJson as Map<String, dynamic>).keys.toSet();
+              final skill = FavoriteItemSkillGroup.fromJson(skillJson);
+              if (skill.skillTable == SkillType.unknown) {
+                unknownSkillTables.add(skill.rawSkillTable);
+              }
+              skillKeys.removeAll(favoriteSkillExpectedKeys);
+              if (skillKeys.isNotEmpty) {
+                extraFavoriteSkillKeys.addAll(skillKeys);
+              }
+            }
+
+            recordKeys.removeAll(expectedKeys);
+            if (recordKeys.isNotEmpty) {
+              extraKeys.addAll(recordKeys);
+            }
+          },
+        );
+
+        logger.d('Folder: $folder');
+        expect(loaded, true);
+        expect(unknownRarity, emptySet);
+        expect(unknownFavoriteType, emptySet);
+        expect(unknownWeaponType, emptySet);
+        expect(extraKeys, emptySet);
+
+        // Nested object assertions
+        expect(extraCollectionSkillKeys, emptySet,
+            reason: 'Extra fields in CollectionItemSkillGroup');
+        expect(unknownSkillTables, emptySet,
+            reason: 'Unknown skill tables in FavoriteItemSkillGroup');
+        expect(extraFavoriteSkillKeys, emptySet,
+            reason: 'Extra fields in FavoriteItemSkillGroup');
+      }
+    });
+
+    test('Check FavoriteItemLevelData with nested objects', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'level_enhance_id',
+          'grade',
+          'level',
+          'favoriteitem_stat_data',
+          'collection_skill_level_data',
+        };
+
+        // For CollectionItemSkillLevel validation
+        final skillLevelExpectedKeys = {'collection_skill_level'};
+        final Set<String> extraSkillLevelKeys = {};
+
+        // For FavoriteItemStat validation
+        final statExpectedKeys = {'stat_type', 'stat_value'};
+        final Set<String?> unknownStatTypes = {};
+        final Set<String> extraStatKeys = {};
+
+        // Main object validations
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(
+          getDesignatedDirectory(folder, 'FavoriteItemLevelTable.json'),
+              (record) {
+            final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+            // Validate CollectionItemSkillLevel objects
+            for (final skillLevelJson in record['collection_skill_level_data'] as List) {
+              final skillLevelKeys = (skillLevelJson as Map<String, dynamic>).keys.toSet();
+              skillLevelKeys.removeAll(skillLevelExpectedKeys);
+              if (skillLevelKeys.isNotEmpty) {
+                extraSkillLevelKeys.addAll(skillLevelKeys);
+              }
+            }
+
+            // Validate FavoriteItemStat objects
+            for (final statJson in record['favoriteitem_stat_data'] as List) {
+              final statKeys = (statJson as Map<String, dynamic>).keys.toSet();
+              final stat = FavoriteItemStat.fromJson(statJson);
+              if (stat.type == StatType.unknown) {
+                unknownStatTypes.add(stat.rawType);
+              }
+              statKeys.removeAll(statExpectedKeys);
+              if (statKeys.isNotEmpty) {
+                extraStatKeys.addAll(statKeys);
+              }
+            }
+
+            recordKeys.removeAll(expectedKeys);
+            if (recordKeys.isNotEmpty) {
+              extraKeys.addAll(recordKeys);
+            }
+          },
+        );
+
+        logger.d('Folder: $folder');
+        expect(loaded, true);
+        expect(extraKeys, emptySet);
+
+        // Nested object assertions
+        expect(extraSkillLevelKeys, emptySet,
+            reason: 'Extra fields in CollectionItemSkillLevel');
+        expect(unknownStatTypes, emptySet,
+            reason: 'Unknown stat types in FavoriteItemStat');
+        expect(extraStatKeys, emptySet,
+            reason: 'Extra fields in FavoriteItemStat');
       }
     });
   });
