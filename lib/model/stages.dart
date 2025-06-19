@@ -181,6 +181,7 @@ class SoloRaidWaveData {
   final int waveOpenCondition;
   @JsonKey(name: 'wave_order')
   final int waveOrder;
+  @JsonKey(name: 'wave')
   final int wave;
   @JsonKey(name: 'monster_stage_lv')
   final int monsterStageLevel;

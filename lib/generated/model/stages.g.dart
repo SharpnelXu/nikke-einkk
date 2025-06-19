@@ -39,6 +39,7 @@ WavePathData _$WavePathDataFromJson(Map<String, dynamic> json) => WavePathData(
           ?.map((e) => WaveMonster.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
+  privateMonsterCount: (json['private_monster_count'] as num?)?.toInt(),
 );
 
 WaveData _$WaveDataFromJson(Map<String, dynamic> json) => WaveData(
@@ -62,6 +63,8 @@ WaveData _$WaveDataFromJson(Map<String, dynamic> json) => WaveData(
   closeMonsterCount: (json['close_monster_count'] as num?)?.toInt() ?? 0,
   midMonsterCount: (json['mid_monster_count'] as num?)?.toInt() ?? 0,
   farMonsterCount: (json['far_monster_count'] as num?)?.toInt() ?? 0,
+  modValue: (json['mod_value'] as num?)?.toInt(),
+  uiTheme: json['ui_theme'] as String?,
 );
 
 SoloRaidWaveData _$SoloRaidWaveDataFromJson(Map<String, dynamic> json) => SoloRaidWaveData(

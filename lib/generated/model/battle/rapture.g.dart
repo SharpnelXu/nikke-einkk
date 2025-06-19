@@ -313,6 +313,7 @@ const _$FunctionTypeEnumMap = {
   FunctionType.durationBuffCheckImmune: 'DurationBuffCheckImmune',
   FunctionType.immediatelyBuffCheckImmune: 'ImmediatelyBuffCheckImmune',
   FunctionType.changeHurtFxExcludingBreakCol: 'ChangeHurtFxExcludingBreakCol',
+  FunctionType.plusBuffCount: 'PlusBuffCount',
 };
 
 BattleRaptureParts _$BattleRapturePartsFromJson(Map<String, dynamic> json) => BattleRaptureParts(
