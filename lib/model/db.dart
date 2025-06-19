@@ -212,7 +212,6 @@ class UserDatabase {
   bool initialized = false;
   final Map<String, String> customizeDirectory = {};
 
-
   void init() {
     customizeDirectory.clear();
 

@@ -205,7 +205,7 @@ class UnionRaidBossDisplay extends StatelessWidget {
           ),
           Text('Time Limit: ${waveData?.battleTime} s'),
           for (final target in targets)
-            RaptureDataDisplay(
+            RaptureLeveledDataDisplay(
               useGlobal: useGlobal,
               data: target,
               stageLv: data.monsterStageLevel,

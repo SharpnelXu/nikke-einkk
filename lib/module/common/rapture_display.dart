@@ -6,7 +6,9 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/monster.dart';
 
-class RaptureDataDisplay extends StatelessWidget {
+import 'custom_widgets.dart';
+
+class RaptureLeveledDataDisplay extends StatelessWidget {
   final bool useGlobal;
   final MonsterData data;
   final int stageLv;
@@ -14,7 +16,7 @@ class RaptureDataDisplay extends StatelessWidget {
 
   NikkeDatabaseV2 get db => useGlobal ? global : cn;
 
-  const RaptureDataDisplay({
+  const RaptureLeveledDataDisplay({
     super.key,
     required this.useGlobal,
     required this.data,
@@ -28,14 +30,33 @@ class RaptureDataDisplay extends StatelessWidget {
     final statEnhanceData = db.monsterStatEnhanceData[data.statEnhanceId]?[stageLv];
 
     final List<Widget> children = [
-      Tooltip(
-        message: 'Target Id: ${data.id}'
-            '\nModel Id: ${data.monsterModelId}'
-            '\nNormal Stage AI: ${data.spotAi}'
-            '\nDefence Stage AI: ${data.spotAiDefense}'
-            '\nBase Defence Stage AI: ${data.spotAiBaseDefense}',
-        child: Text(locale.getTranslation(data.nameKey) ?? data.nameKey),
+      Row(
+        spacing: 3,
+        children: [
+          Tooltip(
+            message:
+                'Target Id: ${data.id}'
+                '\nModel Id: ${data.monsterModelId}'
+                '\nNormal Stage AI: ${data.spotAi}'
+                '\nDefence Stage AI: ${data.spotAiDefense}'
+                '\nBase Defence Stage AI: ${data.spotAiBaseDefense}',
+            child: Text(locale.getTranslation(data.nameKey) ?? data.nameKey),
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
+            iconSize: 16,
+            constraints: BoxConstraints(),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (ctx) => RaptureDataDisplay(useGlobal: useGlobal, data: data)),
+              );
+            },
+            icon: Icon(Icons.search),
+          ),
+        ],
       ),
+
       Text('Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}'),
     ];
     if (statEnhanceData != null) {
@@ -143,5 +164,74 @@ class RaptureDataDisplay extends StatelessWidget {
     }
 
     return condition;
+  }
+}
+
+class RaptureDataDisplay extends StatefulWidget {
+  final bool useGlobal;
+  final MonsterData data;
+
+  const RaptureDataDisplay({super.key, required this.useGlobal, required this.data});
+
+  @override
+  State<RaptureDataDisplay> createState() => _RaptureDataDisplayState();
+}
+
+class _RaptureDataDisplayState extends State<RaptureDataDisplay> {
+  NikkeDatabaseV2 get db => widget.useGlobal ? global : cn;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> children = [
+      Text(locale.getTranslation(widget.data.nameKey) ?? widget.data.nameKey, style: TextStyle(fontSize: 20)),
+      Text('Target ID: ${widget.data.id}'),
+      Text('Model ID: ${widget.data.monsterModelId}'),
+      Text(
+        'Element: ${widget.data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}',
+      ),
+      Text('Normal Stage AI: ${widget.data.spotAi}'),
+      Text('Defence Stage AI: ${widget.data.spotAiDefense}'),
+      Text('Base Defence Stage AI: ${widget.data.spotAiBaseDefense}'),
+    ];
+
+    final parts = db.rapturePartData[widget.data.monsterModelId] ?? [];
+    for (final part in parts) {
+      final partName = locale.getTranslation(part.partsNameKey) ?? part.partsNameKey;
+      children.add(
+        Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey, width: 2),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 3,
+            children: [
+              if (partName != null) Text(partName),
+              Text('Part Type: ${part.partsType}'),
+              Text('Is Main Part: ${part.isMainPart}'),
+              Text('Can Damage: ${part.isPartsDamageable}'),
+              Text('HP Ratio: ${(part.hpRatio / 100).toStringAsFixed(2)}%'),
+              Text('Damage HP Ratio: ${(part.damageHpRatio / 100).toStringAsFixed(2)}%'),
+              Text('ATK Ratio: ${(part.attackRatio / 100).toStringAsFixed(2)}%'),
+              Text('DEF Ratio: ${(part.defenceRatio / 100).toStringAsFixed(2)}%'),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Rapture Data')),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView.builder(
+          itemBuilder: (ctx, idx) => Align(child: Padding(padding: const EdgeInsets.all(2.0), child: children[idx])),
+          itemCount: children.length,
+        ),
+      ),
+      bottomNavigationBar: commonBottomNavigationBar(() => setState(() {})),
+    );
   }
 }
