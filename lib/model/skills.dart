@@ -23,6 +23,7 @@ enum CharacterSkillType {
   explosiveCircuit,
   stigma,
   hitMonsterGetBuff,
+  instantAllParts,
   unknown;
 
   static final Map<String, CharacterSkillType> _reverseMap = Map.fromIterable(
@@ -389,7 +390,15 @@ enum FunctionType {
   uncoverable,
   useCharacterSkillId,
   useSkill2,
-  windReduction;
+  windReduction,
+  focusAttack,
+  noOverlapStatAmmo,
+  dmgReductionExcludingBreakCol,
+  durationBuffCheckImmune,
+  immediatelyBuffCheckImmune,
+  changeHurtFxExcludingBreakCol,
+  plusBuffCount // seems to be CN exclusive
+  ;
 
   static final Map<String, FunctionType> _reverseMap = Map.fromIterable(
     FunctionType.values,
@@ -507,7 +516,11 @@ enum TimingTriggerType {
   onTeamHpRatioUp,
   onUseAmmo,
   onUseBurstSkill,
-  onUserPartsDestroy;
+  onUserPartsDestroy,
+  onSpawnEnemy,
+  onEnemyDead,
+  onUseTeamAmmo,
+  onPelletCriticalHitNum;
 
   static final Map<String, TimingTriggerType> _reverseMap = Map.fromIterable(
     TimingTriggerType.values,
@@ -559,7 +572,12 @@ enum StatusTriggerType {
   isSameSquadUp,
   isSearchElementId,
   isStun,
-  isWeaponType;
+  isWeaponType,
+  isCheckEnemyNikke,
+  isCheckMonsterExcludeNoneType,
+  isBurstStepCheck,
+  isFunctionCount // cn only
+  ;
 
   static final Map<String, StatusTriggerType> _reverseMap = Map.fromIterable(
     StatusTriggerType.values,
@@ -736,6 +754,13 @@ class FunctionData {
   @JsonKey(name: 'connected_function')
   final List<int> connectedFunction;
 
+  @JsonKey(name: 'description_localkey')
+  final String? descriptionLoaclkey;
+  @JsonKey(name: 'element_reaction_icon')
+  final String? elementReactionIcon;
+  @JsonKey(name: 'function_battlepower')
+  final int? functionBattlepower;
+
   FunctionType get functionType => FunctionType.fromName(rawFunctionType);
 
   FunctionData({
@@ -791,6 +816,9 @@ class FunctionData {
     this.fxTarget03Arena,
     this.fxSocketPoint03Arena,
     this.connectedFunction = const [],
+    this.descriptionLoaclkey,
+    this.elementReactionIcon,
+    this.functionBattlepower,
   });
 
   factory FunctionData.fromJson(Map<String, dynamic> json) => _$FunctionDataFromJson(json);

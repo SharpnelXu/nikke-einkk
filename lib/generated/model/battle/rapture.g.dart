@@ -307,6 +307,12 @@ const _$FunctionTypeEnumMap = {
   FunctionType.useCharacterSkillId: 'UseCharacterSkillId',
   FunctionType.useSkill2: 'UseSkill2',
   FunctionType.windReduction: 'WindReduction',
+  FunctionType.focusAttack: 'FocusAttack',
+  FunctionType.noOverlapStatAmmo: 'NoOverlapStatAmmo',
+  FunctionType.dmgReductionExcludingBreakCol: 'DmgReductionExcludingBreakCol',
+  FunctionType.durationBuffCheckImmune: 'DurationBuffCheckImmune',
+  FunctionType.immediatelyBuffCheckImmune: 'ImmediatelyBuffCheckImmune',
+  FunctionType.changeHurtFxExcludingBreakCol: 'ChangeHurtFxExcludingBreakCol',
 };
 
 BattleRaptureParts _$BattleRapturePartsFromJson(Map<String, dynamic> json) => BattleRaptureParts(

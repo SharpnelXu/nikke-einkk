@@ -19,6 +19,12 @@ class TestHelper {
       cn.init();
     }
   }
+
+  static void loadUserDb() {
+    if (!userDb.initialized) {
+      userDb.init();
+    }
+  }
 }
 
 class Pair<A, B> {

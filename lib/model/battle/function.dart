@@ -213,6 +213,10 @@ class BattleFunction {
       case TimingTriggerType.onUseBurstSkill:
       case TimingTriggerType.onUserPartsDestroy:
       case TimingTriggerType.unknown:
+      case TimingTriggerType.onSpawnEnemy:
+      case TimingTriggerType.onEnemyDead:
+      case TimingTriggerType.onUseTeamAmmo:
+      case TimingTriggerType.onPelletCriticalHitNum:
         // logger.i('Unimplemented TimingTriggerType: ${data.timingTriggerType}');
         break;
     }
@@ -578,6 +582,13 @@ class BattleFunction {
       case FunctionType.uncoverable:
       case FunctionType.useSkill2:
       case FunctionType.windReduction:
+      case FunctionType.focusAttack:
+      case FunctionType.noOverlapStatAmmo:
+      case FunctionType.dmgReductionExcludingBreakCol:
+      case FunctionType.durationBuffCheckImmune:
+      case FunctionType.immediatelyBuffCheckImmune:
+      case FunctionType.changeHurtFxExcludingBreakCol:
+      case FunctionType.plusBuffCount:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
     }
@@ -722,6 +733,10 @@ class BattleFunction {
       case StatusTriggerType.isSameSquadUp:
       case StatusTriggerType.isSearchElementId:
       case StatusTriggerType.isStun:
+      case StatusTriggerType.isCheckEnemyNikke:
+      case StatusTriggerType.isCheckMonsterExcludeNoneType:
+      case StatusTriggerType.isBurstStepCheck:
+      case StatusTriggerType.isFunctionCount:
         logger.i('Unimplemented StatusTriggerType: $type');
         return false;
     }

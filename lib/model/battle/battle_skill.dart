@@ -161,6 +161,7 @@ class BattleSkill {
       case CharacterSkillType.hitMonsterGetBuff:
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.unknown:
+      case CharacterSkillType.instantAllParts:
         break;
     }
 
@@ -220,6 +221,7 @@ class BattleSkill {
       case CharacterSkillType.instantSequentialAttack:
         return isThisNikke ? simulation.raptures.sublist(0, 1) : simulation.nikkes.sublist(0, 1);
       case CharacterSkillType.instantAll:
+      case CharacterSkillType.instantAllParts:
       case CharacterSkillType.instantArea:
       case CharacterSkillType.instantCircle:
       case CharacterSkillType.instantCircleSeparate:

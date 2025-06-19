@@ -9,6 +9,7 @@ import '../test_helper.dart';
 
 void main() async {
   await TestHelper.loadData();
+  TestHelper.loadUserDb();
 
   group('Data Examine', () {
     test('funcType & status', () {
@@ -113,15 +114,14 @@ void main() async {
           }
         });
 
-        logger.d('Folder: $folder');
-        expect(loaded, true);
-        expect(unknownRare, emptySet);
-        expect(unknownCharacterClass, emptySet);
-        expect(unknownBurstStep, emptySet);
-        expect(unknownSkillTable, emptySet);
-        expect(unknownCorporation, emptySet);
-        expect(unknownCorporationSubType, emptySet);
-        expect(extraKeys, emptySet);
+        expect(loaded, true, reason: 'Not loaded: $folder');
+        expect(unknownRare, emptySet, reason: 'unknownRare $folder');
+        expect(unknownCharacterClass, emptySet, reason: 'unknownCharacterClass $folder');
+        expect(unknownBurstStep, emptySet, reason: 'unknownBurstStep $folder');
+        expect(unknownSkillTable, emptySet, reason: 'unknownSkillTable $folder');
+        expect(unknownCorporation, emptySet, reason: 'unknownCorporation $folder');
+        expect(unknownCorporationSubType, emptySet, reason: 'unknownCorporationSubType $folder');
+        expect(extraKeys, emptySet, reason: 'ExtraKeys $folder');
       }
     });
 
@@ -228,16 +228,15 @@ void main() async {
           }
         });
 
-        logger.d('Folder: $folder');
-        expect(loaded, true);
-        expect(unknownWeaponType, emptySet);
-        expect(unknownAttackType, emptySet);
-        expect(unknownPreferTarget, emptySet);
-        expect(unknownPreferTargetCondition, emptySet);
-        expect(unknownShotTiming, emptySet);
-        expect(unknownFireType, emptySet);
-        expect(unknownInputType, emptySet);
-        expect(extraKeys, emptySet);
+        expect(loaded, true, reason: 'Not loaded: $folder');
+        expect(unknownWeaponType, emptySet, reason: 'unknownWeaponType: $folder');
+        expect(unknownAttackType, emptySet, reason: 'unknownAttackType: $folder');
+        expect(unknownPreferTarget, emptySet, reason: 'unknownPreferTarget: $folder');
+        expect(unknownPreferTargetCondition, emptySet, reason: 'unknownPreferTargetCondition: $folder');
+        expect(unknownShotTiming, emptySet, reason: 'unknownShotTiming: $folder');
+        expect(unknownFireType, emptySet, reason: 'unknownFireType: $folder');
+        expect(unknownInputType, emptySet, reason: 'unknownInputType: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
       }
     });
 
@@ -266,9 +265,8 @@ void main() async {
           }
         });
 
-        logger.d('Folder: $folder');
-        expect(loaded, true);
-        expect(extraKeys, emptySet);
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
       }
     });
 
@@ -302,9 +300,8 @@ void main() async {
           }
         });
 
-        logger.d('Folder: $folder');
-        expect(loaded, true);
-        expect(extraKeys, emptySet);
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
       }
     });
 
@@ -345,9 +342,8 @@ void main() async {
           }
         });
 
-        logger.d('Folder: $folder');
-        expect(loaded, true);
-        expect(extraKeys, emptySet);
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
       }
     });
 
@@ -433,18 +429,17 @@ void main() async {
           }
         });
 
-        logger.d('Folder: $folder');
-        expect(loaded, true);
-        expect(unknownItemType, emptySet);
-        expect(unknownEquipType, emptySet);
-        expect(unknownCharacterClass, emptySet);
-        expect(unknownItemRarity, emptySet);
-        expect(extraKeys, emptySet);
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(unknownItemType, emptySet, reason: 'unknownItemType: $folder');
+        expect(unknownEquipType, emptySet, reason: 'unknownEquipType: $folder');
+        expect(unknownCharacterClass, emptySet, reason: 'unknownCharacterClass: $folder');
+        expect(unknownItemRarity, emptySet, reason: 'unknownItemRarity: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
 
         // Nested object assertions
-        expect(unknownStatTypes, emptySet, reason: 'Unknown stat types found');
-        expect(extraStatKeys, emptySet, reason: 'Extra fields in EquipmentStat');
-        expect(extraOptionSlotKeys, emptySet, reason: 'Extra fields in OptionSlot');
+        expect(unknownStatTypes, emptySet, reason: 'Unknown stat types found: $folder');
+        expect(extraStatKeys, emptySet, reason: 'Extra fields in EquipmentStat: $folder');
+        expect(extraOptionSlotKeys, emptySet, reason: 'Extra fields in OptionSlot: $folder');
       }
     });
 
@@ -508,13 +503,12 @@ void main() async {
           }
         });
 
-        logger.d('Folder: $folder');
-        expect(loaded, true);
-        expect(unknownItemType, emptySet);
-        expect(unknownRarity, emptySet);
-        expect(unknownCharacterClass, emptySet);
-        expect(extraKeys, emptySet);
-        expect(extraSkillGroupKeys, emptySet, reason: 'Extra fields in HarmonyCubeSkillGroup');
+        expect(loaded, true, reason: 'extraKeys: $folder');
+        expect(unknownItemType, emptySet, reason: 'unknownItemType: $folder');
+        expect(unknownRarity, emptySet, reason: 'unknownRarity: $folder');
+        expect(unknownCharacterClass, emptySet, reason: 'unknownCharacterClass: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
+        expect(extraSkillGroupKeys, emptySet, reason: 'Extra fields in HarmonyCubeSkillGroup: $folder');
       }
     });
 
@@ -544,51 +538,44 @@ void main() async {
         // Main object validations
         final Set<String> extraKeys = {};
 
-        final loaded = loadData(
-          getDesignatedDirectory(folder, 'ItemHarmonyCubeLevelTable.json'),
-              (record) {
-            final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+        final loaded = loadData(getDesignatedDirectory(folder, 'ItemHarmonyCubeLevelTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
 
-            // Validate HarmonyCubeSkillLevel objects
-            for (final skillLevelJson in record['skill_levels'] as List) {
-              final skillLevelKeys = (skillLevelJson as Map<String, dynamic>).keys.toSet();
-              skillLevelKeys.removeAll(skillLevelExpectedKeys);
-              if (skillLevelKeys.isNotEmpty) {
-                extraSkillLevelKeys.addAll(skillLevelKeys);
-              }
+          // Validate HarmonyCubeSkillLevel objects
+          for (final skillLevelJson in record['skill_levels'] as List) {
+            final skillLevelKeys = (skillLevelJson as Map<String, dynamic>).keys.toSet();
+            skillLevelKeys.removeAll(skillLevelExpectedKeys);
+            if (skillLevelKeys.isNotEmpty) {
+              extraSkillLevelKeys.addAll(skillLevelKeys);
             }
+          }
 
-            // Validate HarmonyCubeStat objects
-            for (final statJson in record['harmonycube_stats'] as List) {
-              final statKeys = (statJson as Map<String, dynamic>).keys.toSet();
-              final stat = HarmonyCubeStat.fromJson(statJson);
-              if (stat.type == StatType.unknown) {
-                unknownStatTypes.add(stat.rawType);
-              }
-              statKeys.removeAll(statExpectedKeys);
-              if (statKeys.isNotEmpty) {
-                extraStatKeys.addAll(statKeys);
-              }
+          // Validate HarmonyCubeStat objects
+          for (final statJson in record['harmonycube_stats'] as List) {
+            final statKeys = (statJson as Map<String, dynamic>).keys.toSet();
+            final stat = HarmonyCubeStat.fromJson(statJson);
+            if (stat.type == StatType.unknown) {
+              unknownStatTypes.add(stat.rawType);
             }
-
-            recordKeys.removeAll(expectedKeys);
-            if (recordKeys.isNotEmpty) {
-              extraKeys.addAll(recordKeys);
+            statKeys.removeAll(statExpectedKeys);
+            if (statKeys.isNotEmpty) {
+              extraStatKeys.addAll(statKeys);
             }
-          },
-        );
+          }
 
-        logger.d('Folder: $folder');
-        expect(loaded, true);
-        expect(extraKeys, emptySet);
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
 
         // Nested object assertions
-        expect(extraSkillLevelKeys, emptySet,
-            reason: 'Extra fields in HarmonyCubeSkillLevel');
-        expect(unknownStatTypes, emptySet,
-            reason: 'Unknown stat types in HarmonyCubeStat');
-        expect(extraStatKeys, emptySet,
-            reason: 'Extra fields in HarmonyCubeStat');
+        expect(extraSkillLevelKeys, emptySet, reason: 'Extra fields in HarmonyCubeSkillLevel: $folder');
+        expect(unknownStatTypes, emptySet, reason: 'Unknown stat types in HarmonyCubeStat: $folder');
+        expect(extraStatKeys, emptySet, reason: 'Extra fields in HarmonyCubeStat: $folder');
       }
     });
 
@@ -619,11 +606,7 @@ void main() async {
         final Set<String> extraCollectionSkillKeys = {};
 
         // For FavoriteItemSkillGroup validation
-        final favoriteSkillExpectedKeys = {
-          'favorite_skill_id',
-          'skill_table',
-          'skill_change_slot',
-        };
+        final favoriteSkillExpectedKeys = {'favorite_skill_id', 'skill_table', 'skill_change_slot'};
         final Set<String?> unknownSkillTables = {};
         final Set<String> extraFavoriteSkillKeys = {};
 
@@ -633,66 +616,59 @@ void main() async {
         final Set<String?> unknownWeaponType = {};
         final Set<String> extraKeys = {};
 
-        final loaded = loadData(
-          getDesignatedDirectory(folder, 'FavoriteItemTable.json'),
-              (record) {
-            final recordKeys = (record as Map<String, dynamic>).keys.toSet();
-            final data = FavoriteItemData.fromJson(record);
+        final loaded = loadData(getDesignatedDirectory(folder, 'FavoriteItemTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          final data = FavoriteItemData.fromJson(record);
 
-            // Validate main object enums
-            if (data.favoriteRare == Rarity.unknown) {
-              unknownRarity.add(data.rawFavoriteRare);
-            }
-            if (data.favoriteType == FavoriteItemType.unknown) {
-              unknownFavoriteType.add(data.rawFavoriteType);
-            }
-            if (data.weaponType == WeaponType.unknown) {
-              unknownWeaponType.add(data.rawWeaponType);
-            }
+          // Validate main object enums
+          if (data.favoriteRare == Rarity.unknown) {
+            unknownRarity.add(data.rawFavoriteRare);
+          }
+          if (data.favoriteType == FavoriteItemType.unknown) {
+            unknownFavoriteType.add(data.rawFavoriteType);
+          }
+          if (data.weaponType == WeaponType.unknown) {
+            unknownWeaponType.add(data.rawWeaponType);
+          }
 
-            // Validate CollectionItemSkillGroup objects
-            for (final skillJson in record['collection_skill_group_data'] as List) {
-              final skillKeys = (skillJson as Map<String, dynamic>).keys.toSet();
-              skillKeys.removeAll(collectionSkillExpectedKeys);
-              if (skillKeys.isNotEmpty) {
-                extraCollectionSkillKeys.addAll(skillKeys);
-              }
+          // Validate CollectionItemSkillGroup objects
+          for (final skillJson in record['collection_skill_group_data'] as List) {
+            final skillKeys = (skillJson as Map<String, dynamic>).keys.toSet();
+            skillKeys.removeAll(collectionSkillExpectedKeys);
+            if (skillKeys.isNotEmpty) {
+              extraCollectionSkillKeys.addAll(skillKeys);
             }
+          }
 
-            // Validate FavoriteItemSkillGroup objects
-            for (final skillJson in record['favoriteitem_skill_group_data'] as List) {
-              final skillKeys = (skillJson as Map<String, dynamic>).keys.toSet();
-              final skill = FavoriteItemSkillGroup.fromJson(skillJson);
-              if (skill.skillTable == SkillType.unknown) {
-                unknownSkillTables.add(skill.rawSkillTable);
-              }
-              skillKeys.removeAll(favoriteSkillExpectedKeys);
-              if (skillKeys.isNotEmpty) {
-                extraFavoriteSkillKeys.addAll(skillKeys);
-              }
+          // Validate FavoriteItemSkillGroup objects
+          for (final skillJson in record['favoriteitem_skill_group_data'] as List) {
+            final skillKeys = (skillJson as Map<String, dynamic>).keys.toSet();
+            final skill = FavoriteItemSkillGroup.fromJson(skillJson);
+            if (skill.skillTable == SkillType.unknown) {
+              unknownSkillTables.add(skill.rawSkillTable);
             }
-
-            recordKeys.removeAll(expectedKeys);
-            if (recordKeys.isNotEmpty) {
-              extraKeys.addAll(recordKeys);
+            skillKeys.removeAll(favoriteSkillExpectedKeys);
+            if (skillKeys.isNotEmpty) {
+              extraFavoriteSkillKeys.addAll(skillKeys);
             }
-          },
-        );
+          }
 
-        logger.d('Folder: $folder');
-        expect(loaded, true);
-        expect(unknownRarity, emptySet);
-        expect(unknownFavoriteType, emptySet);
-        expect(unknownWeaponType, emptySet);
-        expect(extraKeys, emptySet);
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(unknownRarity, emptySet, reason: 'unknownRarity: $folder');
+        expect(unknownFavoriteType, emptySet, reason: 'unknownFavoriteType: $folder');
+        expect(unknownWeaponType, emptySet, reason: 'unknownWeaponType: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
 
         // Nested object assertions
-        expect(extraCollectionSkillKeys, emptySet,
-            reason: 'Extra fields in CollectionItemSkillGroup');
-        expect(unknownSkillTables, emptySet,
-            reason: 'Unknown skill tables in FavoriteItemSkillGroup');
-        expect(extraFavoriteSkillKeys, emptySet,
-            reason: 'Extra fields in FavoriteItemSkillGroup');
+        expect(extraCollectionSkillKeys, emptySet, reason: 'Extra fields in CollectionItemSkillGroup: $folder');
+        expect(unknownSkillTables, emptySet, reason: 'Unknown skill tables in FavoriteItemSkillGroup: $folder');
+        expect(extraFavoriteSkillKeys, emptySet, reason: 'Extra fields in FavoriteItemSkillGroup: $folder');
       }
     });
 
@@ -719,51 +695,679 @@ void main() async {
         // Main object validations
         final Set<String> extraKeys = {};
 
-        final loaded = loadData(
-          getDesignatedDirectory(folder, 'FavoriteItemLevelTable.json'),
-              (record) {
-            final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+        final loaded = loadData(getDesignatedDirectory(folder, 'FavoriteItemLevelTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
 
-            // Validate CollectionItemSkillLevel objects
-            for (final skillLevelJson in record['collection_skill_level_data'] as List) {
-              final skillLevelKeys = (skillLevelJson as Map<String, dynamic>).keys.toSet();
-              skillLevelKeys.removeAll(skillLevelExpectedKeys);
-              if (skillLevelKeys.isNotEmpty) {
-                extraSkillLevelKeys.addAll(skillLevelKeys);
-              }
+          // Validate CollectionItemSkillLevel objects
+          for (final skillLevelJson in record['collection_skill_level_data'] as List) {
+            final skillLevelKeys = (skillLevelJson as Map<String, dynamic>).keys.toSet();
+            skillLevelKeys.removeAll(skillLevelExpectedKeys);
+            if (skillLevelKeys.isNotEmpty) {
+              extraSkillLevelKeys.addAll(skillLevelKeys);
             }
+          }
 
-            // Validate FavoriteItemStat objects
-            for (final statJson in record['favoriteitem_stat_data'] as List) {
-              final statKeys = (statJson as Map<String, dynamic>).keys.toSet();
-              final stat = FavoriteItemStat.fromJson(statJson);
-              if (stat.type == StatType.unknown) {
-                unknownStatTypes.add(stat.rawType);
-              }
-              statKeys.removeAll(statExpectedKeys);
-              if (statKeys.isNotEmpty) {
-                extraStatKeys.addAll(statKeys);
-              }
+          // Validate FavoriteItemStat objects
+          for (final statJson in record['favoriteitem_stat_data'] as List) {
+            final statKeys = (statJson as Map<String, dynamic>).keys.toSet();
+            final stat = FavoriteItemStat.fromJson(statJson);
+            if (stat.type == StatType.unknown) {
+              unknownStatTypes.add(stat.rawType);
             }
-
-            recordKeys.removeAll(expectedKeys);
-            if (recordKeys.isNotEmpty) {
-              extraKeys.addAll(recordKeys);
+            statKeys.removeAll(statExpectedKeys);
+            if (statKeys.isNotEmpty) {
+              extraStatKeys.addAll(statKeys);
             }
-          },
-        );
+          }
 
-        logger.d('Folder: $folder');
-        expect(loaded, true);
-        expect(extraKeys, emptySet);
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
 
         // Nested object assertions
-        expect(extraSkillLevelKeys, emptySet,
-            reason: 'Extra fields in CollectionItemSkillLevel');
-        expect(unknownStatTypes, emptySet,
-            reason: 'Unknown stat types in FavoriteItemStat');
-        expect(extraStatKeys, emptySet,
-            reason: 'Extra fields in FavoriteItemStat');
+        expect(extraSkillLevelKeys, emptySet, reason: 'Extra fields in CollectionItemSkillLevel: $folder');
+        expect(unknownStatTypes, emptySet, reason: 'Unknown stat types in FavoriteItemStat: $folder');
+        expect(extraStatKeys, emptySet, reason: 'Extra fields in FavoriteItemStat: $folder');
+      }
+    });
+
+    test('Check SkillData with nested objects', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'skill_cooltime',
+          'attack_type',
+          'counter_type',
+          'prefer_target',
+          'prefer_target_condition',
+          'skill_type',
+          'skill_value_data',
+          'duration_type',
+          'duration_value',
+          'before_use_function_id_list',
+          'before_hurt_function_id_list',
+          'after_use_function_id_list',
+          'after_hurt_function_id_list',
+          'resource_name',
+          'icon',
+          'shake_id',
+        };
+
+        // For SkillValueData validation
+        final skillValueExpectedKeys = {'skill_value_type', 'skill_value'};
+        final Set<String?> unknownValueTypes = {};
+        final Set<String> extraSkillValueKeys = {};
+
+        // Main object validations
+        final Set<String?> unknownAttackType = {};
+        final Set<String?> unknownPreferTarget = {};
+        final Set<String?> unknownPreferTargetCondition = {};
+        final Set<String?> unknownSkillType = {};
+        final Set<String?> unknownDurationType = {};
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'CharacterSkillTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          final data = SkillData.fromJson(record);
+
+          // Validate main object enums
+          if (data.attackType == AttackType.unknown) {
+            unknownAttackType.add(data.rawAttackType);
+          }
+          if (data.preferTarget == PreferTarget.unknown) {
+            unknownPreferTarget.add(data.rawPreferTarget);
+          }
+          if (data.preferTargetCondition == PreferTargetCondition.unknown) {
+            unknownPreferTargetCondition.add(data.rawPreferTargetCondition);
+          }
+          if (data.skillType == CharacterSkillType.unknown) {
+            unknownSkillType.add(data.rawSkillType);
+          }
+          if (data.durationType == DurationType.unknown) {
+            unknownDurationType.add(data.rawDurationType);
+          }
+
+          // Validate SkillValueData objects
+          for (final valueDataJson in record['skill_value_data'] as List) {
+            final valueDataKeys = (valueDataJson as Map<String, dynamic>).keys.toSet();
+            final valueData = SkillValueData.fromJson(valueDataJson);
+            if (valueData.skillValueType == ValueType.unknown) {
+              unknownValueTypes.add(valueData.rawSkillValueType);
+            }
+            valueDataKeys.removeAll(skillValueExpectedKeys);
+            if (valueDataKeys.isNotEmpty) {
+              extraSkillValueKeys.addAll(valueDataKeys);
+            }
+          }
+
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(unknownAttackType, emptySet, reason: 'unknownAttackType: $folder');
+        expect(unknownPreferTarget, emptySet, reason: 'unknownPreferTarget: $folder');
+        expect(unknownPreferTargetCondition, emptySet, reason: 'unknownPreferTargetCondition: $folder');
+        expect(unknownSkillType, emptySet, reason: 'unknownSkillType: $folder');
+        expect(unknownDurationType, emptySet, reason: 'unknownDurationType: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
+
+        // Nested object assertions
+        expect(unknownValueTypes, emptySet, reason: 'Unknown value types in SkillValueData: $folder');
+        expect(extraSkillValueKeys, emptySet, reason: 'Extra fields in SkillValueData: $folder');
+      }
+    });
+
+    test('Check StateEffectData with nested objects', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {'id', 'use_function_id_list', 'hurt_function_id_list', 'functions', 'icon'};
+
+        // For SkillFunction validation
+        final skillFunctionExpectedKeys = {'function'};
+        final Set<String> extraSkillFunctionKeys = {};
+
+        // Main object validations
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'StateEffectTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+          // Validate CollectionItemSkillLevel objects
+          for (final skillFuncJson in record['functions'] as List) {
+            final skillLevelKeys = (skillFuncJson as Map<String, dynamic>).keys.toSet();
+            skillLevelKeys.removeAll(skillFunctionExpectedKeys);
+            if (skillLevelKeys.isNotEmpty) {
+              extraSkillFunctionKeys.addAll(skillLevelKeys);
+            }
+          }
+
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
+
+        // Nested object assertions
+        expect(extraSkillFunctionKeys, emptySet, reason: 'Extra fields in SkillFunction: $folder');
+      }
+    });
+
+    test('Check FunctionData with nested objects', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'group_id',
+          'level',
+          'name_localkey',
+          'buff',
+          'buff_remove',
+          'function_type',
+          'function_value_type',
+          'function_standard',
+          'function_value',
+          'full_count',
+          'is_cancel',
+          'delay_type',
+          'delay_value',
+          'duration_type',
+          'duration_value',
+          'limit_value',
+          'function_target',
+          'timing_trigger_type',
+          'timing_trigger_standard',
+          'timing_trigger_value',
+          'status_trigger_type',
+          'status_trigger_standard',
+          'status_trigger_value',
+          'status_trigger2_type',
+          'status_trigger2_standard',
+          'status_trigger2_value',
+          'keeping_type',
+          'buff_icon',
+          'shot_fx_list_type',
+          'fx_prefab_01',
+          'fx_target_01',
+          'fx_socket_point_01',
+          'fx_prefab_02',
+          'fx_target_02',
+          'fx_socket_point_02',
+          'fx_prefab_03',
+          'fx_target_03',
+          'fx_socket_point_03',
+          'fx_prefab_full',
+          'fx_target_full',
+          'fx_socket_point_full',
+          'fx_prefab_01_arena',
+          'fx_target_01_arena',
+          'fx_socket_point_01_arena',
+          'fx_prefab_02_arena',
+          'fx_target_02_arena',
+          'fx_socket_point_02_arena',
+          'fx_prefab_03_arena',
+          'fx_target_03_arena',
+          'fx_socket_point_03_arena',
+          'connected_function',
+          'description_localkey',
+          'element_reaction_icon',
+          'function_battlepower',
+        };
+
+        // Enum validation sets
+        final Set<String?> unknownBuffTypes = {};
+        final Set<String?> unknownBuffRemoveTypes = {};
+        final Set<String?> unknownFunctionTypes = {};
+        final Set<String?> unknownValueTypes = {};
+        final Set<String?> unknownStandardTypes = {};
+        final Set<String?> unknownDelayTypes = {};
+        final Set<String?> unknownDurationTypes = {};
+        final Set<String?> unknownFunctionTargets = {};
+        final Set<String?> unknownTimingTriggers = {};
+        final Set<String?> unknownStatusTriggers = {};
+        final Set<String?> unknownKeepingTypes = {};
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'FunctionTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          final data = FunctionData.fromJson(record);
+
+          // Validate all enum fields
+          if (data.buff == BuffType.unknown) unknownBuffTypes.add(data.rawBuffType);
+          if (data.buffRemove == BuffRemoveType.unknown) unknownBuffRemoveTypes.add(data.rawBuffRemove);
+          if (data.functionType == FunctionType.unknown) unknownFunctionTypes.add(data.rawFunctionType);
+          if (data.functionValueType == ValueType.unknown) unknownValueTypes.add(data.rawFunctionValueType);
+          if (data.functionStandard == StandardType.unknown) unknownStandardTypes.add(data.rawFunctionStandard);
+          if (data.delayType == DurationType.unknown) unknownDelayTypes.add(data.rawDelayType);
+          if (data.durationType == DurationType.unknown) unknownDurationTypes.add(data.rawDurationType);
+          if (data.functionTarget == FunctionTargetType.unknown) unknownFunctionTargets.add(data.rawFunctionTarget);
+          if (data.timingTriggerType == TimingTriggerType.unknown) unknownTimingTriggers.add(data.rawTimingTriggerType);
+          if (data.timingTriggerStandard == StandardType.unknown) {
+            unknownStandardTypes.add(data.rawTimingTriggerStandard);
+          }
+          if (data.statusTriggerType == StatusTriggerType.unknown) unknownStatusTriggers.add(data.rawStatusTriggerType);
+          if (data.statusTriggerStandard == StandardType.unknown) {
+            unknownStandardTypes.add(data.rawStatusTriggerStandard);
+          }
+          if (data.statusTrigger2Type == StatusTriggerType.unknown) {
+            unknownStatusTriggers.add(data.rawStatusTrigger2Type);
+          }
+          if (data.statusTrigger2Standard == StandardType.unknown) {
+            unknownStandardTypes.add(data.rawStatusTrigger2Standard);
+          }
+          if (data.keepingType == FunctionStatus.unknown) unknownKeepingTypes.add(data.rawKeepingType);
+
+          // Check for extra fields
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+
+        // Main enum validations
+        expect(unknownBuffTypes, emptySet, reason: 'Unknown buff types: $folder');
+        expect(unknownBuffRemoveTypes, emptySet, reason: 'Unknown buff remove types: $folder');
+        expect(unknownFunctionTypes, emptySet, reason: 'Unknown function types: $folder');
+        expect(unknownValueTypes, emptySet, reason: 'Unknown value types: $folder');
+        expect(unknownStandardTypes, emptySet, reason: 'Unknown standard types: $folder');
+        expect(unknownDelayTypes, emptySet, reason: 'Unknown delay types: $folder');
+        expect(unknownDurationTypes, emptySet, reason: 'Unknown duration types: $folder');
+        expect(unknownFunctionTargets, emptySet, reason: 'Unknown function targets: $folder');
+        expect(unknownTimingTriggers, emptySet, reason: 'Unknown timing triggers: $folder');
+        expect(unknownStatusTriggers, emptySet, reason: 'Unknown status triggers: $folder');
+        expect(unknownKeepingTypes, emptySet, reason: 'Unknown keeping types: $folder');
+
+        // Structural validation
+        expect(extraKeys, emptySet, reason: 'Extra fields found: $folder');
+      }
+    });
+
+    test('Check SkillInfoData with nested description values', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'group_id',
+          'skill_level',
+          'next_level_id',
+          'level_up_cost_id',
+          'icon',
+          'name_localkey',
+          'description_localkey',
+          'info_description_localkey',
+          'description_value_list',
+        };
+
+        // For SkillDescriptionValue validation
+        final descriptionValueExpectedKeys = {'description_value'};
+        final Set<String> extraDescriptionValueKeys = {};
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'SkillInfoTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+          // Validate nested description values
+          for (final valueJson in record['description_value_list'] as List) {
+            final valueKeys = (valueJson as Map<String, dynamic>).keys.toSet();
+            valueKeys.removeAll(descriptionValueExpectedKeys);
+            if (valueKeys.isNotEmpty) {
+              extraDescriptionValueKeys.addAll(valueKeys);
+            }
+          }
+
+          // Check for extra keys in main object
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Extra fields in SkillInfoData: $folder');
+        expect(extraDescriptionValueKeys, emptySet, reason: 'Extra fields in SkillDescriptionValue: $folder');
+      }
+    });
+
+    test('Check WaveData with nested WavePathData and WaveMonster objects', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final Set<String> waveFiles = {};
+        final waveLoaded = loadCsv(
+          getDesignatedDirectory(folder, 'WaveData.Group.csv'),
+          (data) => waveFiles.add(data.first),
+        );
+        expect(waveLoaded, true, reason: 'waves not loaded for $folder');
+
+        final expectedKeys = {
+          'stage_id',
+          'group_id',
+          'spot_mod',
+          'battle_time',
+          'monster_count',
+          'use_intro_scene',
+          'wave_repeat',
+          'point_data',
+          'point_data_fly',
+          'background_name',
+          'theme',
+          'theme_time',
+          'stage_info_bg',
+          'target_list',
+          'wave_data',
+          'close_monster_count',
+          'mid_monster_count',
+          'far_monster_count',
+          'mod_value',
+          'ui_theme',
+        };
+
+        final wavePathExpectedKeys = {'wave_path', 'wave_monster_list', 'private_monster_count'};
+        final waveMonsterExpectedKeys = {'wave_monster_id', 'spawn_type'};
+
+        for (final waveFile in waveFiles) {
+          final Set<String> extraWaveDataKeys = {};
+          final Set<String> extraWavePathKeys = {};
+          final Set<String> extraWaveMonsterKeys = {};
+
+          final loaded = loadData(getDesignatedDirectory(folder, 'WaveDataTable.$waveFile.json'), (record) {
+            final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+            // Validate WavePathData
+            for (final pathJson in record['wave_data'] as List) {
+              final pathMap = pathJson as Map<String, dynamic>;
+              final pathKeys = pathMap.keys.toSet();
+
+              // Validate WaveMonster inside WavePathData
+              for (final monsterJson in pathMap['wave_monster_list'] as List) {
+                final monsterMap = monsterJson as Map<String, dynamic>;
+                final monsterKeys = monsterMap.keys.toSet();
+
+                monsterKeys.removeAll(waveMonsterExpectedKeys);
+                if (monsterKeys.isNotEmpty) {
+                  extraWaveMonsterKeys.addAll(monsterKeys);
+                }
+              }
+
+              pathKeys.removeAll(wavePathExpectedKeys);
+              if (pathKeys.isNotEmpty) {
+                extraWavePathKeys.addAll(pathKeys);
+              }
+            }
+
+            // Check for unexpected fields at the WaveData level
+            recordKeys.removeAll(expectedKeys);
+            if (recordKeys.isNotEmpty) {
+              extraWaveDataKeys.addAll(recordKeys);
+            }
+          });
+
+          expect(loaded, true, reason: 'loaded: $folder');
+          expect(extraWaveDataKeys, emptySet, reason: 'Unexpected fields in $waveFile: $folder');
+          expect(extraWavePathKeys, emptySet, reason: 'Unexpected fields in WavePathData of $waveFile: $folder');
+          expect(extraWaveMonsterKeys, emptySet, reason: 'Unexpected fields in WaveMonster of $waveFile: $folder');
+        }
+      }
+    });
+
+    test('Check UnionRaidWaveData fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'preset_group_id',
+          'difficulty_type',
+          'wave_order',
+          'wave',
+          'wave_change_step',
+          'monster_stage_lv',
+          'monster_stage_lv_change_group',
+          'dynamic_object_stage_lv',
+          'cover_stage_lv',
+          'spot_autocontrol',
+          'wave_name',
+          'wave_description',
+          'monster_image_si',
+          'monster_image',
+          'monster_spine_scale',
+          'reward_id',
+        };
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'UnionRaidPresetTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'Not loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected fields in UnionRaidWaveData, $folder');
+      }
+    });
+
+    test('Check SoloRaidWaveData fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'preset_group_id',
+          'difficulty_type',
+          'quick_battle_type',
+          'character_lv',
+          'wave_open_condition',
+          'wave_order',
+          'wave',
+          'monster_stage_lv',
+          'monster_stage_lv_change_group',
+          'dynamic_object_stage_lv',
+          'cover_stage_lv',
+          'spot_autocontrol',
+          'wave_name',
+          'wave_description',
+          'monster_image_si',
+          'monster_image',
+          'first_clear_reward_id',
+          'reward_id',
+        };
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'SoloRaidPresetTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected fields in SoloRaidWaveData: $folder');
+      }
+    });
+
+    test('Check MonsterData with nested MonsterSkillData', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'element_id',
+          'monster_model_id',
+          'name_localkey',
+          'appearance_localkey',
+          'description_localkey',
+          'is_irregular',
+          'hp_ratio',
+          'attack_ratio',
+          'defence_ratio',
+          'energy_resist_ratio',
+          'metal_resist_ratio',
+          'bio_resist_ratio',
+          'detector_center',
+          'detector_radius',
+          'nonetarget',
+          'functionnonetarget',
+          'spot_ai',
+          'spot_ai_defense',
+          'spot_ai_basedefense',
+          'spot_move_speed',
+          'spot_acceleration_time',
+          'fixed_spawn_type',
+          'spot_rand_ratio_normal',
+          'spot_rand_ratio_jump',
+          'spot_rand_ratio_drop',
+          'spot_rand_ratio_dash',
+          'spot_rand_ratio_teleport',
+          'skill_data',
+          'statenhance_id',
+        };
+
+        final skillDataExpectedKeys = {'skill_id', 'use_function_id_skill', 'hurt_function_id_skill'};
+
+        final Set<String> extraMonsterKeys = {};
+        final Set<String> extraSkillKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'MonsterTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+          // Validate nested MonsterSkillData
+          for (final skillJson in record['skill_data'] as List) {
+            final skillMap = skillJson as Map<String, dynamic>;
+            final skillKeys = skillMap.keys.toSet();
+
+            skillKeys.removeAll(skillDataExpectedKeys);
+            if (skillKeys.isNotEmpty) {
+              extraSkillKeys.addAll(skillKeys);
+            }
+          }
+
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraMonsterKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraMonsterKeys, emptySet, reason: 'Unexpected fields in MonsterData: $folder');
+        expect(extraSkillKeys, emptySet, reason: 'Unexpected fields in MonsterSkillData: $folder');
+      }
+    });
+
+    test('Check MonsterStatEnhanceData fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'group_id',
+          'lv',
+          'level_hp',
+          'level_attack',
+          'level_defence',
+          'level_statdamageratio',
+          'level_energy_resist',
+          'level_metal_resist',
+          'level_bio_resist',
+          'level_projectile_hp',
+          'level_broken_hp',
+        };
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'MonsterStatEnhanceTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected fields in MonsterStatEnhanceData: $folder');
+      }
+    });
+
+    test('Check MonsterPartData fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'monster_model_id',
+          'parts_name_localkey',
+          'damage_hp_ratio',
+          'hp_ratio',
+          'attack_ratio',
+          'defence_ratio',
+          'energy_resist_ratio',
+          'metal_resist_ratio',
+          'bio_resist_ratio',
+          'destroy_after_anim',
+          'destroy_after_movable',
+          'passive_skill_id',
+          'visible_hp',
+          'linked_parts_id',
+          'weapon_object',
+          'weapon_object_enum',
+          'parts_type',
+          'parts_object',
+          'parts_skin',
+          'monster_destroy_anim_trigger',
+          'is_main_part',
+          'is_parts_damage_able',
+        };
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'MonsterPartsTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected fields in MonsterPartData: $folder');
+      }
+    });
+
+    test('Check MonsterStageLevelChangeData fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'group',
+          'step',
+          'condition_type',
+          'condition_value_min',
+          'condition_value_max',
+          'monster_stage_lv',
+          'passive_skill_id',
+          'target_passive_skill_id',
+          'gimmickobject_lv_control',
+        };
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'MonsterStageLvChangeTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected fields in MonsterStageLevelChangeData: $folder');
       }
     });
   });

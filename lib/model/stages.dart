@@ -90,8 +90,10 @@ class WavePathData {
   final String? path;
   @JsonKey(name: 'wave_monster_list')
   final List<WaveMonster> monsterList;
+  @JsonKey(name: 'private_monster_count')
+  final int? privateMonsterCount;
 
-  WavePathData({this.path, this.monsterList = const []});
+  WavePathData({this.path, this.monsterList = const [], this.privateMonsterCount});
 
   factory WavePathData.fromJson(Map<String, dynamic> json) => _$WavePathDataFromJson(json);
 }
@@ -133,6 +135,10 @@ class WaveData {
   final int midMonsterCount;
   @JsonKey(name: 'far_monster_count')
   final int farMonsterCount;
+  @JsonKey(name: 'mod_value')
+  final int? modValue;
+  @JsonKey(name: 'ui_theme')
+  final String? uiTheme;
 
   WaveData({
     this.stageId = 0,
@@ -153,6 +159,8 @@ class WaveData {
     this.closeMonsterCount = 0,
     this.midMonsterCount = 0,
     this.farMonsterCount = 0,
+    this.modValue,
+    this.uiTheme,
   });
 
   factory WaveData.fromJson(Map<String, dynamic> json) => _$WaveDataFromJson(json);
