@@ -108,10 +108,6 @@ class NikkeDatabaseV2 {
   final Map<int, StateEffectData> stateEffectTable = {};
   final Map<int, FunctionData> functionTable = {};
 
-  final Set<String> unknownFunctionTypes = {};
-  final Set<String> unknownTimingTriggerTypes = {};
-  final Set<String> unknownStatusTriggerTypes = {};
-
   void init() {
     unionRaidData.clear();
     waveGroupDict.clear();
@@ -123,10 +119,6 @@ class NikkeDatabaseV2 {
     soloRaidData.clear();
     stateEffectTable.clear();
     functionTable.clear();
-
-    unknownFunctionTypes.clear();
-    unknownTimingTriggerTypes.clear();
-    unknownStatusTriggerTypes.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     initialized = true;
@@ -153,15 +145,6 @@ class NikkeDatabaseV2 {
     );
     initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'StateEffectTable.json'), processStateEffectData);
     initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'FunctionTable.json'), processFunctionData);
-    if (unknownFunctionTypes.isNotEmpty) {
-      logger.i('[$server] Resolved unknown functionTypes: $unknownFunctionTypes');
-    }
-    if (unknownTimingTriggerTypes.isNotEmpty) {
-      logger.i('[$server] Resolved unknown timingTriggerTypes: $unknownTimingTriggerTypes');
-    }
-    if (unknownStatusTriggerTypes.isNotEmpty) {
-      logger.i('[$server] Resolved unknown statusTriggerTypes: $unknownStatusTriggerTypes');
-    }
 
     initialized &= loadCsv(getDesignatedDirectory(extractFolderPath, 'WaveData.GroupDict.csv'), processWaveDict);
   }
@@ -239,18 +222,6 @@ class NikkeDatabaseV2 {
 
   void processFunctionData(dynamic record) {
     final data = FunctionData.fromJson(record);
-    if (data.functionType == FunctionType.unknown) {
-      unknownFunctionTypes.add(data.rawFunctionType);
-    }
-    if (data.timingTriggerType == TimingTriggerType.unknown) {
-      unknownTimingTriggerTypes.add(record['timing_trigger_type']);
-    }
-    if (data.statusTriggerType == StatusTriggerType.unknown) {
-      unknownStatusTriggerTypes.add(record['status_trigger_type']);
-    }
-    if (data.statusTrigger2Type == StatusTriggerType.unknown) {
-      unknownStatusTriggerTypes.add(record['status_trigger2_type']);
-    }
     functionTable[data.id] = data;
   }
 }

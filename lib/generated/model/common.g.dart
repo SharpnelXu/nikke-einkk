@@ -108,6 +108,7 @@ WeaponData _$WeaponDataFromJson(Map<String, dynamic> json) => WeaponData(
   shakeId: (json['shake_id'] as num?)?.toInt() ?? 0,
   shakeType: json['ShakeType'] as String? ?? '',
   shakeWeight: (json['ShakeWeight'] as num?)?.toInt() ?? 0,
+  homingScript: json['homing_script'] as String?,
 );
 
 CharacterStatData _$CharacterStatDataFromJson(Map<String, dynamic> json) => CharacterStatData(

@@ -10,6 +10,15 @@ class TestHelper {
 
     return db.dataLoaded;
   }
+
+  static void loadDataV2() {
+    if (!global.initialized) {
+      global.init();
+    }
+    if (!cn.initialized) {
+      cn.init();
+    }
+  }
 }
 
 class Pair<A, B> {

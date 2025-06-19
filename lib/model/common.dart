@@ -366,6 +366,8 @@ class WeaponData {
   final String shakeType;
   @JsonKey(name: 'ShakeWeight')
   final int shakeWeight;
+  @JsonKey(name: 'homing_script')
+  final String? homingScript;
 
   WeaponData({
     this.id = 0,
@@ -424,6 +426,7 @@ class WeaponData {
     this.shakeId = 0,
     this.shakeType = '',
     this.shakeWeight = 0,
+    this.homingScript,
   });
 
   factory WeaponData.fromJson(Map<String, dynamic> json) => _$WeaponDataFromJson(json);
