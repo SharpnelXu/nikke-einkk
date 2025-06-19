@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
-
-import 'common.dart';
+import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 part '../generated/model/skills.g.dart';
 
@@ -23,7 +23,16 @@ enum CharacterSkillType {
   explosiveCircuit,
   stigma,
   hitMonsterGetBuff,
-  unknown,
+  unknown;
+
+  static final Map<String, CharacterSkillType> _reverseMap = Map.fromIterable(
+    CharacterSkillType.values,
+    key: (v) => (v as CharacterSkillType).name.pascal,
+  );
+
+  static CharacterSkillType fromName(String? name) {
+    return _reverseMap[name] ?? CharacterSkillType.unknown;
+  }
 }
 
 // "durationType": "{TimeSec, None, Shots, Battles}"
@@ -32,47 +41,82 @@ enum CharacterSkillType {
 // Battles: Cindy's S2 E3 has duration value 1, not sure what it means for DurationType.battles
 // TimeSecBattles: Flora's S1 E1 has an absurdly large value, not sure why (1000000 = 10000 seconds?)
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum DurationType { none, timeSec, shots, battles, hits, timeSecBattles, unknown }
+enum DurationType {
+  none,
+  timeSec,
+  shots,
+  battles,
+  hits,
+  timeSecBattles,
+  unknown;
+
+  static final Map<String, DurationType> _reverseMap = Map.fromIterable(
+    DurationType.values,
+    key: (v) => (v as DurationType).name.pascal,
+  );
+
+  static DurationType fromName(String? name) {
+    return _reverseMap[name] ?? DurationType.unknown;
+  }
+}
 
 // "skillValueType": "{None, Integer, Percent}"
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum ValueType { none, integer, percent, unknown }
+enum ValueType {
+  none,
+  integer,
+  percent,
+  unknown;
 
-@JsonSerializable()
+  static final Map<String, ValueType> _reverseMap = Map.fromIterable(
+    ValueType.values,
+    key: (v) => (v as ValueType).name.pascal,
+  );
+
+  static ValueType fromName(String? name) {
+    return _reverseMap[name] ?? ValueType.unknown;
+  }
+}
+
+@JsonSerializable(createToJson: false)
 class SkillValueData {
   @JsonKey(name: 'skill_value_type')
-  final ValueType skillValueType;
+  final String rawSkillValueType;
+  ValueType get skillValueType => ValueType.fromName(rawSkillValueType);
 
   @JsonKey(name: 'skill_value')
   final int skillValue;
 
-  SkillValueData({this.skillValueType = ValueType.unknown, this.skillValue = 0});
+  SkillValueData({this.rawSkillValueType = '', this.skillValue = 0});
 
   factory SkillValueData.fromJson(Map<String, dynamic> json) => _$SkillValueDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SkillValueDataToJson(this);
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(createToJson: false)
 class SkillData {
   final int id;
   @JsonKey(name: 'skill_cooltime')
   final int skillCooltime;
   @JsonKey(name: 'attack_type')
-  final AttackType attackType;
+  final String rawAttackType;
+  AttackType get attackType => AttackType.fromName(rawAttackType);
   // "counterType": "{Metal_Type, Energy_Type, Bio_Type}", this is probably not used
   @JsonKey(name: 'counter_type')
   final String counterType;
   @JsonKey(name: 'prefer_target')
-  final PreferTarget preferTarget;
+  final String rawPreferTarget;
+  PreferTarget get preferTarget => PreferTarget.fromName(rawPreferTarget);
   @JsonKey(name: 'prefer_target_condition')
-  final PreferTargetCondition preferTargetCondition;
+  final String rawPreferTargetCondition;
+  PreferTargetCondition get preferTargetCondition => PreferTargetCondition.fromName(rawPreferTargetCondition);
   @JsonKey(name: 'skill_type')
-  final CharacterSkillType skillType;
+  final String rawSkillType;
+  CharacterSkillType get skillType => CharacterSkillType.fromName(rawSkillType);
   @JsonKey(name: 'skill_value_data')
   final List<SkillValueData> skillValueData;
   @JsonKey(name: 'duration_type')
-  final DurationType durationType;
+  final String rawDurationType;
+  DurationType get durationType => DurationType.fromName(rawDurationType);
   @JsonKey(name: 'duration_value')
   final int durationValue;
   @JsonKey(name: 'before_use_function_id_list')
@@ -92,13 +136,13 @@ class SkillData {
   SkillData({
     this.id = 0,
     this.skillCooltime = 0,
-    this.attackType = AttackType.unknown,
+    this.rawAttackType = '',
     this.counterType = '',
-    this.preferTarget = PreferTarget.unknown,
-    this.preferTargetCondition = PreferTargetCondition.unknown,
-    this.skillType = CharacterSkillType.unknown,
+    this.rawPreferTarget = '',
+    this.rawPreferTargetCondition = '',
+    this.rawSkillType = '',
     this.skillValueData = const [],
-    this.durationType = DurationType.unknown,
+    this.rawDurationType = '',
     this.durationValue = 0,
     this.beforeUseFunctionIdList = const [],
     this.beforeHurtFunctionIdList = const [],
@@ -110,23 +154,19 @@ class SkillData {
   });
 
   factory SkillData.fromJson(Map<String, dynamic> json) => _$SkillDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SkillDataToJson(this);
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(createToJson: false)
 class SkillFunction {
   final int function;
 
   SkillFunction({this.function = 0});
 
   factory SkillFunction.fromJson(Map<String, dynamic> json) => _$SkillFunctionFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SkillFunctionToJson(this);
 }
 
 // State Effects directly call functions, probably add buffs?
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(createToJson: false)
 class StateEffectData {
   final int id;
   // no state effects use this
@@ -147,8 +187,6 @@ class StateEffectData {
   });
 
   factory StateEffectData.fromJson(Map<String, dynamic> json) => _$StateEffectDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$StateEffectDataToJson(this);
 }
 
 // "buff": "{Etc, Buff, DeBuff, BuffEtc, DebuffEtc}"
@@ -160,13 +198,36 @@ enum BuffType {
   deBuff,
   @JsonValue('DebuffEtc')
   deBuffEtc,
-  unknown,
+  unknown;
+
+  static final Map<String, BuffType> _reverseMap = Map.fromIterable(
+    BuffType.values,
+    key: (v) => v == BuffType.deBuffEtc ? 'DebuffEtc' : (v as BuffType).name.pascal,
+  );
+
+  static BuffType fromName(String? name) {
+    return _reverseMap[name] ?? BuffType.unknown;
+  }
 }
 
 // "buffRemove": "{Etc, Clear, Resist}"
 // not sure if this is the same as buffType, probably not the same
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum BuffRemoveType { etc, clear, resist, unknown }
+enum BuffRemoveType {
+  etc,
+  clear,
+  resist,
+  unknown;
+
+  static final Map<String, BuffRemoveType> _reverseMap = Map.fromIterable(
+    BuffRemoveType.values,
+    key: (v) => (v as BuffRemoveType).name.pascal,
+  );
+
+  static BuffRemoveType fromName(String? name) {
+    return _reverseMap[name] ?? BuffRemoveType.unknown;
+  }
+}
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum FunctionType {
@@ -328,16 +389,60 @@ enum FunctionType {
   uncoverable,
   useCharacterSkillId,
   useSkill2,
-  windReduction,
+  windReduction;
+
+  static final Map<String, FunctionType> _reverseMap = Map.fromIterable(
+    FunctionType.values,
+    key: (v) => (v as FunctionType).jsonKey,
+  );
+
+  String get jsonKey => this == FunctionType.immuneDamageMainHp ? 'ImmuneDamage_MainHP' : name.pascal;
+
+  static FunctionType fromName(String name) {
+    return _reverseMap[name] ?? FunctionType.unknown;
+  }
 }
 
 // functionTarget may not mean the actual function target based on Flora's Skill 2 (checks teammates on both sides
 // but triggerStandard is functionTarget which is self)
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum StandardType { unknown, none, user, functionTarget, triggerTarget }
+enum StandardType {
+  unknown,
+  none,
+  user,
+  functionTarget,
+  triggerTarget;
+
+  static final Map<String, StandardType> _reverseMap = Map.fromIterable(
+    StandardType.values,
+    key: (v) => (v as StandardType).name.pascal,
+  );
+
+  static StandardType fromName(String? name) {
+    return _reverseMap[name] ?? StandardType.unknown;
+  }
+}
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum FunctionTargetType { unknown, none, self, target, targetCover, allCharacter, allMonster, userCover }
+enum FunctionTargetType {
+  unknown,
+  none,
+  self,
+  target,
+  targetCover,
+  allCharacter,
+  allMonster,
+  userCover;
+
+  static final Map<String, FunctionTargetType> _reverseMap = Map.fromIterable(
+    FunctionTargetType.values,
+    key: (v) => (v as FunctionTargetType).name.pascal,
+  );
+
+  static FunctionTargetType fromName(String? name) {
+    return _reverseMap[name] ?? FunctionTargetType.unknown;
+  }
+}
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum TimingTriggerType {
@@ -402,7 +507,16 @@ enum TimingTriggerType {
   onTeamHpRatioUp,
   onUseAmmo,
   onUseBurstSkill,
-  onUserPartsDestroy,
+  onUserPartsDestroy;
+
+  static final Map<String, TimingTriggerType> _reverseMap = Map.fromIterable(
+    TimingTriggerType.values,
+    key: (v) => (v as TimingTriggerType).name.pascal,
+  );
+
+  static TimingTriggerType fromName(String? name) {
+    return _reverseMap[name] ?? TimingTriggerType.unknown;
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
@@ -445,13 +559,46 @@ enum StatusTriggerType {
   isSameSquadUp,
   isSearchElementId,
   isStun,
-  isWeaponType,
+  isWeaponType;
+
+  static final Map<String, StatusTriggerType> _reverseMap = Map.fromIterable(
+    StatusTriggerType.values,
+    key: (v) {
+      switch (v as StatusTriggerType) {
+        case isPhase:
+          return 'isPhase';
+        case isSameSquadCount:
+          return 'IsSameSqaudCount';
+        case isSameSquadUp:
+          return 'IsSameSqaudUp';
+        default:
+          return v.name.pascal;
+      }
+    },
+  );
+
+  static StatusTriggerType fromName(String? name) {
+    return _reverseMap[name] ?? StatusTriggerType.unknown;
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum FunctionStatus { on, off }
+enum FunctionStatus {
+  on,
+  off,
+  unknown;
 
-@JsonSerializable(explicitToJson: true)
+  static final Map<String, FunctionStatus> _reverseMap = Map.fromIterable(
+    FunctionStatus.values,
+    key: (v) => (v as FunctionStatus).name.pascal,
+  );
+
+  static FunctionStatus fromName(String? name) {
+    return _reverseMap[name] ?? FunctionStatus.unknown;
+  }
+}
+
+@JsonSerializable(createToJson: false)
 class FunctionData {
   final int id;
   @JsonKey(name: 'group_id')
@@ -460,15 +607,20 @@ class FunctionData {
   @JsonKey(name: 'name_localkey')
   final String nameLocalkey;
   // equipment lines are BuffEtc
-  final BuffType buff;
+  @JsonKey(name: 'buff')
+  final String rawBuffType;
+  BuffType get buff => BuffType.fromName(rawBuffType);
   @JsonKey(name: 'buff_remove')
-  final BuffRemoveType buffRemove;
+  final String rawBuffRemove;
+  BuffRemoveType get buffRemove => BuffRemoveType.fromName(rawBuffRemove);
   @JsonKey(name: 'function_type')
-  final FunctionType functionType;
+  final String rawFunctionType;
   @JsonKey(name: 'function_value_type')
-  final ValueType functionValueType;
+  final String rawFunctionValueType;
+  ValueType get functionValueType => ValueType.fromName(rawFunctionValueType);
   @JsonKey(name: 'function_standard')
-  final StandardType functionStandard;
+  final String rawFunctionStandard;
+  StandardType get functionStandard => StandardType.fromName(rawFunctionStandard);
   @JsonKey(name: 'function_value')
   final int functionValue;
   // equipment lines have full_count 100, Grave S2 function 4 (stateEffect) has full_count 60
@@ -482,159 +634,169 @@ class FunctionData {
   @JsonKey(name: 'is_cancel')
   final bool isCancel;
   @JsonKey(name: 'delay_type')
-  final DurationType delayType;
+  final String rawDelayType;
+  DurationType get delayType => DurationType.fromName(rawDelayType);
   @JsonKey(name: 'delay_value')
   final int delayValue;
   @JsonKey(name: 'duration_type')
-  final DurationType durationType;
+  final String rawDurationType;
+  DurationType get durationType => DurationType.fromName(rawDurationType);
   @JsonKey(name: 'duration_value')
   final int durationValue;
   @JsonKey(name: 'limit_value')
   final int limitValue;
   @JsonKey(name: 'function_target')
-  final FunctionTargetType functionTarget;
+  final String rawFunctionTarget;
+  FunctionTargetType get functionTarget => FunctionTargetType.fromName(rawFunctionTarget);
   // might be possible that connected functions ignore this condition (from Phantom S1E2, which is linked to E1)
   @JsonKey(name: 'timing_trigger_type')
-  final TimingTriggerType timingTriggerType;
+  final String rawTimingTriggerType;
+  TimingTriggerType get timingTriggerType => TimingTriggerType.fromName(rawTimingTriggerType);
   @JsonKey(name: 'timing_trigger_standard')
-  final StandardType timingTriggerStandard;
+  final String rawTimingTriggerStandard;
+  StandardType get timingTriggerStandard => StandardType.fromName(rawTimingTriggerStandard);
   @JsonKey(name: 'timing_trigger_value')
   final int timingTriggerValue;
   @JsonKey(name: 'status_trigger_type')
-  final StatusTriggerType statusTriggerType;
+  final String rawStatusTriggerType;
+  StatusTriggerType get statusTriggerType => StatusTriggerType.fromName(rawStatusTriggerType);
   @JsonKey(name: 'status_trigger_standard')
-  final StandardType statusTriggerStandard;
+  final String rawStatusTriggerStandard;
+  StandardType get statusTriggerStandard => StandardType.fromName(rawStatusTriggerStandard);
   @JsonKey(name: 'status_trigger_value')
   final int statusTriggerValue;
   @JsonKey(name: 'status_trigger2_type')
-  final StatusTriggerType statusTrigger2Type;
+  final String rawStatusTrigger2Type;
+  StatusTriggerType get statusTrigger2Type => StatusTriggerType.fromName(rawStatusTrigger2Type);
   @JsonKey(name: 'status_trigger2_standard')
-  final StandardType statusTrigger2Standard;
+  final String rawStatusTrigger2Standard;
+  StandardType get statusTrigger2Standard => StandardType.fromName(rawStatusTrigger2Standard);
   @JsonKey(name: 'status_trigger2_value')
   final int statusTrigger2Value;
   // best guess is whether to keep the function as on or off after trigger
   // based on conditional max hp cube, this should also dictates if a function should be triggered?
   // but Elegg's skill2 is onHitNum with keepingType on, and statusTrigger
   @JsonKey(name: 'keeping_type')
-  final FunctionStatus keepingType;
+  final String rawKeepingType;
+  FunctionStatus get keepingType => FunctionStatus.fromName(rawKeepingType);
   @JsonKey(name: 'buff_icon')
   final String buffIcon;
 
   // these are likely effects
   // "shotFxListType": "{None, Gear1, Gear2, Gear3}"
   @JsonKey(name: 'shot_fx_list_type')
-  final String shotFxListType;
+  final String? shotFxListType;
   // a bunch of fx_xxx_xxx_xxx string, probably linked to effects?
   @JsonKey(name: 'fx_prefab_01')
-  final String fxPrefab01;
+  final String? fxPrefab01;
   // "fxTarget": "{User, Target, TargetMonsterDead}" (also some don't have these fxTargetXX fields)
   @JsonKey(name: 'fx_target_01')
-  final String fxTarget01;
+  final String? fxTarget01;
   // "fxSocketPoint": "{None, Center, Bottom, Head, Top, Cover, World, Core}"
   // (also some don't have these fxSocketPointXX fields)
   @JsonKey(name: 'fx_socket_point_01')
-  final String fxSocketPoint01;
+  final String? fxSocketPoint01;
   @JsonKey(name: 'fx_prefab_02')
-  final String fxPrefab02;
+  final String? fxPrefab02;
   @JsonKey(name: 'fx_target_02')
-  final String fxTarget02;
+  final String? fxTarget02;
   @JsonKey(name: 'fx_socket_point_02')
-  final String fxSocketPoint02;
+  final String? fxSocketPoint02;
   @JsonKey(name: 'fx_prefab_03')
-  final String fxPrefab03;
+  final String? fxPrefab03;
   @JsonKey(name: 'fx_target_03')
-  final String fxTarget03;
+  final String? fxTarget03;
   @JsonKey(name: 'fx_socket_point_03')
-  final String fxSocketPoint03;
+  final String? fxSocketPoint03;
   @JsonKey(name: 'fx_prefab_full')
-  final String fxPrefabFull;
+  final String? fxPrefabFull;
   @JsonKey(name: 'fx_target_full')
-  final String fxTargetFull;
+  final String? fxTargetFull;
   @JsonKey(name: 'fx_socket_point_full')
-  final String fxSocketPointFull;
+  final String? fxSocketPointFull;
   @JsonKey(name: 'fx_prefab_01_arena')
-  final String fxPrefab01Arena;
+  final String? fxPrefab01Arena;
   @JsonKey(name: 'fx_target_01_arena')
-  final String fxTarget01Arena;
+  final String? fxTarget01Arena;
   @JsonKey(name: 'fx_socket_point_01_arena')
-  final String fxSocketPoint01Arena;
+  final String? fxSocketPoint01Arena;
   @JsonKey(name: 'fx_prefab_02_arena')
-  final String fxPrefab02Arena;
+  final String? fxPrefab02Arena;
   @JsonKey(name: 'fx_target_02_arena')
-  final String fxTarget02Arena;
+  final String? fxTarget02Arena;
   @JsonKey(name: 'fx_socket_point_02_arena')
-  final String fxSocketPoint02Arena;
+  final String? fxSocketPoint02Arena;
   @JsonKey(name: 'fx_prefab_03_arena')
-  final String fxPrefab03Arena;
+  final String? fxPrefab03Arena;
   @JsonKey(name: 'fx_target_03_arena')
-  final String fxTarget03Arena;
+  final String? fxTarget03Arena;
   @JsonKey(name: 'fx_socket_point_03_arena')
-  final String fxSocketPoint03Arena;
+  final String? fxSocketPoint03Arena;
 
   @JsonKey(name: 'connected_function')
   final List<int> connectedFunction;
+
+  FunctionType get functionType => FunctionType.fromName(rawFunctionType);
 
   FunctionData({
     this.id = 0,
     this.groupId = 0,
     this.level = 0,
     this.nameLocalkey = '',
-    this.buff = BuffType.unknown,
-    this.buffRemove = BuffRemoveType.unknown,
-    this.functionType = FunctionType.unknown,
-    this.functionValueType = ValueType.unknown,
-    this.functionStandard = StandardType.unknown,
+    this.rawBuffType = '',
+    this.rawBuffRemove = '',
+    this.rawFunctionType = '',
+    this.rawFunctionValueType = '',
+    this.rawFunctionStandard = '',
     this.functionValue = 0,
     this.fullCount = 0,
     this.isCancel = false,
-    this.delayType = DurationType.unknown,
+    this.rawDelayType = '',
     this.delayValue = 0,
-    this.durationType = DurationType.unknown,
+    this.rawDurationType = '',
     this.durationValue = 0,
     this.limitValue = 0,
-    this.functionTarget = FunctionTargetType.unknown,
-    this.timingTriggerType = TimingTriggerType.unknown,
-    this.timingTriggerStandard = StandardType.unknown,
+    this.rawFunctionTarget = '',
+    this.rawTimingTriggerType = '',
+    this.rawTimingTriggerStandard = '',
     this.timingTriggerValue = 0,
-    this.statusTriggerType = StatusTriggerType.unknown,
-    this.statusTriggerStandard = StandardType.unknown,
+    this.rawStatusTriggerType = '',
+    this.rawStatusTriggerStandard = '',
     this.statusTriggerValue = 0,
-    this.statusTrigger2Type = StatusTriggerType.unknown,
-    this.statusTrigger2Standard = StandardType.unknown,
+    this.rawStatusTrigger2Type = '',
+    this.rawStatusTrigger2Standard = '',
     this.statusTrigger2Value = 0,
-    this.keepingType = FunctionStatus.off,
+    this.rawKeepingType = '',
     this.buffIcon = '',
-    this.shotFxListType = '',
-    this.fxPrefab01 = '',
-    this.fxTarget01 = '',
-    this.fxSocketPoint01 = '',
-    this.fxPrefab02 = '',
-    this.fxTarget02 = '',
-    this.fxSocketPoint02 = '',
-    this.fxPrefab03 = '',
-    this.fxTarget03 = '',
-    this.fxSocketPoint03 = '',
-    this.fxPrefabFull = '',
-    this.fxTargetFull = '',
-    this.fxSocketPointFull = '',
-    this.fxPrefab01Arena = '',
-    this.fxTarget01Arena = '',
-    this.fxSocketPoint01Arena = '',
-    this.fxPrefab02Arena = '',
-    this.fxTarget02Arena = '',
-    this.fxSocketPoint02Arena = '',
-    this.fxPrefab03Arena = '',
-    this.fxTarget03Arena = '',
-    this.fxSocketPoint03Arena = '',
+    this.shotFxListType,
+    this.fxPrefab01,
+    this.fxTarget01,
+    this.fxSocketPoint01,
+    this.fxPrefab02,
+    this.fxTarget02,
+    this.fxSocketPoint02,
+    this.fxPrefab03,
+    this.fxTarget03,
+    this.fxSocketPoint03,
+    this.fxPrefabFull,
+    this.fxTargetFull,
+    this.fxSocketPointFull,
+    this.fxPrefab01Arena,
+    this.fxTarget01Arena,
+    this.fxSocketPoint01Arena,
+    this.fxPrefab02Arena,
+    this.fxTarget02Arena,
+    this.fxSocketPoint02Arena,
+    this.fxPrefab03Arena,
+    this.fxTarget03Arena,
+    this.fxSocketPoint03Arena,
     this.connectedFunction = const [],
   });
 
   factory FunctionData.fromJson(Map<String, dynamic> json) => _$FunctionDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$FunctionDataToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class SkillDescriptionValue {
   @JsonKey(name: 'description_value')
   final String? value;
@@ -642,11 +804,9 @@ class SkillDescriptionValue {
   SkillDescriptionValue({this.value});
 
   factory SkillDescriptionValue.fromJson(Map<String, dynamic> json) => _$SkillDescriptionValueFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SkillDescriptionValueToJson(this);
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(createToJson: false)
 class SkillInfoData {
   final int id;
   @JsonKey(name: 'group_id')
@@ -681,6 +841,4 @@ class SkillInfoData {
   });
 
   factory SkillInfoData.fromJson(Map<String, dynamic> json) => _$SkillInfoDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SkillInfoDataToJson(this);
 }

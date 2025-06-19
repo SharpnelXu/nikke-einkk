@@ -5,8 +5,7 @@ import 'package:nikke_einkk/model/battle/utils.dart' as utils;
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/monster.dart';
-
-import 'custom_widgets.dart';
+import 'package:nikke_einkk/module/common/custom_widgets.dart';
 
 class RaptureLeveledDataDisplay extends StatelessWidget {
   final bool useGlobal;

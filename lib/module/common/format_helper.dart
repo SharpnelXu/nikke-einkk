@@ -5,6 +5,29 @@ import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 
+/// From source_helper:CaseHelper package
+extension CaseHelper on String {
+  String get snake => _fixCase('_');
+  String get screamingSnake => snake.toUpperCase();
+  String get pascal {
+    if (isEmpty) {
+      return '';
+    }
+
+    return this[0].toUpperCase() + substring(1);
+  }
+
+  String _fixCase(String separator) => replaceAllMapped(RegExp('[A-Z]'), (match) {
+    var lower = match.group(0)!.toLowerCase();
+
+    if (match.start > 0) {
+      lower = '$separator$lower';
+    }
+
+    return lower;
+  });
+}
+
 String coreString(int coreLevel) {
   if (coreLevel < 1 || coreLevel > 11) return '$coreLevel';
   final gradeLevel = coreLevel > 4 ? 4 : coreLevel;

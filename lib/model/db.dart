@@ -93,6 +93,8 @@ class NikkeDatabaseV2 {
   bool isGlobal = true;
   bool initialized = false;
 
+  String get server => isGlobal ? 'Global' : 'CN';
+
   NikkeDatabaseV2(this.isGlobal);
 
   final Map<int, List<UnionRaidWaveData>> unionRaidData = {}; // key is presetId
@@ -103,6 +105,12 @@ class NikkeDatabaseV2 {
   final Map<int, Map<int, MonsterStatEnhanceData>> monsterStatEnhanceData = {}; // key is groupId, lv
   final Map<int, List<MonsterStageLevelChangeData>> monsterStageLvChangeData = {};
   final Map<int, List<SoloRaidWaveData>> soloRaidData = {}; // key is presetId
+  final Map<int, StateEffectData> stateEffectTable = {};
+  final Map<int, FunctionData> functionTable = {};
+
+  final Set<String> unknownFunctionTypes = {};
+  final Set<String> unknownTimingTriggerTypes = {};
+  final Set<String> unknownStatusTriggerTypes = {};
 
   void init() {
     unionRaidData.clear();
@@ -113,6 +121,12 @@ class NikkeDatabaseV2 {
     monsterStatEnhanceData.clear();
     monsterStageLvChangeData.clear();
     soloRaidData.clear();
+    stateEffectTable.clear();
+    functionTable.clear();
+
+    unknownFunctionTypes.clear();
+    unknownTimingTriggerTypes.clear();
+    unknownStatusTriggerTypes.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     initialized = true;
@@ -137,6 +151,17 @@ class NikkeDatabaseV2 {
       getDesignatedDirectory(extractFolderPath, 'SoloRaidPresetTable.json'),
       processSoloRaidWaveData,
     );
+    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'StateEffectTable.json'), processStateEffectData);
+    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'FunctionTable.json'), processFunctionData);
+    if (unknownFunctionTypes.isNotEmpty) {
+      logger.i('[$server] Resolved unknown functionTypes: $unknownFunctionTypes');
+    }
+    if (unknownTimingTriggerTypes.isNotEmpty) {
+      logger.i('[$server] Resolved unknown timingTriggerTypes: $unknownTimingTriggerTypes');
+    }
+    if (unknownStatusTriggerTypes.isNotEmpty) {
+      logger.i('[$server] Resolved unknown statusTriggerTypes: $unknownStatusTriggerTypes');
+    }
 
     initialized &= loadCsv(getDesignatedDirectory(extractFolderPath, 'WaveData.GroupDict.csv'), processWaveDict);
   }
@@ -205,6 +230,28 @@ class NikkeDatabaseV2 {
     final data = MonsterStageLevelChangeData.fromJson(record);
     monsterStageLvChangeData.putIfAbsent(data.group, () => []);
     monsterStageLvChangeData[data.group]!.add(data);
+  }
+
+  void processStateEffectData(dynamic record) {
+    final data = StateEffectData.fromJson(record);
+    stateEffectTable[data.id] = data;
+  }
+
+  void processFunctionData(dynamic record) {
+    final data = FunctionData.fromJson(record);
+    if (data.functionType == FunctionType.unknown) {
+      unknownFunctionTypes.add(data.rawFunctionType);
+    }
+    if (data.timingTriggerType == TimingTriggerType.unknown) {
+      unknownTimingTriggerTypes.add(record['timing_trigger_type']);
+    }
+    if (data.statusTriggerType == StatusTriggerType.unknown) {
+      unknownStatusTriggerTypes.add(record['status_trigger_type']);
+    }
+    if (data.statusTrigger2Type == StatusTriggerType.unknown) {
+      unknownStatusTriggerTypes.add(record['status_trigger2_type']);
+    }
+    functionTable[data.id] = data;
   }
 }
 

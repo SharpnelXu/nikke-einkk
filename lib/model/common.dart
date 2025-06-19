@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 part '../generated/model/common.g.dart';
 
@@ -48,7 +49,7 @@ part '../generated/model/common.g.dart';
 // "is_detail_close": false
 // }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class NikkeCharacterData {
   // format "corporation + resourceId + gradeCoreId", e.g. 235004, series = 2, resourceId = 350, gradeCoreId = 04
   final int id;
@@ -69,7 +70,8 @@ class NikkeCharacterData {
   final int order;
   // valid values are "SSR", "SR", "R"
   @JsonKey(name: 'original_rare')
-  final Rarity originalRare;
+  final String rawOriginalRare;
+  Rarity get originalRare => Rarity.fromName(rawOriginalRare);
   // valid values are [1, 11], use `limitBreak` for more readable format
   @JsonKey(name: 'grade_core_id')
   final int gradeCoreId;
@@ -89,7 +91,8 @@ class NikkeCharacterData {
   final int statEnhanceId;
   // "Attacker", "Defender", "Supporter"
   @JsonKey(name: 'class')
-  final NikkeClass characterClass;
+  final String rawCharacterClass;
+  NikkeClass get characterClass => NikkeClass.fromName(rawCharacterClass);
   @JsonKey(name: 'element_id')
   final List<int> elementId;
   @JsonKey(name: 'critical_ratio')
@@ -107,10 +110,12 @@ class NikkeCharacterData {
   final int bonusRangeMax;
   // "AllStep", "Step1", "Step2", "Step3"
   @JsonKey(name: 'use_burst_skill')
-  final BurstStep useBurstSkill;
+  final String rawUseBurstSkill;
+  BurstStep get useBurstSkill => BurstStep.fromName(rawUseBurstSkill);
   // "NextStep", "Step1", "Step2", "Step3", "StepFull"
   @JsonKey(name: 'change_burst_step')
-  final BurstStep changeBurstStep;
+  final String rawChangeBurstStep;
+  BurstStep get changeBurstStep => BurstStep.fromName(rawChangeBurstStep);
   @JsonKey(name: 'burst_apply_delay')
   final int burstApplyDelay;
   // 500, 1000, 1500
@@ -125,14 +130,16 @@ class NikkeCharacterData {
   // value is "StateEffect", so use `skill1Id` and search in StateEffectTable
   // also has value "CharacterSkill", so search in CharacterSkillTable
   @JsonKey(name: 'skill1_table')
-  final SkillType skill1Table;
+  final String rawSkill1Table;
+  SkillType get skill1Table => SkillType.fromName(rawSkill1Table);
   // CharacterSkillTable
   @JsonKey(name: 'skill2_id')
   final int skill2Id;
   // value is "StateEffect", so use `skill2Id` and search in StateEffectTable
   // also has value "CharacterSkill", so search in CharacterSkillTable
   @JsonKey(name: 'skill2_table')
-  final SkillType skill2Table;
+  final String rawSkill2Table;
+  SkillType get skill2Table => SkillType.fromName(rawSkill2Table);
   // doesn't know what this means
   @JsonKey(name: 'eff_category_type')
   final String effCategoryType;
@@ -148,10 +155,12 @@ class NikkeCharacterData {
   // doesn't know what this means
   @JsonKey(name: 'category_type_3')
   final String categoryType3;
-  @JsonKey(unknownEnumValue: Corporation.unknown)
-  final Corporation corporation;
+  @JsonKey(name: 'corporation')
+  final String rawCorporation;
+  Corporation get corporation => Corporation.fromName(rawCorporation);
   @JsonKey(name: 'corporation_sub_type')
-  final CorporationSubType corporationSubType;
+  final String? rawCorporationSubType;
+  CorporationSubType? get corporationSubType => CorporationSubType.fromName(rawCorporationSubType);
   @JsonKey(name: 'cv_localkey')
   final String cvLocalkey;
   final String squad;
@@ -175,33 +184,33 @@ class NikkeCharacterData {
     this.additionalSkins = const [],
     this.nameCode = 0,
     this.order = 0,
-    this.originalRare = Rarity.unknown,
+    this.rawOriginalRare = '',
     this.gradeCoreId = 0,
     this.growGrade = 0,
     this.statEnhanceId = 0,
-    this.characterClass = NikkeClass.unknown,
+    this.rawCharacterClass = '',
     this.elementId = const [],
     this.criticalRatio = 0,
     this.criticalDamage = 0,
     this.shotId = 0,
     this.bonusRangeMin = 0,
     this.bonusRangeMax = 0,
-    this.useBurstSkill = BurstStep.unknown,
-    this.changeBurstStep = BurstStep.unknown,
+    this.rawUseBurstSkill = '',
+    this.rawChangeBurstStep = '',
     this.burstApplyDelay = 0,
     this.burstDuration = 0,
     this.ultiSkillId = 0,
     this.skill1Id = 0,
-    this.skill1Table = SkillType.unknown,
+    this.rawSkill1Table = '',
     this.skill2Id = 0,
-    this.skill2Table = SkillType.unknown,
+    this.rawSkill2Table = '',
     this.effCategoryType = '',
     this.effCategoryValue = 0,
     this.categoryType1 = '',
     this.categoryType2 = '',
     this.categoryType3 = '',
-    this.corporation = Corporation.unknown,
-    this.corporationSubType = CorporationSubType.none,
+    this.rawCorporation = '',
+    this.rawCorporationSubType,
     this.cvLocalkey = '',
     this.squad = '',
     this.pieceId = 0,
@@ -211,8 +220,6 @@ class NikkeCharacterData {
   });
 
   factory NikkeCharacterData.fromJson(Map<String, dynamic> json) => _$NikkeCharacterDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$NikkeCharacterDataToJson(this);
 
   bool get hasUnknownEnum {
     return originalRare == Rarity.unknown ||
@@ -224,9 +231,21 @@ class NikkeCharacterData {
 }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
-enum CorporationSubType { none, overspec }
+enum CorporationSubType {
+  unknown,
+  overspec;
 
-@JsonSerializable()
+  static final Map<String, CorporationSubType> _reverseMap = Map.fromIterable(
+    CorporationSubType.values,
+    key: (v) => (v as CorporationSubType).name.screamingSnake,
+  );
+
+  static CorporationSubType? fromName(String? name) {
+    return name == null ? null : _reverseMap[name] ?? CorporationSubType.unknown;
+  }
+}
+
+@JsonSerializable(createToJson: false)
 class WeaponData {
   final int id;
   @JsonKey(name: 'name_localkey')
@@ -236,23 +255,30 @@ class WeaponData {
   @JsonKey(name: 'camera_work')
   final String cameraWork;
   @JsonKey(name: 'weapon_type')
-  final WeaponType weaponType;
+  final String rawWeaponType;
+  WeaponType get weaponType => WeaponType.fromName(rawWeaponType);
   // Metal/Energy/Bio, probably not used
   @JsonKey(name: 'attack_type')
-  final AttackType attackType;
+  final String rawAttackType;
+  AttackType get attackType => AttackType.fromName(rawAttackType);
   // Metal_Type/Energy_Type, probably not used
   @JsonKey(name: 'counter_enermy')
   final String counterEnemy;
   @JsonKey(name: 'prefer_target')
-  final PreferTarget preferTarget;
+  final String rawPreferTarget;
+  PreferTarget get preferTarget => PreferTarget.fromName(rawPreferTarget);
   @JsonKey(name: 'prefer_target_condition')
-  final PreferTargetCondition preferTargetCondition;
+  final String rawPreferTargetCondition;
+  PreferTargetCondition get preferTargetCondition => PreferTargetCondition.fromName(rawPreferTargetCondition);
   @JsonKey(name: 'shot_timing')
-  final ShotTiming shotTiming;
+  final String rawShotTiming;
+  ShotTiming get shotTiming => ShotTiming.fromName(rawShotTiming);
   @JsonKey(name: 'fire_type')
-  final FireType fireType;
+  final String rawFireType;
+  FireType get fireType => FireType.fromName(rawFireType);
   @JsonKey(name: 'input_type')
-  final InputType inputType;
+  final String rawInputType;
+  InputType get inputType => InputType.fromName(rawInputType);
   @JsonKey(name: 'is_targeting')
   final bool isTargeting;
   final int damage;
@@ -346,14 +372,14 @@ class WeaponData {
     this.nameLocalkey = '',
     this.descriptionLocalkey = '',
     this.cameraWork = '',
-    this.weaponType = WeaponType.unknown,
-    this.attackType = AttackType.unknown,
+    this.rawWeaponType = '',
+    this.rawAttackType = '',
     this.counterEnemy = '',
-    this.preferTarget = PreferTarget.front,
-    this.preferTargetCondition = PreferTargetCondition.none,
-    this.shotTiming = ShotTiming.concurrence,
-    this.fireType = FireType.instant,
-    this.inputType = InputType.down,
+    this.rawPreferTarget = '',
+    this.rawPreferTargetCondition = '',
+    this.rawShotTiming = '',
+    this.rawFireType = '',
+    this.rawInputType = '',
     this.isTargeting = false,
     this.damage = 0,
     this.shotCount = 0,
@@ -401,11 +427,9 @@ class WeaponData {
   });
 
   factory WeaponData.fromJson(Map<String, dynamic> json) => _$WeaponDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$WeaponDataToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class CharacterStatData {
   final int id;
   final int group;
@@ -437,12 +461,10 @@ class CharacterStatData {
 
   factory CharacterStatData.fromJson(Map<String, dynamic> json) => _$CharacterStatDataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$CharacterStatDataToJson(this);
-
   static final emptyData = CharacterStatData();
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class CharacterStatEnhanceData {
   final int id;
   @JsonKey(name: 'grade_ratio')
@@ -491,8 +513,6 @@ class CharacterStatEnhanceData {
 
   factory CharacterStatEnhanceData.fromJson(Map<String, dynamic> json) => _$CharacterStatEnhanceDataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$CharacterStatEnhanceDataToJson(this);
-
   static final emptyData = CharacterStatEnhanceData();
 }
 
@@ -516,7 +536,7 @@ class ClassAttractiveStatData {
   static final emptyData = ClassAttractiveStatData();
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class AttractiveStatData {
   final int id;
   @JsonKey(name: 'attractive_level')
@@ -622,8 +642,6 @@ class AttractiveStatData {
 
   factory AttractiveStatData.fromJson(Map<String, dynamic> json) => _$AttractiveStatDataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$AttractiveStatDataToJson(this);
-
   ClassAttractiveStatData getStatData(NikkeClass nikkeClass) {
     return switch (nikkeClass) {
       NikkeClass.unknown => ClassAttractiveStatData.emptyData,
@@ -654,10 +672,34 @@ enum Rarity {
         return Colors.blue;
     }
   }
+
+  static final Map<String, Rarity> _reverseMap = Map.fromIterable(
+    Rarity.values,
+    key: (v) => (v as Rarity).name.screamingSnake,
+  );
+
+  static Rarity fromName(String? name) {
+    return _reverseMap[name] ?? Rarity.unknown;
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum StatType { atk, defence, hp, none, unknown }
+enum StatType {
+  atk,
+  defence,
+  hp,
+  none,
+  unknown;
+
+  static final Map<String, StatType> _reverseMap = Map.fromIterable(
+    StatType.values,
+    key: (v) => (v as StatType).name.pascal,
+  );
+
+  static StatType fromName(String? name) {
+    return _reverseMap[name] ?? StatType.unknown;
+  }
+}
 
 enum WeaponType {
   unknown(-1),
@@ -686,10 +728,34 @@ enum WeaponType {
   String toString() {
     return name.toUpperCase();
   }
+
+  static final Map<String, WeaponType> _reverseMap = Map.fromIterable(
+    WeaponType.values,
+    key: (v) => v == WeaponType.none ? 'None' : (v as WeaponType).name.screamingSnake,
+  );
+
+  static WeaponType fromName(String? name) {
+    return _reverseMap[name] ?? WeaponType.unknown;
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum NikkeClass { unknown, attacker, defender, supporter, all }
+enum NikkeClass {
+  unknown,
+  attacker,
+  defender,
+  supporter,
+  all;
+
+  static final Map<String, NikkeClass> _reverseMap = Map.fromIterable(
+    NikkeClass.values,
+    key: (v) => (v as NikkeClass).name.pascal,
+  );
+
+  static NikkeClass fromName(String? name) {
+    return _reverseMap[name] ?? NikkeClass.unknown;
+  }
+}
 
 enum NikkeElement {
   unknown(-1),
@@ -783,6 +849,15 @@ enum BurstStep {
         return 'ANY';
     }
   }
+
+  static final Map<String, BurstStep> _reverseMap = Map.fromIterable(
+    BurstStep.values,
+    key: (v) => (v as BurstStep).name.pascal,
+  );
+
+  static BurstStep fromName(String? name) {
+    return _reverseMap[name] ?? BurstStep.unknown;
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
@@ -798,6 +873,15 @@ enum Corporation {
   final int id;
 
   const Corporation(this.id);
+
+  static final Map<String, Corporation> _reverseMap = Map.fromIterable(
+    Corporation.values,
+    key: (v) => (v as Corporation).name.toUpperCase(),
+  );
+
+  static Corporation fromName(String? name) {
+    return _reverseMap[name] ?? Corporation.unknown;
+  }
 }
 
 enum RecycleStat {
@@ -855,7 +939,16 @@ enum PreferTarget {
   water,
   electronic,
   iron,
-  wind,
+  wind;
+
+  static final Map<String, PreferTarget> _reverseMap = Map.fromIterable(
+    PreferTarget.values,
+    key: (v) => (v as PreferTarget).name.pascal,
+  );
+
+  static PreferTarget fromName(String? name) {
+    return _reverseMap[name] ?? PreferTarget.unknown;
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
@@ -868,40 +961,117 @@ enum PreferTargetCondition {
   destroyCover,
   onlySG,
   onlyRL,
-  onlyAR,
+  onlyAR;
+
+  static final Map<String, PreferTargetCondition> _reverseMap = Map.fromIterable(
+    PreferTargetCondition.values,
+    key: (v) => (v as PreferTargetCondition).name.pascal,
+  );
+
+  static PreferTargetCondition fromName(String? name) {
+    return _reverseMap[name] ?? PreferTargetCondition.unknown;
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum ShotTiming { sequence, concurrence } // sequence only used for Vesti's Burst Skill
+enum ShotTiming {
+  unknown,
+  sequence, // sequence only used for Vesti's Burst Skill
+  concurrence;
+
+  static final Map<String, ShotTiming> _reverseMap = Map.fromIterable(
+    ShotTiming.values,
+    key: (v) => (v as ShotTiming).name.pascal,
+  );
+
+  static ShotTiming fromName(String? name) {
+    return _reverseMap[name] ?? ShotTiming.unknown;
+  }
+}
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum FireType {
+  unknown,
   instant, // All AR, SG, SR, MG (except Modernia burst)
   homingProjectile, // should be all other RLs
   mechaShiftyShot,
   multiTarget, // Modernia burst
   projectileCurve, // Cindy
   projectileDirect, // 5 RL occurrences (Laplace, Ynui Alt, Summer Neon burst, A2, SBS)
-  stickyProjectileDirect, // Rapi: Red Hood alt attack
+  stickyProjectileDirect // Rapi: Red Hood alt attack
+  ;
+
+  static final Map<String, FireType> _reverseMap = Map.fromIterable(
+    FireType.values,
+    key: (v) => (v as FireType).name.pascal,
+  );
+
+  static FireType fromName(String? name) {
+    return _reverseMap[name] ?? FireType.unknown;
+  }
 }
 
 enum InputType {
+  unknown,
   @JsonValue('DOWN')
   down,
   @JsonValue('DOWN_Charge')
   downCharge,
   @JsonValue('UP')
-  up,
+  up;
+
+  static final Map<String, InputType> _reverseMap = {
+    'DOWN': InputType.down,
+    'DOWN_Charge': InputType.downCharge,
+    'UP': InputType.up,
+  };
+
+  static InputType fromName(String? name) {
+    return _reverseMap[name] ?? InputType.unknown;
+  }
 }
 
 // "attackType": "{Fire, Energy, Water, Bio, Electronic, Wind, Iron}"
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum AttackType { fire, water, electronic, iron, wind, energy, bio, metal, unknown }
+enum AttackType {
+  fire,
+  water,
+  electronic,
+  iron,
+  wind,
+  energy,
+  bio,
+  metal,
+  unknown;
+
+  static final Map<String, AttackType> _reverseMap = Map.fromIterable(
+    AttackType.values,
+    key: (v) => (v as AttackType).name.pascal,
+  );
+
+  static AttackType fromName(String? name) {
+    return _reverseMap[name] ?? AttackType.unknown;
+  }
+}
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum SkillType { none, stateEffect, characterSkill, unknown }
+enum SkillType {
+  none,
+  stateEffect,
+  characterSkill,
+  unknown;
 
-@JsonSerializable()
+  static final Map<String, SkillType> _reverseMap = Map.fromIterable(
+    SkillType.values,
+    key: (v) => (v as SkillType).name.pascal,
+  );
+
+  static SkillType fromName(String? name) {
+    return _reverseMap[name] ?? SkillType.unknown;
+  }
+}
+
+@JsonSerializable(createToJson: false)
 class CoverStatData {
   final int id;
   final int lv;
@@ -913,6 +1083,4 @@ class CoverStatData {
   CoverStatData({this.id = 0, this.lv = 0, this.levelHp = 0, this.levelDefence = 0});
 
   factory CoverStatData.fromJson(Map<String, dynamic> json) => _$CoverStatDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CoverStatDataToJson(this);
 }

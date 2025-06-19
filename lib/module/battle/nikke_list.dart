@@ -350,7 +350,11 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
               titled: true,
               label: 'Attract',
               min: 1,
-              max: characterData?.corporationSubType == CorporationSubType.overspec ? 40 : 30,
+              max:
+                  characterData?.corporationSubType == CorporationSubType.overspec ||
+                          characterData?.corporation == Corporation.pilgrim
+                      ? 40
+                      : 30,
               value: option.attractLevel,
               valueFormatter: (v) => 'Lv$v',
               onChange: (newValue) {

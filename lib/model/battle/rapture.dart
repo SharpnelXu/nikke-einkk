@@ -13,6 +13,7 @@ import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 part '../../generated/model/battle/rapture.g.dart';
 
@@ -589,19 +590,19 @@ class BattleRapture extends BattleEntity {
               FunctionData(
                 id: -1,
                 groupId: -(action.setParameter! * 1000 + action.buffType!.index),
-                buff: action.isBuff! ? BuffType.buff : BuffType.deBuff,
-                buffRemove: BuffRemoveType.clear,
-                functionType: action.buffType!,
-                functionValueType: ValueType.percent,
+                rawBuffType: action.isBuff! ? BuffType.buff.name.pascal : BuffType.deBuff.name.pascal,
+                rawBuffRemove: BuffRemoveType.clear.name.pascal,
+                rawFunctionType: action.buffType!.jsonKey,
+                rawFunctionValueType: ValueType.percent.name.pascal,
                 functionValue: action.buffValue!,
-                functionStandard: StandardType.user,
+                rawFunctionStandard: StandardType.user.name.pascal,
                 fullCount: 999,
-                durationType: action.durationType!,
+                rawDurationType: action.durationType!.name.pascal,
                 durationValue: BattleUtils.frameToTimeData(action.frameDuration!, simulation.fps),
-                functionTarget: FunctionTargetType.self,
-                timingTriggerType: TimingTriggerType.none,
-                statusTriggerType: StatusTriggerType.none,
-                statusTrigger2Type: StatusTriggerType.none,
+                rawFunctionTarget: FunctionTargetType.self.name.pascal,
+                rawTimingTriggerType: TimingTriggerType.none.name.pascal,
+                rawStatusTriggerType: StatusTriggerType.none.name.pascal,
+                rawStatusTrigger2Type: StatusTriggerType.none.name.pascal,
               ),
               uniqueId,
               target.uniqueId,

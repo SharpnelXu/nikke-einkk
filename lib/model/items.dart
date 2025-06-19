@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
-
-import 'common.dart';
-
+import 'package:nikke_einkk/module/common/format_helper.dart';
 part '../generated/model/items.g.dart';
 
 // ItemEquipTable
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class EquipmentData {
   final int id;
   @JsonKey(name: 'name_localkey')
@@ -17,13 +16,17 @@ class EquipmentData {
   @JsonKey(name: 'resource_id')
   final String resourceId;
   @JsonKey(name: 'item_type')
-  final ItemType itemType;
+  final String rawItemType;
+  ItemType get itemType => ItemType.fromName(rawItemType);
   @JsonKey(name: 'item_sub_type')
-  final EquipType itemSubType;
-  @JsonKey(name: 'class', unknownEnumValue: NikkeClass.unknown)
-  final NikkeClass characterClass;
+  final String rawItemSubType;
+  EquipType get itemSubType => EquipType.fromName(rawItemSubType);
+  @JsonKey(name: 'class')
+  final String rawCharacterClass;
+  NikkeClass get characterClass => NikkeClass.fromName(rawCharacterClass);
   @JsonKey(name: 'item_rare')
-  final EquipRarity itemRarity;
+  final String rawItemRarity;
+  EquipRarity get itemRarity => EquipRarity.fromName(rawItemRarity);
   @JsonKey(name: 'grade_core_id')
   final int gradeCoreId;
   @JsonKey(name: 'grow_grade')
@@ -43,10 +46,10 @@ class EquipmentData {
     this.nameLocalkey = '',
     this.descriptionLocalkey = '',
     this.resourceId = '',
-    this.itemType = ItemType.equip,
-    this.itemSubType = EquipType.unknown,
-    this.characterClass = NikkeClass.unknown,
-    this.itemRarity = EquipRarity.unknown,
+    this.rawItemType = '',
+    this.rawItemSubType = '',
+    this.rawCharacterClass = '',
+    this.rawItemRarity = '',
     this.gradeCoreId = 0,
     this.growGrade = 0,
     this.stat = const [],
@@ -57,25 +60,23 @@ class EquipmentData {
   });
 
   factory EquipmentData.fromJson(Map<String, dynamic> json) => _$EquipmentDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$EquipmentDataToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class EquipmentStat {
   @JsonKey(name: 'stat_type')
-  final StatType statType;
+  final String rawStatType;
+  StatType get statType => StatType.fromName(rawStatType);
+
   @JsonKey(name: 'stat_value')
   final int statValue;
 
-  EquipmentStat({this.statType = StatType.none, this.statValue = 0});
+  EquipmentStat({this.rawStatType = '', this.statValue = 0});
 
   factory EquipmentStat.fromJson(Map<String, dynamic> json) => _$EquipmentStatFromJson(json);
-
-  Map<String, dynamic> toJson() => _$EquipmentStatToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class OptionSlot {
   @JsonKey(name: 'option_slot')
   final int optionSlot;
@@ -85,11 +86,23 @@ class OptionSlot {
   OptionSlot({this.optionSlot = 0, this.optionSlotSuccessRatio = 0});
 
   factory OptionSlot.fromJson(Map<String, dynamic> json) => _$OptionSlotFromJson(json);
-  Map<String, dynamic> toJson() => _$OptionSlotToJson(this);
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum ItemType { unknown, equip, harmonyCube }
+enum ItemType {
+  unknown,
+  equip,
+  harmonyCube;
+
+  static final Map<String, ItemType> _reverseMap = Map.fromIterable(
+    ItemType.values,
+    key: (v) => (v as ItemType).name.pascal,
+  );
+
+  static ItemType fromName(String? name) {
+    return _reverseMap[name] ?? ItemType.unknown;
+  }
+}
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
 enum EquipRarity {
@@ -142,6 +155,15 @@ enum EquipRarity {
     EquipRarity.unknown || EquipRarity.t1 || EquipRarity.t2 || EquipRarity.t3 || EquipRarity.t10 => false,
     EquipRarity.t4 || EquipRarity.t5 || EquipRarity.t6 || EquipRarity.t7 || EquipRarity.t8 || EquipRarity.t9 => true,
   };
+
+  static final Map<String, EquipRarity> _reverseMap = Map.fromIterable(
+    EquipRarity.values,
+    key: (v) => (v as EquipRarity).name.pascal,
+  );
+
+  static EquipRarity fromName(String? name) {
+    return _reverseMap[name] ?? EquipRarity.unknown;
+  }
 }
 
 enum EquipType {
@@ -153,7 +175,18 @@ enum EquipType {
   @JsonValue('Module_C')
   arm,
   @JsonValue('Module_D')
-  leg,
+  leg;
+
+  static final Map<String, EquipType> _reverseMap = {
+    'Module_A': EquipType.head,
+    'Module_B': EquipType.body,
+    'Module_C': EquipType.arm,
+    'Module_D': EquipType.leg,
+  };
+
+  static EquipType fromName(String? name) {
+    return _reverseMap[name] ?? EquipType.unknown;
+  }
 }
 
 /// from EquipmentOptionTable.json
@@ -239,7 +272,7 @@ class EquipLine {
   Map<String, dynamic> toJson() => _$EquipLineToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class HarmonyCubeSkillGroup {
   @JsonKey(name: 'skill_group_id')
   final int skillGroupId;
@@ -247,11 +280,9 @@ class HarmonyCubeSkillGroup {
   HarmonyCubeSkillGroup({this.skillGroupId = 0});
 
   factory HarmonyCubeSkillGroup.fromJson(Map<String, dynamic> json) => _$HarmonyCubeSkillGroupFromJson(json);
-
-  Map<String, dynamic> toJson() => _$HarmonyCubeSkillGroupToJson(this);
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(createToJson: false)
 class HarmonyCubeData {
   final int id;
   @JsonKey(name: 'name_localkey')
@@ -300,11 +331,9 @@ class HarmonyCubeData {
   });
 
   factory HarmonyCubeData.fromJson(Map<String, dynamic> json) => _$HarmonyCubeDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$HarmonyCubeDataToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class HarmonyCubeSkillLevel {
   @JsonKey(name: 'skill_level')
   final int level;
@@ -312,25 +341,22 @@ class HarmonyCubeSkillLevel {
   HarmonyCubeSkillLevel({this.level = 0});
 
   factory HarmonyCubeSkillLevel.fromJson(Map<String, dynamic> json) => _$HarmonyCubeSkillLevelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$HarmonyCubeSkillLevelToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class HarmonyCubeStat {
   @JsonKey(name: 'stat_type')
-  final StatType type;
+  final String rawType;
+  StatType get type => StatType.fromName(rawType);
   @JsonKey(name: 'stat_rate')
   final int rate;
 
-  HarmonyCubeStat({this.type = StatType.unknown, this.rate = 0});
+  HarmonyCubeStat({this.rawType = '', this.rate = 0});
 
   factory HarmonyCubeStat.fromJson(Map<String, dynamic> json) => _$HarmonyCubeStatFromJson(json);
-
-  Map<String, dynamic> toJson() => _$HarmonyCubeStatToJson(this);
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(createToJson: false)
 class HarmonyCubeLevelData {
   final int id;
   @JsonKey(name: 'level_enhance_id')
@@ -361,11 +387,9 @@ class HarmonyCubeLevelData {
   });
 
   factory HarmonyCubeLevelData.fromJson(Map<String, dynamic> json) => _$HarmonyCubeLevelDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$HarmonyCubeLevelDataToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class CollectionItemSkillGroup {
   @JsonKey(name: 'collection_skill_id')
   final int skillId;
@@ -373,30 +397,40 @@ class CollectionItemSkillGroup {
   CollectionItemSkillGroup({this.skillId = 0});
 
   factory CollectionItemSkillGroup.fromJson(Map<String, dynamic> json) => _$CollectionItemSkillGroupFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CollectionItemSkillGroupToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class FavoriteItemSkillGroup {
   @JsonKey(name: 'favorite_skill_id')
   final int skillId;
   @JsonKey(name: 'skill_table')
-  final SkillType skillTable;
+  final String rawSkillTable;
+  SkillType get skillTable => SkillType.fromName(rawSkillTable);
   @JsonKey(name: 'skill_change_slot')
   final int skillChangeSlot;
 
-  FavoriteItemSkillGroup({this.skillId = 0, this.skillTable = SkillType.none, this.skillChangeSlot = 0});
+  FavoriteItemSkillGroup({this.skillId = 0, this.rawSkillTable = '', this.skillChangeSlot = 0});
 
   factory FavoriteItemSkillGroup.fromJson(Map<String, dynamic> json) => _$FavoriteItemSkillGroupFromJson(json);
-
-  Map<String, dynamic> toJson() => _$FavoriteItemSkillGroupToJson(this);
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
-enum FavoriteItemType { collection, favorite }
+enum FavoriteItemType {
+  unknown,
+  collection,
+  favorite;
 
-@JsonSerializable(explicitToJson: true)
+  static final Map<String, FavoriteItemType> _reverseMap = Map.fromIterable(
+    FavoriteItemType.values,
+    key: (v) => (v as FavoriteItemType).name.pascal,
+  );
+
+  static FavoriteItemType fromName(String? name) {
+    return _reverseMap[name] ?? FavoriteItemType.unknown;
+  }
+}
+
+@JsonSerializable(createToJson: false)
 class FavoriteItemData {
   final int id;
   @JsonKey(name: 'name_localkey')
@@ -411,11 +445,14 @@ class FavoriteItemData {
   final String propResourceId;
   final int order;
   @JsonKey(name: 'favorite_rare')
-  final Rarity favoriteRare;
+  final String rawFavoriteRare;
+  Rarity get favoriteRare => Rarity.fromName(rawFavoriteRare);
   @JsonKey(name: 'favorite_type')
-  final FavoriteItemType favoriteType;
+  final String rawFavoriteType;
+  FavoriteItemType get favoriteType => FavoriteItemType.fromName(rawFavoriteType);
   @JsonKey(name: 'weapon_type')
-  final WeaponType weaponType;
+  final String rawWeaponType;
+  WeaponType get weaponType => WeaponType.fromName(rawWeaponType);
   @JsonKey(name: 'name_code')
   final int nameCode;
   @JsonKey(name: 'max_level')
@@ -439,9 +476,9 @@ class FavoriteItemData {
     this.imgResourceId = '',
     this.propResourceId = '',
     this.order = 0,
-    this.favoriteRare = Rarity.r,
-    this.favoriteType = FavoriteItemType.collection,
-    this.weaponType = WeaponType.none,
+    this.rawFavoriteRare = '',
+    this.rawFavoriteType = '',
+    this.rawWeaponType = '',
     this.nameCode = 0,
     this.maxLevel = 0,
     this.levelEnhanceId = 0,
@@ -452,25 +489,22 @@ class FavoriteItemData {
   });
 
   factory FavoriteItemData.fromJson(Map<String, dynamic> json) => _$FavoriteItemDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$FavoriteItemDataToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class FavoriteItemStat {
   @JsonKey(name: 'stat_type')
-  final StatType type;
+  final String rawType;
+  StatType get type => StatType.fromName(rawType);
   @JsonKey(name: 'stat_value')
   final int value;
 
-  FavoriteItemStat({this.type = StatType.unknown, this.value = 0});
+  FavoriteItemStat({this.rawType = '', this.value = 0});
 
   factory FavoriteItemStat.fromJson(Map<String, dynamic> json) => _$FavoriteItemStatFromJson(json);
-
-  Map<String, dynamic> toJson() => _$FavoriteItemStatToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class CollectionItemSkillLevel {
   @JsonKey(name: 'collection_skill_level')
   final int level;
@@ -478,11 +512,9 @@ class CollectionItemSkillLevel {
   CollectionItemSkillLevel({this.level = 0});
 
   factory CollectionItemSkillLevel.fromJson(Map<String, dynamic> json) => _$CollectionItemSkillLevelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$CollectionItemSkillLevelToJson(this);
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(createToJson: false)
 class FavoriteItemLevelData {
   final int id;
   @JsonKey(name: 'level_enhance_id')
@@ -504,8 +536,6 @@ class FavoriteItemLevelData {
   });
 
   factory FavoriteItemLevelData.fromJson(Map<String, dynamic> json) => _$FavoriteItemLevelDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$FavoriteItemLevelDataToJson(this);
 }
 
 /// cube table

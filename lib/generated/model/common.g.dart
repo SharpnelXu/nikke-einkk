@@ -14,36 +14,33 @@ NikkeCharacterData _$NikkeCharacterDataFromJson(Map<String, dynamic> json) => Ni
   additionalSkins: (json['additional_skins'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
   nameCode: (json['name_code'] as num?)?.toInt() ?? 0,
   order: (json['order'] as num?)?.toInt() ?? 0,
-  originalRare: $enumDecodeNullable(_$RarityEnumMap, json['original_rare']) ?? Rarity.unknown,
+  rawOriginalRare: json['original_rare'] as String? ?? '',
   gradeCoreId: (json['grade_core_id'] as num?)?.toInt() ?? 0,
   growGrade: (json['grow_grade'] as num?)?.toInt() ?? 0,
   statEnhanceId: (json['stat_enhance_id'] as num?)?.toInt() ?? 0,
-  characterClass: $enumDecodeNullable(_$NikkeClassEnumMap, json['class']) ?? NikkeClass.unknown,
+  rawCharacterClass: json['class'] as String? ?? '',
   elementId: (json['element_id'] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList() ?? const [],
   criticalRatio: (json['critical_ratio'] as num?)?.toInt() ?? 0,
   criticalDamage: (json['critical_damage'] as num?)?.toInt() ?? 0,
   shotId: (json['shot_id'] as num?)?.toInt() ?? 0,
   bonusRangeMin: (json['bonusrange_min'] as num?)?.toInt() ?? 0,
   bonusRangeMax: (json['bonusrange_max'] as num?)?.toInt() ?? 0,
-  useBurstSkill: $enumDecodeNullable(_$BurstStepEnumMap, json['use_burst_skill']) ?? BurstStep.unknown,
-  changeBurstStep: $enumDecodeNullable(_$BurstStepEnumMap, json['change_burst_step']) ?? BurstStep.unknown,
+  rawUseBurstSkill: json['use_burst_skill'] as String? ?? '',
+  rawChangeBurstStep: json['change_burst_step'] as String? ?? '',
   burstApplyDelay: (json['burst_apply_delay'] as num?)?.toInt() ?? 0,
   burstDuration: (json['burst_duration'] as num?)?.toInt() ?? 0,
   ultiSkillId: (json['ulti_skill_id'] as num?)?.toInt() ?? 0,
   skill1Id: (json['skill1_id'] as num?)?.toInt() ?? 0,
-  skill1Table: $enumDecodeNullable(_$SkillTypeEnumMap, json['skill1_table']) ?? SkillType.unknown,
+  rawSkill1Table: json['skill1_table'] as String? ?? '',
   skill2Id: (json['skill2_id'] as num?)?.toInt() ?? 0,
-  skill2Table: $enumDecodeNullable(_$SkillTypeEnumMap, json['skill2_table']) ?? SkillType.unknown,
+  rawSkill2Table: json['skill2_table'] as String? ?? '',
   effCategoryType: json['eff_category_type'] as String? ?? '',
   effCategoryValue: (json['eff_category_value'] as num?)?.toInt() ?? 0,
   categoryType1: json['category_type_1'] as String? ?? '',
   categoryType2: json['category_type_2'] as String? ?? '',
   categoryType3: json['category_type_3'] as String? ?? '',
-  corporation:
-      $enumDecodeNullable(_$CorporationEnumMap, json['corporation'], unknownValue: Corporation.unknown) ??
-      Corporation.unknown,
-  corporationSubType:
-      $enumDecodeNullable(_$CorporationSubTypeEnumMap, json['corporation_sub_type']) ?? CorporationSubType.none,
+  rawCorporation: json['corporation'] as String? ?? '',
+  rawCorporationSubType: json['corporation_sub_type'] as String?,
   cvLocalkey: json['cv_localkey'] as String? ?? '',
   squad: json['squad'] as String? ?? '',
   pieceId: (json['piece_id'] as num?)?.toInt() ?? 0,
@@ -52,104 +49,19 @@ NikkeCharacterData _$NikkeCharacterDataFromJson(Map<String, dynamic> json) => Ni
   isDetailClose: json['is_detail_close'] as bool? ?? false,
 );
 
-Map<String, dynamic> _$NikkeCharacterDataToJson(NikkeCharacterData instance) => <String, dynamic>{
-  'id': instance.id,
-  'name_localkey': instance.nameLocalkey,
-  'description_localkey': instance.descriptionLocalkey,
-  'resource_id': instance.resourceId,
-  'additional_skins': instance.additionalSkins,
-  'name_code': instance.nameCode,
-  'order': instance.order,
-  'original_rare': _$RarityEnumMap[instance.originalRare]!,
-  'grade_core_id': instance.gradeCoreId,
-  'grow_grade': instance.growGrade,
-  'stat_enhance_id': instance.statEnhanceId,
-  'class': _$NikkeClassEnumMap[instance.characterClass]!,
-  'element_id': instance.elementId,
-  'critical_ratio': instance.criticalRatio,
-  'critical_damage': instance.criticalDamage,
-  'shot_id': instance.shotId,
-  'bonusrange_min': instance.bonusRangeMin,
-  'bonusrange_max': instance.bonusRangeMax,
-  'use_burst_skill': _$BurstStepEnumMap[instance.useBurstSkill]!,
-  'change_burst_step': _$BurstStepEnumMap[instance.changeBurstStep]!,
-  'burst_apply_delay': instance.burstApplyDelay,
-  'burst_duration': instance.burstDuration,
-  'ulti_skill_id': instance.ultiSkillId,
-  'skill1_id': instance.skill1Id,
-  'skill1_table': _$SkillTypeEnumMap[instance.skill1Table]!,
-  'skill2_id': instance.skill2Id,
-  'skill2_table': _$SkillTypeEnumMap[instance.skill2Table]!,
-  'eff_category_type': instance.effCategoryType,
-  'eff_category_value': instance.effCategoryValue,
-  'category_type_1': instance.categoryType1,
-  'category_type_2': instance.categoryType2,
-  'category_type_3': instance.categoryType3,
-  'corporation': _$CorporationEnumMap[instance.corporation]!,
-  'corporation_sub_type': _$CorporationSubTypeEnumMap[instance.corporationSubType]!,
-  'cv_localkey': instance.cvLocalkey,
-  'squad': instance.squad,
-  'piece_id': instance.pieceId,
-  'is_visible': instance.isVisible,
-  'prism_is_active': instance.prismIsActive,
-  'is_detail_close': instance.isDetailClose,
-};
-
-const _$RarityEnumMap = {Rarity.unknown: 'UNKNOWN', Rarity.ssr: 'SSR', Rarity.sr: 'SR', Rarity.r: 'R'};
-
-const _$NikkeClassEnumMap = {
-  NikkeClass.unknown: 'Unknown',
-  NikkeClass.attacker: 'Attacker',
-  NikkeClass.defender: 'Defender',
-  NikkeClass.supporter: 'Supporter',
-  NikkeClass.all: 'All',
-};
-
-const _$BurstStepEnumMap = {
-  BurstStep.unknown: 'Unknown',
-  BurstStep.step1: 'Step1',
-  BurstStep.step2: 'Step2',
-  BurstStep.step3: 'Step3',
-  BurstStep.stepFull: 'StepFull',
-  BurstStep.allStep: 'AllStep',
-  BurstStep.nextStep: 'NextStep',
-  BurstStep.none: 'None',
-};
-
-const _$SkillTypeEnumMap = {
-  SkillType.none: 'None',
-  SkillType.stateEffect: 'StateEffect',
-  SkillType.characterSkill: 'CharacterSkill',
-  SkillType.unknown: 'Unknown',
-};
-
-const _$CorporationEnumMap = {
-  Corporation.unknown: 'UNKNOWN',
-  Corporation.none: 'NONE',
-  Corporation.missilis: 'MISSILIS',
-  Corporation.elysion: 'ELYSION',
-  Corporation.tetra: 'TETRA',
-  Corporation.pilgrim: 'PILGRIM',
-  Corporation.abnormal: 'ABNORMAL',
-};
-
-const _$CorporationSubTypeEnumMap = {CorporationSubType.none: 'NONE', CorporationSubType.overspec: 'OVERSPEC'};
-
 WeaponData _$WeaponDataFromJson(Map<String, dynamic> json) => WeaponData(
   id: (json['id'] as num?)?.toInt() ?? 0,
   nameLocalkey: json['name_localkey'] as String? ?? '',
   descriptionLocalkey: json['description_localkey'] as String? ?? '',
   cameraWork: json['camera_work'] as String? ?? '',
-  weaponType: $enumDecodeNullable(_$WeaponTypeEnumMap, json['weapon_type']) ?? WeaponType.unknown,
-  attackType: $enumDecodeNullable(_$AttackTypeEnumMap, json['attack_type']) ?? AttackType.unknown,
+  rawWeaponType: json['weapon_type'] as String? ?? '',
+  rawAttackType: json['attack_type'] as String? ?? '',
   counterEnemy: json['counter_enermy'] as String? ?? '',
-  preferTarget: $enumDecodeNullable(_$PreferTargetEnumMap, json['prefer_target']) ?? PreferTarget.front,
-  preferTargetCondition:
-      $enumDecodeNullable(_$PreferTargetConditionEnumMap, json['prefer_target_condition']) ??
-      PreferTargetCondition.none,
-  shotTiming: $enumDecodeNullable(_$ShotTimingEnumMap, json['shot_timing']) ?? ShotTiming.concurrence,
-  fireType: $enumDecodeNullable(_$FireTypeEnumMap, json['fire_type']) ?? FireType.instant,
-  inputType: $enumDecodeNullable(_$InputTypeEnumMap, json['input_type']) ?? InputType.down,
+  rawPreferTarget: json['prefer_target'] as String? ?? '',
+  rawPreferTargetCondition: json['prefer_target_condition'] as String? ?? '',
+  rawShotTiming: json['shot_timing'] as String? ?? '',
+  rawFireType: json['fire_type'] as String? ?? '',
+  rawInputType: json['input_type'] as String? ?? '',
   isTargeting: json['is_targeting'] as bool? ?? false,
   damage: (json['damage'] as num?)?.toInt() ?? 0,
   shotCount: (json['shot_count'] as num?)?.toInt() ?? 0,
@@ -198,146 +110,6 @@ WeaponData _$WeaponDataFromJson(Map<String, dynamic> json) => WeaponData(
   shakeWeight: (json['ShakeWeight'] as num?)?.toInt() ?? 0,
 );
 
-Map<String, dynamic> _$WeaponDataToJson(WeaponData instance) => <String, dynamic>{
-  'id': instance.id,
-  'name_localkey': instance.nameLocalkey,
-  'description_localkey': instance.descriptionLocalkey,
-  'camera_work': instance.cameraWork,
-  'weapon_type': _$WeaponTypeEnumMap[instance.weaponType]!,
-  'attack_type': _$AttackTypeEnumMap[instance.attackType]!,
-  'counter_enermy': instance.counterEnemy,
-  'prefer_target': _$PreferTargetEnumMap[instance.preferTarget]!,
-  'prefer_target_condition': _$PreferTargetConditionEnumMap[instance.preferTargetCondition]!,
-  'shot_timing': _$ShotTimingEnumMap[instance.shotTiming]!,
-  'fire_type': _$FireTypeEnumMap[instance.fireType]!,
-  'input_type': _$InputTypeEnumMap[instance.inputType]!,
-  'is_targeting': instance.isTargeting,
-  'damage': instance.damage,
-  'shot_count': instance.shotCount,
-  'muzzle_count': instance.muzzleCount,
-  'multi_target_count': instance.multiTargetCount,
-  'center_shot_count': instance.centerShotCount,
-  'max_ammo': instance.maxAmmo,
-  'maintain_fire_stance': instance.maintainFireStance,
-  'uptype_fire_timing': instance.upTypeFireTiming,
-  'reload_time': instance.reloadTime,
-  'reload_bullet': instance.reloadBullet,
-  'reload_start_ammo': instance.reloadStartAmmo,
-  'rate_of_fire_reset_time': instance.rateOfFireResetTime,
-  'rate_of_fire': instance.rateOfFire,
-  'end_rate_of_fire': instance.endRateOfFire,
-  'rate_of_fire_change_pershot': instance.rateOfFireChangePerShot,
-  'burst_energy_pershot': instance.burstEnergyPerShot,
-  'target_burst_energy_pershot': instance.targetBurstEnergyPerShot,
-  'spot_first_delay': instance.spotFirstDelay,
-  'spot_last_delay': instance.spotLastDelay,
-  'start_accuracy_circle_scale': instance.startAccuracyCircleScale,
-  'end_accuracy_circle_scale': instance.endAccuracyCircleScale,
-  'accuracy_change_pershot': instance.accuracyChangePerShot,
-  'accuracy_change_speed': instance.accuracyChangeSpeed,
-  'auto_start_accuracy_circle_scale': instance.autoStartAccuracyCircleScale,
-  'auto_end_accuracy_circle_scale': instance.autoEndAccuracyCircleScale,
-  'auto_accuracy_change_pershot': instance.autoAccuracyChangePerShot,
-  'auto_accuracy_change_speed': instance.autoAccuracyChangeSpeed,
-  'zoom_rate': instance.zoomRate,
-  'multi_aim_range': instance.multiAimRange,
-  'spot_projectile_speed': instance.spotProjectileSpeed,
-  'charge_time': instance.chargeTime,
-  'full_charge_damage': instance.fullChargeDamage,
-  'full_charge_burst_energy': instance.fullChargeBurstEnergy,
-  'spot_radius_object': instance.spotRadiusObject,
-  'spot_radius': instance.spotRadius,
-  'spot_explosion_range': instance.spotExplosionRange,
-  'core_damage_rate': instance.coreDamageRate,
-  'penetration': instance.penetration,
-  'use_function_id_list': instance.useFunctionIdList,
-  'hurt_function_id_list': instance.hurtFunctionIdList,
-  'shake_id': instance.shakeId,
-  'ShakeType': instance.shakeType,
-  'ShakeWeight': instance.shakeWeight,
-};
-
-const _$WeaponTypeEnumMap = {
-  WeaponType.unknown: 'unknown',
-  WeaponType.none: 'None',
-  WeaponType.ar: 'AR',
-  WeaponType.mg: 'MG',
-  WeaponType.rl: 'RL',
-  WeaponType.sg: 'SG',
-  WeaponType.smg: 'SMG',
-  WeaponType.sr: 'SR',
-};
-
-const _$AttackTypeEnumMap = {
-  AttackType.fire: 'Fire',
-  AttackType.water: 'Water',
-  AttackType.electronic: 'Electronic',
-  AttackType.iron: 'Iron',
-  AttackType.wind: 'Wind',
-  AttackType.energy: 'Energy',
-  AttackType.bio: 'Bio',
-  AttackType.metal: 'Metal',
-  AttackType.unknown: 'Unknown',
-};
-
-const _$PreferTargetEnumMap = {
-  PreferTarget.unknown: 'Unknown',
-  PreferTarget.targetAR: 'TargetAR',
-  PreferTarget.targetGL: 'TargetGL',
-  PreferTarget.targetPS: 'TargetPS',
-  PreferTarget.random: 'Random',
-  PreferTarget.back: 'Back',
-  PreferTarget.front: 'Front',
-  PreferTarget.haveDebuff: 'HaveDebuff',
-  PreferTarget.longInitChargeTime: 'LongInitChargeTime',
-  PreferTarget.highAttack: 'HighAttack',
-  PreferTarget.highAttackFirstSelf: 'HighAttackFirstSelf',
-  PreferTarget.highAttackLastSelf: 'HighAttackLastSelf',
-  PreferTarget.highDefence: 'HighDefence',
-  PreferTarget.highHP: 'HighHP',
-  PreferTarget.highMaxHP: 'HighMaxHP',
-  PreferTarget.lowDefence: 'LowDefence',
-  PreferTarget.lowHP: 'LowHP',
-  PreferTarget.lowHPCover: 'LowHPCover',
-  PreferTarget.lowHPLastSelf: 'LowHPLastSelf',
-  PreferTarget.lowHPRatio: 'LowHPRatio',
-  PreferTarget.nearAim: 'NearAim',
-  PreferTarget.attacker: 'Attacker',
-  PreferTarget.defender: 'Defender',
-  PreferTarget.supporter: 'Supporter',
-  PreferTarget.fire: 'Fire',
-  PreferTarget.water: 'Water',
-  PreferTarget.electronic: 'Electronic',
-  PreferTarget.iron: 'Iron',
-  PreferTarget.wind: 'Wind',
-};
-
-const _$PreferTargetConditionEnumMap = {
-  PreferTargetCondition.unknown: 'Unknown',
-  PreferTargetCondition.none: 'None',
-  PreferTargetCondition.includeNoneTargetLast: 'IncludeNoneTargetLast',
-  PreferTargetCondition.includeNoneTargetNone: 'IncludeNoneTargetNone',
-  PreferTargetCondition.excludeSelf: 'ExcludeSelf',
-  PreferTargetCondition.destroyCover: 'DestroyCover',
-  PreferTargetCondition.onlySG: 'OnlySG',
-  PreferTargetCondition.onlyRL: 'OnlyRL',
-  PreferTargetCondition.onlyAR: 'OnlyAR',
-};
-
-const _$ShotTimingEnumMap = {ShotTiming.sequence: 'Sequence', ShotTiming.concurrence: 'Concurrence'};
-
-const _$FireTypeEnumMap = {
-  FireType.instant: 'Instant',
-  FireType.homingProjectile: 'HomingProjectile',
-  FireType.mechaShiftyShot: 'MechaShiftyShot',
-  FireType.multiTarget: 'MultiTarget',
-  FireType.projectileCurve: 'ProjectileCurve',
-  FireType.projectileDirect: 'ProjectileDirect',
-  FireType.stickyProjectileDirect: 'StickyProjectileDirect',
-};
-
-const _$InputTypeEnumMap = {InputType.down: 'DOWN', InputType.downCharge: 'DOWN_Charge', InputType.up: 'UP'};
-
 CharacterStatData _$CharacterStatDataFromJson(Map<String, dynamic> json) => CharacterStatData(
   id: (json['id'] as num?)?.toInt() ?? 0,
   group: (json['group'] as num?)?.toInt() ?? 0,
@@ -349,18 +121,6 @@ CharacterStatData _$CharacterStatDataFromJson(Map<String, dynamic> json) => Char
   metalResist: (json['level_metal_resist'] as num?)?.toInt() ?? 0,
   bioResist: (json['level_bio_resist'] as num?)?.toInt() ?? 0,
 );
-
-Map<String, dynamic> _$CharacterStatDataToJson(CharacterStatData instance) => <String, dynamic>{
-  'id': instance.id,
-  'group': instance.group,
-  'level': instance.level,
-  'level_hp': instance.hp,
-  'level_attack': instance.attack,
-  'level_defence': instance.defence,
-  'level_energy_resist': instance.energyResist,
-  'level_metal_resist': instance.metalResist,
-  'level_bio_resist': instance.bioResist,
-};
 
 CharacterStatEnhanceData _$CharacterStatEnhanceDataFromJson(Map<String, dynamic> json) => CharacterStatEnhanceData(
   id: (json['id'] as num?)?.toInt() ?? 0,
@@ -378,23 +138,6 @@ CharacterStatEnhanceData _$CharacterStatEnhanceDataFromJson(Map<String, dynamic>
   coreMetalResist: (json['core_metal_resist'] as num?)?.toInt() ?? 0,
   coreBioResist: (json['core_bio_resist'] as num?)?.toInt() ?? 0,
 );
-
-Map<String, dynamic> _$CharacterStatEnhanceDataToJson(CharacterStatEnhanceData instance) => <String, dynamic>{
-  'id': instance.id,
-  'grade_ratio': instance.gradeRatio,
-  'grade_hp': instance.gradeHp,
-  'grade_attack': instance.gradeAttack,
-  'grade_defence': instance.gradeDefence,
-  'grade_energy_resist': instance.gradeEnergyResist,
-  'grade_metal_resist': instance.gradeMetalResist,
-  'grade_bio_resist': instance.gradeBioResist,
-  'core_hp': instance.coreHp,
-  'core_attack': instance.coreAttack,
-  'core_defence': instance.coreDefence,
-  'core_energy_resist': instance.coreEnergyResist,
-  'core_metal_resist': instance.coreMetalResist,
-  'core_bio_resist': instance.coreBioResist,
-};
 
 AttractiveStatData _$AttractiveStatDataFromJson(Map<String, dynamic> json) => AttractiveStatData(
   id: (json['id'] as num?)?.toInt() ?? 0,
@@ -420,40 +163,9 @@ AttractiveStatData _$AttractiveStatDataFromJson(Map<String, dynamic> json) => At
   supporterBioResistRate: (json['supporter_bio_resist_rate'] as num?)?.toInt() ?? 0,
 );
 
-Map<String, dynamic> _$AttractiveStatDataToJson(AttractiveStatData instance) => <String, dynamic>{
-  'id': instance.id,
-  'attractive_level': instance.attractiveLevel,
-  'attractive_point': instance.attractivePoint,
-  'attacker_hp_rate': instance.attackerHpRate,
-  'attacker_attack_rate': instance.attackerAttackRate,
-  'attacker_defence_rate': instance.attackerDefenceRate,
-  'attacker_energy_resist_rate': instance.attackerEnergyResistRate,
-  'attacker_metal_resist_rate': instance.attackerMetalResistRate,
-  'attacker_bio_resist_rate': instance.attackerBioResistRate,
-  'defender_hp_rate': instance.defenderHpRate,
-  'defender_attack_rate': instance.defenderAttackRate,
-  'defender_defence_rate': instance.defenderDefenceRate,
-  'defender_energy_resist_rate': instance.defenderEnergyResistRate,
-  'defender_metal_resist_rate': instance.defenderMetalResistRate,
-  'defender_bio_resist_rate': instance.defenderBioResistRate,
-  'supporter_hp_rate': instance.supporterHpRate,
-  'supporter_attack_rate': instance.supporterAttackRate,
-  'supporter_defence_rate': instance.supporterDefenceRate,
-  'supporter_energy_resist_rate': instance.supporterEnergyResistRate,
-  'supporter_metal_resist_rate': instance.supporterMetalResistRate,
-  'supporter_bio_resist_rate': instance.supporterBioResistRate,
-};
-
 CoverStatData _$CoverStatDataFromJson(Map<String, dynamic> json) => CoverStatData(
   id: (json['id'] as num?)?.toInt() ?? 0,
   lv: (json['lv'] as num?)?.toInt() ?? 0,
   levelHp: (json['level_hp'] as num?)?.toInt() ?? 0,
   levelDefence: (json['level_defence'] as num?)?.toInt() ?? 0,
 );
-
-Map<String, dynamic> _$CoverStatDataToJson(CoverStatData instance) => <String, dynamic>{
-  'id': instance.id,
-  'lv': instance.lv,
-  'level_hp': instance.levelHp,
-  'level_defence': instance.levelDefence,
-};
