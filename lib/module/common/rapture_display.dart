@@ -6,6 +6,7 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/monster.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
+import 'package:nikke_einkk/module/common/skill_display.dart';
 
 class RaptureLeveledDataDisplay extends StatelessWidget {
   final bool useGlobal;
@@ -48,7 +49,7 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (ctx) => RaptureDataDisplay(useGlobal: useGlobal, data: data)),
+                MaterialPageRoute(builder: (ctx) => RaptureDataDisplayPage(useGlobal: useGlobal, data: data)),
               );
             },
             icon: Icon(Icons.search),
@@ -166,17 +167,17 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
   }
 }
 
-class RaptureDataDisplay extends StatefulWidget {
+class RaptureDataDisplayPage extends StatefulWidget {
   final bool useGlobal;
   final MonsterData data;
 
-  const RaptureDataDisplay({super.key, required this.useGlobal, required this.data});
+  const RaptureDataDisplayPage({super.key, required this.useGlobal, required this.data});
 
   @override
-  State<RaptureDataDisplay> createState() => _RaptureDataDisplayState();
+  State<RaptureDataDisplayPage> createState() => _RaptureDataDisplayPageState();
 }
 
-class _RaptureDataDisplayState extends State<RaptureDataDisplay> {
+class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
   NikkeDatabaseV2 get db => widget.useGlobal ? global : cn;
 
   @override
@@ -215,6 +216,18 @@ class _RaptureDataDisplayState extends State<RaptureDataDisplay> {
               Text('Damage HP Ratio: ${(part.damageHpRatio / 100).toStringAsFixed(2)}%'),
               Text('ATK Ratio: ${(part.attackRatio / 100).toStringAsFixed(2)}%'),
               Text('DEF Ratio: ${(part.defenceRatio / 100).toStringAsFixed(2)}%'),
+              if (part.passiveSkillId != 0 && db.stateEffectTable[part.passiveSkillId] != null)
+                Container(
+                  padding: const EdgeInsets.all(3.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey, width: 2),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: StateEffectDataDisplay(
+                    data: db.stateEffectTable[part.passiveSkillId]!,
+                    useGlobal: widget.useGlobal,
+                  ),
+                ),
             ],
           ),
         ),

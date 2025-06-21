@@ -179,6 +179,13 @@ class StateEffectData {
   final List<SkillFunction> functions;
   final String icon;
 
+  List<int> get allValidFuncIds =>
+      [
+        ...useFunctionIdList,
+        ...hurtFunctionIdList,
+        ...functions.map((func) => func.function),
+      ].where((id) => id != 0).toList();
+
   StateEffectData({
     this.id = 0,
     this.useFunctionIdList = const [],
@@ -623,7 +630,7 @@ class FunctionData {
   final int groupId;
   final int level;
   @JsonKey(name: 'name_localkey')
-  final String nameLocalkey;
+  final String? nameLocalkey;
   // equipment lines are BuffEtc
   @JsonKey(name: 'buff')
   final String rawBuffType;
@@ -767,7 +774,7 @@ class FunctionData {
     this.id = 0,
     this.groupId = 0,
     this.level = 0,
-    this.nameLocalkey = '',
+    this.nameLocalkey,
     this.rawBuffType = '',
     this.rawBuffRemove = '',
     this.rawFunctionType = '',

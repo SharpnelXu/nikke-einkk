@@ -58,7 +58,7 @@ FunctionData _$FunctionDataFromJson(Map<String, dynamic> json) => FunctionData(
   id: (json['id'] as num?)?.toInt() ?? 0,
   groupId: (json['group_id'] as num?)?.toInt() ?? 0,
   level: (json['level'] as num?)?.toInt() ?? 0,
-  nameLocalkey: json['name_localkey'] as String? ?? '',
+  nameLocalkey: json['name_localkey'] as String?,
   rawBuffType: json['buff'] as String? ?? '',
   rawBuffRemove: json['buff_remove'] as String? ?? '',
   rawFunctionType: json['function_type'] as String? ?? '',
