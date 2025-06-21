@@ -911,6 +911,7 @@ enum RecycleStat {
 enum PreferTarget {
   unknown,
 
+  none,
   targetAR,
   targetGL,
   targetPS,
@@ -919,6 +920,7 @@ enum PreferTarget {
   back,
   front,
   haveDebuff,
+  notStun,
   longInitChargeTime,
 
   highAttack,
@@ -1001,8 +1003,19 @@ enum FireType {
   multiTarget, // Modernia burst
   projectileCurve, // Cindy
   projectileDirect, // 5 RL occurrences (Laplace, Ynui Alt, Summer Neon burst, A2, SBS)
-  stickyProjectileDirect // Rapi: Red Hood alt attack
-  ;
+  stickyProjectileDirect, // Rapi: Red Hood alt attack
+
+  range,
+  instantAll,
+  suicide,
+  calling,
+  barrier,
+  normalCalling,
+  instantAll_FrontRay,
+  objectCreate,
+  objectCreateToDecoy,
+  instantNumber,
+  projectileCurveV2;
 
   static final Map<String, FireType> _reverseMap = Map.fromIterable(
     FireType.values,
@@ -1045,7 +1058,8 @@ enum AttackType {
   energy,
   bio,
   metal,
-  unknown;
+  unknown,
+  none;
 
   static final Map<String, AttackType> _reverseMap = Map.fromIterable(
     AttackType.values,

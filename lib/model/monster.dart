@@ -1,9 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/skills.dart';
 
 part '../generated/model/monster.g.dart';
 
 @JsonSerializable(createToJson: false)
-class MonsterSkillData {
+class MonsterSkillInfoData {
   @JsonKey(name: 'skill_id')
   final int skillId;
   @JsonKey(name: 'use_function_id_skill')
@@ -11,9 +13,11 @@ class MonsterSkillData {
   @JsonKey(name: 'hurt_function_id_skill')
   final List<int> hurtFunctionIds;
 
-  MonsterSkillData({this.skillId = 0, this.useFunctionIds = const [], this.hurtFunctionIds = const []});
+  List<int> get validFunctionIds => [...useFunctionIds, ...hurtFunctionIds].where((id) => id != 0).toList();
 
-  factory MonsterSkillData.fromJson(Map<String, dynamic> json) => _$MonsterSkillDataFromJson(json);
+  MonsterSkillInfoData({this.skillId = 0, this.useFunctionIds = const [], this.hurtFunctionIds = const []});
+
+  factory MonsterSkillInfoData.fromJson(Map<String, dynamic> json) => _$MonsterSkillInfoDataFromJson(json);
 }
 
 @JsonSerializable(explicitToJson: true, createToJson: false)
@@ -72,9 +76,10 @@ class MonsterData {
   @JsonKey(name: 'spot_rand_ratio_teleport')
   final int spotRandRatioTeleport;
   @JsonKey(name: 'skill_data')
-  final List<MonsterSkillData> skillData;
+  final List<MonsterSkillInfoData> skillData;
   @JsonKey(name: 'statenhance_id')
   final int statEnhanceId;
+  List<MonsterSkillInfoData> get validSkillData => skillData.where((data) => data.skillId != 0).toList();
 
   MonsterData({
     this.id = 0,
@@ -267,4 +272,146 @@ class MonsterStageLevelChangeData {
 
   factory MonsterStageLevelChangeData.fromJson(Map<String, dynamic> json) =>
       _$MonsterStageLevelChangeDataFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class MonsterSkillData {
+  final int id;
+  @JsonKey(name: 'name_localkey')
+  final String? nameKey;
+  @JsonKey(name: 'description_localkey')
+  final String? descriptionKey;
+  @JsonKey(name: 'skill_icon')
+  final String skillIcon;
+  @JsonKey(name: 'skill_ani_number')
+  final String animationNumber;
+  @JsonKey(name: 'weapon_type')
+  final String weaponType;
+  @JsonKey(name: 'prefer_target')
+  final String rawPreferTarget;
+  PreferTarget get preferTarget => PreferTarget.fromName(rawPreferTarget);
+  @JsonKey(name: 'show_lock_on')
+  final bool showLockOn;
+  @JsonKey(name: 'attack_type')
+  final String rawAttackType;
+  AttackType get attackType => AttackType.fromName(rawAttackType);
+  @JsonKey(name: 'fire_type')
+  final String rawFireType;
+  FireType get fireType => FireType.fromName(rawFireType);
+  @JsonKey(name: 'casting_time')
+  final int castingTime;
+  @JsonKey(name: 'break_object')
+  final List<String> breakObjects;
+  @JsonKey(name: 'break_object_hp_raito')
+  final int breakObjectHpRatio;
+  @JsonKey(name: 'skill_value_type_01')
+  final String rawSkillValueType1;
+  ValueType get skillValueType1 => ValueType.fromName(rawSkillValueType1);
+  @JsonKey(name: 'skill_value_01')
+  final int skillValue1;
+  @JsonKey(name: 'skill_value_type_02')
+  final String rawSkillValueType2;
+  ValueType get skillValueType2 => ValueType.fromName(rawSkillValueType2);
+  @JsonKey(name: 'skill_value_02')
+  final int skillValue2;
+  @JsonKey(name: 'shot_count')
+  final int shotCount;
+  @JsonKey(name: 'delay_time')
+  final int delayTime;
+  @JsonKey(name: 'shot_timing')
+  final String shotTiming;
+  final int penetration;
+  @JsonKey(name: 'projectile_speed')
+  final int projectileSpeed;
+  @JsonKey(name: 'projectile_hp_ratio')
+  final int projectileHpRatio;
+  @JsonKey(name: 'projectile_radius_object')
+  final int projectileRadiusObject;
+  @JsonKey(name: 'projectile_radius')
+  final int projectileRadius;
+  @JsonKey(name: 'spot_explosion_range')
+  final int explosionRange;
+  @JsonKey(name: 'is_destroyable_projectile')
+  final bool isDestroyableProjectile;
+  @JsonKey(name: 'relate_anim')
+  final bool relateAnim;
+  @JsonKey(name: 'deceleration_rate')
+  final int decelerationRate;
+  @JsonKey(name: 'target_character_ratio')
+  final int targetCharacterRatio;
+  @JsonKey(name: 'target_cover_ratio')
+  final int targetCoverRatio;
+  @JsonKey(name: 'target_nothing_ratio')
+  final int targetNothingRatio;
+  @JsonKey(name: 'calling_group_id')
+  final int callingGroupId;
+  @JsonKey(name: 'target_count')
+  final int targetCount;
+  @JsonKey(name: 'object_resource')
+  final List<String> objectResources;
+  @JsonKey(name: 'object_position_type')
+  final String objectPositionType;
+  @JsonKey(name: 'object_position')
+  final List<double> objectPosition;
+  @JsonKey(name: 'is_using_timeline')
+  final bool isUsingTimeline;
+  @JsonKey(name: 'control_gauge')
+  final int controlGauge;
+  @JsonKey(name: 'control_parts')
+  final List<String> controlParts;
+
+  @JsonKey(name: 'weapon_object_enum')
+  final String? weaponObjectEnum;
+  @JsonKey(name: 'linked_parts')
+  final String? linkedParts;
+  @JsonKey(name: 'cancel_type')
+  final String? cancelType;
+
+  MonsterSkillData({
+    this.id = 0,
+    this.nameKey,
+    this.descriptionKey,
+    this.skillIcon = '',
+    this.animationNumber = '',
+    this.weaponType = '',
+    this.rawPreferTarget = 'None',
+    this.showLockOn = false,
+    this.rawAttackType = '',
+    this.rawFireType = '',
+    this.castingTime = 0,
+    this.breakObjects = const [],
+    this.breakObjectHpRatio = 0,
+    this.rawSkillValueType1 = '',
+    this.skillValue1 = 0,
+    this.rawSkillValueType2 = 'None',
+    this.skillValue2 = 0,
+    this.shotCount = 0,
+    this.delayTime = 0,
+    this.shotTiming = 'None',
+    this.penetration = 0,
+    this.projectileSpeed = 0,
+    this.projectileHpRatio = 0,
+    this.projectileRadiusObject = 0,
+    this.projectileRadius = 0,
+    this.explosionRange = 0,
+    this.isDestroyableProjectile = false,
+    this.relateAnim = false,
+    this.decelerationRate = 0,
+    this.targetCharacterRatio = 0,
+    this.targetCoverRatio = 0,
+    this.targetNothingRatio = 0,
+    this.callingGroupId = 0,
+    this.targetCount = 0,
+    this.objectResources = const [],
+    this.objectPositionType = 'None',
+    this.objectPosition = const [0.0, 0.0, 0.0],
+    this.isUsingTimeline = false,
+    this.controlGauge = 0,
+    this.controlParts = const [],
+    this.weaponObjectEnum,
+    this.linkedParts,
+    this.cancelType,
+  });
+
+  factory MonsterSkillData.fromJson(Map<String, dynamic> json) => _$MonsterSkillDataFromJson(json);
 }

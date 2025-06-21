@@ -3,6 +3,7 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/data_path.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/monster.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 import '../test_helper.dart';
@@ -1197,7 +1198,7 @@ void main() async {
       }
     });
 
-    test('Check MonsterData with nested MonsterSkillData', () {
+    test('Check MonsterData with nested MonsterSkillInfoData', () {
       for (final folder in [globalFolder, cnFolder]) {
         final expectedKeys = {
           'id',
@@ -1240,7 +1241,7 @@ void main() async {
         final loaded = loadData(getDesignatedDirectory(folder, 'MonsterTable.json'), (record) {
           final recordKeys = (record as Map<String, dynamic>).keys.toSet();
 
-          // Validate nested MonsterSkillData
+          // Validate nested MonsterSkillInfoData
           for (final skillJson in record['skill_data'] as List) {
             final skillMap = skillJson as Map<String, dynamic>;
             final skillKeys = skillMap.keys.toSet();
@@ -1259,7 +1260,7 @@ void main() async {
 
         expect(loaded, true, reason: 'loaded: $folder');
         expect(extraMonsterKeys, emptySet, reason: 'Unexpected fields in MonsterData: $folder');
-        expect(extraSkillKeys, emptySet, reason: 'Unexpected fields in MonsterSkillData: $folder');
+        expect(extraSkillKeys, emptySet, reason: 'Unexpected fields in MonsterSkillInfoData: $folder');
       }
     });
 
@@ -1368,6 +1369,96 @@ void main() async {
 
         expect(loaded, true, reason: 'loaded: $folder');
         expect(extraKeys, emptySet, reason: 'Unexpected fields in MonsterStageLevelChangeData: $folder');
+      }
+    });
+
+    test('Check MonsterSkillData with enums and unexpected fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'name_localkey',
+          'description_localkey',
+          'skill_icon',
+          'skill_ani_number',
+          'weapon_type',
+          'prefer_target',
+          'show_lock_on',
+          'attack_type',
+          'fire_type',
+          'casting_time',
+          'break_object',
+          'break_object_hp_raito',
+          'skill_value_type_01',
+          'skill_value_01',
+          'skill_value_type_02',
+          'skill_value_02',
+          'shot_count',
+          'delay_time',
+          'shot_timing',
+          'penetration',
+          'projectile_speed',
+          'projectile_hp_ratio',
+          'projectile_radius_object',
+          'projectile_radius',
+          'spot_explosion_range',
+          'is_destroyable_projectile',
+          'relate_anim',
+          'deceleration_rate',
+          'target_character_ratio',
+          'target_cover_ratio',
+          'target_nothing_ratio',
+          'calling_group_id',
+          'target_count',
+          'object_resource',
+          'object_position_type',
+          'object_position',
+          'is_using_timeline',
+          'control_gauge',
+          'control_parts',
+          'weapon_object_enum',
+          'linked_parts',
+          'cancel_type',
+        };
+
+        final Set<String?> unknownPreferTargets = {};
+        final Set<String?> unknownAttackTypes = {};
+        final Set<String?> unknownFireTypes = {};
+        final Set<String?> unknownValueTypes = {};
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'MonsterSkillTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          final data = MonsterSkillData.fromJson(record);
+
+          // Enum validations
+          if (data.preferTarget == PreferTarget.unknown) {
+            unknownPreferTargets.add(data.rawPreferTarget);
+          }
+          if (data.attackType == AttackType.unknown) {
+            unknownAttackTypes.add(data.rawAttackType);
+          }
+          if (data.fireType == FireType.unknown) {
+            unknownFireTypes.add(data.rawFireType);
+          }
+          if (data.skillValueType1 == ValueType.unknown) {
+            unknownValueTypes.add(data.rawSkillValueType1);
+          }
+          if (data.skillValueType2 == ValueType.unknown) {
+            unknownValueTypes.add(data.rawSkillValueType2);
+          }
+
+          recordKeys.removeAll(expectedKeys);
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(unknownPreferTargets, emptySet, reason: 'Unknown PreferTarget: $folder');
+        expect(unknownAttackTypes, emptySet, reason: 'Unknown AttackType: $folder');
+        expect(unknownFireTypes, emptySet, reason: 'Unknown FireType: $folder');
+        expect(unknownValueTypes, emptySet, reason: 'Unknown ValueType: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected keys in MonsterSkillData: $folder');
       }
     });
   });

@@ -415,6 +415,8 @@ class BattleSkill {
       case PreferTarget.targetGL:
       case PreferTarget.targetPS:
       case PreferTarget.unknown:
+      case PreferTarget.none:
+      case PreferTarget.notStun:
         return [];
     }
 

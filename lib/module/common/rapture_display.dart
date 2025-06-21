@@ -178,23 +178,107 @@ class RaptureDataDisplayPage extends StatefulWidget {
 }
 
 class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
+  int tab = 0;
   NikkeDatabaseV2 get db => widget.useGlobal ? global : cn;
+  MonsterData get data => widget.data;
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> children = [
-      Text(locale.getTranslation(widget.data.nameKey) ?? widget.data.nameKey, style: TextStyle(fontSize: 20)),
-      Text('Target ID: ${widget.data.id}'),
-      Text('Model ID: ${widget.data.monsterModelId}'),
-      Text(
-        'Element: ${widget.data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}',
-      ),
-      Text('Normal Stage AI: ${widget.data.spotAi}'),
-      Text('Defence Stage AI: ${widget.data.spotAiDefense}'),
-      Text('Base Defence Stage AI: ${widget.data.spotAiBaseDefense}'),
+      Text(locale.getTranslation(data.nameKey) ?? data.nameKey, style: TextStyle(fontSize: 20)),
+      Text('Target ID: ${data.id}'),
+      Text('Model ID: ${data.monsterModelId}'),
+      Text('Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}'),
+      Text('Normal Stage AI: ${data.spotAi}'),
+      Text('Defence Stage AI: ${data.spotAiDefense}'),
+      Text('Base Defence Stage AI: ${data.spotAiBaseDefense}'),
+      buildTabs(),
+      Divider(),
+      getTab(),
     ];
 
-    final parts = db.rapturePartData[widget.data.monsterModelId] ?? [];
+    return Scaffold(
+      appBar: AppBar(title: Text('Rapture Data')),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView.builder(
+          itemBuilder: (ctx, idx) => Align(child: Padding(padding: const EdgeInsets.all(2.0), child: children[idx])),
+          itemCount: children.length,
+        ),
+      ),
+      bottomNavigationBar: commonBottomNavigationBar(() => setState(() {})),
+    );
+  }
+
+  List<String> get tabTitle => ['Parts', 'Skills'];
+
+  Widget buildTabs() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: List.generate(tabTitle.length, (idx) {
+        return TextButton(
+          onPressed: () {
+            tab = idx;
+            setState(() {});
+          },
+          child: Text(tabTitle[idx]),
+        );
+      }),
+    );
+  }
+
+  Widget getTab() {
+    switch (tab) {
+      case 0:
+        return buildPartsTab();
+      case 1:
+        return buildSkillsTab();
+      default:
+        return Text('Not implemented');
+    }
+  }
+
+  Widget buildSkillsTab() {
+    final skills = data.validSkillData;
+
+    final List<Widget> children = [];
+    for (final skill in skills) {
+      final skillData = db.monsterSkillTable[skill.skillId];
+      final funcs = skill.validFunctionIds;
+      if (skillData != null) {
+        children.add(
+          Container(
+            padding: const EdgeInsets.all(3.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 2),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Column(
+              spacing: 3,
+              children: [
+                MonsterSkillDataDisplay(data: skillData, useGlobal: widget.useGlobal),
+                for (final funcId in funcs)
+                  Container(
+                    padding: const EdgeInsets.all(3.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey, width: 2),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: SimpleFunctionDisplay(functionId: funcId, useGlobal: widget.useGlobal),
+                  ),
+              ],
+            ),
+          ),
+        );
+      }
+    }
+
+    return Column(spacing: 3, children: children);
+  }
+
+  Widget buildPartsTab() {
+    final parts = db.rapturePartData[data.monsterModelId] ?? [];
+    final List<Widget> children = [];
     for (final part in parts) {
       final partName = locale.getTranslation(part.partsNameKey) ?? part.partsNameKey;
       children.add(
@@ -234,16 +318,6 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: Text('Rapture Data')),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView.builder(
-          itemBuilder: (ctx, idx) => Align(child: Padding(padding: const EdgeInsets.all(2.0), child: children[idx])),
-          itemCount: children.length,
-        ),
-      ),
-      bottomNavigationBar: commonBottomNavigationBar(() => setState(() {})),
-    );
+    return Column(spacing: 3, children: children);
   }
 }

@@ -6,7 +6,7 @@ part of '../../model/monster.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-MonsterSkillData _$MonsterSkillDataFromJson(Map<String, dynamic> json) => MonsterSkillData(
+MonsterSkillInfoData _$MonsterSkillInfoDataFromJson(Map<String, dynamic> json) => MonsterSkillInfoData(
   skillId: (json['skill_id'] as num?)?.toInt() ?? 0,
   useFunctionIds:
       (json['use_function_id_skill'] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList() ?? const [],
@@ -45,7 +45,7 @@ MonsterData _$MonsterDataFromJson(Map<String, dynamic> json) => MonsterData(
   spotRandRatioTeleport: (json['spot_rand_ratio_teleport'] as num?)?.toInt() ?? 0,
   skillData:
       (json['skill_data'] as List<dynamic>?)
-          ?.map((e) => MonsterSkillData.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => MonsterSkillInfoData.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
   statEnhanceId: (json['statenhance_id'] as num?)?.toInt() ?? 0,
@@ -105,3 +105,50 @@ MonsterStageLevelChangeData _$MonsterStageLevelChangeDataFromJson(Map<String, dy
       targetPassiveSkillId: (json['target_passive_skill_id'] as num?)?.toInt() ?? 0,
       gimmickObjectLvControl: (json['gimmickobject_lv_control'] as num?)?.toInt() ?? 0,
     );
+
+MonsterSkillData _$MonsterSkillDataFromJson(Map<String, dynamic> json) => MonsterSkillData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  nameKey: json['name_localkey'] as String?,
+  descriptionKey: json['description_localkey'] as String?,
+  skillIcon: json['skill_icon'] as String? ?? '',
+  animationNumber: json['skill_ani_number'] as String? ?? '',
+  weaponType: json['weapon_type'] as String? ?? '',
+  rawPreferTarget: json['prefer_target'] as String? ?? 'None',
+  showLockOn: json['show_lock_on'] as bool? ?? false,
+  rawAttackType: json['attack_type'] as String? ?? '',
+  rawFireType: json['fire_type'] as String? ?? '',
+  castingTime: (json['casting_time'] as num?)?.toInt() ?? 0,
+  breakObjects: (json['break_object'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
+  breakObjectHpRatio: (json['break_object_hp_raito'] as num?)?.toInt() ?? 0,
+  rawSkillValueType1: json['skill_value_type_01'] as String? ?? '',
+  skillValue1: (json['skill_value_01'] as num?)?.toInt() ?? 0,
+  rawSkillValueType2: json['skill_value_type_02'] as String? ?? 'None',
+  skillValue2: (json['skill_value_02'] as num?)?.toInt() ?? 0,
+  shotCount: (json['shot_count'] as num?)?.toInt() ?? 0,
+  delayTime: (json['delay_time'] as num?)?.toInt() ?? 0,
+  shotTiming: json['shot_timing'] as String? ?? 'None',
+  penetration: (json['penetration'] as num?)?.toInt() ?? 0,
+  projectileSpeed: (json['projectile_speed'] as num?)?.toInt() ?? 0,
+  projectileHpRatio: (json['projectile_hp_ratio'] as num?)?.toInt() ?? 0,
+  projectileRadiusObject: (json['projectile_radius_object'] as num?)?.toInt() ?? 0,
+  projectileRadius: (json['projectile_radius'] as num?)?.toInt() ?? 0,
+  explosionRange: (json['spot_explosion_range'] as num?)?.toInt() ?? 0,
+  isDestroyableProjectile: json['is_destroyable_projectile'] as bool? ?? false,
+  relateAnim: json['relate_anim'] as bool? ?? false,
+  decelerationRate: (json['deceleration_rate'] as num?)?.toInt() ?? 0,
+  targetCharacterRatio: (json['target_character_ratio'] as num?)?.toInt() ?? 0,
+  targetCoverRatio: (json['target_cover_ratio'] as num?)?.toInt() ?? 0,
+  targetNothingRatio: (json['target_nothing_ratio'] as num?)?.toInt() ?? 0,
+  callingGroupId: (json['calling_group_id'] as num?)?.toInt() ?? 0,
+  targetCount: (json['target_count'] as num?)?.toInt() ?? 0,
+  objectResources: (json['object_resource'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
+  objectPositionType: json['object_position_type'] as String? ?? 'None',
+  objectPosition:
+      (json['object_position'] as List<dynamic>?)?.map((e) => (e as num).toDouble()).toList() ?? const [0.0, 0.0, 0.0],
+  isUsingTimeline: json['is_using_timeline'] as bool? ?? false,
+  controlGauge: (json['control_gauge'] as num?)?.toInt() ?? 0,
+  controlParts: (json['control_parts'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
+  weaponObjectEnum: json['weapon_object_enum'] as String?,
+  linkedParts: json['linked_parts'] as String?,
+  cancelType: json['cancel_type'] as String?,
+);

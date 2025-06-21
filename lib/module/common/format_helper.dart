@@ -4,6 +4,7 @@ import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/skills.dart';
 
 /// From source_helper:CaseHelper package
 extension CaseHelper on String {
@@ -133,4 +134,20 @@ String frameDataToNiceTimeString(int frame, int fps) {
   return '${timeData ~/ 6000}:'
       '${seconds < 10 ? '0' : ''}'
       '${(timeData % 6000 / 100).toStringAsFixed(3)}';
+}
+
+String toPercentString(int value) {
+  return '${(value / 10000).toStringAsFixed(2)}%';
+}
+
+String? valueString(int value, ValueType type) {
+  switch (type) {
+    case ValueType.integer:
+      return '$value';
+    case ValueType.percent:
+      return toPercentString(value);
+    case ValueType.none:
+    case ValueType.unknown:
+      return null;
+  }
 }

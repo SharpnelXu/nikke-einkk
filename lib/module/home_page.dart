@@ -2,10 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/module/api/data_downloader.dart';
 import 'package:nikke_einkk/module/battle/battle_setup.dart';
+import 'package:nikke_einkk/module/monsters/monster_list.dart';
 import 'package:nikke_einkk/module/soloraid/solo_raid_presets.dart';
 import 'package:nikke_einkk/module/unionraid/union_raid_presets.dart';
 
 class EinkkHomePage extends StatelessWidget {
+  const EinkkHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> items = [
@@ -61,6 +64,19 @@ class EinkkHomePage extends StatelessWidget {
         },
         icon: Icon(Icons.person),
         label: Text('Solo Raid Data'),
+      ),
+      TextButton.icon(
+        style: TextButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          iconAlignment: IconAlignment.start,
+          textStyle: TextStyle(fontSize: 30),
+          iconSize: 30,
+        ),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => MonsterListPage()));
+        },
+        icon: Icon(Icons.catching_pokemon),
+        label: Text('Rapture Data'),
       ),
     ];
     return Scaffold(
