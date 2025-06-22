@@ -403,74 +403,52 @@ class GameDataUnpacker {
       final fileData = file.readAsBytesSync();
       logger.d('File size: ${fileData.length} bytes');
 
-      // First round of key derivation
       final firstKey = generateKey(salt2, preSharedValue);
-
-      // Extract decryption key and IV
       final decryptionKey = firstKey.sublist(0, 16);
       final iv = firstKey.sublist(16, 32);
 
       logger.d('First decryption key: ${toHexString(decryptionKey)}\nFirst IV: ${toHexString(iv)}');
 
-      // First decryption using AES-CBC
       final cipher = CBCBlockCipher(AESEngine())..init(false, ParametersWithIV(KeyParameter(decryptionKey), iv));
       final decryptedData = _processBlocks(cipher, fileData);
 
-      // Load into memory stream
-      final ms = decryptedData;
-
-      // Try to load as ZIP
-      final zipFile = ZipDecoder().decodeBytes(ms);
-
-      // List ZIP contents
+      final zipFile = ZipDecoder().decodeBytes(decryptedData);
       logger.d('ZIP contents: ${zipFile.files.map((file) => file.name)}');
 
-      final signFileName = 'sign';
-      final dataFileName = 'data';
-      // Get sign and data entries
       final signEntry = zipFile.files.firstWhere(
-        (file) => file.name == signFileName,
+        (file) => file.name == 'sign',
         orElse: () => throw Exception('sign entry not found in ZIP'),
       );
 
       final dataEntry = zipFile.files.firstWhere(
-        (file) => file.name == dataFileName,
+        (file) => file.name == 'data',
         orElse: () => throw Exception('data entry not found in ZIP'),
       );
 
-      // Read sign and data
-      final signData = signEntry.content as Uint8List;
+      final signBytes = signEntry.content as Uint8List;
       final dataBytes = dataEntry.content as Uint8List;
 
-      // Verify signature
       final rsaKey = RSAPublicKey(
         BigInt.parse(toHexString(rsaModulus), radix: 16),
         BigInt.parse(toHexString(rsaExponent), radix: 16),
       );
 
       final verifier = Signer('SHA-256/RSA')..init(false, PublicKeyParameter<RSAPublicKey>(rsaKey));
-      if (!verifier.verifySignature(dataBytes, RSASignature(signData))) {
+      if (!verifier.verifySignature(dataBytes, RSASignature(signBytes))) {
         throw Exception('Signature verification failed');
       }
       logger.d('Signature verification passed');
 
-      // Second key derivation
       final secondKey = generateKey(salt1, preSharedValue);
-
-      // Extract second decryption key and IV
       final val2 = secondKey.sublist(0, 16);
       final iv2 = secondKey.sublist(16, 32);
 
       logger.d('Second decryption key: ${toHexString(val2)}\nSecond IV: ${toHexString(iv2)}');
 
-      // Final decryption using the counter mode transformation
       final outputData = Uint8List(dataBytes.length);
       _doTransformation(val2, iv2, dataBytes, outputData);
-
-      // Open the final ZIP
       _mainZip = ZipDecoder().decodeBytes(outputData);
 
-      // Success
       logger.d("Final ZIP contains ${_mainZip!.files.length} files");
 
       return true;

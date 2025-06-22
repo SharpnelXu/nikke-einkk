@@ -185,13 +185,25 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> children = [
-      Text(locale.getTranslation(data.nameKey) ?? data.nameKey, style: TextStyle(fontSize: 20)),
-      Text('Target ID: ${data.id}'),
-      Text('Model ID: ${data.monsterModelId}'),
-      Text('Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}'),
-      Text('Normal Stage AI: ${data.spotAi}'),
-      Text('Defence Stage AI: ${data.spotAiDefense}'),
-      Text('Base Defence Stage AI: ${data.spotAiBaseDefense}'),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(locale.getTranslation(data.nameKey) ?? data.nameKey, style: TextStyle(fontSize: 20)),
+          Tooltip(
+            message:
+                'Normal Stage AI: ${data.spotAi}\n'
+                'Defence Stage AI: ${data.spotAiDefense}\n'
+                'Base Defence Stage AI: ${data.spotAiBaseDefense}',
+            child: Icon(Icons.info_outline),
+          ),
+        ],
+      ),
+      Text(locale.getTranslation(data.descriptionKey) ?? data.descriptionKey, style: TextStyle(fontSize: 20)),
+      Text(
+        'Target ID: ${data.id}   '
+        'Model ID: ${data.monsterModelId}   '
+        'Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}',
+      ),
       buildTabs(),
       Divider(),
       getTab(),
@@ -221,7 +233,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
             tab = idx;
             setState(() {});
           },
-          child: Text(tabTitle[idx]),
+          child: Text(tabTitle[idx], style: TextStyle(fontWeight: tab == idx ? FontWeight.bold : null)),
         );
       }),
     );
