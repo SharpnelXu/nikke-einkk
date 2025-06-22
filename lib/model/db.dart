@@ -83,7 +83,10 @@ class Locale {
     final splits = joinedKey.split(':');
     if (splits.length != 2) return null;
 
-    final tableType = splits[0];
+    String tableType = splits[0];
+    if (tableType == 'Locale_BeforeInstall') {
+      tableType = 'Locale_Character';
+    }
     final key = splits[1];
     return locale[tableType]?[key]?.forLanguage(language);
   }
@@ -108,6 +111,9 @@ class NikkeDatabaseV2 {
   final Map<int, StateEffectData> stateEffectTable = {};
   final Map<int, FunctionData> functionTable = {};
   final Map<int, MonsterSkillData> monsterSkillTable = {};
+  final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
+  final Map<int, WeaponData> characterShotTable = {};
+  final Map<int, SkillData> characterSkillTable = {};
 
   void init() {
     unionRaidData.clear();
@@ -121,6 +127,9 @@ class NikkeDatabaseV2 {
     stateEffectTable.clear();
     functionTable.clear();
     monsterSkillTable.clear();
+    characterResourceGardeTable.clear();
+    characterShotTable.clear();
+    characterSkillTable.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     initialized = true;
@@ -150,6 +159,15 @@ class NikkeDatabaseV2 {
     initialized &= loadData(
       getDesignatedDirectory(extractFolderPath, 'MonsterSkillTable.json'),
       processMonsterSkillData,
+    );
+    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'CharacterTable.json'), processCharacterData);
+    initialized &= loadData(
+      getDesignatedDirectory(extractFolderPath, 'CharacterShotTable.json'),
+      processCharacterShotData,
+    );
+    initialized &= loadData(
+      getDesignatedDirectory(extractFolderPath, 'CharacterSkillTable.json'),
+      processCharacterSkillData,
     );
 
     initialized &= loadCsv(getDesignatedDirectory(extractFolderPath, 'WaveData.GroupDict.csv'), processWaveDict);
@@ -234,6 +252,27 @@ class NikkeDatabaseV2 {
   void processMonsterSkillData(dynamic record) {
     final data = MonsterSkillData.fromJson(record);
     monsterSkillTable[data.id] = data;
+  }
+
+  void processCharacterData(dynamic record) {
+    final data = NikkeCharacterData.fromJson(record);
+
+    if (data.resourceId == 16) {
+      data.elementId.add(NikkeElement.iron.id);
+    }
+
+    characterResourceGardeTable.putIfAbsent(data.resourceId, () => {});
+    characterResourceGardeTable[data.resourceId]![data.gradeCoreId] = data;
+  }
+
+  void processCharacterShotData(dynamic record) {
+    final data = WeaponData.fromJson(record);
+    characterShotTable[data.id] = data;
+  }
+
+  void processCharacterSkillData(dynamic record) {
+    final data = SkillData.fromJson(record);
+    characterSkillTable[data.id] = data;
   }
 }
 

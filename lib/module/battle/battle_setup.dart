@@ -13,12 +13,13 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/user_data.dart';
-import 'package:nikke_einkk/module/battle/nikke_list.dart';
+import 'package:nikke_einkk/module/battle/nikke_setup.dart';
 import 'package:nikke_einkk/module/battle/rapture_setup.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/simple_dialog.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
+import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
 class BattleSetupPage extends StatefulWidget {
   const BattleSetupPage({super.key});
@@ -443,7 +444,12 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
               await Navigator.push(context, MaterialPageRoute(builder: (ctx) => NikkeSelectorPage(option: option)));
               if (mounted) setState(() {});
             },
-            child: buildNikkeIcon(characterData, true, 'Tap to select'),
+            child: NikkeIcon(
+              isSelected: true,
+              characterData: characterData,
+              weapon: db.characterShotTable[characterData?.shotId],
+              defaultText: 'Tap to select',
+            ),
           ),
           Text(name == null ? 'None' : '$name / ${weapon?.weaponType}', maxLines: 1),
           ...statDisplays,

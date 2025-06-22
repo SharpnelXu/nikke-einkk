@@ -10,6 +10,7 @@ import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
+import 'package:nikke_einkk/module/nikkes/nikke_list.dart';
 
 class NikkeSelectorPage extends StatefulWidget {
   final BattleNikkeOptions option;
@@ -22,232 +23,10 @@ class NikkeSelectorPage extends StatefulWidget {
 
 class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
   BattleNikkeOptions get option => widget.option;
-  NikkeFilterData filterData = NikkeFilterData();
-  ScrollController scrollController = ScrollController();
-  bool extraFilters = false;
 
   @override
   Widget build(BuildContext context) {
     option.errorCorrection();
-
-    final defaultFilterButtonRow = IntrinsicHeight(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          spacing: 8,
-          children: [
-            IconButton(
-              onPressed: () {
-                filterData.reset();
-                if (mounted) setState(() {});
-              },
-              icon: const Icon(Icons.refresh_outlined),
-            ),
-            IconButton(
-              onPressed: () {
-                extraFilters = !extraFilters;
-                if (mounted) setState(() {});
-              },
-              icon: Icon(Icons.filter_alt, color: extraFilters ? Colors.black : Colors.grey),
-            ),
-            const VerticalDivider(width: 5, color: Colors.grey),
-            Text('Burst: '),
-            ...List.generate(NikkeFilterData.defaultBurstSteps.length, (index) {
-              final buttonStep = NikkeFilterData.defaultBurstSteps[index];
-              final enabled = filterData.burstSteps.contains(buttonStep);
-              return FilledButton(
-                style: FilledButton.styleFrom(
-                  foregroundColor: enabled ? Colors.white : Colors.black,
-                  backgroundColor: enabled ? Colors.blue : Colors.white,
-                ),
-                onPressed: () {
-                  if (enabled) {
-                    filterData.burstSteps.remove(buttonStep);
-                  } else {
-                    filterData.burstSteps.add(buttonStep);
-                  }
-                  if (mounted) setState(() {});
-                },
-                child: Text(buttonStep.toString()),
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-
-    final cropFilterRow = Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        spacing: 8,
-        children: [
-          Text('Corporation: '),
-          ...List.generate(NikkeFilterData.defaultCorps.length, (index) {
-            final buttonCorp = NikkeFilterData.defaultCorps[index];
-            final enabled = filterData.corps.contains(buttonCorp);
-            return FilledButton(
-              style: FilledButton.styleFrom(
-                foregroundColor: enabled ? Colors.white : Colors.black,
-                backgroundColor: enabled ? Colors.blue : Colors.white,
-              ),
-              onPressed: () {
-                if (enabled) {
-                  filterData.corps.remove(buttonCorp);
-                } else {
-                  filterData.corps.add(buttonCorp);
-                }
-                if (mounted) setState(() {});
-              },
-              child: Text(buttonCorp.name.toUpperCase()),
-            );
-          }),
-        ],
-      ),
-    );
-
-    final elementsFilterRow = Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        spacing: 8,
-        children: [
-          Text('Element: '),
-          ...List.generate(NikkeFilterData.defaultElements.length, (index) {
-            final buttonEle = NikkeFilterData.defaultElements[index];
-            final enabled = filterData.elements.contains(buttonEle);
-            return FilledButton(
-              style: FilledButton.styleFrom(
-                foregroundColor: enabled ? Colors.white : Colors.black,
-                backgroundColor: enabled ? buttonEle.color : Colors.white,
-              ),
-              onPressed: () {
-                if (enabled) {
-                  filterData.elements.remove(buttonEle);
-                } else {
-                  filterData.elements.add(buttonEle);
-                }
-                if (mounted) setState(() {});
-              },
-              child: Text(buttonEle.name.toUpperCase()),
-            );
-          }),
-        ],
-      ),
-    );
-
-    final weaponTypeFilterRow = Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        spacing: 8,
-        children: [
-          Text('Weapon Type: '),
-          ...List.generate(NikkeFilterData.defaultWeaponTypes.length, (index) {
-            final buttonType = NikkeFilterData.defaultWeaponTypes[index];
-            final enabled = filterData.weaponTypes.contains(buttonType);
-            return FilledButton(
-              style: FilledButton.styleFrom(
-                foregroundColor: enabled ? Colors.white : Colors.black,
-                backgroundColor: enabled ? Colors.blue : Colors.white,
-              ),
-              onPressed: () {
-                if (enabled) {
-                  filterData.weaponTypes.remove(buttonType);
-                } else {
-                  filterData.weaponTypes.add(buttonType);
-                }
-                if (mounted) setState(() {});
-              },
-              child: Text(buttonType.name.toUpperCase()),
-            );
-          }),
-        ],
-      ),
-    );
-
-    final classFilterRow = Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        spacing: 8,
-        children: [
-          Text('Class: '),
-          ...List.generate(NikkeFilterData.defaultClasses.length, (index) {
-            final buttonType = NikkeFilterData.defaultClasses[index];
-            final enabled = filterData.classes.contains(buttonType);
-            return FilledButton(
-              style: FilledButton.styleFrom(
-                foregroundColor: enabled ? Colors.white : Colors.black,
-                backgroundColor: enabled ? Colors.blue : Colors.white,
-              ),
-              onPressed: () {
-                if (enabled) {
-                  filterData.classes.remove(buttonType);
-                } else {
-                  filterData.classes.add(buttonType);
-                }
-                if (mounted) setState(() {});
-              },
-              child: Text(buttonType.name.toUpperCase()),
-            );
-          }),
-        ],
-      ),
-    );
-
-    final rarityRow = Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        spacing: 8,
-        children: [
-          Text('Rarity: '),
-          ...List.generate(NikkeFilterData.defaultRarity.length, (index) {
-            final buttonType = NikkeFilterData.defaultRarity[index];
-            final enabled = filterData.rarity.contains(buttonType);
-            return FilledButton(
-              style: FilledButton.styleFrom(
-                foregroundColor: enabled ? Colors.white : Colors.black,
-                backgroundColor: enabled ? buttonType.color : Colors.white,
-              ),
-              onPressed: () {
-                if (enabled) {
-                  filterData.rarity.remove(buttonType);
-                } else {
-                  filterData.rarity.add(buttonType);
-                }
-                if (mounted) setState(() {});
-              },
-              child: Text(buttonType.name.toUpperCase()),
-            );
-          }),
-        ],
-      ),
-    );
-
-    final filterList = Expanded(
-      child: Column(
-        children: [
-          defaultFilterButtonRow,
-          if (extraFilters) elementsFilterRow,
-          if (extraFilters) weaponTypeFilterRow,
-          if (extraFilters) cropFilterRow,
-          if (extraFilters) classFilterRow,
-          if (extraFilters) rarityRow,
-          Expanded(
-            child: CustomScrollView(
-              controller: scrollController,
-              slivers: [
-                SliverGrid.extent(
-                  maxCrossAxisExtent: 144,
-                  children:
-                      db.characterResourceGardeTable.values
-                          .where((groupedData) => filterData.shouldInclude(groupedData))
-                          .map((groupedData) => _buildGrid(groupedData))
-                          .toList(),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
 
     final characterData = db.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
     final weapon = db.characterShotTable[characterData?.shotId];
@@ -387,7 +166,19 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
       appBar: AppBar(title: const Text('Nikke Options')),
       body: Row(
         children: [
-          filterList,
+          Expanded(
+            child: NikkeGrids(
+              useGlobal: true,
+              onCall: (data) {
+                option.nikkeResourceId = data.resourceId;
+                if (db.userData.nikkeOptions.containsKey(option.nikkeResourceId)) {
+                  option.copyFrom(db.userData.nikkeOptions[option.nikkeResourceId]!);
+                }
+                if (mounted) setState(() {});
+              },
+              isSelected: (data) => option.nikkeResourceId == data.resourceId,
+            ),
+          ),
           Container(width: 250, alignment: Alignment.topLeft, child: SingleChildScrollView(child: optionColumn)),
         ],
       ),
@@ -638,66 +429,5 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
         ],
       ),
     );
-  }
-
-  Widget _buildGrid(Map<int, NikkeCharacterData> groupedData) {
-    final characterData = groupedData.values.last;
-    final isSelected = option.nikkeResourceId == characterData.resourceId;
-    return InkWell(
-      onTap: () {
-        option.nikkeResourceId = characterData.resourceId;
-        if (db.userData.nikkeOptions.containsKey(option.nikkeResourceId)) {
-          option.copyFrom(db.userData.nikkeOptions[option.nikkeResourceId]!);
-        }
-        if (mounted) setState(() {});
-      },
-      child: buildNikkeIcon(characterData, isSelected),
-    );
-  }
-}
-
-class NikkeFilterData {
-  static List<BurstStep> defaultBurstSteps = [BurstStep.step1, BurstStep.step2, BurstStep.step3];
-  static List<Corporation> defaultCorps = [
-    Corporation.elysion,
-    Corporation.missilis,
-    Corporation.tetra,
-    Corporation.pilgrim,
-    Corporation.abnormal,
-  ];
-  static List<NikkeElement> defaultElements = NikkeElement.values.where((ele) => ele != NikkeElement.unknown).toList();
-  static List<WeaponType> defaultWeaponTypes =
-      WeaponType.values.where((type) => type != WeaponType.none && type != WeaponType.unknown).toList();
-  static List<NikkeClass> defaultClasses = [NikkeClass.attacker, NikkeClass.defender, NikkeClass.supporter];
-  static List<Rarity> defaultRarity = [Rarity.ssr, Rarity.sr, Rarity.r];
-
-  List<BurstStep> burstSteps = [];
-  List<Corporation> corps = [];
-  List<NikkeElement> elements = [];
-  List<NikkeClass> classes = [];
-  List<WeaponType> weaponTypes = [];
-  List<Rarity> rarity = [Rarity.ssr];
-
-  bool shouldInclude(Map<int, NikkeCharacterData> gradeToCharData) {
-    final characterData = gradeToCharData.values.last;
-    final weapon = db.characterShotTable[characterData.shotId];
-    return (burstSteps.isEmpty ||
-            characterData.useBurstSkill == BurstStep.allStep ||
-            burstSteps.contains(characterData.useBurstSkill)) &&
-        (corps.isEmpty || corps.contains(characterData.corporation)) &&
-        (elements.isEmpty || characterData.elementId.any((eleId) => elements.contains(NikkeElement.fromId(eleId)))) &&
-        (classes.isEmpty || classes.contains(characterData.characterClass)) &&
-        (weaponTypes.isEmpty || weaponTypes.contains(weapon?.weaponType)) &&
-        (rarity.isEmpty || rarity.contains(characterData.originalRare));
-  }
-
-  void reset() {
-    burstSteps.clear();
-    corps.clear();
-    elements.clear();
-    classes.clear();
-    weaponTypes.clear();
-    rarity.clear();
-    rarity.add(Rarity.ssr);
   }
 }
