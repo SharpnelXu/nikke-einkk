@@ -3,7 +3,7 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/monster.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
-import 'package:nikke_einkk/module/common/rapture_display.dart';
+import 'package:nikke_einkk/module/monsters/rapture_display.dart';
 
 class MonsterListPage extends StatefulWidget {
   const MonsterListPage({super.key});

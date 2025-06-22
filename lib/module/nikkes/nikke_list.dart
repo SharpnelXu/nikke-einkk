@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
-import 'package:nikke_einkk/module/common/format_helper.dart';
+import 'package:nikke_einkk/module/common/custom_widgets.dart';
+import 'package:nikke_einkk/module/nikkes/nikke_page.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
 class NikkeListPage extends StatefulWidget {
@@ -31,7 +32,17 @@ class _NikkeListPageState extends State<NikkeListPage> {
           ],
         ),
       ),
-      body: NikkeGrids(useGlobal: useGlobal),
+      body: NikkeGrids(
+        useGlobal: useGlobal,
+        includeInvisible: true,
+        onCall: (data) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (ctx) => NikkeCharacterPage(useGlobal: useGlobal, data: data)),
+          );
+        },
+      ),
+      bottomNavigationBar: commonBottomNavigationBar(() => setState(() {})),
     );
   }
 
@@ -43,10 +54,11 @@ class _NikkeListPageState extends State<NikkeListPage> {
 
 class NikkeGrids extends StatefulWidget {
   final bool useGlobal;
+  final bool includeInvisible;
   final void Function(NikkeCharacterData)? onCall;
   final bool Function(NikkeCharacterData)? isSelected;
 
-  const NikkeGrids({super.key, required this.useGlobal, this.onCall, this.isSelected});
+  const NikkeGrids({super.key, required this.useGlobal, this.onCall, this.isSelected, this.includeInvisible = false});
 
   @override
   State<NikkeGrids> createState() => _NikkeGridsState();
@@ -272,6 +284,7 @@ class _NikkeGridsState extends State<NikkeGrids> {
                     db.characterResourceGardeTable.values
                         .map((groupedData) => groupedData.values.last)
                         .where((data) => filterData.shouldInclude(data, db.characterShotTable[data.shotId]))
+                        .where((data) => data.isVisible || widget.includeInvisible)
                         .map((data) => _buildGrid(data, db.characterShotTable[data.shotId]))
                         .toList(),
               ),

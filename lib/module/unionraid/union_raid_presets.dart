@@ -4,7 +4,7 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/stages.dart';
 import 'package:nikke_einkk/module/api/data_downloader.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
-import 'package:nikke_einkk/module/common/rapture_display.dart';
+import 'package:nikke_einkk/module/monsters/rapture_display.dart';
 
 class UnionRaidPresetPage extends StatefulWidget {
   const UnionRaidPresetPage({super.key});

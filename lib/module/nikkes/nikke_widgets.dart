@@ -32,7 +32,7 @@ class NikkeIcon extends StatelessWidget {
       margin: const EdgeInsets.all(5.0),
       padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
-        border: Border.all(color: characterData?.originalRare.color ?? Colors.black, width: 3),
+        border: Border.all(color: characterData?.isVisible ?? true ? characterData?.originalRare.color ?? Colors.black : Colors.red, width: 3),
         borderRadius: BorderRadius.circular(5),
         gradient: colors != null && colors.length > 1 ? LinearGradient(colors: colors) : null,
         color: colors != null && colors.length == 1 ? colors.first : null,
@@ -43,16 +43,17 @@ class NikkeIcon extends StatelessWidget {
         children: [
           Text('$name', style: textStyle),
           if (characterData != null)
-            Positioned(top: 2, left: 2, child: Text(characterData.corporation.name.toUpperCase(), style: textStyle)),
+            Positioned(top: 2, left: 2, child: Text(characterData!.corporation.name.toUpperCase(), style: textStyle)),
           if (characterData != null)
             Positioned(
               bottom: 2,
               left: 2,
-              child: Text(characterData.characterClass.name.toUpperCase(), style: textStyle),
+              child: Text(characterData!.characterClass.name.toUpperCase(), style: textStyle),
             ),
-          if (weapon != null) Positioned(top: 2, right: 2, child: Text(weapon.weaponType.toString(), style: textStyle)),
+          if (weapon != null)
+            Positioned(top: 2, right: 2, child: Text(weapon!.weaponType.toString(), style: textStyle)),
           if (characterData != null)
-            Positioned(bottom: 2, right: 2, child: Text(characterData.useBurstSkill.toString(), style: textStyle)),
+            Positioned(bottom: 2, right: 2, child: Text(characterData!.useBurstSkill.toString(), style: textStyle)),
         ],
       ),
     );

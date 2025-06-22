@@ -187,6 +187,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
     final List<Widget> children = [
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 5,
         children: [
           Text(locale.getTranslation(data.nameKey) ?? data.nameKey, style: TextStyle(fontSize: 20)),
           Tooltip(

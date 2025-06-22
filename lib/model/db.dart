@@ -34,7 +34,7 @@ class Locale {
     locale.clear();
 
     bool result = true;
-    result &= loadLocaleCharacter();
+    result &= loadGeneral('Locale_Character');
     result &= loadGeneral('Locale_Skill');
     result &= loadGeneral('Locale_System');
     result &= loadGeneral('Locale_Monster');
@@ -42,25 +42,6 @@ class Locale {
     logger.i('Locale init result: $result');
 
     return result;
-  }
-
-  bool loadLocaleCharacter() {
-    final type = 'Locale_Character';
-    final file = File(join(localePath, type, '$type.json'));
-    final exists = file.existsSync();
-    if (exists) {
-      locale[type] = {};
-      final jsonList = jsonDecode(file.readAsStringSync());
-      final regex = RegExp(r'^\d+_name');
-      for (final record in jsonList) {
-        final translation = Translation.fromJson(record);
-        final match = regex.hasMatch(translation.key);
-        if (match) {
-          locale[type]![translation.key] = translation;
-        }
-      }
-    }
-    return exists;
   }
 
   bool loadGeneral(String type) {
