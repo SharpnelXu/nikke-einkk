@@ -32,7 +32,10 @@ class NikkeIcon extends StatelessWidget {
       margin: const EdgeInsets.all(5.0),
       padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
-        border: Border.all(color: characterData?.isVisible ?? true ? characterData?.originalRare.color ?? Colors.black : Colors.red, width: 3),
+        border: Border.all(
+          color: characterData?.isVisible ?? true ? characterData?.originalRare.color ?? Colors.black : Colors.red,
+          width: 3,
+        ),
         borderRadius: BorderRadius.circular(5),
         gradient: colors != null && colors.length > 1 ? LinearGradient(colors: colors) : null,
         color: colors != null && colors.length == 1 ? colors.first : null,

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/module/api/data_downloader.dart';
+import 'package:nikke_einkk/module/api/locale_unpacker.dart';
 import 'package:nikke_einkk/module/battle/battle_setup.dart';
 import 'package:nikke_einkk/module/monsters/monster_list.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_list.dart';
@@ -39,6 +40,19 @@ class EinkkHomePage extends StatelessWidget {
         },
         icon: Icon(Icons.download),
         label: Text('Static Data Download'),
+      ),
+      TextButton.icon(
+        style: TextButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          iconAlignment: IconAlignment.start,
+          textStyle: TextStyle(fontSize: 30),
+          iconSize: 30,
+        ),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => LocaleUnpackerPage()));
+        },
+        icon: Icon(Icons.language),
+        label: Text('Locale Unpack'),
       ),
       TextButton.icon(
         style: TextButton.styleFrom(

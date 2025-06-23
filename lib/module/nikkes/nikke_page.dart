@@ -50,7 +50,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
         'Squad: ${locale.getTranslation('Locale_Character:${data.squad.toLowerCase()}_name') ?? data.squad}   '
         '${locale.getTranslation('${data.cvLocalkey}_en') ?? data.cvLocalkey} (EN)'
         ' / ${locale.getTranslation('${data.cvLocalkey}_ko') ?? data.cvLocalkey} (KR)'
-        ' / ${locale.getTranslation('${data.cvLocalkey}_ja') ?? data.cvLocalkey} (JP)'
+        ' / ${locale.getTranslation('${data.cvLocalkey}_ja') ?? data.cvLocalkey} (JP)',
       ),
       buildTabs(),
       Divider(),

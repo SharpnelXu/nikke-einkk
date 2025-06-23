@@ -109,7 +109,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
 
           if (downloadedGlobal) {
             global.init();
-          } else if (!downloadedGlobal) {
+          } else {
             cn.init();
           }
 

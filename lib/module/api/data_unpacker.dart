@@ -348,29 +348,27 @@ class GameDataUnpacker {
   }
 
   void _doTransformation(Uint8List key, Uint8List salt, Uint8List input, Uint8List output) {
-    const blockSize = 16; // AES block size
+    // Create AES cipher in ECB mode
+    final ecbBlockCipher = ECBBlockCipher(AESEngine())..init(true, KeyParameter(key));
+    final blockSize = ecbBlockCipher.blockSize; // AES block size
 
     if (salt.length != blockSize) {
       throw ArgumentError("Salt size must be same as block size (actual: ${salt.length}, expected: $blockSize)");
     }
 
     // Clone the counter (salt)
-    var counter = Uint8List.fromList(salt);
-    var xorMask = <int>[];
-
-    // Create AES cipher in ECB mode
-
-    final ecbBlockCipher = ECBBlockCipher(AESEngine())..init(true, KeyParameter(key));
+    final counter = Uint8List.fromList(salt);
+    final xorMask = <int>[];
 
     // Process input byte by byte
-    for (var i = 0; i < input.length; i++) {
+    for (int i = 0; i < input.length; i++) {
       if (xorMask.isEmpty) {
         // Generate a new counter block
-        var counterBlock = Uint8List(blockSize);
+        final counterBlock = Uint8List(blockSize);
         ecbBlockCipher.processBlock(counter, 0, counterBlock, 0);
 
         // Increment counter (from right to left)
-        for (var j = counter.length - 1; j >= 0; j--) {
+        for (int j = counter.length - 1; j >= 0; j--) {
           counter[j] = (counter[j] + 1) & 0xFF;
           if (counter[j] != 0) break;
         }
@@ -380,7 +378,7 @@ class GameDataUnpacker {
       }
 
       // XOR with next mask byte
-      var mask = xorMask.removeAt(0);
+      final mask = xorMask.removeAt(0);
       output[i] = input[i] ^ mask;
     }
   }
@@ -460,23 +458,22 @@ class GameDataUnpacker {
 
   Uint8List _processBlocks(BlockCipher cipher, Uint8List input) {
     final output = Uint8List(input.length);
-    for (var offset = 0; offset < input.length; offset += cipher.blockSize) {
+    for (int offset = 0; offset < input.length; offset += cipher.blockSize) {
       final chunkEnd = offset + cipher.blockSize;
       final isLastChunk = chunkEnd >= input.length;
 
       if (isLastChunk) {
         // Handle PKCS#7 padding for the last block
-        final block = Uint8List(cipher.blockSize);
+        final finalInputBlock = Uint8List(cipher.blockSize);
+        final finalOutputBlock = Uint8List(cipher.blockSize);
         final remaining = input.length - offset;
-        block.setRange(0, remaining, input, offset);
+        finalInputBlock.setRange(0, remaining, input, offset);
         final padValue = cipher.blockSize - remaining;
-        for (var i = remaining; i < cipher.blockSize; i++) {
-          block[i] = padValue;
+        for (int i = remaining; i < cipher.blockSize; i++) {
+          finalInputBlock[i] = padValue;
         }
-        cipher.processBlock(block, 0, output, offset);
-        // Remove padding
-        final padCount = output[offset + cipher.blockSize - 1];
-        return output.sublist(0, output.length - padCount);
+        cipher.processBlock(finalInputBlock, 0, finalOutputBlock, 0);
+        output.setRange(offset, input.length, finalOutputBlock);
       } else {
         cipher.processBlock(input, offset, output, offset);
       }
@@ -495,7 +492,7 @@ class GameDataUnpacker {
       dir.createSync(recursive: true);
     }
 
-    for (var i = 0; i < zip.files.length; i++) {
+    for (int i = 0; i < zip.files.length; i++) {
       final file = zip.files[i];
 
       // Create directory structure if needed
