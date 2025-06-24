@@ -332,7 +332,7 @@ class NikkeFilterData {
   List<Rarity> rarity = [Rarity.ssr];
 
   bool shouldInclude(NikkeCharacterData characterData, WeaponData? weapon) {
-    final redHoodCheck = burstSteps.contains(characterData.useBurstSkill);
+    final redHoodCheck = characterData.useBurstSkill == BurstStep.allStep;
     final rapiRedHoodCheck = burstSteps.contains(BurstStep.step1) && characterData.resourceId == 16;
     final burstCheck =
         burstSteps.isEmpty || burstSteps.contains(characterData.useBurstSkill) || redHoodCheck || rapiRedHoodCheck;

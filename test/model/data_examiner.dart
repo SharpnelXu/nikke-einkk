@@ -1461,5 +1461,25 @@ void main() async {
         expect(extraKeys, emptySet, reason: 'Unexpected keys in MonsterSkillData: $folder');
       }
     });
+
+    test('Check WordGroupData unexpected fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {'id', 'group', 'page_number', 'order', 'resource_type', 'resource_value'};
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'WordTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          recordKeys.removeAll(expectedKeys);
+
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected keys in WordGroupData: $folder');
+      }
+    });
   });
 }

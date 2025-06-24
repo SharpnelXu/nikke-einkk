@@ -16,9 +16,26 @@ class StateEffectDataDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final functionIds = data.allValidFuncIds;
 
+    final skillInfo = db.skillInfoTable[data.id];
+
     return Column(
       spacing: 3,
       children: [
+        if (skillInfo != null)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            spacing: 3,
+            children: [
+              Text(locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey),
+              Tooltip(
+                message:
+                    '${locale.getTranslation(skillInfo.infoDescriptionLocalkey) ?? skillInfo.infoDescriptionLocalkey}'
+                    '\n${locale.getTranslation(skillInfo.descriptionLocalkey) ?? skillInfo.descriptionLocalkey}',
+                child: Icon(Icons.info_outline, size: 16),
+              ),
+            ],
+          ),
         Text('Passive Skill ID: ${data.id}'),
         for (final functionId in functionIds)
           Container(
@@ -51,9 +68,18 @@ class SimpleFunctionDisplay extends StatelessWidget {
     } else {
       if (func.nameLocalkey != null) {
         children.add(
-          Tooltip(
-            message: locale.getTranslation(func.descriptionLoaclkey) ?? func.descriptionLoaclkey ?? 'No Description',
-            child: Text(locale.getTranslation(func.nameLocalkey) ?? func.nameLocalkey!),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            spacing: 3,
+            children: [
+              Text(locale.getTranslation(func.nameLocalkey) ?? func.nameLocalkey!),
+              Tooltip(
+                message:
+                    locale.getTranslation(func.descriptionLoaclkey) ?? func.descriptionLoaclkey ?? 'No Description',
+                child: Icon(Icons.info_outline, size: 16),
+              ),
+            ],
           ),
         );
       }
@@ -86,9 +112,17 @@ class MonsterSkillDataDisplay extends StatelessWidget {
     final List<Widget> children = [];
     if (data.nameKey != null) {
       children.add(
-        Tooltip(
-          message: locale.getTranslation(data.descriptionKey) ?? data.descriptionKey ?? 'No Description',
-          child: Text(locale.getTranslation(data.nameKey) ?? data.nameKey!),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          spacing: 3,
+          children: [
+            Text(locale.getTranslation(data.nameKey) ?? data.nameKey!),
+            Tooltip(
+              message: locale.getTranslation(data.descriptionKey) ?? data.descriptionKey ?? 'No Description',
+              child: Icon(Icons.info_outline, size: 16),
+            ),
+          ],
         ),
       );
     }

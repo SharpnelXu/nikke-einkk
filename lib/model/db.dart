@@ -95,6 +95,8 @@ class NikkeDatabaseV2 {
   final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
   final Map<int, WeaponData> characterShotTable = {};
   final Map<int, SkillData> characterSkillTable = {};
+  final Map<int, SkillInfoData> skillInfoTable = {};
+  final Map<String, List<WordGroupData>> wordGroupTable = {};
 
   void init() {
     unionRaidData.clear();
@@ -111,6 +113,8 @@ class NikkeDatabaseV2 {
     characterResourceGardeTable.clear();
     characterShotTable.clear();
     characterSkillTable.clear();
+    skillInfoTable.clear();
+    wordGroupTable.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     initialized = true;
@@ -150,6 +154,8 @@ class NikkeDatabaseV2 {
       getDesignatedDirectory(extractFolderPath, 'CharacterSkillTable.json'),
       processCharacterSkillData,
     );
+    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'SkillInfoTable.json'), processSkillInfoData);
+    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'WordTable.json'), processWordGroupData);
 
     initialized &= loadCsv(getDesignatedDirectory(extractFolderPath, 'WaveData.GroupDict.csv'), processWaveDict);
   }
@@ -254,6 +260,17 @@ class NikkeDatabaseV2 {
   void processCharacterSkillData(dynamic record) {
     final data = SkillData.fromJson(record);
     characterSkillTable[data.id] = data;
+  }
+
+  void processSkillInfoData(dynamic record) {
+    final data = SkillInfoData.fromJson(record);
+    skillInfoTable[data.id] = data;
+  }
+
+  void processWordGroupData(dynamic record) {
+    final data = WordGroupData.fromJson(record);
+    wordGroupTable.putIfAbsent(data.group, () => []);
+    wordGroupTable[data.group]!.add(data);
   }
 }
 

@@ -132,3 +132,12 @@ SkillInfoData _$SkillInfoDataFromJson(Map<String, dynamic> json) => SkillInfoDat
           .toList() ??
       const [],
 );
+
+WordGroupData _$WordGroupDataFromJson(Map<String, dynamic> json) => WordGroupData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  group: json['group'] as String? ?? '',
+  pageNumber: (json['page_number'] as num?)?.toInt() ?? 0,
+  order: (json['order'] as num?)?.toInt() ?? 0,
+  resourceType: json['resource_type'] as String? ?? '',
+  resourceValue: json['resource_value'] as String? ?? '',
+);

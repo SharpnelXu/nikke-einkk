@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/favorite_item.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
@@ -136,8 +137,12 @@ String frameDataToNiceTimeString(int frame, int fps) {
       '${(timeData % 6000 / 100).toStringAsFixed(3)}';
 }
 
-String toPercentString(int value) {
-  return '${(value / 10000).toStringAsFixed(2)}%';
+String toPercentString(num value) {
+  return '${(value / 100).toStringAsFixed(2)}%';
+}
+
+String timeString(int value) {
+  return '${(value / 100).toStringAsFixed(2)} s';
 }
 
 String? valueString(int value, ValueType type) {
@@ -149,5 +154,99 @@ String? valueString(int value, ValueType type) {
     case ValueType.none:
     case ValueType.unknown:
       return null;
+  }
+}
+
+DescriptionTextWidget formatSkillInfoDescription(SkillInfoData skillInfo, bool useGlobal) {
+  String result = locale.getTranslation(skillInfo.descriptionLocalkey) ?? skillInfo.descriptionLocalkey;
+  for (int v = 1; v <= skillInfo.descriptionValues.length; v += 1) {
+    final replaceKey = '{description_value_${v < 10 ? '0' : ''}$v}';
+    final replaceValue = skillInfo.descriptionValues[v - 1];
+    result = result.replaceFirst(replaceKey, replaceValue.value ?? '');
+  }
+
+  return DescriptionTextWidget(result, useGlobal);
+}
+
+class DescriptionTextWidget extends StatelessWidget {
+  final String text;
+  final bool useGlobal;
+
+  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+
+  const DescriptionTextWidget(this.text, this.useGlobal, {super.key});
+
+  List<InlineSpan> buildTextSpans(String curText, TextStyle style) {
+    final textSpans = <InlineSpan>[];
+    int currentIndex = 0;
+
+    // Combined regex pattern for both tag types
+    final regex = RegExp(
+      r'(<color=#([\dA-F]{6})>(.*?)</color>)|(<word_group=(\d+)>(.*?)</word_group>)',
+      caseSensitive: false,
+      dotAll: true,
+    );
+
+    for (final match in regex.allMatches(curText)) {
+      // Add text before the match
+      if (match.start > currentIndex) {
+        textSpans.add(TextSpan(text: curText.substring(currentIndex, match.start), style: style));
+      }
+
+      // Process color tag
+      if (match.group(1) != null) {
+        final colorCode = match.group(2)!;
+        final content = match.group(3)!;
+        textSpans.addAll(buildTextSpans(content, style.copyWith(color: Color(int.parse('0xFF$colorCode')))));
+      }
+      // Process word_group tag
+      else if (match.group(4) != null) {
+        final wordGroupId = match.group(5)!;
+        final content = match.group(6)!;
+        final wordGroupData =
+            db.wordGroupTable[wordGroupId]
+                ?.where((data) => data.resourceType == 'locale')
+                .sorted(
+                  (a, b) =>
+                      a.pageNumber == b.pageNumber ? a.order.compareTo(b.order) : a.pageNumber.compareTo(b.pageNumber),
+                ) ??
+            [];
+        textSpans.add(
+          WidgetSpan(
+            child: Tooltip(
+              message:
+                  'Word Group ID: $wordGroupId\n'
+                  '${wordGroupData.map((data) => locale.getTranslation('Locale_Skill:${data.resourceValue}')).join('\n\n')}',
+              child: Text(
+                content,
+                style: style.copyWith(
+                  color: Colors.orange,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.orange,
+                  decorationThickness: 1.5,
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      currentIndex = match.end;
+    }
+
+    // Add remaining text
+    if (currentIndex < curText.length) {
+      textSpans.add(TextSpan(text: curText.substring(currentIndex), style: style));
+    }
+    return textSpans;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final defaultStyle = DefaultTextStyle.of(context).style;
+    final textSpans = buildTextSpans(text, defaultStyle);
+
+    return RichText(text: TextSpan(children: textSpans, style: defaultStyle));
   }
 }

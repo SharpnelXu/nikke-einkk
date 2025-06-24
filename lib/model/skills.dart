@@ -877,3 +877,27 @@ class SkillInfoData {
 
   factory SkillInfoData.fromJson(Map<String, dynamic> json) => _$SkillInfoDataFromJson(json);
 }
+
+@JsonSerializable(createToJson: false)
+class WordGroupData {
+  final int id;
+  final String group;
+  @JsonKey(name: 'page_number')
+  final int pageNumber;
+  final int order;
+  @JsonKey(name: 'resource_type')
+  final String resourceType;
+  @JsonKey(name: 'resource_value')
+  final String resourceValue;
+
+  WordGroupData({
+    this.id = 0,
+    this.group = '',
+    this.pageNumber = 0,
+    this.order = 0,
+    this.resourceType = '',
+    this.resourceValue = '',
+  });
+
+  factory WordGroupData.fromJson(Map<String, dynamic> json) => _$WordGroupDataFromJson(json);
+}

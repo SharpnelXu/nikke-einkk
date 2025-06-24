@@ -91,6 +91,7 @@ class LocaleUnpackerPage extends StatelessWidget {
 
                 await EasyLoading.dismiss();
                 locale.init();
+                await EasyLoading.showInfo('Success');
               },
               child: Text('Select Directory And Unpack'),
             ),
