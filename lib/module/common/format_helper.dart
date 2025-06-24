@@ -5,6 +5,7 @@ import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 /// From source_helper:CaseHelper package
@@ -50,12 +51,12 @@ String coreString(int coreLevel) {
   return result;
 }
 
-String dollLvString(BattleFavoriteItem? doll, int dollLevel) {
+String dollLvString(FavoriteItemData? doll, int dollLevel) {
   if (doll == null) {
     return dollLevel.toString();
   }
 
-  if (doll.rarity == Rarity.ssr) {
+  if (doll.favoriteRare == Rarity.ssr) {
     String result = '★';
     for (int i = 0; i < dollLevel; i += 1) {
       result += '★';

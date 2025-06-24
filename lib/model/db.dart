@@ -97,6 +97,7 @@ class NikkeDatabaseV2 {
   final Map<int, SkillData> characterSkillTable = {};
   final Map<int, SkillInfoData> skillInfoTable = {};
   final Map<String, List<WordGroupData>> wordGroupTable = {};
+  final Map<int, FavoriteItemData> nameCodeFavItemTable = {};
 
   void init() {
     unionRaidData.clear();
@@ -115,6 +116,7 @@ class NikkeDatabaseV2 {
     characterSkillTable.clear();
     skillInfoTable.clear();
     wordGroupTable.clear();
+    nameCodeFavItemTable.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     initialized = true;
@@ -156,6 +158,7 @@ class NikkeDatabaseV2 {
     );
     initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'SkillInfoTable.json'), processSkillInfoData);
     initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'WordTable.json'), processWordGroupData);
+    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'FavoriteItemTable.json'), processDollData);
 
     initialized &= loadCsv(getDesignatedDirectory(extractFolderPath, 'WaveData.GroupDict.csv'), processWaveDict);
   }
@@ -271,6 +274,13 @@ class NikkeDatabaseV2 {
     final data = WordGroupData.fromJson(record);
     wordGroupTable.putIfAbsent(data.group, () => []);
     wordGroupTable[data.group]!.add(data);
+  }
+
+  void processDollData(dynamic record) {
+    final data = FavoriteItemData.fromJson(record);
+    if (data.favoriteRare == Rarity.ssr) {
+      nameCodeFavItemTable[data.nameCode] = data;
+    }
   }
 }
 

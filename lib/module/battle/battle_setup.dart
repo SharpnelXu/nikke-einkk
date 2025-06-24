@@ -271,7 +271,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
     final dollString =
         doll == null
             ? 'None'
-            : '${doll.rarity.name.toUpperCase()} (Lv ${doll.rarity == Rarity.ssr ? dollLvString(doll, doll.level) : doll.level})';
+            : '${doll.rarity.name.toUpperCase()} (Lv ${doll.rarity == Rarity.ssr ? dollLvString(doll.data, doll.level) : doll.level})';
 
     final List<Widget> statDisplays = [];
 

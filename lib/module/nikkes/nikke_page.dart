@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/skill_display.dart';
@@ -23,6 +24,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   NikkeCharacterData get data => widget.data;
   WeaponData? get weapon => db.characterShotTable[data.shotId];
   List<int> skillLevels = [10, 10, 10];
+  bool favoriteItemSkill = true;
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +125,23 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
 
   Widget buildSkillTab(int skillId, SkillType skillType, int index) {
     final level = skillLevels[index];
-    final actualSkillId = skillId + level - 1;
+
+    final dollData = db.nameCodeFavItemTable[data.nameCode];
+    int dollGrade = 0;
+    FavoriteItemSkillGroup? dollSkill;
+
+    for (int i = 0; i < (dollData?.favoriteItemSkills.length ?? 0); i += 1) {
+      final substituteSkillData = dollData!.favoriteItemSkills[i];
+      if (substituteSkillData.skillId == 0) continue;
+
+      if (substituteSkillData.skillChangeSlot == index + 1) {
+        dollGrade = i;
+        dollSkill = substituteSkillData;
+      }
+    }
+
+    final actualSkillId = dollSkill != null && favoriteItemSkill ? dollSkill.skillId + level - 1 : skillId + level - 1;
+    final actualSkillType = dollSkill != null && favoriteItemSkill ? dollSkill.skillTable : skillType;
 
     final skillInfo = db.skillInfoTable[actualSkillId];
 
@@ -132,7 +150,23 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
         '${skillInfo == null ? 'Skill Info Not Found!' : locale.getTranslation(skillInfo.nameLocalkey)} Lv $level',
         style: TextStyle(fontSize: 20),
       ),
-      Text('Skill ID: $actualSkillId, type: ${skillType == SkillType.characterSkill ? 'Active' : 'Passive'}'),
+      Wrap(
+        spacing: 5,
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          if (dollData != null) Text('Favorite Item Skill: ${dollLvString(dollData, dollGrade)}'),
+          if (dollData != null)
+            Checkbox(
+              value: favoriteItemSkill,
+              onChanged: (v) {
+                favoriteItemSkill = v!;
+                setState(() {});
+              },
+            ),
+          Text('Skill ID: $actualSkillId, type: ${actualSkillType == SkillType.characterSkill ? 'Active' : 'Passive'}'),
+        ],
+      ),
       if (skillInfo != null) DescriptionTextWidget(skillInfo, widget.useGlobal),
       SliderWithPrefix(
         titled: true,
@@ -147,7 +181,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
         },
       ),
     ];
-    if (skillType == SkillType.stateEffect) {
+    if (actualSkillType == SkillType.stateEffect) {
       final data = db.stateEffectTable[actualSkillId];
       if (data == null) {
         children.add(Text('Not Found!'));
@@ -163,7 +197,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
           ),
         );
       }
-    } else if (skillType == SkillType.characterSkill) {
+    } else if (actualSkillType == SkillType.characterSkill) {
       final data = db.characterSkillTable[actualSkillId];
       if (data == null) {
         children.add(Text('Not Found!'));
