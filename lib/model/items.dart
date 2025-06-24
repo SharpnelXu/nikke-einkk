@@ -245,10 +245,10 @@ class EquipLine {
   EquipLine.onValue(this.type, int stat) : _level = 1 {
     for (int level = 1; level <= 15; level += 1) {
       _level = level;
-      final stateEffectData = db.stateEffectTable[getStateEffectId()]!;
+      final stateEffectData = dbLegacy.stateEffectTable[getStateEffectId()]!;
       for (final functionId in stateEffectData.functions) {
         if (functionId.function != 0) {
-          final function = db.functionTable[functionId.function]!;
+          final function = dbLegacy.functionTable[functionId.function]!;
           if (stat == function.functionValue) {
             return;
           }

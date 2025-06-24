@@ -14,10 +14,10 @@ class UnionRaidPresetPage extends StatefulWidget {
 }
 
 class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
-  bool useGlobal = true;
   int? urPreset;
 
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  bool get useGlobal => userDb.useGlobal;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
   @override
   Widget build(BuildContext context) {
@@ -70,11 +70,7 @@ class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
           child: Text('Data not initialized! Click to download'),
         ),
       for (final difficulty in difficultyToWaveChangeStep.keys)
-        UnionRaidDataDisplay(
-          difficulty: difficulty,
-          raidData: difficultyToWaveChangeStep[difficulty]!,
-          useGlobal: useGlobal,
-        ),
+        UnionRaidDataDisplay(difficulty: difficulty, raidData: difficultyToWaveChangeStep[difficulty]!),
     ];
 
     return Scaffold(
@@ -92,7 +88,7 @@ class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
   }
 
   void serverRadioChange(bool? v) {
-    useGlobal = v ?? useGlobal;
+    userDb.useGlobal = v ?? useGlobal;
     if (!db.unionRaidData.keys.contains(urPreset)) {
       urPreset = null;
     }
@@ -102,11 +98,10 @@ class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
 
 class UnionRaidDataDisplay extends StatefulWidget {
   final String difficulty;
-  final bool useGlobal;
   // grouped by waveChangeStep
   final Map<int, List<UnionRaidWaveData>> raidData;
 
-  const UnionRaidDataDisplay({super.key, required this.difficulty, required this.raidData, required this.useGlobal});
+  const UnionRaidDataDisplay({super.key, required this.difficulty, required this.raidData});
 
   @override
   State<UnionRaidDataDisplay> createState() => _UnionRaidDataDisplayState();
@@ -161,9 +156,7 @@ class _UnionRaidDataDisplayState extends State<UnionRaidDataDisplay> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 5,
-            children: [
-              for (final data in sortedCurrentWave) UnionRaidBossDisplay(data: data, useGlobal: widget.useGlobal),
-            ],
+            children: [for (final data in sortedCurrentWave) UnionRaidBossDisplay(data: data)],
           ),
         ],
       ),
@@ -173,10 +166,9 @@ class _UnionRaidDataDisplayState extends State<UnionRaidDataDisplay> {
 
 class UnionRaidBossDisplay extends StatelessWidget {
   final UnionRaidWaveData data;
-  final bool useGlobal;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
-  const UnionRaidBossDisplay({super.key, required this.data, required this.useGlobal});
+  const UnionRaidBossDisplay({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +198,6 @@ class UnionRaidBossDisplay extends StatelessWidget {
           Text('Time Limit: ${waveData?.battleTime} s'),
           for (final target in targets)
             RaptureLeveledDataDisplay(
-              useGlobal: useGlobal,
               data: target,
               stageLv: data.monsterStageLevel,
               stageLvChangeGroup: data.monsterStageLevelChangeGroup,

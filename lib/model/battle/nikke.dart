@@ -51,7 +51,7 @@ class BattleNikkeOptions {
        skillLevels = skillLevels.toList() {
     final favoriteItemNameCode = favoriteItem?.data.nameCode ?? -1;
     if (favoriteItemNameCode > 0 &&
-        favoriteItemNameCode != db.characterResourceGardeTable[nikkeResourceId]?[coreLevel]?.nameCode) {
+        favoriteItemNameCode != dbLegacy.characterResourceGardeTable[nikkeResourceId]?[coreLevel]?.nameCode) {
       favoriteItem = null;
     }
   }
@@ -61,13 +61,13 @@ class BattleNikkeOptions {
   Map<String, dynamic> toJson() => _$BattleNikkeOptionsToJson(this);
 
   void errorCorrection() {
-    if (!db.characterResourceGardeTable.containsKey(nikkeResourceId)) {
+    if (!dbLegacy.characterResourceGardeTable.containsKey(nikkeResourceId)) {
       return;
     }
 
-    syncLevel = syncLevel.clamp(1, db.maxSyncLevel);
+    syncLevel = syncLevel.clamp(1, dbLegacy.maxSyncLevel);
 
-    final groupedData = db.characterResourceGardeTable[nikkeResourceId]!;
+    final groupedData = dbLegacy.characterResourceGardeTable[nikkeResourceId]!;
     final coreLevels = groupedData.keys.toList();
     coreLevels.sort();
     coreLevel.clamp(coreLevels.first, coreLevels.last);
@@ -125,10 +125,10 @@ class BattleNikkeOptions {
     }
 
     final doll = favoriteItem;
-    final weapon = db.characterShotTable[characterData.shotId]!;
+    final weapon = dbLegacy.characterShotTable[characterData.shotId]!;
     if (doll != null) {
       doll.weaponType = weapon.weaponType;
-      if (doll.rarity == Rarity.ssr && !db.nameCodeFavItemTable.containsKey(characterData.nameCode)) {
+      if (doll.rarity == Rarity.ssr && !dbLegacy.nameCodeFavItemTable.containsKey(characterData.nameCode)) {
         doll.rarity = Rarity.sr;
         doll.nameCode = 0;
       }
@@ -182,13 +182,13 @@ class BattleCover extends BattleEntity {
   String get name => 'Cover';
 
   @override
-  int get baseHp => db.coverStatTable[level]!.levelHp;
+  int get baseHp => dbLegacy.coverStatTable[level]!.levelHp;
 
   @override
   int get baseAttack => 0;
 
   @override
-  int get baseDefence => db.coverStatTable[level]!.levelDefence;
+  int get baseDefence => dbLegacy.coverStatTable[level]!.levelDefence;
 
   BattleCover(this.level);
 
@@ -204,10 +204,11 @@ class BattleNikke extends BattleEntity {
 
   int fps = 60;
 
-  NikkeCharacterData get characterData => db.characterResourceGardeTable[option.nikkeResourceId]![option.coreLevel]!;
+  NikkeCharacterData get characterData =>
+      dbLegacy.characterResourceGardeTable[option.nikkeResourceId]![option.coreLevel]!;
   @override
-  String get name => db.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId.toString();
-  WeaponData get baseWeaponData => db.characterShotTable[characterData.shotId]!;
+  String get name => dbLegacy.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId.toString();
+  WeaponData get baseWeaponData => dbLegacy.characterShotTable[characterData.shotId]!;
   // skill data
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
@@ -220,11 +221,11 @@ class BattleNikke extends BattleEntity {
   int get coreLevel => characterData.gradeCoreId;
 
   CharacterStatData get baseStat =>
-      db.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ?? CharacterStatData.emptyData;
+      dbLegacy.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ?? CharacterStatData.emptyData;
   CharacterStatEnhanceData get statEnhanceData =>
-      db.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
+      dbLegacy.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
   ClassAttractiveStatData get attractiveStat =>
-      db.attractiveStatTable[option.attractLevel]?.getStatData(nikkeClass) ?? ClassAttractiveStatData.emptyData;
+      dbLegacy.attractiveStatTable[option.attractLevel]?.getStatData(nikkeClass) ?? ClassAttractiveStatData.emptyData;
 
   @override
   int get baseHp => BattleUtils.getBaseStat(
@@ -706,7 +707,8 @@ class BattleNikke extends BattleEntity {
       }
 
       for (final buff in buffs) {
-        if (buff.data.durationType == DurationType.shots && db.onShotFunctionTypes.contains(buff.data.functionType)) {
+        if (buff.data.durationType == DurationType.shots &&
+            dbLegacy.onShotFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }
@@ -727,7 +729,8 @@ class BattleNikke extends BattleEntity {
 
     if (event is RaptureDamageEvent && event.targetUniqueId == uniqueId) {
       for (final buff in buffs) {
-        if (buff.data.durationType == DurationType.shots && db.onHitFunctionTypes.contains(buff.data.functionType)) {
+        if (buff.data.durationType == DurationType.shots &&
+            dbLegacy.onHitFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }

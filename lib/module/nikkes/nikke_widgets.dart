@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
+import 'package:nikke_einkk/module/nikkes/nikke_list.dart';
 
 const avatarSize = 120.0;
 
@@ -65,13 +67,12 @@ class NikkeIcon extends StatelessWidget {
 }
 
 class WeaponDataDisplay extends StatelessWidget {
-  final bool useGlobal;
   final NikkeCharacterData? character;
   final int weaponId;
 
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
-  const WeaponDataDisplay({super.key, this.character, required this.weaponId, required this.useGlobal});
+  const WeaponDataDisplay({super.key, this.character, required this.weaponId});
 
   @override
   Widget build(BuildContext context) {
@@ -249,5 +250,90 @@ class WeaponDataDisplay extends StatelessWidget {
       ]);
     }
     return Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children);
+  }
+}
+
+class NikkeAdvancedFilterDialog extends StatefulWidget {
+  final NikkeFilterData filterData;
+  const NikkeAdvancedFilterDialog({super.key, required this.filterData});
+
+  @override
+  State<NikkeAdvancedFilterDialog> createState() => _NikkeAdvancedFilterDialogState();
+}
+
+class _NikkeAdvancedFilterDialogState extends State<NikkeAdvancedFilterDialog> {
+  NikkeFilterData get filterData => widget.filterData;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Advanced Nikke Filter'),
+      content: Column(
+        spacing: 5,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Skill Types', style: TextStyle(fontSize: 18)),
+          Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            children:
+                CharacterSkillType.sorted.map((type) {
+                  final enabled = filterData.skillTypes.contains(type);
+                  return FilledButton(
+                    style: FilledButton.styleFrom(
+                      foregroundColor: enabled ? Colors.white : Colors.black,
+                      backgroundColor: enabled ? Colors.blue : Colors.white,
+                    ),
+                    onPressed: () {
+                      if (enabled) {
+                        filterData.skillTypes.remove(type);
+                      } else {
+                        filterData.skillTypes.add(type);
+                      }
+                      setState(() {});
+                    },
+                    child: Text(type.name),
+                  );
+                }).toList(),
+          ),
+          Text('~~~~~'),
+          Text('Function Types', style: TextStyle(fontSize: 18)),
+          Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            children:
+                FunctionType.sorted.map((type) {
+                  final enabled = filterData.funcTypes.contains(type);
+                  return FilledButton(
+                    style: FilledButton.styleFrom(
+                      foregroundColor: enabled ? Colors.white : Colors.black,
+                      backgroundColor: enabled ? Colors.blue : Colors.white,
+                    ),
+                    onPressed: () {
+                      if (enabled) {
+                        filterData.funcTypes.remove(type);
+                      } else {
+                        filterData.funcTypes.add(type);
+                      }
+                      setState(() {});
+                    },
+                    child: Text(type.name),
+                  );
+                }).toList(),
+          ),
+        ],
+      ),
+      contentPadding: const EdgeInsetsDirectional.fromSTEB(24.0, 20.0, 24.0, 24.0),
+      scrollable: true,
+      actions: [
+        TextButton(
+          child: Text('OK'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+    );
   }
 }

@@ -13,11 +13,11 @@ class MonsterListPage extends StatefulWidget {
 }
 
 class _MonsterListPageState extends State<MonsterListPage> {
-  bool useGlobal = true;
   final filterData = MonsterFilterData();
   final searchController = TextEditingController();
 
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  bool get useGlobal => userDb.useGlobal;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
   @override
   void dispose() {
@@ -26,7 +26,7 @@ class _MonsterListPageState extends State<MonsterListPage> {
   }
 
   void serverRadioChange(bool? v) {
-    useGlobal = v ?? useGlobal;
+    userDb.useGlobal = v ?? useGlobal;
     if (mounted) setState(() {});
   }
 
@@ -115,9 +115,7 @@ class _MonsterListPageState extends State<MonsterListPage> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (ctx) => RaptureDataDisplayPage(useGlobal: useGlobal, data: raptureData),
-                            ),
+                            MaterialPageRoute(builder: (ctx) => RaptureDataDisplayPage(data: raptureData)),
                           );
                         },
                         child: Text('${locale.getTranslation(raptureData.nameKey)}, ID: ${raptureData.id}'),

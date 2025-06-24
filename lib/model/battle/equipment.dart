@@ -17,7 +17,7 @@ class BattleEquipment {
   EquipType type;
   NikkeClass equipClass;
   EquipRarity rarity;
-  EquipmentData get equipData => db.groupedEquipTable[type]![equipClass]![rarity]!;
+  EquipmentData get equipData => dbLegacy.groupedEquipTable[type]![equipClass]![rarity]!;
   Corporation _corporation = Corporation.none;
   Corporation get corporation => _corporation;
   set corporation(Corporation newCorp) {
@@ -88,11 +88,11 @@ class BattleEquipment {
     for (final equipLine in equipLines) {
       if (equipLine.type == EquipLineType.none) continue;
 
-      final stateEffectData = db.stateEffectTable[equipLine.getStateEffectId()]!;
+      final stateEffectData = dbLegacy.stateEffectTable[equipLine.getStateEffectId()]!;
       wearer.functions.addAll(
         stateEffectData.functions
             .where((data) => data.function != 0)
-            .map((data) => BattleFunction(db.functionTable[data.function]!, wearer.uniqueId)),
+            .map((data) => BattleFunction(dbLegacy.functionTable[data.function]!, wearer.uniqueId)),
       );
     }
   }

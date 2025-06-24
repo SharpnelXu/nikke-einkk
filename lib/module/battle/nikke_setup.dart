@@ -28,9 +28,9 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
   Widget build(BuildContext context) {
     option.errorCorrection();
 
-    final characterData = db.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
-    final weapon = db.characterShotTable[characterData?.shotId];
-    final name = db.getTranslation(characterData?.nameLocalkey)?.zhCN;
+    final characterData = dbLegacy.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
+    final weapon = dbLegacy.characterShotTable[characterData?.shotId];
+    final name = dbLegacy.getTranslation(characterData?.nameLocalkey)?.zhCN;
     final List<Widget> chargeWeaponAdditionalSettings = [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -103,7 +103,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                   width: 100,
                   child: RangedNumberTextField(
                     minValue: 1,
-                    maxValue: db.maxSyncLevel,
+                    maxValue: dbLegacy.maxSyncLevel,
                     defaultValue: option.syncLevel,
                     onChangeFunction:
                         (newValue) => setState(() {
@@ -168,11 +168,10 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
         children: [
           Expanded(
             child: NikkeGrids(
-              useGlobal: true,
               onCall: (data) {
                 option.nikkeResourceId = data.resourceId;
-                if (db.userData.nikkeOptions.containsKey(option.nikkeResourceId)) {
-                  option.copyFrom(db.userData.nikkeOptions[option.nikkeResourceId]!);
+                if (dbLegacy.userData.nikkeOptions.containsKey(option.nikkeResourceId)) {
+                  option.copyFrom(dbLegacy.userData.nikkeOptions[option.nikkeResourceId]!);
                 }
                 if (mounted) setState(() {});
               },
@@ -188,7 +187,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
   Widget _buildDollColumn(int? nameCode, WeaponType? weaponType) {
     final doll = option.favoriteItem;
     final allowedRare = [Rarity.unknown, Rarity.r, Rarity.sr];
-    if (nameCode != null && db.nameCodeFavItemTable.containsKey(nameCode)) {
+    if (nameCode != null && dbLegacy.nameCodeFavItemTable.containsKey(nameCode)) {
       allowedRare.add(Rarity.ssr);
     }
     final entries = UnmodifiableListView<DropdownMenuEntry<Rarity>>(
@@ -229,7 +228,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                         );
                       }
                       if (value == Rarity.ssr) {
-                        if (nameCode != null && db.nameCodeFavItemTable.containsKey(nameCode)) {
+                        if (nameCode != null && dbLegacy.nameCodeFavItemTable.containsKey(nameCode)) {
                           option.favoriteItem!.nameCode = nameCode;
                         } else {
                           option.favoriteItem!.nameCode = 0;
@@ -401,13 +400,14 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                           titled: true,
                           label: 'Lv',
                           valueFormatter: (level) {
-                            final stateEffectData = db.stateEffectTable[equipment.equipLines[index].getStateEffectId()];
+                            final stateEffectData =
+                                dbLegacy.stateEffectTable[equipment.equipLines[index].getStateEffectId()];
                             if (stateEffectData == null) {
                               return level.toString();
                             }
                             for (final functionId in stateEffectData.functions) {
                               if (functionId.function != 0) {
-                                final function = db.functionTable[functionId.function]!;
+                                final function = dbLegacy.functionTable[functionId.function]!;
                                 return '$level (${(function.functionValue / 100).toStringAsFixed(2)}%)';
                               }
                             }

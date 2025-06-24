@@ -474,7 +474,7 @@ void main() async {
         final stateEffectId = line.getStateEffectId();
 
         expect(stateEffectId, isNonZero);
-        expect(db.stateEffectTable.containsKey(stateEffectId), true);
+        expect(dbLegacy.stateEffectTable.containsKey(stateEffectId), true);
       }
     }
   });
@@ -488,14 +488,14 @@ void main() async {
         expect(stateEffectIds.length, isNonZero);
         for (final stateEffectId in stateEffectIds) {
           expect(stateEffectId, isNonZero);
-          expect(db.stateEffectTable.containsKey(stateEffectId), true);
+          expect(dbLegacy.stateEffectTable.containsKey(stateEffectId), true);
         }
       }
     }
   });
 
   test('Favorite Item Effect Exists', () {
-    for (final groupedData in db.dollTable.values) {
+    for (final groupedData in dbLegacy.dollTable.values) {
       for (final favoriteItemData in groupedData.values) {
         for (int level = 0; level <= 15; level += 1) {
           final doll = BattleFavoriteItem(
@@ -508,13 +508,13 @@ void main() async {
           expect(stateEffectIds.length, isNonZero);
           for (final stateEffectId in stateEffectIds) {
             expect(stateEffectId, isNonZero);
-            expect(db.stateEffectTable.containsKey(stateEffectId), true);
+            expect(dbLegacy.stateEffectTable.containsKey(stateEffectId), true);
           }
         }
       }
     }
 
-    for (final favoriteItemData in db.nameCodeFavItemTable.values) {
+    for (final favoriteItemData in dbLegacy.nameCodeFavItemTable.values) {
       for (int level = 0; level <= 2; level += 1) {
         final doll = BattleFavoriteItem(
           weaponType: favoriteItemData.weaponType,
@@ -527,7 +527,7 @@ void main() async {
         expect(stateEffectIds.length, isNonZero);
         for (final stateEffectId in stateEffectIds) {
           expect(stateEffectId, isNonZero);
-          expect(db.stateEffectTable.containsKey(stateEffectId), true);
+          expect(dbLegacy.stateEffectTable.containsKey(stateEffectId), true);
         }
       }
     }

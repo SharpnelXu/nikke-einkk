@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
@@ -34,6 +35,10 @@ enum CharacterSkillType {
   static CharacterSkillType fromName(String? name) {
     return _reverseMap[name] ?? CharacterSkillType.unknown;
   }
+
+  static List<CharacterSkillType> sorted = CharacterSkillType.values.toList().sorted(
+    (a, b) => a.name.compareTo(b.name),
+  );
 }
 
 // "durationType": "{TimeSec, None, Shots, Battles}"
@@ -417,8 +422,7 @@ enum FunctionType {
   immediatelyBuffCheckImmune,
   changeHurtFxExcludingBreakCol,
   plusBuffCount, // seems to be CN exclusive
-  durationDamage
-  ;
+  durationDamage;
 
   static final Map<String, FunctionType> _reverseMap = Map.fromIterable(
     FunctionType.values,
@@ -430,6 +434,8 @@ enum FunctionType {
   static FunctionType fromName(String name) {
     return _reverseMap[name] ?? FunctionType.unknown;
   }
+
+  static List<FunctionType> sorted = FunctionType.values.toList().sorted((a, b) => a.name.compareTo(b.name));
 }
 
 // functionTarget may not mean the actual function target based on Flora's Skill 2 (checks teammates on both sides

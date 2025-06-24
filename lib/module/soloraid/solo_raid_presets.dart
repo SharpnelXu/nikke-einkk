@@ -14,10 +14,10 @@ class SoloRaidPresetPage extends StatefulWidget {
 }
 
 class _SoloRaidPresetPageState extends State<SoloRaidPresetPage> {
-  bool useGlobal = true;
   int? srPreset;
 
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  bool get useGlobal => userDb.useGlobal;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
   @override
   Widget build(BuildContext context) {
@@ -74,11 +74,7 @@ class _SoloRaidPresetPageState extends State<SoloRaidPresetPage> {
         spacing: 3,
         children: [
           for (final difficulty in difficultyToWaveOrder.keys)
-            SoloRaidDataDisplay(
-              difficulty: difficulty,
-              raidData: difficultyToWaveOrder[difficulty]!,
-              useGlobal: useGlobal,
-            ),
+            SoloRaidDataDisplay(difficulty: difficulty, raidData: difficultyToWaveOrder[difficulty]!),
         ],
       ),
     ];
@@ -98,7 +94,7 @@ class _SoloRaidPresetPageState extends State<SoloRaidPresetPage> {
   }
 
   void serverRadioChange(bool? v) {
-    useGlobal = v ?? useGlobal;
+    userDb.useGlobal = v ?? useGlobal;
     if (!db.soloRaidData.keys.contains(srPreset)) {
       srPreset = null;
     }
@@ -108,11 +104,10 @@ class _SoloRaidPresetPageState extends State<SoloRaidPresetPage> {
 
 class SoloRaidDataDisplay extends StatefulWidget {
   final String difficulty;
-  final bool useGlobal;
   // grouped by waveChangeStep
   final Map<int, List<SoloRaidWaveData>> raidData;
 
-  const SoloRaidDataDisplay({super.key, required this.difficulty, required this.raidData, required this.useGlobal});
+  const SoloRaidDataDisplay({super.key, required this.difficulty, required this.raidData});
 
   @override
   State<SoloRaidDataDisplay> createState() => _SoloRaidDataDisplayState();
@@ -167,9 +162,7 @@ class _SoloRaidDataDisplayState extends State<SoloRaidDataDisplay> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 5,
-            children: [
-              for (final data in sortedCurrentWave) SoloRaidBossDisplay(data: data, useGlobal: widget.useGlobal),
-            ],
+            children: [for (final data in sortedCurrentWave) SoloRaidBossDisplay(data: data)],
           ),
         ],
       ),
@@ -179,10 +172,9 @@ class _SoloRaidDataDisplayState extends State<SoloRaidDataDisplay> {
 
 class SoloRaidBossDisplay extends StatelessWidget {
   final SoloRaidWaveData data;
-  final bool useGlobal;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
-  const SoloRaidBossDisplay({super.key, required this.data, required this.useGlobal});
+  const SoloRaidBossDisplay({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +204,6 @@ class SoloRaidBossDisplay extends StatelessWidget {
           Text('Time Limit: ${waveData?.battleTime} s'),
           for (final target in targets)
             RaptureLeveledDataDisplay(
-              useGlobal: useGlobal,
               data: target,
               stageLv: data.monsterStageLevel,
               stageLvChangeGroup: data.monsterStageLevelChangeGroup,

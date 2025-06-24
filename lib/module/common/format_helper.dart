@@ -72,8 +72,8 @@ String dollLvString(FavoriteItemData? doll, int dollLevel) {
 const avatarSize = 120.0;
 
 Widget buildNikkeIcon(NikkeCharacterData? characterData, bool isSelected, [String defaultText = 'None']) {
-  final name = db.getTranslation(characterData?.nameLocalkey)?.zhCN ?? characterData?.resourceId ?? defaultText;
-  final weapon = db.characterShotTable[characterData?.shotId];
+  final name = dbLegacy.getTranslation(characterData?.nameLocalkey)?.zhCN ?? characterData?.resourceId ?? defaultText;
+  final weapon = dbLegacy.characterShotTable[characterData?.shotId];
 
   final colors =
       characterData?.elementId
@@ -304,17 +304,14 @@ List<InlineSpan> buildDescriptionTextSpans(String curText, TextStyle style, Nikk
 
 class DescriptionTextWidget extends StatelessWidget {
   final SkillInfoData skillInfoData;
-  final bool useGlobal;
 
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
-
-  const DescriptionTextWidget(this.skillInfoData, this.useGlobal, {super.key});
+  const DescriptionTextWidget(this.skillInfoData, {super.key});
 
   @override
   Widget build(BuildContext context) {
     final text = formatSkillInfoDescription(skillInfoData);
     final defaultStyle = DefaultTextStyle.of(context).style;
-    final textSpans = buildDescriptionTextSpans(text, defaultStyle, db);
+    final textSpans = buildDescriptionTextSpans(text, defaultStyle, userDb.gameDb);
 
     return RichText(text: TextSpan(children: textSpans, style: defaultStyle));
   }

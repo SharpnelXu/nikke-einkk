@@ -7,12 +7,11 @@ import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
 class CharacterSkillDataDisplay extends StatelessWidget {
-  final bool useGlobal;
   final SkillData data;
 
-  const CharacterSkillDataDisplay({super.key, required this.useGlobal, required this.data});
+  const CharacterSkillDataDisplay({super.key, required this.data});
 
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +83,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('↓↓↓ Equip This Weapon  ↓↓↓', style: TextStyle(fontSize: 16)),
-            WeaponDataDisplay(useGlobal: useGlobal, weaponId: data.skillValueData[2].skillValue),
+            WeaponDataDisplay(weaponId: data.skillValueData[2].skillValue),
           ],
         ),
       );
@@ -102,10 +101,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
-            children: [
-              Text('Function ${idx + 1}'),
-              SimpleFunctionDisplay(functionId: functionIds[idx], useGlobal: useGlobal),
-            ],
+            children: [Text('Function ${idx + 1}'), SimpleFunctionDisplay(functionId: functionIds[idx])],
           ),
         ),
     ];
@@ -119,12 +115,11 @@ class CharacterSkillDataDisplay extends StatelessWidget {
 }
 
 class StateEffectDataDisplay extends StatelessWidget {
-  final bool useGlobal;
   final StateEffectData data;
 
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
-  const StateEffectDataDisplay({super.key, required this.data, required this.useGlobal});
+  const StateEffectDataDisplay({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -171,10 +166,7 @@ class StateEffectDataDisplay extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               spacing: 3,
-              children: [
-                Text('Function ${idx + 1}'),
-                SimpleFunctionDisplay(functionId: functionIds[idx], useGlobal: useGlobal),
-              ],
+              children: [Text('Function ${idx + 1}'), SimpleFunctionDisplay(functionId: functionIds[idx])],
             ),
           ),
       ],
@@ -183,12 +175,11 @@ class StateEffectDataDisplay extends StatelessWidget {
 }
 
 class SimpleFunctionDisplay extends StatelessWidget {
-  final bool useGlobal;
   final int functionId;
 
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
-  const SimpleFunctionDisplay({super.key, required this.functionId, required this.useGlobal});
+  const SimpleFunctionDisplay({super.key, required this.functionId});
 
   @override
   Widget build(BuildContext context) {
@@ -265,7 +256,7 @@ class SimpleFunctionDisplay extends StatelessWidget {
               border: Border.all(color: buffTypeColor(db.functionTable[functionId]?.buff), width: 2),
               borderRadius: BorderRadius.circular(5),
             ),
-            child: SimpleFunctionDisplay(functionId: connectedFunc, useGlobal: useGlobal),
+            child: SimpleFunctionDisplay(functionId: connectedFunc),
           ),
       ];
       children.addAll([
@@ -302,7 +293,7 @@ class SimpleFunctionDisplay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('↓↓↓ Invoke This Skill ↓↓↓', style: TextStyle(fontSize: 16)),
-              skillData == null ? Text('Not Found!') : CharacterSkillDataDisplay(useGlobal: useGlobal, data: skillData),
+              skillData == null ? Text('Not Found!') : CharacterSkillDataDisplay(data: skillData),
             ],
           ),
         );
@@ -320,12 +311,11 @@ class SimpleFunctionDisplay extends StatelessWidget {
 }
 
 class MonsterSkillDataDisplay extends StatelessWidget {
-  final bool useGlobal;
   final MonsterSkillData data;
 
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
-  const MonsterSkillDataDisplay({super.key, required this.data, required this.useGlobal});
+  const MonsterSkillDataDisplay({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {

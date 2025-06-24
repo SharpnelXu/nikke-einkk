@@ -7,7 +7,12 @@ final userDataPath = path.join(appPath, 'userData');
 
 String getStaticDataPath(bool global, [String? version]) {
   final server = global ? 'global' : 'cn';
-  return path.join(appPath, 'data', server, 'StaticData${version != null ? '-${version.replaceAll('/', '-')}' : ''}.pack');
+  return path.join(
+    appPath,
+    'data',
+    server,
+    'StaticData${version != null ? '-${version.replaceAll('/', '-')}' : ''}.pack',
+  );
 }
 
 String getExtractDataFolderPath(bool global) {

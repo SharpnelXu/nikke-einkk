@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_page.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
@@ -13,9 +14,7 @@ class NikkeListPage extends StatefulWidget {
 }
 
 class _NikkeListPageState extends State<NikkeListPage> {
-  bool useGlobal = true;
-
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  bool get useGlobal => userDb.useGlobal;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,13 +32,9 @@ class _NikkeListPageState extends State<NikkeListPage> {
         ),
       ),
       body: NikkeGrids(
-        useGlobal: useGlobal,
         includeInvisible: true,
         onCall: (data) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (ctx) => NikkeCharacterPage(useGlobal: useGlobal, data: data)),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => NikkeCharacterPage(data: data)));
         },
       ),
       bottomNavigationBar: commonBottomNavigationBar(() => setState(() {})),
@@ -47,18 +42,17 @@ class _NikkeListPageState extends State<NikkeListPage> {
   }
 
   void serverRadioChange(bool? v) {
-    useGlobal = v ?? useGlobal;
+    userDb.useGlobal = v ?? useGlobal;
     if (mounted) setState(() {});
   }
 }
 
 class NikkeGrids extends StatefulWidget {
-  final bool useGlobal;
   final bool includeInvisible;
   final void Function(NikkeCharacterData)? onCall;
   final bool Function(NikkeCharacterData)? isSelected;
 
-  const NikkeGrids({super.key, required this.useGlobal, this.onCall, this.isSelected, this.includeInvisible = false});
+  const NikkeGrids({super.key, this.onCall, this.isSelected, this.includeInvisible = false});
 
   @override
   State<NikkeGrids> createState() => _NikkeGridsState();
@@ -69,7 +63,7 @@ class _NikkeGridsState extends State<NikkeGrids> {
   ScrollController scrollController = ScrollController();
   bool extraFilters = false;
 
-  NikkeDatabaseV2 get db => widget.useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
   @override
   void dispose() {
@@ -120,6 +114,18 @@ class _NikkeGridsState extends State<NikkeGrids> {
                 child: Text(buttonStep.toString()),
               );
             }),
+            const VerticalDivider(width: 5, color: Colors.grey),
+            FilledButton(
+              onPressed: () async {
+                await showDialog(
+                  context: context,
+                  builder: (ctx) {
+                    return NikkeAdvancedFilterDialog(filterData: filterData);
+                  },
+                );
+              },
+              child: Text('Advanced Filter'),
+            ),
           ],
         ),
       ),
@@ -330,18 +336,25 @@ class NikkeFilterData {
   List<NikkeClass> classes = [];
   List<WeaponType> weaponTypes = [];
   List<Rarity> rarity = [Rarity.ssr];
+  List<CharacterSkillType> skillTypes = [];
+  List<FunctionType> funcTypes = [];
+
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
   bool shouldInclude(NikkeCharacterData characterData, WeaponData? weapon) {
-    final redHoodCheck = characterData.useBurstSkill == BurstStep.allStep;
-    final rapiRedHoodCheck = burstSteps.contains(BurstStep.step1) && characterData.resourceId == 16;
-    final burstCheck =
-        burstSteps.isEmpty || burstSteps.contains(characterData.useBurstSkill) || redHoodCheck || rapiRedHoodCheck;
-    return burstCheck &&
+    return _burstCheck(characterData) &&
         (corps.isEmpty || corps.contains(characterData.corporation)) &&
         (elements.isEmpty || characterData.elementId.any((eleId) => elements.contains(NikkeElement.fromId(eleId)))) &&
         (classes.isEmpty || classes.contains(characterData.characterClass)) &&
         (weaponTypes.isEmpty || weaponTypes.contains(weapon?.weaponType)) &&
         (rarity.isEmpty || rarity.contains(characterData.originalRare));
+  }
+
+  bool _burstCheck(NikkeCharacterData characterData) {
+    if (burstSteps.isEmpty || burstSteps.contains(characterData.useBurstSkill)) return true;
+    final redHoodCheck = characterData.useBurstSkill == BurstStep.allStep;
+    final rapiRedHoodCheck = burstSteps.contains(BurstStep.step1) && characterData.resourceId == 16;
+    return redHoodCheck || rapiRedHoodCheck;
   }
 
   void reset() {
@@ -352,5 +365,7 @@ class NikkeFilterData {
     weaponTypes.clear();
     rarity.clear();
     rarity.add(Rarity.ssr);
+    skillTypes.clear();
+    funcTypes.clear();
   }
 }

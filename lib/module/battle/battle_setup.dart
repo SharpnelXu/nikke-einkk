@@ -41,9 +41,9 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
   void initState() {
     super.initState();
 
-    playerOptions = db.userData.playerOptions.copy();
+    playerOptions = dbLegacy.userData.playerOptions.copy();
     final Map<HarmonyCubeType, int> storedCubeLevel = {};
-    for (final cube in db.userData.cubes) {
+    for (final cube in dbLegacy.userData.cubes) {
       storedCubeLevel[cube.type] = cube.cubeLevel;
     }
     for (final cube in cubes) {
@@ -135,7 +135,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                     String? outputFile = await FilePicker.platform.saveFile(
                       dialogTitle: 'Save battle setup',
                       fileName: 'battleSetup.json',
-                      initialDirectory: db.userDataPath,
+                      initialDirectory: dbLegacy.userDataPath,
                       type: FileType.custom,
                       allowedExtensions: ['json'],
                     );
@@ -148,7 +148,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                       final file = File(outputFile);
                       await file.writeAsString(jsonEncode(battleSetup.toJson()), encoding: utf8);
 
-                      final userData = db.userData;
+                      final userData = dbLegacy.userData;
                       userData.cubes.clear();
                       userData.cubes.addAll(cubes);
 
@@ -158,7 +158,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                           userData.nikkeOptions[nikkeOption.nikkeResourceId] = nikkeOption.copy()..cube = null;
                         }
                       }
-                      db.writeUserData();
+                      dbLegacy.writeUserData();
                     }
 
                     if (mounted) setState(() {});
@@ -170,7 +170,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                   onPressed: () async {
                     final selectResult = await FilePicker.platform.pickFiles(
                       dialogTitle: 'Load battle setup',
-                      initialDirectory: db.userDataPath,
+                      initialDirectory: dbLegacy.userDataPath,
                       type: FileType.custom,
                       allowedExtensions: ['json'],
                       allowMultiple: false,
@@ -263,9 +263,9 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
   @override
   Widget build(BuildContext context) {
     final format = NumberFormat.decimalPattern();
-    final characterData = db.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
-    final name = db.getTranslation(characterData?.nameLocalkey)?.zhCN ?? characterData?.resourceId;
-    final weapon = db.characterShotTable[characterData?.shotId];
+    final characterData = dbLegacy.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
+    final name = dbLegacy.getTranslation(characterData?.nameLocalkey)?.zhCN ?? characterData?.resourceId;
+    final weapon = dbLegacy.characterShotTable[characterData?.shotId];
 
     final doll = option.favoriteItem;
     final dollString =
@@ -281,14 +281,14 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
         if (equip == null) continue;
 
         for (final equipLine in equip.equipLines) {
-          final stateEffectData = db.stateEffectTable[equipLine.getStateEffectId()];
+          final stateEffectData = dbLegacy.stateEffectTable[equipLine.getStateEffectId()];
           if (stateEffectData == null) {
             continue;
           }
 
           for (final functionId in stateEffectData.functions) {
             if (functionId.function != 0) {
-              final function = db.functionTable[functionId.function]!;
+              final function = dbLegacy.functionTable[functionId.function]!;
               equipLineVals.putIfAbsent(equipLine.type, () => 0);
               equipLineVals[equipLine.type] = equipLineVals[equipLine.type]! + function.functionValue;
             }
@@ -297,11 +297,12 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
       }
 
       final baseStat =
-          db.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ?? CharacterStatData.emptyData;
+          dbLegacy.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ??
+          CharacterStatData.emptyData;
       final statEnhanceData =
-          db.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
+          dbLegacy.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
       final attractiveStat =
-          db.attractiveStatTable[option.attractLevel]?.getStatData(characterData.characterClass) ??
+          dbLegacy.attractiveStatTable[option.attractLevel]?.getStatData(characterData.characterClass) ??
           ClassAttractiveStatData.emptyData;
 
       final baseHp = BattleUtils.getBaseStat(
@@ -447,7 +448,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
             child: NikkeIcon(
               isSelected: true,
               characterData: characterData,
-              weapon: db.characterShotTable[characterData?.shotId],
+              weapon: dbLegacy.characterShotTable[characterData?.shotId],
               defaultText: 'Tap to select',
             ),
           ),
@@ -553,7 +554,7 @@ class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
                 width: 100,
                 child: RangedNumberTextField(
                   minValue: 1,
-                  maxValue: db.maxSyncLevel,
+                  maxValue: dbLegacy.maxSyncLevel,
                   defaultValue: globalSync,
                   onChangeFunction: (newValue) {
                     globalSync = newValue;
@@ -574,7 +575,7 @@ class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
                 width: 100,
                 child: RangedNumberTextField(
                   minValue: 1,
-                  maxValue: maxResearchLevel(db.maxSyncLevel),
+                  maxValue: maxResearchLevel(dbLegacy.maxSyncLevel),
                   defaultValue: option.personalRecycleLevel,
                   onChangeFunction: (newValue) {
                     option.personalRecycleLevel = newValue;
@@ -603,7 +604,7 @@ class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
                   width: 100,
                   child: RangedNumberTextField(
                     minValue: 1,
-                    maxValue: maxResearchLevel(db.maxSyncLevel),
+                    maxValue: maxResearchLevel(dbLegacy.maxSyncLevel),
                     defaultValue: option.classRecycleLevels[type] ?? 0,
                     onChangeFunction: (newValue) {
                       option.classRecycleLevels[type] = newValue;
@@ -632,7 +633,7 @@ class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
                 SizedBox(
                   width: 100,
                   child: RangedNumberTextField(
-                    maxValue: maxResearchLevel(db.maxSyncLevel),
+                    maxValue: maxResearchLevel(dbLegacy.maxSyncLevel),
                     defaultValue: option.corpRecycleLevels[type] ?? 0,
                     onChangeFunction: (newValue) {
                       option.corpRecycleLevels[type] = newValue;

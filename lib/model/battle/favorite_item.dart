@@ -23,9 +23,9 @@ class BattleFavoriteItem {
   Map<String, dynamic> toJson() => _$BattleFavoriteItemToJson(this);
 
   FavoriteItemData get data =>
-      rarity == Rarity.ssr ? db.nameCodeFavItemTable[nameCode]! : db.dollTable[weaponType]![rarity]!;
+      rarity == Rarity.ssr ? dbLegacy.nameCodeFavItemTable[nameCode]! : dbLegacy.dollTable[weaponType]![rarity]!;
 
-  FavoriteItemLevelData get levelData => db.favoriteItemLevelTable[data.levelEnhanceId]![level]!;
+  FavoriteItemLevelData get levelData => dbLegacy.favoriteItemLevelTable[data.levelEnhanceId]![level]!;
 
   int getStat(StatType statType) {
     return levelData.stats.firstWhereOrNull((stat) => stat.type == statType)?.value ?? 0;
@@ -38,7 +38,7 @@ class BattleFavoriteItem {
 
       final skillGroupId = data.collectionSkills[index].skillId;
       final skillLevel = levelData.skillLevels[index].level;
-      final skillLevelData = db.groupedSkillInfoTable[skillGroupId]?[skillLevel];
+      final skillLevelData = dbLegacy.groupedSkillInfoTable[skillGroupId]?[skillLevel];
 
       if (skillLevelData != null) {
         result.add(skillLevelData.id);
@@ -49,11 +49,11 @@ class BattleFavoriteItem {
 
   void applyCollectionItemEffect(BattleSimulation simulation, BattleNikke owner) {
     for (final stateEffectId in getCollectionItemStateEffectIds()) {
-      final stateEffectData = db.stateEffectTable[stateEffectId]!;
+      final stateEffectData = dbLegacy.stateEffectTable[stateEffectId]!;
       owner.functions.addAll(
         stateEffectData.functions
             .where((data) => data.function != 0)
-            .map((data) => BattleFunction(db.functionTable[data.function]!, owner.uniqueId)),
+            .map((data) => BattleFunction(dbLegacy.functionTable[data.function]!, owner.uniqueId)),
       );
     }
   }

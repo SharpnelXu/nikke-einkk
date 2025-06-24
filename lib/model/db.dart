@@ -14,7 +14,7 @@ import 'package:nikke_einkk/model/user_data.dart';
 import 'package:path/path.dart';
 
 /// db object
-final db = NikkeDatabase();
+final dbLegacy = NikkeDatabase();
 
 final locale = Locale();
 final global = NikkeDatabaseV2(true);
@@ -287,6 +287,9 @@ class NikkeDatabaseV2 {
 class UserDatabase {
   bool initialized = false;
   final Map<String, String> customizeDirectory = {};
+  bool useGlobal = true;
+
+  NikkeDatabaseV2 get gameDb => useGlobal ? global : cn;
 
   void init() {
     customizeDirectory.clear();

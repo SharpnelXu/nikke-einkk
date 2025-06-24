@@ -9,10 +9,9 @@ import 'package:nikke_einkk/module/common/slider.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
 class NikkeCharacterPage extends StatefulWidget {
-  final bool useGlobal;
   final NikkeCharacterData data;
 
-  const NikkeCharacterPage({super.key, required this.useGlobal, required this.data});
+  const NikkeCharacterPage({super.key, required this.data});
 
   @override
   State<NikkeCharacterPage> createState() => _NikkeCharacterPageState();
@@ -20,7 +19,7 @@ class NikkeCharacterPage extends StatefulWidget {
 
 class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   int tab = 0;
-  NikkeDatabaseV2 get db => widget.useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
   NikkeCharacterData get data => widget.data;
   WeaponData? get weapon => db.characterShotTable[data.shotId];
   List<int> skillLevels = [10, 10, 10];
@@ -111,7 +110,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   Widget getTab() {
     switch (tab) {
       case 0:
-        return WeaponDataDisplay(character: data, weaponId: data.shotId, useGlobal: widget.useGlobal);
+        return WeaponDataDisplay(character: data, weaponId: data.shotId);
       case 1:
         return buildSkillTab(data.skill1Id, data.skill1Table, 0);
       case 2:
@@ -167,7 +166,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
           Text('Skill ID: $actualSkillId, type: ${actualSkillType == SkillType.characterSkill ? 'Active' : 'Passive'}'),
         ],
       ),
-      if (skillInfo != null) DescriptionTextWidget(skillInfo, widget.useGlobal),
+      if (skillInfo != null) DescriptionTextWidget(skillInfo),
       SliderWithPrefix(
         titled: true,
         label: 'Skill ${index + 1}',
@@ -193,7 +192,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
               border: Border.all(color: Colors.grey, width: 2),
               borderRadius: BorderRadius.circular(5),
             ),
-            child: StateEffectDataDisplay(data: data, useGlobal: widget.useGlobal),
+            child: StateEffectDataDisplay(data: data),
           ),
         );
       }
@@ -209,7 +208,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
               border: Border.all(color: Colors.grey, width: 2),
               borderRadius: BorderRadius.circular(5),
             ),
-            child: CharacterSkillDataDisplay(data: data, useGlobal: widget.useGlobal),
+            child: CharacterSkillDataDisplay(data: data),
           ),
         );
       }

@@ -9,16 +9,14 @@ import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/skill_display.dart';
 
 class RaptureLeveledDataDisplay extends StatelessWidget {
-  final bool useGlobal;
   final MonsterData data;
   final int stageLv;
   final int stageLvChangeGroup;
 
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
 
   const RaptureLeveledDataDisplay({
     super.key,
-    required this.useGlobal,
     required this.data,
     required this.stageLv,
     required this.stageLvChangeGroup,
@@ -47,10 +45,7 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
             iconSize: 16,
             constraints: BoxConstraints(),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (ctx) => RaptureDataDisplayPage(useGlobal: useGlobal, data: data)),
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (ctx) => RaptureDataDisplayPage(data: data)));
             },
             icon: Icon(Icons.search),
           ),
@@ -168,10 +163,9 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
 }
 
 class RaptureDataDisplayPage extends StatefulWidget {
-  final bool useGlobal;
   final MonsterData data;
 
-  const RaptureDataDisplayPage({super.key, required this.useGlobal, required this.data});
+  const RaptureDataDisplayPage({super.key, required this.data});
 
   @override
   State<RaptureDataDisplayPage> createState() => _RaptureDataDisplayPageState();
@@ -179,7 +173,7 @@ class RaptureDataDisplayPage extends StatefulWidget {
 
 class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
   int tab = 0;
-  NikkeDatabaseV2 get db => widget.useGlobal ? global : cn;
+  NikkeDatabaseV2 get db => userDb.gameDb;
   MonsterData get data => widget.data;
 
   @override
@@ -273,7 +267,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
             child: Column(
               spacing: 3,
               children: [
-                MonsterSkillDataDisplay(data: skillData, useGlobal: widget.useGlobal),
+                MonsterSkillDataDisplay(data: skillData),
                 for (final funcId in funcs)
                   Container(
                     padding: const EdgeInsets.all(3.0),
@@ -281,7 +275,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
                       border: Border.all(color: Colors.grey, width: 2),
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: SimpleFunctionDisplay(functionId: funcId, useGlobal: widget.useGlobal),
+                    child: SimpleFunctionDisplay(functionId: funcId),
                   ),
               ],
             ),
@@ -336,10 +330,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
                     border: Border.all(color: Colors.grey, width: 2),
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child: StateEffectDataDisplay(
-                    data: db.stateEffectTable[part.passiveSkillId]!,
-                    useGlobal: widget.useGlobal,
-                  ),
+                  child: StateEffectDataDisplay(data: db.stateEffectTable[part.passiveSkillId]!),
                 ),
             ],
           ),

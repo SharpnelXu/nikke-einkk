@@ -4,11 +4,11 @@ class TestHelper {
   TestHelper._();
 
   static Future<bool> loadData() async {
-    if (!db.dataLoaded) {
-      await db.loadData();
+    if (!dbLegacy.dataLoaded) {
+      await dbLegacy.loadData();
     }
 
-    return db.dataLoaded;
+    return dbLegacy.dataLoaded;
   }
 
   static void loadDataV2() {

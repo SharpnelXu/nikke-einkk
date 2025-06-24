@@ -20,9 +20,9 @@ class BattleHarmonyCube {
 
   Map<String, dynamic> toJson() => _$BattleHarmonyCubeToJson(this);
 
-  HarmonyCubeData get cubeData => db.harmonyCubeTable[type.cubeId]!;
+  HarmonyCubeData get cubeData => dbLegacy.harmonyCubeTable[type.cubeId]!;
 
-  HarmonyCubeLevelData get levelData => db.harmonyCubeLevelTable[cubeData.levelEnhanceId]![cubeLevel]!;
+  HarmonyCubeLevelData get levelData => dbLegacy.harmonyCubeLevelTable[cubeData.levelEnhanceId]![cubeLevel]!;
 
   int getStat(StatType statType) {
     return levelData.stats.firstWhereOrNull((stat) => stat.type == statType)?.rate ?? 0;
@@ -35,7 +35,7 @@ class BattleHarmonyCube {
 
       final skillGroupId = cubeData.harmonyCubeSkillGroups[index].skillGroupId;
       final skillLevel = levelData.skillLevels[index].level;
-      final skillLevelData = db.groupedSkillInfoTable[skillGroupId]?[skillLevel];
+      final skillLevelData = dbLegacy.groupedSkillInfoTable[skillGroupId]?[skillLevel];
 
       if (skillLevelData != null) {
         result.add(skillLevelData.id);
@@ -46,11 +46,11 @@ class BattleHarmonyCube {
 
   void applyCubeEffect(BattleSimulation simulation, BattleNikke wearer) {
     for (final stateEffectId in getCubeStateEffectIds()) {
-      final stateEffectData = db.stateEffectTable[stateEffectId]!;
+      final stateEffectData = dbLegacy.stateEffectTable[stateEffectId]!;
       wearer.functions.addAll(
         stateEffectData.functions
             .where((data) => data.function != 0)
-            .map((data) => BattleFunction(db.functionTable[data.function]!, wearer.uniqueId)),
+            .map((data) => BattleFunction(dbLegacy.functionTable[data.function]!, wearer.uniqueId)),
       );
     }
   }
