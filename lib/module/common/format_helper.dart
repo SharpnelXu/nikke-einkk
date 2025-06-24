@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:nikke_einkk/model/battle/favorite_item.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
@@ -161,6 +160,7 @@ String? valueString(int value, ValueType type) {
 String? durationString(int value, DurationType type) {
   switch (type) {
     case DurationType.timeSec:
+    case DurationType.timeSecVer2:
       return value == 0 ? null : timeString(value);
     case DurationType.shots:
       return value == 0 ? null : '$value shots';

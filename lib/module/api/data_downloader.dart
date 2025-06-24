@@ -9,7 +9,6 @@ import 'package:nikke_einkk/generated/proto/nikke-models.pb.dart';
 import 'package:nikke_einkk/model/data_path.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/module/api/data_unpacker.dart';
-import 'package:nikke_einkk/module/common/easy_loading.dart';
 
 /// Downloader logic copied from EpinelPS
 class StaticDataDownloadPage extends StatefulWidget {
@@ -75,7 +74,28 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
                 Text('CN', style: TextStyle(fontWeight: !useGlobal ? FontWeight.bold : null)),
                 FilledButton.icon(
                   onPressed: () async {
-                    await showEasyLoading(() => downloadStaticData(), mask: true);
+                    await EasyLoading.show(status: 'Downloading');
+                    await downloadStaticData();
+                    await EasyLoading.dismiss();
+
+                    await EasyLoading.showInfo('Extracting...', maskType: EasyLoadingMaskType.clear);
+
+                    unpacker = GameDataUnpacker(
+                      getStaticDataPath(downloadedGlobal, pack!.version),
+                      Uint8List.fromList(pack!.salt1),
+                      Uint8List.fromList(pack!.salt2),
+                    );
+                    unpacker!.loadGameData();
+                    unpacker!.extractFiles(getExtractDataFolderPath(downloadedGlobal));
+
+                    if (downloadedGlobal) {
+                      global.init();
+                    } else {
+                      cn.init();
+                    }
+
+                    await EasyLoading.dismiss();
+                    setState(() {});
                   },
                   label: Text('Download'),
                   icon: Icon(Icons.download),
@@ -95,31 +115,6 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
     return [
       const Divider(),
       Text('StaticData Saved', style: TextStyle(fontSize: 20)),
-      FilledButton.icon(
-        onPressed: () async {
-          await EasyLoading.showInfo('This will take a while...', maskType: EasyLoadingMaskType.clear);
-
-          unpacker = GameDataUnpacker(
-            getStaticDataPath(downloadedGlobal),
-            Uint8List.fromList(pack!.salt1),
-            Uint8List.fromList(pack!.salt2),
-          );
-          unpacker!.loadGameData();
-          unpacker!.extractFiles(getExtractDataFolderPath(downloadedGlobal));
-
-          if (downloadedGlobal) {
-            global.init();
-          } else {
-            cn.init();
-          }
-
-          await EasyLoading.dismiss();
-
-          setState(() {});
-        },
-        label: Text('Extract'),
-        icon: Icon(Icons.file_upload_outlined),
-      ),
       if (unpacker != null) Text('Extracted ${unpacker!.totalFileCount} files to saved folder'),
     ];
   }
@@ -154,7 +149,6 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
     final packUri = Uri.tryParse(downloadHtmlController.text);
     if (packUri == null) {
       errorText = 'Link is invalid';
-      setState(() {});
       return;
     }
 
@@ -168,7 +162,6 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
       );
     } catch (e) {
       errorText = 'Error sending request: $e';
-      setState(() {});
       return;
     }
 
@@ -177,31 +170,27 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
       downloadedGlobal = useGlobal;
     } catch (e) {
       errorText = 'Error parsing response: $e';
-      setState(() {});
       return;
     }
 
     final staticDataUri = Uri.tryParse(pack!.url);
     if (staticDataUri == null) {
       errorText = 'Parsed URL is invalid: ${pack!.url}';
-      setState(() {});
       return;
     }
 
     try {
       http.Response dataResponse = await client.get(staticDataUri);
-      File dataFile = await File(getStaticDataPath(downloadedGlobal)).create(recursive: true);
+      File dataFile = await File(getStaticDataPath(downloadedGlobal, pack!.version)).create(recursive: true);
       await dataFile.writeAsBytes(dataResponse.bodyBytes);
     } catch (e) {
       errorText = 'Error parsing data response: $e';
-      setState(() {});
       return;
     }
 
     staticDataDownloaded = true;
     errorText = null;
     unpacker = null;
-    setState(() {});
   }
 
   void serverRadioChange(bool? v) {

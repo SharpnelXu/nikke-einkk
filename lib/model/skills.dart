@@ -49,12 +49,16 @@ enum DurationType {
   battles,
   hits,
   timeSecBattles,
+  @JsonValue('TimeSec_Ver2')
+  timeSecVer2,
   unknown;
 
   static final Map<String, DurationType> _reverseMap = Map.fromIterable(
     DurationType.values,
-    key: (v) => (v as DurationType).name.pascal,
+    key: (v) => (v as DurationType).jsonKey,
   );
+
+  String get jsonKey => this == DurationType.timeSecVer2 ? 'TimeSec_Ver2' : name.pascal;
 
   static DurationType fromName(String? name) {
     return _reverseMap[name] ?? DurationType.unknown;
@@ -412,7 +416,8 @@ enum FunctionType {
   durationBuffCheckImmune,
   immediatelyBuffCheckImmune,
   changeHurtFxExcludingBreakCol,
-  plusBuffCount // seems to be CN exclusive
+  plusBuffCount, // seems to be CN exclusive
+  durationDamage
   ;
 
   static final Map<String, FunctionType> _reverseMap = Map.fromIterable(

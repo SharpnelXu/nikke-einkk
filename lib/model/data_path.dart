@@ -5,9 +5,9 @@ const appPath = '.';
 final localePath = path.join(appPath, 'data', 'Locale');
 final userDataPath = path.join(appPath, 'userData');
 
-String getStaticDataPath(bool global) {
+String getStaticDataPath(bool global, [String? version]) {
   final server = global ? 'global' : 'cn';
-  return path.join(appPath, 'data', server, 'StaticData.pack');
+  return path.join(appPath, 'data', server, 'StaticData${version != null ? '-${version.replaceAll('/', '-')}' : ''}.pack');
 }
 
 String getExtractDataFolderPath(bool global) {

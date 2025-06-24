@@ -25,6 +25,7 @@ class BattleBuff {
     switch (data.durationType) {
       case DurationType.none:
       case DurationType.timeSecBattles:
+      case DurationType.timeSecVer2:
         return false;
       case DurationType.battles:
         // added for Alice S2 (continuous penetration if hp above threshold)

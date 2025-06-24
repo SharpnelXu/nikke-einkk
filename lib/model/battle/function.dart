@@ -589,6 +589,7 @@ class BattleFunction {
       case FunctionType.immediatelyBuffCheckImmune:
       case FunctionType.changeHurtFxExcludingBreakCol:
       case FunctionType.plusBuffCount:
+      case FunctionType.durationDamage:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
     }
