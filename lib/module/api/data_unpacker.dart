@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:archive/archive.dart';
-import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/data_path.dart' as data;
-import 'package:pointycastle/export.dart';
+import 'package:nikke_einkk/model/db.dart';
 import 'package:path/path.dart' as path;
+import 'package:pointycastle/export.dart';
 
 /// Decrypt & Extract logic copied from EpinelPS
 class GameDataUnpacker {

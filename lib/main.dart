@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/module/home_page.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  packageInfo = await PackageInfo.fromPlatform();
   await dbLegacy.loadData();
 
   if (Platform.isWindows || Platform.isLinux) {

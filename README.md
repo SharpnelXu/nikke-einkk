@@ -3,6 +3,19 @@ Battle Simulation app for Nikke.
 
 Data sourced from Internet and not included in repo at the moment.
 
+## Current Available Tools
+- StaticData download & unpack
+- Locale data unpack
+- UR data display
+- SR data display
+- Rapture data display
+- Nikke data display
+
+## Developing Tools
+- Simple damage calculator
+- Simple calculator for specific buff types like chargeTime
+- Simulation
+
 ## Damage & Stat Formula
 
 Final Damage = Final Attack * Final Damage Rate * Total Corrections * Elements * Charge Rate * Add Damage Rate * Receive Damage Rate
@@ -76,12 +89,8 @@ where the difference is 0.000004% (actual: 902435165 vs calculated: 902435200)
   - RLs: projectile travel calculation, current formula is hardcoded as `100 * rapture.distance / projectileSpeed`
 - Skills
   - Function Target & Timing Trigger Standard & Status Trigger Standard
-- Equip skills
-- Cube skills
-- Doll skills
-- Data provisioning, too unpredictable if sourced from static game data
 - User actions
-- Boss actions
+- Boss actions (Pending testing)
 
 ### UI
 - *Essentially everything*
@@ -89,7 +98,6 @@ where the difference is 0.000004% (actual: 902435165 vs calculated: 902435200)
 - Individual damage specifications
 - Filter out actions
 - Damage summary
-- Nikke select UI
-- Nikke config UI
 - User action edit UI
-- Boss action edit UI
+- Boss action edit UI (Pending testing)
+- Localization

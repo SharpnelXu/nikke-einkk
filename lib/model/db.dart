@@ -11,6 +11,7 @@ import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/model/stages.dart';
 import 'package:nikke_einkk/model/translation.dart';
 import 'package:nikke_einkk/model/user_data.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart';
 
 /// db object
@@ -20,6 +21,7 @@ final locale = Locale();
 final global = NikkeDatabaseV2(true);
 final cn = NikkeDatabaseV2(false);
 final userDb = UserDatabase();
+late PackageInfo packageInfo;
 
 final Logger logger = Logger();
 

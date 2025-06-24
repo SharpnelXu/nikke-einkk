@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
+
 part '../generated/model/items.g.dart';
 
 // ItemEquipTable
