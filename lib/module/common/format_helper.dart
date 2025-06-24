@@ -157,6 +157,54 @@ String? valueString(int value, ValueType type) {
   }
 }
 
+String? durationString(int value, DurationType type) {
+  switch (type) {
+    case DurationType.timeSec:
+      return value == 0 ? null : timeString(value);
+    case DurationType.shots:
+      return value == 0 ? null : '$value shots';
+    case DurationType.battles:
+      return '∞';
+    case DurationType.hits:
+      return value == 0 ? null : '$value hits';
+    case DurationType.timeSecBattles:
+      return 'Every ${timeString(value)}';
+    case DurationType.none:
+    case DurationType.unknown:
+      return null;
+  }
+}
+
+Color buffTypeColor(BuffType? type) {
+  if (type == null) {
+    return Colors.grey;
+  }
+  switch (type) {
+    case BuffType.buff:
+    case BuffType.buffEtc:
+      return Colors.green;
+    case BuffType.deBuff:
+    case BuffType.deBuffEtc:
+      return Colors.red;
+    case BuffType.etc:
+    case BuffType.unknown:
+      return Colors.grey;
+  }
+}
+
+String? functionStandardString(StandardType funcStandard) {
+  switch (funcStandard) {
+    case StandardType.user:
+      return 'Activator';
+    case StandardType.functionTarget:
+      return 'Receiver';
+    case StandardType.triggerTarget: // there is no triggerTarget in functionStandardType
+    case StandardType.unknown:
+    case StandardType.none:
+      return null;
+  }
+}
+
 String formatFunctionDescription(FunctionData func) {
   String result = locale.getTranslation(func.descriptionLoaclkey) ?? func.descriptionLoaclkey ?? '';
   final replaceKey = '{function_value02}';

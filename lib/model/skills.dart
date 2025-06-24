@@ -134,6 +134,14 @@ class SkillData {
   @JsonKey(name: 'shake_id')
   final int shakeId;
 
+  List<int> get allValidFuncIds =>
+      [
+        ...beforeUseFunctionIdList,
+        ...beforeHurtFunctionIdList,
+        ...afterUseFunctionIdList,
+        ...afterHurtFunctionIdList,
+      ].where((id) => id != 0).toList();
+
   SkillData({
     this.id = 0,
     this.skillCooltime = 0,

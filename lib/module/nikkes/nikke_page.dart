@@ -5,6 +5,7 @@ import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/skill_display.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
+import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
 class NikkeCharacterPage extends StatefulWidget {
   final bool useGlobal;
@@ -108,7 +109,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   Widget getTab() {
     switch (tab) {
       case 0:
-        return buildWeaponTab();
+        return WeaponDataDisplay(character: data, weaponId: data.shotId, useGlobal: widget.useGlobal);
       case 1:
         return buildSkillTab(data.skill1Id, data.skill1Table, 0);
       case 2:
@@ -118,113 +119,6 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
       default:
         return Text('Not implemented');
     }
-  }
-
-  Widget buildWeaponTab() {
-    final weapon = this.weapon;
-    final List<Widget> children = [
-      Text('Weapon ID: ${data.shotId} - ${weapon == null ? 'Not Found' : 'Found'}', style: TextStyle(fontSize: 20)),
-    ];
-    if (weapon != null) {
-      children.addAll([
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Weapon Type: ${weapon.rawWeaponType}'),
-            Text('Bonus Range: ${data.bonusRangeMin} - ${data.bonusRangeMax}'),
-            Text('Shot Timing: ${weapon.rawShotTiming}'),
-            Text('Fire Type: ${weapon.rawFireType}'),
-          ],
-        ),
-        Text('Damage', style: TextStyle(fontSize: 20)),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Base: ${toPercentString(weapon.damage)}'),
-            Text(
-              'Critical: ${toPercentString(data.criticalDamage)} '
-              '(${toPercentString(data.criticalRatio)} chance)',
-            ),
-            Text('Core: ${toPercentString(weapon.coreDamageRate)}'),
-            if (weapon.fullChargeDamage != 10000)
-              Text('Full Charge: ${toPercentString(weapon.fullChargeDamage)} (${timeString(weapon.chargeTime)})'),
-          ],
-        ),
-        Text('Burst', style: TextStyle(fontSize: 20)),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Base: ${toPercentString(weapon.burstEnergyPerShot / 100)}'),
-            Text('Target: ${toPercentString(weapon.targetBurstEnergyPerShot / 100)}'),
-            if (weapon.fullChargeBurstEnergy != 10000)
-              Text('Full Charge: ${toPercentString(weapon.fullChargeBurstEnergy)}'),
-            Text('Shot Count: ${weapon.shotCount} x ${weapon.muzzleCount}'),
-          ],
-        ),
-        Text('Ammo', style: TextStyle(fontSize: 20)),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Max Ammo: ${weapon.maxAmmo}'),
-            Text('Reload Time: ${timeString(weapon.reloadTime)} (${toPercentString(weapon.reloadBullet)})'),
-            Text('Time Exit Cover: ${timeString(weapon.spotFirstDelay)}'),
-            Text('Time Enter Cover: ${timeString(weapon.spotLastDelay)}'),
-          ],
-        ),
-        if (weapon.spotProjectileSpeed > 0) Text('Projectile', style: TextStyle(fontSize: 20)),
-        if (weapon.spotProjectileSpeed > 0)
-          Wrap(
-            spacing: 15,
-            alignment: WrapAlignment.center,
-            children: [
-              Text('Speed: ${weapon.spotProjectileSpeed}'),
-              Text('Explosion Range: ${weapon.spotExplosionRange}'),
-            ],
-          ),
-        Wrap(
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Rate Of Fire', style: TextStyle(fontSize: 20)),
-            Tooltip(message: 'Note: capped to 60 due to frame rate', child: Icon(Icons.info_outline, size: 16)),
-          ],
-        ),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Rate: ${weapon.rateOfFire} - ${weapon.endRateOfFire}'),
-            Text('(${weapon.rateOfFire / 60} - ${weapon.endRateOfFire / 60} shots/s)'),
-            Text('Change Per Shot: ${weapon.rateOfFireChangePerShot}'),
-            Text('Reset Time: ${timeString(weapon.rateOfFireResetTime)}'),
-          ],
-        ),
-        Text('Accuracy', style: TextStyle(fontSize: 20)),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Rate: ${weapon.startAccuracyCircleScale} - ${weapon.endAccuracyCircleScale}'),
-            Text('Change Per Shot: ${weapon.accuracyChangePerShot}'),
-            Text('Reset Time: ${timeString(weapon.accuracyChangeSpeed)}'),
-          ],
-        ),
-        Text('Misc', style: TextStyle(fontSize: 20)),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Penetration: ${weapon.penetration}'),
-            Text('Maintain Fire Stance: ${timeString(weapon.maintainFireStance)}'),
-            Text('Up Fire Timing: ${toPercentString(weapon.upTypeFireTiming)}'),
-          ],
-        ),
-      ]);
-    }
-    return Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children);
   }
 
   Widget buildSkillTab(int skillId, SkillType skillType, int index) {
@@ -266,6 +160,22 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
               borderRadius: BorderRadius.circular(5),
             ),
             child: StateEffectDataDisplay(data: data, useGlobal: widget.useGlobal),
+          ),
+        );
+      }
+    } else if (skillType == SkillType.characterSkill) {
+      final data = db.characterSkillTable[actualSkillId];
+      if (data == null) {
+        children.add(Text('Not Found!'));
+      } else {
+        children.add(
+          Container(
+            padding: const EdgeInsets.all(3.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 2),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: CharacterSkillDataDisplay(data: data, useGlobal: widget.useGlobal),
           ),
         );
       }

@@ -1,8 +1,122 @@
 import 'package:flutter/material.dart';
+import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/monster.dart';
 import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
+import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
+
+class CharacterSkillDataDisplay extends StatelessWidget {
+  final bool useGlobal;
+  final SkillData data;
+
+  const CharacterSkillDataDisplay({super.key, required this.useGlobal, required this.data});
+
+  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+
+  @override
+  Widget build(BuildContext context) {
+    final defaultStyle = DefaultTextStyle.of(context).style;
+    final functionIds = data.allValidFuncIds;
+
+    final skillInfo = db.skillInfoTable[data.id];
+
+    final durationStr = durationString(data.durationValue, data.durationType);
+    final valueStr = data.skillValueData
+        .map((valueData) => valueString(valueData.skillValue, valueData.skillValueType))
+        .join(', ');
+    final List<Widget> children = [
+      if (skillInfo != null)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          spacing: 3,
+          children: [
+            Text(
+              locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey,
+              style: TextStyle(fontSize: 18),
+            ),
+            Tooltip(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey, width: 2),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              richMessage: TextSpan(
+                children: buildDescriptionTextSpans(formatSkillInfoDescription(skillInfo), defaultStyle, db),
+              ),
+              child: Icon(Icons.info_outline, size: 16),
+            ),
+          ],
+        ),
+      Text('Active Skill ID: ${data.id}'),
+      Wrap(
+        spacing: 10,
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text('Type: ${data.rawSkillType}'),
+          if (data.preferTarget != PreferTarget.none) Text('Target: ${data.rawPreferTarget}'),
+          if (data.preferTargetCondition != PreferTargetCondition.none) Text('(${data.rawPreferTargetCondition})'),
+        ],
+      ),
+      if (valueStr.isNotEmpty) Text('Skill Values: $valueStr'),
+      Wrap(
+        spacing: 10,
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          if (durationStr != null) Text('Duration: $durationStr'),
+          Text('CD: ${timeString(data.skillCooltime)}'),
+        ],
+      ),
+    ];
+
+    if (data.skillType == CharacterSkillType.changeWeapon) {
+      final skillColumn = Container(
+        padding: const EdgeInsets.all(3.0),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey, width: 2),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Column(
+          spacing: 5,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('↓↓↓ Equip This Weapon  ↓↓↓', style: TextStyle(fontSize: 16)),
+            WeaponDataDisplay(useGlobal: useGlobal, weaponId: data.skillValueData[2].skillValue),
+          ],
+        ),
+      );
+      children.add(skillColumn);
+    }
+
+    final connectedFunctions = [
+      for (int idx = 0; idx < functionIds.length; idx += 1)
+        Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: buffTypeColor(db.functionTable[functionIds[idx]]?.buff), width: 2),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 3,
+            children: [
+              Text('Function ${idx + 1}'),
+              SimpleFunctionDisplay(functionId: functionIds[idx], useGlobal: useGlobal),
+            ],
+          ),
+        ),
+    ];
+    if (connectedFunctions.isNotEmpty) {
+      children.add(Text('↓↓↓ Connected Functions ↓↓↓', style: TextStyle(fontSize: 16)));
+      children.addAll(connectedFunctions);
+    }
+
+    return Column(spacing: 5, mainAxisSize: MainAxisSize.min, children: children);
+  }
+}
 
 class StateEffectDataDisplay extends StatelessWidget {
   final bool useGlobal;
@@ -20,7 +134,8 @@ class StateEffectDataDisplay extends StatelessWidget {
     final skillInfo = db.skillInfoTable[data.id];
 
     return Column(
-      spacing: 3,
+      spacing: 5,
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (skillInfo != null)
           Row(
@@ -46,14 +161,21 @@ class StateEffectDataDisplay extends StatelessWidget {
             ],
           ),
         Text('Passive Skill ID: ${data.id}'),
-        for (final functionId in functionIds)
+        for (int idx = 0; idx < functionIds.length; idx += 1)
           Container(
             padding: const EdgeInsets.all(3.0),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey, width: 2),
+              border: Border.all(color: buffTypeColor(db.functionTable[functionIds[idx]]?.buff), width: 2),
               borderRadius: BorderRadius.circular(5),
             ),
-            child: SimpleFunctionDisplay(functionId: functionId, useGlobal: useGlobal),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 3,
+              children: [
+                Text('Function ${idx + 1}'),
+                SimpleFunctionDisplay(functionId: functionIds[idx], useGlobal: useGlobal),
+              ],
+            ),
           ),
       ],
     );
@@ -78,12 +200,13 @@ class SimpleFunctionDisplay extends StatelessWidget {
       if (func.nameLocalkey != null) {
         final description = formatFunctionDescription(func);
         children.add(
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            spacing: 3,
+          Wrap(
+            spacing: 5,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text(locale.getTranslation(func.nameLocalkey) ?? func.nameLocalkey!),
+              Text(func.rawBuffType, style: TextStyle(fontSize: 16)),
+              Text(locale.getTranslation(func.nameLocalkey) ?? func.nameLocalkey!, style: TextStyle(fontSize: 16)),
               if (description.isNotEmpty)
                 Tooltip(
                   decoration: BoxDecoration(
@@ -99,19 +222,100 @@ class SimpleFunctionDisplay extends StatelessWidget {
           ),
         );
       }
+      final funcValueString = valueString(func.functionValue, func.functionValueType);
+      final funcStandardString = functionStandardString(func.functionStandard);
+      final durationStr = durationString(func.durationValue, func.durationType);
+      final delayStr = durationString(func.delayValue, func.delayType);
+      final miscRow = [
+        if (delayStr != null) Text('Delay: $delayStr'),
+        if (durationStr != null) Text('Remove: ${func.rawBuffRemove}'),
+        if (durationStr != null) Text('Duration: $durationStr'),
+        if (func.limitValue != 0) Text('Use Limit Per Battle: ${func.limitValue}'),
+      ];
+
+      final List<Widget> triggerRow = [];
+      if (func.timingTriggerType != TimingTriggerType.none) {
+        triggerRow.addAll([
+          Text('Trigger: ${func.rawTimingTriggerType}'),
+          if (func.timingTriggerValue != 0) Text('${func.timingTriggerValue}'),
+          if (func.timingTriggerStandard != StandardType.none) Text('(of ${func.rawTimingTriggerStandard})'),
+        ]);
+      }
+
+      final List<Widget> statusRow = [];
+      if (func.statusTriggerType != StatusTriggerType.none) {
+        statusRow.addAll([
+          Text('Check: ${func.rawStatusTriggerType}'),
+          if (func.statusTriggerValue != 0) Text('${func.statusTriggerValue}'),
+          if (func.statusTriggerStandard != StandardType.none) Text('(of ${func.rawStatusTriggerStandard})'),
+        ]);
+      }
+      if (func.statusTrigger2Type != StatusTriggerType.none) {
+        statusRow.addAll([
+          Text('Check: ${func.rawStatusTrigger2Type}'),
+          if (func.statusTrigger2Value != 0) Text('${func.statusTrigger2Value}'),
+          if (func.statusTrigger2Standard != StandardType.none) Text('(of ${func.rawStatusTrigger2Standard})'),
+        ]);
+      }
+      final connectedFuncs = [
+        for (final connectedFunc in func.connectedFunction.where((funcId) => funcId != 0))
+          Container(
+            padding: const EdgeInsets.all(3.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: buffTypeColor(db.functionTable[functionId]?.buff), width: 2),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: SimpleFunctionDisplay(functionId: connectedFunc, useGlobal: useGlobal),
+          ),
+      ];
       children.addAll([
-        Text('Function ID: $functionId'),
-        Text('Type: ${func.rawFunctionType}'),
-        Text('Duration: ${func.durationValue} (${func.rawDurationType})'),
+        Wrap(
+          spacing: 10,
+          alignment: WrapAlignment.center,
+          children: [Text('Function ID: $functionId'), if (func.fullCount != 1) Text('Max Stack: ${func.fullCount}')],
+        ),
+        Wrap(
+          spacing: 10,
+          alignment: WrapAlignment.center,
+          children: [
+            Text('Target: ${func.rawFunctionTarget}'),
+            Text('Type: ${func.rawFunctionType}'),
+            if (funcValueString != null) Text('Value: $funcValueString'),
+            if (funcStandardString != null) Text('(of $funcStandardString)'),
+          ],
+        ),
+        if (triggerRow.isNotEmpty) Wrap(spacing: 5, alignment: WrapAlignment.center, children: triggerRow),
+        if (statusRow.isNotEmpty) Wrap(spacing: 5, alignment: WrapAlignment.center, children: statusRow),
+        if (miscRow.isNotEmpty) Wrap(spacing: 10, alignment: WrapAlignment.center, children: miscRow),
       ]);
 
-      final funcValueString = valueString(func.functionValue, func.functionValueType);
-      if (funcValueString != null) {
-        children.add(Text('Value: $funcValueString'));
+      if (func.functionType == FunctionType.useCharacterSkillId) {
+        final skillData = db.characterSkillTable[func.functionValue];
+        final skillColumn = Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey, width: 2),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            spacing: 5,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('↓↓↓ Invoke This Skill ↓↓↓', style: TextStyle(fontSize: 16)),
+              skillData == null ? Text('Not Found!') : CharacterSkillDataDisplay(useGlobal: useGlobal, data: skillData),
+            ],
+          ),
+        );
+        children.add(skillColumn);
+      }
+
+      if (connectedFuncs.isNotEmpty) {
+        children.add(Text('↓↓↓ Connected Functions ↓↓↓', style: TextStyle(fontSize: 16)));
+        children.addAll(connectedFuncs);
       }
     }
 
-    return Column(spacing: 3, children: children);
+    return Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children);
   }
 }
 
@@ -187,6 +391,6 @@ class MonsterSkillDataDisplay extends StatelessWidget {
       );
     }
 
-    return Column(spacing: 3, children: children);
+    return Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children);
   }
 }
