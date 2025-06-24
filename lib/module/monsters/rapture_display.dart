@@ -89,17 +89,17 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
                   spacing: 3,
                   children: [
                     Text('HP: ${format.format((utils.toModifier(part.hpRatio) * statEnhanceData.levelHp).round())}'),
+                    Text('(${(part.hpRatio / 100).toStringAsFixed(2)}%)'),
                     Tooltip(
                       message:
+                          'Don\'t trust this number, it is unknown if this is correct or not.\n'
                           'Damage Ratio HP: '
-                          '${format.format((utils.toModifier(part.damageHpRatio) * statEnhanceData.levelHp).round())}'
-                          '\n'
+                          '${format.format((utils.toModifier(part.damageHpRatio) * statEnhanceData.levelHp).round())} '
                           '(${(part.damageHpRatio / 100).toStringAsFixed(2)}%)',
                       child: Icon(Icons.info_outline, size: 16),
                     ),
                   ],
                 ),
-                Text('(${(part.hpRatio / 100).toStringAsFixed(2)}%)'),
                 if (part.defenceRatio != 10000)
                   Text(
                     'DEF: '
@@ -200,10 +200,14 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
         ],
       ),
       Text(locale.getTranslation(data.descriptionKey) ?? data.descriptionKey, style: TextStyle(fontSize: 20)),
-      Text(
-        'Target ID: ${data.id}   '
-        'Model ID: ${data.monsterModelId}   '
-        'Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}',
+      Wrap(
+        spacing: 15,
+        alignment: WrapAlignment.center,
+        children: [
+          Text('Target ID: ${data.id}'),
+          Text('Model ID: ${data.monsterModelId}'),
+          Text('Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}'),
+        ],
       ),
       buildTabs(),
       Divider(),
@@ -305,14 +309,26 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
             children: [
-              if (partName != null) Text(partName),
-              Text('Part Type: ${part.partsType}'),
-              Text('Is Main Part: ${part.isMainPart}'),
-              Text('Can Damage: ${part.isPartsDamageable}'),
-              Text('HP Ratio: ${(part.hpRatio / 100).toStringAsFixed(2)}%'),
-              Text('Damage HP Ratio: ${(part.damageHpRatio / 100).toStringAsFixed(2)}%'),
-              Text('ATK Ratio: ${(part.attackRatio / 100).toStringAsFixed(2)}%'),
-              Text('DEF Ratio: ${(part.defenceRatio / 100).toStringAsFixed(2)}%'),
+              if (partName != null) Text(partName, style: TextStyle(fontSize: 20)),
+              Wrap(
+                spacing: 15,
+                alignment: WrapAlignment.center,
+                children: [
+                  Text('Type: ${part.partsType}'),
+                  Text('Main Part: ${part.isMainPart}'),
+                  Text('Damageable: ${part.isPartsDamageable}'),
+                ],
+              ),
+              Wrap(
+                spacing: 15,
+                alignment: WrapAlignment.center,
+                children: [
+                  Text('HP: ${(part.hpRatio / 100).toStringAsFixed(2)}%'),
+                  Text('Damage HP: ${(part.damageHpRatio / 100).toStringAsFixed(2)}%'),
+                  Text('ATK: ${(part.attackRatio / 100).toStringAsFixed(2)}%'),
+                  Text('DEF: ${(part.defenceRatio / 100).toStringAsFixed(2)}%'),
+                ],
+              ),
               if (part.passiveSkillId != 0 && db.stateEffectTable[part.passiveSkillId] != null)
                 Container(
                   padding: const EdgeInsets.all(3.0),

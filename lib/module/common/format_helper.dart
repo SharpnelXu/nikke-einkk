@@ -157,7 +157,16 @@ String? valueString(int value, ValueType type) {
   }
 }
 
-DescriptionTextWidget formatSkillInfoDescription(SkillInfoData skillInfo, bool useGlobal) {
+String formatFunctionDescription(FunctionData func) {
+  String result = locale.getTranslation(func.descriptionLoaclkey) ?? func.descriptionLoaclkey ?? '';
+  final replaceKey = '{function_value02}';
+  final replaceValue = (func.functionValue / 100).toStringAsFixed(2);
+  result = result.replaceFirst(replaceKey, replaceValue);
+
+  return result;
+}
+
+String formatSkillInfoDescription(SkillInfoData skillInfo) {
   String result = locale.getTranslation(skillInfo.descriptionLocalkey) ?? skillInfo.descriptionLocalkey;
   for (int v = 1; v <= skillInfo.descriptionValues.length; v += 1) {
     final replaceKey = '{description_value_${v < 10 ? '0' : ''}$v}';
@@ -165,87 +174,98 @@ DescriptionTextWidget formatSkillInfoDescription(SkillInfoData skillInfo, bool u
     result = result.replaceFirst(replaceKey, replaceValue.value ?? '');
   }
 
-  return DescriptionTextWidget(result, useGlobal);
+  return result;
+}
+
+List<InlineSpan> buildDescriptionTextSpans(String curText, TextStyle style, NikkeDatabaseV2 db) {
+  final textSpans = <InlineSpan>[];
+  int currentIndex = 0;
+
+  // Combined regex pattern for both tag types
+  final regex = RegExp(
+    r'(<color=#([\dA-F]{6})>(.*?)</color>)|(<word_group=(\d+)>(.*?)</word_group>)',
+    caseSensitive: false,
+    dotAll: true,
+  );
+
+  for (final match in regex.allMatches(curText)) {
+    // Add text before the match
+    if (match.start > currentIndex) {
+      textSpans.add(TextSpan(text: curText.substring(currentIndex, match.start), style: style));
+    }
+
+    // Process color tag
+    if (match.group(1) != null) {
+      final colorCode = match.group(2)!;
+      final content = match.group(3)!;
+      textSpans.addAll(
+        buildDescriptionTextSpans(content, style.copyWith(color: Color(int.parse('0xFF$colorCode'))), db),
+      );
+    }
+    // Process word_group tag
+    else if (match.group(4) != null) {
+      final wordGroupId = match.group(5)!;
+      final content = match.group(6)!;
+      final wordGroupData =
+          db.wordGroupTable[wordGroupId]
+              ?.where((data) => data.resourceType == 'locale')
+              .sorted(
+                (a, b) =>
+                    a.pageNumber == b.pageNumber ? a.order.compareTo(b.order) : a.pageNumber.compareTo(b.pageNumber),
+              ) ??
+          [];
+      final toolTipMessage =
+          'Word Group ID: $wordGroupId\n'
+          '${wordGroupData.map((data) => locale.getTranslation('Locale_Skill:${data.resourceValue}')).join('\n\n')}';
+      textSpans.add(
+        WidgetSpan(
+          child: Tooltip(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.grey, width: 2),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            richMessage: TextSpan(
+              children: buildDescriptionTextSpans(toolTipMessage, style.copyWith(color: Colors.black), db),
+            ),
+            child: Text(
+              content,
+              style: style.copyWith(
+                color: Colors.orange,
+                fontWeight: FontWeight.bold,
+                decoration: TextDecoration.underline,
+                decorationColor: Colors.orange,
+                decorationThickness: 1.5,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    currentIndex = match.end;
+  }
+
+  // Add remaining text
+  if (currentIndex < curText.length) {
+    textSpans.add(TextSpan(text: curText.substring(currentIndex), style: style));
+  }
+  return textSpans;
 }
 
 class DescriptionTextWidget extends StatelessWidget {
-  final String text;
+  final SkillInfoData skillInfoData;
   final bool useGlobal;
 
   NikkeDatabaseV2 get db => useGlobal ? global : cn;
 
-  const DescriptionTextWidget(this.text, this.useGlobal, {super.key});
-
-  List<InlineSpan> buildTextSpans(String curText, TextStyle style) {
-    final textSpans = <InlineSpan>[];
-    int currentIndex = 0;
-
-    // Combined regex pattern for both tag types
-    final regex = RegExp(
-      r'(<color=#([\dA-F]{6})>(.*?)</color>)|(<word_group=(\d+)>(.*?)</word_group>)',
-      caseSensitive: false,
-      dotAll: true,
-    );
-
-    for (final match in regex.allMatches(curText)) {
-      // Add text before the match
-      if (match.start > currentIndex) {
-        textSpans.add(TextSpan(text: curText.substring(currentIndex, match.start), style: style));
-      }
-
-      // Process color tag
-      if (match.group(1) != null) {
-        final colorCode = match.group(2)!;
-        final content = match.group(3)!;
-        textSpans.addAll(buildTextSpans(content, style.copyWith(color: Color(int.parse('0xFF$colorCode')))));
-      }
-      // Process word_group tag
-      else if (match.group(4) != null) {
-        final wordGroupId = match.group(5)!;
-        final content = match.group(6)!;
-        final wordGroupData =
-            db.wordGroupTable[wordGroupId]
-                ?.where((data) => data.resourceType == 'locale')
-                .sorted(
-                  (a, b) =>
-                      a.pageNumber == b.pageNumber ? a.order.compareTo(b.order) : a.pageNumber.compareTo(b.pageNumber),
-                ) ??
-            [];
-        textSpans.add(
-          WidgetSpan(
-            child: Tooltip(
-              message:
-                  'Word Group ID: $wordGroupId\n'
-                  '${wordGroupData.map((data) => locale.getTranslation('Locale_Skill:${data.resourceValue}')).join('\n\n')}',
-              child: Text(
-                content,
-                style: style.copyWith(
-                  color: Colors.orange,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.orange,
-                  decorationThickness: 1.5,
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-
-      currentIndex = match.end;
-    }
-
-    // Add remaining text
-    if (currentIndex < curText.length) {
-      textSpans.add(TextSpan(text: curText.substring(currentIndex), style: style));
-    }
-    return textSpans;
-  }
+  const DescriptionTextWidget(this.skillInfoData, this.useGlobal, {super.key});
 
   @override
   Widget build(BuildContext context) {
+    final text = formatSkillInfoDescription(skillInfoData);
     final defaultStyle = DefaultTextStyle.of(context).style;
-    final textSpans = buildTextSpans(text, defaultStyle);
+    final textSpans = buildDescriptionTextSpans(text, defaultStyle, db);
 
     return RichText(text: TextSpan(children: textSpans, style: defaultStyle));
   }

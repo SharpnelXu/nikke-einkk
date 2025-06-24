@@ -33,28 +33,43 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
           Text(locale.getTranslation(data.nameLocalkey) ?? data.nameLocalkey, style: TextStyle(fontSize: 20)),
           if (!data.isVisible) Text('NonPlayableCharacter or Unreleased'),
           Tooltip(
+            textStyle: TextStyle(fontSize: 14),
             message: locale.getTranslation(data.descriptionLocalkey) ?? data.descriptionLocalkey,
             child: Icon(Icons.info_outline),
           ),
         ],
       ),
-      Text(
-        'Resource ID: ${data.resourceId}   '
-        'Name Code: ${data.nameCode}   '
-        'Rarity: ${data.rawOriginalRare}   '
-        'Element: ${data.elementId.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}',
+      Wrap(
+        spacing: 15,
+        alignment: WrapAlignment.center,
+        children: [
+          Text('Resource ID: ${data.resourceId}'),
+          Text('Name Code: ${data.nameCode}'),
+          Text('Rarity: ${data.rawOriginalRare}'),
+          Text('Element: ${data.elementId.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}'),
+        ],
       ),
-      Text(
-        'Class: ${data.rawCharacterClass}   '
-        'Burst: ${data.rawUseBurstSkill}   '
-        'Weapon: ${weapon?.rawWeaponType}   '
-        'Corporation: ${data.rawCorporation} ${data.rawCorporationSubType ?? ''}',
+      Wrap(
+        spacing: 15,
+        alignment: WrapAlignment.center,
+        children: [
+          Text('Class: ${data.rawCharacterClass}'),
+          Text('Burst: ${data.rawUseBurstSkill}'),
+          Text('Weapon: ${weapon?.rawWeaponType}'),
+          Text('Corporation: ${data.rawCorporation} ${data.rawCorporationSubType ?? ''}'),
+        ],
       ),
-      Text(
-        'Squad: ${locale.getTranslation('Locale_Character:${data.squad.toLowerCase()}_name') ?? data.squad}   '
-        '${locale.getTranslation('${data.cvLocalkey}_en') ?? data.cvLocalkey} (EN)'
-        ' / ${locale.getTranslation('${data.cvLocalkey}_ko') ?? data.cvLocalkey} (KR)'
-        ' / ${locale.getTranslation('${data.cvLocalkey}_ja') ?? data.cvLocalkey} (JP)',
+      Wrap(
+        spacing: 15,
+        alignment: WrapAlignment.center,
+        children: [
+          Text('Squad: ${locale.getTranslation('Locale_Character:${data.squad.toLowerCase()}_name') ?? data.squad}'),
+          Text(
+            '${locale.getTranslation('${data.cvLocalkey}_en') ?? data.cvLocalkey} (EN)'
+            ' / ${locale.getTranslation('${data.cvLocalkey}_ko') ?? data.cvLocalkey} (KR)'
+            ' / ${locale.getTranslation('${data.cvLocalkey}_ja') ?? data.cvLocalkey} (JP)',
+          ),
+        ],
       ),
       buildTabs(),
       Divider(),
@@ -224,7 +239,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
         style: TextStyle(fontSize: 20),
       ),
       Text('Skill ID: $actualSkillId, type: ${skillType == SkillType.characterSkill ? 'Active' : 'Passive'}'),
-      if (skillInfo != null) formatSkillInfoDescription(skillInfo, widget.useGlobal),
+      if (skillInfo != null) DescriptionTextWidget(skillInfo, widget.useGlobal),
       SliderWithPrefix(
         titled: true,
         label: 'Skill ${index + 1}',

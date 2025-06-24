@@ -14,6 +14,7 @@ class StateEffectDataDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final defaultStyle = DefaultTextStyle.of(context).style;
     final functionIds = data.allValidFuncIds;
 
     final skillInfo = db.skillInfoTable[data.id];
@@ -27,11 +28,19 @@ class StateEffectDataDisplay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
             children: [
-              Text(locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey),
+              Text(
+                locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey,
+                style: TextStyle(fontSize: 18),
+              ),
               Tooltip(
-                message:
-                    '${locale.getTranslation(skillInfo.infoDescriptionLocalkey) ?? skillInfo.infoDescriptionLocalkey}'
-                    '\n${locale.getTranslation(skillInfo.descriptionLocalkey) ?? skillInfo.descriptionLocalkey}',
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey, width: 2),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                richMessage: TextSpan(
+                  children: buildDescriptionTextSpans(formatSkillInfoDescription(skillInfo), defaultStyle, db),
+                ),
                 child: Icon(Icons.info_outline, size: 16),
               ),
             ],
@@ -67,6 +76,7 @@ class SimpleFunctionDisplay extends StatelessWidget {
       children.add(Text('Function not found!'));
     } else {
       if (func.nameLocalkey != null) {
+        final description = formatFunctionDescription(func);
         children.add(
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -74,11 +84,17 @@ class SimpleFunctionDisplay extends StatelessWidget {
             spacing: 3,
             children: [
               Text(locale.getTranslation(func.nameLocalkey) ?? func.nameLocalkey!),
-              Tooltip(
-                message:
-                    locale.getTranslation(func.descriptionLoaclkey) ?? func.descriptionLoaclkey ?? 'No Description',
-                child: Icon(Icons.info_outline, size: 16),
-              ),
+              if (description.isNotEmpty)
+                Tooltip(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey, width: 2),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  textStyle: TextStyle(fontSize: 14, color: Colors.black),
+                  message: description,
+                  child: Icon(Icons.info_outline, size: 16),
+                ),
             ],
           ),
         );
@@ -111,43 +127,64 @@ class MonsterSkillDataDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Widget> children = [];
     if (data.nameKey != null) {
+      final description = locale.getTranslation(data.descriptionKey) ?? data.descriptionKey;
       children.add(
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           spacing: 3,
           children: [
-            Text(locale.getTranslation(data.nameKey) ?? data.nameKey!),
-            Tooltip(
-              message: locale.getTranslation(data.descriptionKey) ?? data.descriptionKey ?? 'No Description',
-              child: Icon(Icons.info_outline, size: 16),
-            ),
+            Text(locale.getTranslation(data.nameKey) ?? data.nameKey!, style: TextStyle(fontSize: 18)),
+            if (description != null)
+              Tooltip(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey, width: 2),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                textStyle: TextStyle(fontSize: 14, color: Colors.black),
+                message: description,
+                child: Icon(Icons.info_outline, size: 16),
+              ),
           ],
         ),
       );
     }
+    final skillValue1Str = valueString(data.skillValue1, data.skillValueType1);
+    final skillValue2Str = valueString(data.skillValue2, data.skillValueType2);
+    final valueStr = [skillValue1Str, skillValue2Str].where((s) => s != null).join(', ');
     children.addAll([
       Text('Skill ID: ${data.id}'),
-      Text('Type: ${data.rawFireType}'),
-      Text('Target: ${data.rawPreferTarget} (${data.shotCount} shots)'),
-      Text('Locking: ${data.showLockOn}'),
-      Text('Casting Time: ${(data.castingTime / 100).toStringAsFixed(2)} s'),
+      Wrap(
+        spacing: 10,
+        alignment: WrapAlignment.center,
+        children: [
+          Text('Type: ${data.rawFireType}'),
+          if (valueStr.isNotEmpty) Text('($valueStr)'),
+          Text('Target: ${data.rawPreferTarget} (${data.shotCount} shots)'),
+        ],
+      ),
+      Wrap(
+        spacing: 10,
+        alignment: WrapAlignment.center,
+        children: [
+          Text('Locking: ${data.showLockOn}'),
+          Text('Casting Time: ${(data.castingTime / 100).toStringAsFixed(2)} s'),
+        ],
+      ),
     ]);
     if (data.projectileHpRatio != 0) {
-      children.addAll([
-        Text('Projectile HP Ratio: ${toPercentString(data.projectileHpRatio)}'),
-        Text('Projectile Destroyable: ${data.isDestroyableProjectile}'),
-      ]);
-    }
-
-    final skillValue1Str = valueString(data.skillValue1, data.skillValueType1);
-    if (skillValue1Str != null) {
-      children.add(Text('Value: $skillValue1Str'));
-    }
-
-    final skillValue2Str = valueString(data.skillValue2, data.skillValueType2);
-    if (skillValue2Str != null) {
-      children.add(Text('Value: $skillValue2Str'));
+      children.add(
+        Wrap(
+          spacing: 10,
+          alignment: WrapAlignment.center,
+          children: [
+            Text('Projectile: '),
+            Text('HP: ${toPercentString(data.projectileHpRatio)}'),
+            Text('Destroyable: ${data.isDestroyableProjectile}'),
+          ],
+        ),
+      );
     }
 
     return Column(spacing: 3, children: children);
