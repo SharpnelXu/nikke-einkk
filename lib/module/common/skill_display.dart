@@ -90,6 +90,25 @@ class CharacterSkillDataDisplay extends StatelessWidget {
       children.add(skillColumn);
     }
 
+    if (data.skillType == CharacterSkillType.launchWeapon) {
+      final skillColumn = Container(
+        padding: const EdgeInsets.all(3.0),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey, width: 2),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Column(
+          spacing: 5,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('↓↓↓ Launch This Weapon  ↓↓↓', style: TextStyle(fontSize: 16)),
+            WeaponDataDisplay(weaponId: data.skillValueData[2].skillValue),
+          ],
+        ),
+      );
+      children.add(skillColumn);
+    }
+
     final connectedFunctions = [
       for (int idx = 0; idx < functionIds.length; idx += 1)
         Container(

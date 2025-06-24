@@ -220,14 +220,6 @@ class NikkeCharacterData {
   });
 
   factory NikkeCharacterData.fromJson(Map<String, dynamic> json) => _$NikkeCharacterDataFromJson(json);
-
-  bool get hasUnknownEnum {
-    return originalRare == Rarity.unknown ||
-        corporation == Corporation.unknown ||
-        useBurstSkill == BurstStep.unknown ||
-        changeBurstStep == BurstStep.unknown ||
-        characterClass == NikkeClass.unknown;
-  }
 }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)

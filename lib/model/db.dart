@@ -99,6 +99,11 @@ class NikkeDatabaseV2 {
   final Map<String, List<WordGroupData>> wordGroupTable = {};
   final Map<int, FavoriteItemData> nameCodeFavItemTable = {};
 
+  final Map<int, Set<CharacterSkillType>> nameCodeSkillTypes = {};
+  final Map<int, Set<FunctionType>> nameCodeFuncTypes = {};
+  final Map<int, Set<TimingTriggerType>> nameCodeTimingTypes = {};
+  final Map<int, Set<StatusTriggerType>> nameCodeStatusTypes = {};
+
   void init() {
     unionRaidData.clear();
     waveGroupDict.clear();
@@ -117,6 +122,10 @@ class NikkeDatabaseV2 {
     skillInfoTable.clear();
     wordGroupTable.clear();
     nameCodeFavItemTable.clear();
+    nameCodeSkillTypes.clear();
+    nameCodeFuncTypes.clear();
+    nameCodeTimingTypes.clear();
+    nameCodeStatusTypes.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     initialized = true;
@@ -161,6 +170,108 @@ class NikkeDatabaseV2 {
     initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'FavoriteItemTable.json'), processDollData);
 
     initialized &= loadCsv(getDesignatedDirectory(extractFolderPath, 'WaveData.GroupDict.csv'), processWaveDict);
+
+    if (initialized) {
+      _buildFilterTable();
+    }
+  }
+
+  void _buildFilterTable() {
+    for (final characterData in characterResourceGardeTable.values.map((entry) => entry.values.first)) {
+      nameCodeSkillTypes.putIfAbsent(characterData.nameCode, () => {});
+      nameCodeFuncTypes.putIfAbsent(characterData.nameCode, () => {});
+      nameCodeTimingTypes.putIfAbsent(characterData.nameCode, () => {});
+      nameCodeStatusTypes.putIfAbsent(characterData.nameCode, () => {});
+      final skillTypes = nameCodeSkillTypes[characterData.nameCode]!;
+      final funcTypes = nameCodeFuncTypes[characterData.nameCode]!;
+      final timingTypes = nameCodeTimingTypes[characterData.nameCode]!;
+      final statusTypes = nameCodeStatusTypes[characterData.nameCode]!;
+      _processSkill(characterData.skill1Id, characterData.skill1Table, skillTypes, funcTypes, timingTypes, statusTypes);
+      _processSkill(characterData.skill2Id, characterData.skill2Table, skillTypes, funcTypes, timingTypes, statusTypes);
+      _processActiveSkill(characterData.ultiSkillId, skillTypes, funcTypes, timingTypes, statusTypes);
+
+      final favItem = nameCodeFavItemTable[characterData.nameCode];
+      if (favItem != null) {
+        for (final favSkill in favItem.favoriteItemSkills) {
+          _processSkill(favSkill.skillId, favSkill.skillTable, skillTypes, funcTypes, timingTypes, statusTypes);
+        }
+      }
+    }
+  }
+
+  void _processSkill(
+    int skillId,
+    SkillType type,
+    Set<CharacterSkillType> skillTypes,
+    Set<FunctionType> funcTypes,
+    Set<TimingTriggerType> timingTypes,
+    Set<StatusTriggerType> statusTypes,
+  ) {
+    if (type == SkillType.characterSkill) {
+      _processActiveSkill(skillId, skillTypes, funcTypes, timingTypes, statusTypes);
+    } else {
+      _processPassiveSkill(skillId, skillTypes, funcTypes, timingTypes, statusTypes);
+    }
+  }
+
+  void _processPassiveSkill(
+    int skillId,
+    Set<CharacterSkillType> skillTypes,
+    Set<FunctionType> funcTypes,
+    Set<TimingTriggerType> timingTypes,
+    Set<StatusTriggerType> statusTypes,
+  ) {
+    final skillData = stateEffectTable[skillId];
+    if (skillData != null) {
+      for (final funcId in skillData.allValidFuncIds) {
+        _processFunc(funcId, skillTypes, funcTypes, timingTypes, statusTypes);
+      }
+    }
+  }
+
+  void _processActiveSkill(
+    int skillId,
+    Set<CharacterSkillType> skillTypes,
+    Set<FunctionType> funcTypes,
+    Set<TimingTriggerType> timingTypes,
+    Set<StatusTriggerType> statusTypes,
+  ) {
+    final skillData = characterSkillTable[skillId];
+    if (skillData == null) {
+      skillTypes.add(CharacterSkillType.unknown);
+      return;
+    }
+
+    skillTypes.add(skillData.skillType);
+    for (final funcId in skillData.allValidFuncIds) {
+      _processFunc(funcId, skillTypes, funcTypes, timingTypes, statusTypes);
+    }
+  }
+
+  void _processFunc(
+    int funcId,
+    Set<CharacterSkillType> skillTypes,
+    Set<FunctionType> funcTypes,
+    Set<TimingTriggerType> timingTypes,
+    Set<StatusTriggerType> statusTypes,
+  ) {
+    final func = functionTable[funcId];
+    if (func == null) {
+      funcTypes.add(FunctionType.unknown);
+      return;
+    }
+
+    funcTypes.add(func.functionType);
+    timingTypes.add(func.timingTriggerType);
+    statusTypes.add(func.statusTriggerType);
+    statusTypes.add(func.statusTrigger2Type);
+    if (func.functionType == FunctionType.useCharacterSkillId) {
+      _processActiveSkill(func.functionValue, skillTypes, funcTypes, timingTypes, statusTypes);
+    }
+
+    for (final funcId in func.connectedFunction.where((funcId) => funcId != 0)) {
+      _processFunc(funcId, skillTypes, funcTypes, timingTypes, statusTypes);
+    }
   }
 
   WaveData? getWaveData(int stageId) {

@@ -123,6 +123,7 @@ class _NikkeGridsState extends State<NikkeGrids> {
                     return NikkeAdvancedFilterDialog(filterData: filterData);
                   },
                 );
+                setState(() {});
               },
               child: Text('Advanced Filter'),
             ),
@@ -338,6 +339,10 @@ class NikkeFilterData {
   List<Rarity> rarity = [Rarity.ssr];
   List<CharacterSkillType> skillTypes = [];
   List<FunctionType> funcTypes = [];
+  List<TimingTriggerType> timingTypes = [];
+  List<StatusTriggerType> statusTypes = [];
+  bool skillOr = true;
+  bool funcOr = true;
 
   NikkeDatabaseV2 get db => userDb.gameDb;
 
@@ -347,7 +352,11 @@ class NikkeFilterData {
         (elements.isEmpty || characterData.elementId.any((eleId) => elements.contains(NikkeElement.fromId(eleId)))) &&
         (classes.isEmpty || classes.contains(characterData.characterClass)) &&
         (weaponTypes.isEmpty || weaponTypes.contains(weapon?.weaponType)) &&
-        (rarity.isEmpty || rarity.contains(characterData.originalRare));
+        (rarity.isEmpty || rarity.contains(characterData.originalRare)) &&
+        _skillTypeCheck(characterData) &&
+        _funcTypeCheck(characterData) &&
+        _timingTypeCheck(characterData) &&
+        _statusTypeCheck(characterData);
   }
 
   bool _burstCheck(NikkeCharacterData characterData) {
@@ -355,6 +364,54 @@ class NikkeFilterData {
     final redHoodCheck = characterData.useBurstSkill == BurstStep.allStep;
     final rapiRedHoodCheck = burstSteps.contains(BurstStep.step1) && characterData.resourceId == 16;
     return redHoodCheck || rapiRedHoodCheck;
+  }
+
+  bool _skillTypeCheck(NikkeCharacterData characterData) {
+    if (skillTypes.isEmpty) return true;
+
+    final Set<CharacterSkillType> characterSkillTypes = db.nameCodeSkillTypes[characterData.nameCode] ?? {};
+
+    if (skillOr) {
+      for (final requiredType in skillTypes) {
+        if (characterSkillTypes.contains(requiredType)) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      return characterSkillTypes.containsAll(skillTypes);
+    }
+  }
+
+  bool _funcTypeCheck(NikkeCharacterData characterData) {
+    if (funcTypes.isEmpty) return true;
+
+    final Set<FunctionType> characterFuncTypes = db.nameCodeFuncTypes[characterData.nameCode] ?? {};
+
+    if (funcOr) {
+      for (final requiredType in funcTypes) {
+        if (characterFuncTypes.contains(requiredType)) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      return characterFuncTypes.containsAll(funcTypes);
+    }
+  }
+
+  bool _timingTypeCheck(NikkeCharacterData characterData) {
+    if (timingTypes.isEmpty) return true;
+
+    final Set<TimingTriggerType> types = db.nameCodeTimingTypes[characterData.nameCode] ?? {};
+    return types.containsAll(timingTypes);
+  }
+
+  bool _statusTypeCheck(NikkeCharacterData characterData) {
+    if (statusTypes.isEmpty) return true;
+
+    final Set<StatusTriggerType> types = db.nameCodeStatusTypes[characterData.nameCode] ?? {};
+    return types.containsAll(statusTypes);
   }
 
   void reset() {
@@ -367,5 +424,9 @@ class NikkeFilterData {
     rarity.add(Rarity.ssr);
     skillTypes.clear();
     funcTypes.clear();
+    timingTypes.clear();
+    statusTypes.clear();
+    skillOr = true;
+    funcOr = true;
   }
 }

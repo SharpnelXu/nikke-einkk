@@ -208,9 +208,9 @@ String? functionStandardString(StandardType funcStandard) {
 
 String formatFunctionDescription(FunctionData func) {
   String result = locale.getTranslation(func.descriptionLoaclkey) ?? func.descriptionLoaclkey ?? '';
-  final replaceKey = '{function_value02}';
   final replaceValue = (func.functionValue / 100).toStringAsFixed(2);
-  result = result.replaceFirst(replaceKey, replaceValue);
+  result = result.replaceAll('{function_value01}', '${func.functionValue}');
+  result = result.replaceAll('{function_value02}', replaceValue);
 
   return result;
 }
@@ -220,7 +220,7 @@ String formatSkillInfoDescription(SkillInfoData skillInfo) {
   for (int v = 1; v <= skillInfo.descriptionValues.length; v += 1) {
     final replaceKey = '{description_value_${v < 10 ? '0' : ''}$v}';
     final replaceValue = skillInfo.descriptionValues[v - 1];
-    result = result.replaceFirst(replaceKey, replaceValue.value ?? '');
+    result = result.replaceAll(replaceKey, replaceValue.value ?? '');
   }
 
   return result;

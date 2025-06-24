@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
@@ -185,8 +187,8 @@ class WeaponDataDisplay extends StatelessWidget {
                   children: [
                     Positioned(
                       child: Container(
-                        height: weapon.endAccuracyCircleScale * 0.75,
-                        width: weapon.endAccuracyCircleScale * 0.75,
+                        height: max(1, weapon.endAccuracyCircleScale * 0.75),
+                        width: max(1, weapon.endAccuracyCircleScale * 0.75),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey, width: 3),
                           color: null,
@@ -196,8 +198,8 @@ class WeaponDataDisplay extends StatelessWidget {
                     ),
                     Positioned(
                       child: Container(
-                        height: weapon.startAccuracyCircleScale * 0.75,
-                        width: weapon.startAccuracyCircleScale * 0.75,
+                        height: max(1, weapon.startAccuracyCircleScale * 0.75),
+                        width: max(1, weapon.startAccuracyCircleScale * 0.75),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.white, width: 3),
                           color: null,
@@ -272,7 +274,24 @@ class _NikkeAdvancedFilterDialogState extends State<NikkeAdvancedFilterDialog> {
         spacing: 5,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Skill Types', style: TextStyle(fontSize: 18)),
+          Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            children: [
+              Text('Skill Types', style: TextStyle(fontSize: 18)),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  foregroundColor: filterData.skillOr ? Colors.white : Colors.black,
+                  backgroundColor: filterData.skillOr ? Colors.blue : Colors.white,
+                ),
+                onPressed: () {
+                  filterData.skillOr = !filterData.skillOr;
+                  setState(() {});
+                },
+                child: Text(filterData.skillOr ? 'OR Mode' : 'AND Mode'),
+              ),
+            ],
+          ),
           Wrap(
             spacing: 5,
             runSpacing: 5,
@@ -296,8 +315,24 @@ class _NikkeAdvancedFilterDialogState extends State<NikkeAdvancedFilterDialog> {
                   );
                 }).toList(),
           ),
-          Text('~~~~~'),
-          Text('Function Types', style: TextStyle(fontSize: 18)),
+          Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            children: [
+              Text('Function Types', style: TextStyle(fontSize: 18)),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  foregroundColor: filterData.funcOr ? Colors.white : Colors.black,
+                  backgroundColor: filterData.funcOr ? Colors.blue : Colors.white,
+                ),
+                onPressed: () {
+                  filterData.funcOr = !filterData.funcOr;
+                  setState(() {});
+                },
+                child: Text(filterData.funcOr ? 'OR Mode' : 'AND Mode'),
+              ),
+            ],
+          ),
           Wrap(
             spacing: 5,
             runSpacing: 5,
@@ -314,6 +349,54 @@ class _NikkeAdvancedFilterDialogState extends State<NikkeAdvancedFilterDialog> {
                         filterData.funcTypes.remove(type);
                       } else {
                         filterData.funcTypes.add(type);
+                      }
+                      setState(() {});
+                    },
+                    child: Text(type.name),
+                  );
+                }).toList(),
+          ),
+          Text('Timing Trigger Types', style: TextStyle(fontSize: 18)),
+          Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            children:
+                TimingTriggerType.sorted.map((type) {
+                  final enabled = filterData.timingTypes.contains(type);
+                  return FilledButton(
+                    style: FilledButton.styleFrom(
+                      foregroundColor: enabled ? Colors.white : Colors.black,
+                      backgroundColor: enabled ? Colors.blue : Colors.white,
+                    ),
+                    onPressed: () {
+                      if (enabled) {
+                        filterData.timingTypes.remove(type);
+                      } else {
+                        filterData.timingTypes.add(type);
+                      }
+                      setState(() {});
+                    },
+                    child: Text(type.name),
+                  );
+                }).toList(),
+          ),
+          Text('Status Trigger Types', style: TextStyle(fontSize: 18)),
+          Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            children:
+                StatusTriggerType.sorted.map((type) {
+                  final enabled = filterData.statusTypes.contains(type);
+                  return FilledButton(
+                    style: FilledButton.styleFrom(
+                      foregroundColor: enabled ? Colors.white : Colors.black,
+                      backgroundColor: enabled ? Colors.blue : Colors.white,
+                    ),
+                    onPressed: () {
+                      if (enabled) {
+                        filterData.statusTypes.remove(type);
+                      } else {
+                        filterData.statusTypes.add(type);
                       }
                       setState(() {});
                     },

@@ -548,6 +548,8 @@ enum TimingTriggerType {
   onUseTeamAmmo,
   onPelletCriticalHitNum;
 
+  static List<TimingTriggerType> sorted = TimingTriggerType.values.toList().sorted((a, b) => a.name.compareTo(b.name));
+
   static final Map<String, TimingTriggerType> _reverseMap = Map.fromIterable(
     TimingTriggerType.values,
     key: (v) => (v as TimingTriggerType).name.pascal,
@@ -624,6 +626,8 @@ enum StatusTriggerType {
   static StatusTriggerType fromName(String? name) {
     return _reverseMap[name] ?? StatusTriggerType.unknown;
   }
+
+  static List<StatusTriggerType> sorted = StatusTriggerType.values.toList().sorted((a, b) => a.name.compareTo(b.name));
 }
 
 @JsonEnum(fieldRename: FieldRename.pascal)
