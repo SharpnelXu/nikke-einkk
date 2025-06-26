@@ -51,8 +51,8 @@ NikkeCharacterData _$NikkeCharacterDataFromJson(Map<String, dynamic> json) => Ni
 
 WeaponData _$WeaponDataFromJson(Map<String, dynamic> json) => WeaponData(
   id: (json['id'] as num?)?.toInt() ?? 0,
-  nameLocalkey: json['name_localkey'] as String? ?? '',
-  descriptionLocalkey: json['description_localkey'] as String? ?? '',
+  nameLocalkey: json['name_localkey'] as String?,
+  descriptionLocalkey: json['description_localkey'] as String?,
   cameraWork: json['camera_work'] as String? ?? '',
   rawWeaponType: json['weapon_type'] as String? ?? '',
   rawAttackType: json['attack_type'] as String? ?? '',

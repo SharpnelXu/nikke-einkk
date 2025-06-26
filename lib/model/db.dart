@@ -25,7 +25,7 @@ late PackageInfo packageInfo;
 
 final Logger logger = Logger();
 
-enum Language { unknown, ko, en, ja, zhTW, zhCN, th, de, fr }
+enum Language { unknown, ko, en, ja, zhTW, zhCN, th, de, fr, debug }
 
 class Locale {
   Language language = Language.en;
@@ -61,6 +61,7 @@ class Locale {
   }
 
   String? getTranslation(String? joinedKey) {
+    if (language == Language.debug) return joinedKey;
     if (joinedKey == null) return null;
 
     final splits = joinedKey.split(':');

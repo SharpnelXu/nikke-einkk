@@ -241,9 +241,9 @@ enum CorporationSubType {
 class WeaponData {
   final int id;
   @JsonKey(name: 'name_localkey')
-  final String nameLocalkey;
+  final String? nameLocalkey;
   @JsonKey(name: 'description_localkey')
-  final String descriptionLocalkey;
+  final String? descriptionLocalkey;
   @JsonKey(name: 'camera_work')
   final String cameraWork;
   @JsonKey(name: 'weapon_type')
@@ -363,8 +363,8 @@ class WeaponData {
 
   WeaponData({
     this.id = 0,
-    this.nameLocalkey = '',
-    this.descriptionLocalkey = '',
+    this.nameLocalkey,
+    this.descriptionLocalkey,
     this.cameraWork = '',
     this.rawWeaponType = '',
     this.rawAttackType = '',

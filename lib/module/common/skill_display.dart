@@ -272,7 +272,7 @@ class SimpleFunctionDisplay extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(3.0),
             decoration: BoxDecoration(
-              border: Border.all(color: buffTypeColor(db.functionTable[functionId]?.buff), width: 2),
+              border: Border.all(color: buffTypeColor(db.functionTable[connectedFunc]?.buff), width: 2),
               borderRadius: BorderRadius.circular(5),
             ),
             child: SimpleFunctionDisplay(functionId: connectedFunc),

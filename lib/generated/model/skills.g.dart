@@ -108,7 +108,7 @@ FunctionData _$FunctionDataFromJson(Map<String, dynamic> json) => FunctionData(
   fxSocketPoint03Arena: json['fx_socket_point_03_arena'] as String?,
   connectedFunction:
       (json['connected_function'] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList() ?? const [],
-  descriptionLoaclkey: json['description_localkey'] as String?,
+  descriptionLocalkey: json['description_localkey'] as String?,
   elementReactionIcon: json['element_reaction_icon'] as String?,
   functionBattlepower: (json['function_battlepower'] as num?)?.toInt(),
 );

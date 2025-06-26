@@ -785,7 +785,7 @@ class FunctionData {
   final List<int> connectedFunction;
 
   @JsonKey(name: 'description_localkey')
-  final String? descriptionLoaclkey;
+  final String? descriptionLocalkey;
   @JsonKey(name: 'element_reaction_icon')
   final String? elementReactionIcon;
   @JsonKey(name: 'function_battlepower')
@@ -846,7 +846,7 @@ class FunctionData {
     this.fxTarget03Arena,
     this.fxSocketPoint03Arena,
     this.connectedFunction = const [],
-    this.descriptionLoaclkey,
+    this.descriptionLocalkey,
     this.elementReactionIcon,
     this.functionBattlepower,
   });

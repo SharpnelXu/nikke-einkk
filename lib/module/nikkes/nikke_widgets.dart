@@ -81,7 +81,10 @@ class WeaponDataDisplay extends StatelessWidget {
     final sectionFontSize = 16.0;
     final weapon = db.characterShotTable[weaponId];
     final List<Widget> children = [
-      Text('Weapon ID: $weaponId - ${weapon == null ? 'Not Found' : 'Found'}', style: TextStyle(fontSize: 18)),
+      if (weapon != null && weapon.nameLocalkey != null)
+        Text(locale.getTranslation(weapon.nameLocalkey!) ?? weapon.nameLocalkey!, style: TextStyle(fontSize: 18)),
+      Text('Weapon ID: $weaponId'),
+      if (weapon != null && weapon.descriptionLocalkey != null) DescriptionTextWidget(formatWeaponDescription(weapon)),
     ];
     if (weapon != null) {
       children.addAll([

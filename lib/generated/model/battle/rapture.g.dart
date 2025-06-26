@@ -124,6 +124,7 @@ const _$DurationTypeEnumMap = {
   DurationType.battles: 'Battles',
   DurationType.hits: 'Hits',
   DurationType.timeSecBattles: 'TimeSecBattles',
+  DurationType.timeSecVer2: 'TimeSec_Ver2',
   DurationType.unknown: 'Unknown',
 };
 
@@ -314,6 +315,7 @@ const _$FunctionTypeEnumMap = {
   FunctionType.immediatelyBuffCheckImmune: 'ImmediatelyBuffCheckImmune',
   FunctionType.changeHurtFxExcludingBreakCol: 'ChangeHurtFxExcludingBreakCol',
   FunctionType.plusBuffCount: 'PlusBuffCount',
+  FunctionType.durationDamage: 'DurationDamage',
 };
 
 BattleRaptureParts _$BattleRapturePartsFromJson(Map<String, dynamic> json) => BattleRaptureParts(

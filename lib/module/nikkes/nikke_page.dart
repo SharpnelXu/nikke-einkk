@@ -166,7 +166,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
           Text('Skill ID: $actualSkillId, type: ${actualSkillType == SkillType.characterSkill ? 'Active' : 'Passive'}'),
         ],
       ),
-      if (skillInfo != null) DescriptionTextWidget(skillInfo),
+      if (skillInfo != null) DescriptionTextWidget(formatSkillInfoDescription(skillInfo)),
       SliderWithPrefix(
         titled: true,
         label: 'Skill ${index + 1}',

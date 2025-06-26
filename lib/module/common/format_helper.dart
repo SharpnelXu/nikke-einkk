@@ -206,11 +206,24 @@ String? functionStandardString(StandardType funcStandard) {
   }
 }
 
+String formatWeaponDescription(WeaponData weapon) {
+  String result = locale.getTranslation(weapon.descriptionLocalkey) ?? weapon.descriptionLocalkey ?? '';
+  result = result.replaceAll('{damage}', (weapon.damage / 100).toStringAsFixed(2));
+  result = result.replaceAll('{core_damage_rate}', (weapon.coreDamageRate / 100).toStringAsFixed(2));
+  result = result.replaceAll('{charge_time}', (weapon.chargeTime / 100).toStringAsFixed(2));
+  result = result.replaceAll('{full_charge_damage}', (weapon.fullChargeDamage / 100).toStringAsFixed(2));
+
+  return result;
+}
+
 String formatFunctionDescription(FunctionData func) {
-  String result = locale.getTranslation(func.descriptionLoaclkey) ?? func.descriptionLoaclkey ?? '';
+  String result = locale.getTranslation(func.descriptionLocalkey) ?? func.descriptionLocalkey ?? '';
   final replaceValue = (func.functionValue / 100).toStringAsFixed(2);
+  final replaceValueAbs = (func.functionValue / 100).abs().toStringAsFixed(2);
   result = result.replaceAll('{function_value01}', '${func.functionValue}');
   result = result.replaceAll('{function_value02}', replaceValue);
+  result = result.replaceAll('{function_dec_value01}', '${func.functionValue.abs()}');
+  result = result.replaceAll('{function_dec_value02}', replaceValueAbs);
 
   return result;
 }
@@ -303,13 +316,12 @@ List<InlineSpan> buildDescriptionTextSpans(String curText, TextStyle style, Nikk
 }
 
 class DescriptionTextWidget extends StatelessWidget {
-  final SkillInfoData skillInfoData;
+  final String text;
 
-  const DescriptionTextWidget(this.skillInfoData, {super.key});
+  const DescriptionTextWidget(this.text, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    final text = formatSkillInfoDescription(skillInfoData);
     final defaultStyle = DefaultTextStyle.of(context).style;
     final textSpans = buildDescriptionTextSpans(text, defaultStyle, userDb.gameDb);
 

@@ -1481,5 +1481,51 @@ void main() async {
         expect(extraKeys, emptySet, reason: 'Unexpected keys in WordGroupData: $folder');
       }
     });
+
+    test('WordGroup description parsing', () {
+      locale.loadGeneral('Locale_Skill');
+      final labelRegex = RegExp(r'\{(\w+)\}');
+      final tagRegex = RegExp(r'<(\w+)(=.+)?>');
+      final Set<String> labelSet = {};
+      final Set<String> tagSet = {};
+      for (final transl in locale.locale['Locale_Skill']!.values) {
+        for (final str in [transl.en, transl.zhCN, transl.ja, transl.ko]) {
+          for (final match in labelRegex.allMatches(str)) {
+            labelSet.add(match[1]!);
+          }
+          for (final match in tagRegex.allMatches(str)) {
+            tagSet.add(match[1]!);
+          }
+        }
+      }
+
+      final expectedLabels = {
+        'description_value_01',
+        'description_value_02',
+        'description_value_03',
+        'description_value_04',
+        'description_value_05',
+        'description_value_06',
+        'description_value_07',
+        'description_value_08',
+        'description_value_09',
+        'description_value_10',
+        'description_value_11',
+        'function_dec_value01',
+        'function_dec_value02',
+        'function_value01',
+        'function_value02',
+        'duration_value01', // not used
+        'duration_value02', // not used
+        'damage',
+        'core_damage_rate',
+        'charge_time',
+        'full_charge_damage',
+      };
+      final expectedTags = {'color', 'word_group'};
+
+      expect(labelSet, expectedLabels, reason: 'Unexpected description value');
+      expect(tagSet, expectedTags, reason: 'Unexpected tags');
+    });
   });
 }
