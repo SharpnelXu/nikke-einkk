@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/monster.dart';
@@ -331,13 +333,15 @@ class SimpleFunctionDisplay extends StatelessWidget {
 
 class MonsterSkillDataDisplay extends StatelessWidget {
   final MonsterSkillData data;
+  final MonsterStatEnhanceData? statEnhanceData;
 
   NikkeDatabaseV2 get db => userDb.gameDb;
 
-  const MonsterSkillDataDisplay({super.key, required this.data});
+  const MonsterSkillDataDisplay({super.key, required this.data, this.statEnhanceData});
 
   @override
   Widget build(BuildContext context) {
+    final format = NumberFormat.decimalPattern();
     final List<Widget> children = [];
     if (data.nameKey != null) {
       final description = locale.getTranslation(data.descriptionKey) ?? data.descriptionKey;
@@ -381,6 +385,7 @@ class MonsterSkillDataDisplay extends StatelessWidget {
         spacing: 10,
         alignment: WrapAlignment.center,
         children: [
+          Text('Penetration: ${data.penetration}'),
           Text('Locking: ${data.showLockOn}'),
           Text('Casting Time: ${(data.castingTime / 100).toStringAsFixed(2)} s'),
         ],
@@ -393,7 +398,9 @@ class MonsterSkillDataDisplay extends StatelessWidget {
           alignment: WrapAlignment.center,
           children: [
             Text('Projectile: '),
-            Text('HP: ${toPercentString(data.projectileHpRatio)}'),
+            if (statEnhanceData == null) Text('HP Ratio: ${toPercentString(data.projectileHpRatio)}'),
+            if (statEnhanceData != null)
+              Text('HP: ${format.format(toModifier(data.projectileHpRatio) * statEnhanceData!.levelProjectileHp)}'),
             Text('Destroyable: ${data.isDestroyableProjectile}'),
           ],
         ),

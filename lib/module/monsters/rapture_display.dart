@@ -6,6 +6,7 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/monster.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/skill_display.dart';
 
 class RaptureLeveledDataDisplay extends StatelessWidget {
@@ -45,7 +46,10 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
             iconSize: 16,
             constraints: BoxConstraints(),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (ctx) => RaptureDataDisplayPage(data: data)));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (ctx) => RaptureDataDisplayPage(data: data, stageLv: stageLv)),
+              );
             },
             icon: Icon(Icons.search),
           ),
@@ -59,6 +63,7 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
         Text('HP: ${format.format((utils.toModifier(data.hpRatio) * statEnhanceData.levelHp).round())}'),
         Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * statEnhanceData.levelAttack).round())}'),
         Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * statEnhanceData.levelDefence).round())}'),
+        Text('Damage Ratio: ${(statEnhanceData.levelStatDamageRatio / 100).toStringAsFixed(2)}%'),
         Text('Part Base HP: ${format.format(statEnhanceData.levelBrokenHp)}'),
         Text('Projectile Base HP: ${format.format(statEnhanceData.levelProjectileHp)}'),
       ]);
@@ -162,8 +167,9 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
 
 class RaptureDataDisplayPage extends StatefulWidget {
   final MonsterData data;
+  final int? stageLv;
 
-  const RaptureDataDisplayPage({super.key, required this.data});
+  const RaptureDataDisplayPage({super.key, required this.data, this.stageLv});
 
   @override
   State<RaptureDataDisplayPage> createState() => _RaptureDataDisplayPageState();
@@ -173,14 +179,19 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
   int tab = 0;
   NikkeDatabaseV2 get db => userDb.gameDb;
   MonsterData get data => widget.data;
+  int? get stageLv => widget.stageLv;
+  MonsterStatEnhanceData? get statEnhanceData => db.monsterStatEnhanceData[data.statEnhanceId]?[stageLv];
+  static final format = NumberFormat.decimalPattern();
 
   @override
   Widget build(BuildContext context) {
+    final stat = statEnhanceData;
     final List<Widget> children = [
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 5,
         children: [
+          if (stageLv != null) Text('Lv $stageLv'),
           Text(locale.getTranslation(data.nameKey) ?? data.nameKey, style: TextStyle(fontSize: 20)),
           Tooltip(
             message:
@@ -201,6 +212,17 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
           Text('Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}'),
         ],
       ),
+      if (stat != null)
+        Wrap(
+          spacing: 15,
+          alignment: WrapAlignment.center,
+          children: [
+            Text('HP: ${format.format((utils.toModifier(data.hpRatio) * stat.levelHp).round())}'),
+            Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * stat.levelAttack).round())}'),
+            Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * stat.levelDefence).round())}'),
+            Text('Damage Ratio: ${(stat.levelStatDamageRatio / 100).toStringAsFixed(2)}%'),
+          ],
+        ),
       buildTabs(),
       Divider(),
       getTab(),
@@ -265,12 +287,12 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
             child: Column(
               spacing: 3,
               children: [
-                MonsterSkillDataDisplay(data: skillData),
+                MonsterSkillDataDisplay(data: skillData, statEnhanceData: statEnhanceData),
                 for (final funcId in funcs)
                   Container(
                     padding: const EdgeInsets.all(3.0),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey, width: 2),
+                      border: Border.all(color: buffTypeColor(db.functionTable[funcId]?.buff), width: 2),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: SimpleFunctionDisplay(functionId: funcId),
@@ -287,6 +309,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
 
   Widget buildPartsTab() {
     final parts = db.rapturePartData[data.monsterModelId] ?? [];
+    final stat = statEnhanceData;
     final List<Widget> children = [];
     for (final part in parts) {
       final partName = locale.getTranslation(part.partsNameKey) ?? part.partsNameKey;
@@ -311,16 +334,33 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
                   Text('Damageable: ${part.isPartsDamageable}'),
                 ],
               ),
-              Wrap(
-                spacing: 15,
-                alignment: WrapAlignment.center,
-                children: [
-                  Text('HP: ${(part.hpRatio / 100).toStringAsFixed(2)}%'),
-                  Text('Damage HP: ${(part.damageHpRatio / 100).toStringAsFixed(2)}%'),
-                  Text('ATK: ${(part.attackRatio / 100).toStringAsFixed(2)}%'),
-                  Text('DEF: ${(part.defenceRatio / 100).toStringAsFixed(2)}%'),
-                ],
-              ),
+              if (stat == null)
+                Wrap(
+                  spacing: 15,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    Text('HP: ${(part.hpRatio / 100).toStringAsFixed(2)}%'),
+                    Text('Break Bonus: ${(part.damageHpRatio / 100).toStringAsFixed(2)}%'),
+                    Text('ATK: ${(part.attackRatio / 100).toStringAsFixed(2)}%'),
+                    Text('DEF: ${(part.defenceRatio / 100).toStringAsFixed(2)}%'),
+                  ],
+                ),
+              if (stat != null)
+                Wrap(
+                  spacing: 15,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    Text(
+                      'HP: ${format.format((utils.toModifier(part.hpRatio) * (part.isMainPart ? stat.levelHp : stat.levelBrokenHp)).round())}',
+                    ),
+                    if (!part.isMainPart)
+                      Text(
+                        'Break Bonus: ${format.format((utils.toModifier(part.damageHpRatio) * stat.levelBrokenHp).round())}',
+                      ),
+                    Text('ATK: ${format.format((utils.toModifier(part.attackRatio) * stat.levelAttack).round())}'),
+                    Text('DEF: ${format.format((utils.toModifier(part.defenceRatio) * stat.levelDefence).round())}'),
+                  ],
+                ),
               if (part.passiveSkillId != 0 && db.stateEffectTable[part.passiveSkillId] != null)
                 Container(
                   padding: const EdgeInsets.all(3.0),
