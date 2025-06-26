@@ -84,7 +84,8 @@ class LocaleUnpackerPage extends StatelessWidget {
                       final tableName = table['tbl_name']! as String;
                       final result = await db.query(tableName);
                       final jsonFile = File(join(outputPath, fileName, '$tableName.json'));
-                      await jsonFile.writeAsString(jsonEncode(result));
+                      final jsonEncoder = JsonEncoder.withIndent('  ');
+                      await jsonFile.writeAsString(jsonEncoder.convert(result));
                     }
                   }
                 }
