@@ -88,6 +88,7 @@ class LocaleUnpackerPage extends StatelessWidget {
                       await jsonFile.writeAsString(jsonEncoder.convert(result));
                     }
                   }
+                  await db.close();
                 }
 
                 await EasyLoading.dismiss();
