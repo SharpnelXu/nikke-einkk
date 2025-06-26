@@ -59,6 +59,8 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
         Text('HP: ${format.format((utils.toModifier(data.hpRatio) * statEnhanceData.levelHp).round())}'),
         Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * statEnhanceData.levelAttack).round())}'),
         Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * statEnhanceData.levelDefence).round())}'),
+        Text('Part Base HP: ${format.format(statEnhanceData.levelBrokenHp)}'),
+        Text('Projectile Base HP: ${format.format(statEnhanceData.levelProjectileHp)}'),
       ]);
 
       final parts = db.rapturePartData[data.monsterModelId] ?? [];
@@ -77,24 +79,18 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
               spacing: 3,
               children: [
                 Tooltip(
-                  message: 'Type: ${part.partsType}',
+                  message: 'NameKey: ${part.partsNameKey}\nType: ${part.partsType}',
                   child: Text(locale.getTranslation(part.partsNameKey) ?? part.partsNameKey ?? 'Unknown Part'),
                 ),
-                Row(
-                  spacing: 3,
-                  children: [
-                    Text('HP: ${format.format((utils.toModifier(part.hpRatio) * statEnhanceData.levelHp).round())}'),
-                    Text('(${(part.hpRatio / 100).toStringAsFixed(2)}%)'),
-                    Tooltip(
-                      message:
-                          'Don\'t trust this number, it is unknown if this is correct or not.\n'
-                          'Damage Ratio HP: '
-                          '${format.format((utils.toModifier(part.damageHpRatio) * statEnhanceData.levelHp).round())} '
-                          '(${(part.damageHpRatio / 100).toStringAsFixed(2)}%)',
-                      child: Icon(Icons.info_outline, size: 16),
-                    ),
-                  ],
+                Text(
+                  'HP: ${format.format((utils.toModifier(part.hpRatio) * statEnhanceData.levelBrokenHp).round())}'
+                  ' (${(part.hpRatio / 100).toStringAsFixed(2)}%)',
                 ),
+                if (part.damageHpRatio != 0)
+                  Text(
+                    'Break Bonus: ${format.format((utils.toModifier(part.damageHpRatio) * statEnhanceData.levelBrokenHp).round())}'
+                    ' (${(part.damageHpRatio / 100).toStringAsFixed(2)}%)',
+                  ),
                 if (part.defenceRatio != 10000)
                   Text(
                     'DEF: '
@@ -134,6 +130,8 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
                   'Range: ${format.format(stageLvChange.conditionValueMin)}-'
                   '${stageLvChange.conditionValueMax == 0 ? '∞' : format.format(stageLvChange.conditionValueMax)}',
                 ),
+                Text('Part Base HP: ${format.format(changedStat.levelBrokenHp)}'),
+                Text('Projectile Base HP: ${format.format(changedStat.levelProjectileHp)}'),
                 Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * changedStat.levelAttack).round())}'),
                 Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * changedStat.levelDefence).round())}'),
               ],
