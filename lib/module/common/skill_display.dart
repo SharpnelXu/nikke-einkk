@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
@@ -341,7 +340,6 @@ class MonsterSkillDataDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final format = NumberFormat.decimalPattern();
     final List<Widget> children = [];
     if (data.nameKey != null) {
       final description = locale.getTranslation(data.descriptionKey) ?? data.descriptionKey;
@@ -400,7 +398,7 @@ class MonsterSkillDataDisplay extends StatelessWidget {
             Text('Projectile: '),
             if (statEnhanceData == null) Text('HP Ratio: ${data.projectileHpRatio.percentString}'),
             if (statEnhanceData != null)
-              Text('HP: ${format.format(toModifier(data.projectileHpRatio) * statEnhanceData!.levelProjectileHp)}'),
+              Text('HP: ${(toModifier(data.projectileHpRatio) * statEnhanceData!.levelProjectileHp).decimalPattern}'),
             Text('Destroyable: ${data.isDestroyableProjectile}'),
           ],
         ),

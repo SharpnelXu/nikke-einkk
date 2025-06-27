@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:nikke_einkk/model/battle/utils.dart' as utils;
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
@@ -25,7 +24,6 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final format = NumberFormat.decimalPattern();
     final statEnhanceData = db.monsterStatEnhanceData[data.statEnhanceId]?[stageLv];
 
     final List<Widget> children = [
@@ -55,17 +53,15 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
           ),
         ],
       ),
-
+      Text('Lv: $stageLv'),
       Text('Element: ${data.elementIds.map((eleId) => NikkeElement.fromId(eleId).name.toUpperCase()).join(', ')}'),
     ];
     if (statEnhanceData != null) {
       children.addAll([
-        Text('HP: ${format.format((utils.toModifier(data.hpRatio) * statEnhanceData.levelHp).round())}'),
-        Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * statEnhanceData.levelAttack).round())}'),
-        Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * statEnhanceData.levelDefence).round())}'),
+        Text('HP: ${(utils.toModifier(data.hpRatio) * statEnhanceData.levelHp).decimalPattern}'),
+        Text('ATK: ${(utils.toModifier(data.attackRatio) * statEnhanceData.levelAttack).decimalPattern}'),
+        Text('DEF: ${(utils.toModifier(data.defenceRatio) * statEnhanceData.levelDefence).decimalPattern}'),
         Text('Damage Ratio: ${statEnhanceData.levelStatDamageRatio.percentString}'),
-        Text('Part Base HP: ${format.format(statEnhanceData.levelBrokenHp)}'),
-        Text('Projectile Base HP: ${format.format(statEnhanceData.levelProjectileHp)}'),
       ]);
 
       final parts = db.rapturePartData[data.monsterModelId] ?? [];
@@ -88,18 +84,18 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
                   child: Text(locale.getTranslation(part.partsNameKey) ?? part.partsNameKey ?? 'Unknown Part'),
                 ),
                 Text(
-                  'HP: ${format.format((utils.toModifier(part.hpRatio) * statEnhanceData.levelBrokenHp).round())}'
+                  'HP: ${(utils.toModifier(part.hpRatio) * statEnhanceData.levelBrokenHp).decimalPattern}'
                   ' (${part.hpRatio.percentString})',
                 ),
                 if (part.damageHpRatio != 0)
                   Text(
-                    'Break Bonus: ${format.format((utils.toModifier(part.damageHpRatio) * statEnhanceData.levelBrokenHp).round())}'
+                    'Break Bonus: ${(utils.toModifier(part.damageHpRatio) * statEnhanceData.levelBrokenHp).decimalPattern}'
                     ' (${part.damageHpRatio.percentString})',
                   ),
                 if (part.defenceRatio != 10000)
                   Text(
                     'DEF: '
-                    '${format.format((utils.toModifier(part.defenceRatio) * statEnhanceData.levelDefence).round())}',
+                    '${(utils.toModifier(part.defenceRatio) * statEnhanceData.levelDefence).decimalPattern}',
                   ),
               ],
             ),
@@ -113,10 +109,12 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
           db.monsterStageLvChangeData[stageLvChangeGroup]?.sorted((a, b) => a.step.compareTo(b.step)).toList() ?? [];
 
       for (final stageLvChange in stageLvChanges) {
+        if (stageLvChange.monsterStageLv == stageLv) continue;
         final changedStat = db.monsterStatEnhanceData[data.statEnhanceId]?[stageLvChange.monsterStageLv];
         final hasChange =
             changedStat?.levelAttack != statEnhanceData?.levelAttack ||
-            changedStat?.levelDefence != statEnhanceData?.levelDefence;
+            changedStat?.levelDefence != statEnhanceData?.levelDefence ||
+            changedStat?.levelStatDamageRatio != statEnhanceData?.levelStatDamageRatio;
         if (changedStat == null || !hasChange) continue;
 
         children.add(
@@ -130,15 +128,34 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               spacing: 3,
               children: [
-                Text('Stat Change: ${shortenConditionType(stageLvChange.conditionType)}'),
-                Text(
-                  'Range: ${format.format(stageLvChange.conditionValueMin)}-'
-                  '${stageLvChange.conditionValueMax == 0 ? '∞' : format.format(stageLvChange.conditionValueMax)}',
+                Row(
+                  spacing: 3,
+                  children: [
+                    Text('Stat Change: ${shortenConditionType(stageLvChange.conditionType)}'),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      iconSize: 16,
+                      constraints: BoxConstraints(),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (ctx) => RaptureDataDisplayPage(data: data, stageLv: stageLvChange.monsterStageLv),
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.search),
+                    ),
+                  ],
                 ),
-                Text('Part Base HP: ${format.format(changedStat.levelBrokenHp)}'),
-                Text('Projectile Base HP: ${format.format(changedStat.levelProjectileHp)}'),
-                Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * changedStat.levelAttack).round())}'),
-                Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * changedStat.levelDefence).round())}'),
+                Text(
+                  'Range: ${stageLvChange.conditionValueMin.decimalPattern}-'
+                  '${stageLvChange.conditionValueMax == 0 ? '∞' : stageLvChange.conditionValueMax.decimalPattern}',
+                ),
+                Text('Lv: ${stageLvChange.monsterStageLv}'),
+                Text('ATK: ${(utils.toModifier(data.attackRatio) * changedStat.levelAttack).decimalPattern}'),
+                Text('DEF: ${(utils.toModifier(data.defenceRatio) * changedStat.levelDefence).decimalPattern}'),
+                Text('Damage Ratio: ${changedStat.levelStatDamageRatio.percentString}'),
               ],
             ),
           ),
@@ -181,7 +198,6 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
   MonsterData get data => widget.data;
   int? get stageLv => widget.stageLv;
   MonsterStatEnhanceData? get statEnhanceData => db.monsterStatEnhanceData[data.statEnhanceId]?[stageLv];
-  static final format = NumberFormat.decimalPattern();
 
   @override
   Widget build(BuildContext context) {
@@ -217,9 +233,9 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
           spacing: 15,
           alignment: WrapAlignment.center,
           children: [
-            Text('HP: ${format.format((utils.toModifier(data.hpRatio) * stat.levelHp).round())}'),
-            Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * stat.levelAttack).round())}'),
-            Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * stat.levelDefence).round())}'),
+            Text('HP: ${(utils.toModifier(data.hpRatio) * stat.levelHp).decimalPattern}'),
+            Text('ATK: ${(utils.toModifier(data.attackRatio) * stat.levelAttack).decimalPattern}'),
+            Text('DEF: ${(utils.toModifier(data.defenceRatio) * stat.levelDefence).decimalPattern}'),
             Text('Damage Ratio: ${stat.levelStatDamageRatio.percentString}'),
           ],
         ),
@@ -351,14 +367,14 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
                   alignment: WrapAlignment.center,
                   children: [
                     Text(
-                      'HP: ${format.format((utils.toModifier(part.hpRatio) * (part.isMainPart ? stat.levelHp : stat.levelBrokenHp)).round())}',
+                      'HP: ${(utils.toModifier(part.hpRatio) * (part.isMainPart ? stat.levelHp : stat.levelBrokenHp)).decimalPattern}',
                     ),
                     if (!part.isMainPart)
                       Text(
-                        'Break Bonus: ${format.format((utils.toModifier(part.damageHpRatio) * stat.levelBrokenHp).round())}',
+                        'Break Bonus: ${(utils.toModifier(part.damageHpRatio) * stat.levelBrokenHp).decimalPattern}',
                       ),
-                    Text('ATK: ${format.format((utils.toModifier(part.attackRatio) * stat.levelAttack).round())}'),
-                    Text('DEF: ${format.format((utils.toModifier(part.defenceRatio) * stat.levelDefence).round())}'),
+                    Text('ATK: ${(utils.toModifier(part.attackRatio) * stat.levelAttack).decimalPattern}'),
+                    Text('DEF: ${(utils.toModifier(part.defenceRatio) * stat.levelDefence).decimalPattern}'),
                   ],
                 ),
               if (part.passiveSkillId != 0 && db.stateEffectTable[part.passiveSkillId] != null)
