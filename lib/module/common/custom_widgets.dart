@@ -129,3 +129,188 @@ Widget commonBottomNavigationBar(void Function() setState) {
     ),
   );
 }
+
+class InputCancelOkDialog extends StatefulWidget {
+  final String? title;
+  final String? initValue;
+  final int? maxLines;
+  final String? hintText;
+  final String? helperText;
+  final String? errorText;
+  final bool Function(String s)? validate;
+  final ValueChanged<String>? onSubmit;
+  final TextInputType? keyboardType;
+  final bool autofocus;
+  final bool showNumButton;
+
+  const InputCancelOkDialog({
+    super.key,
+    this.title,
+    this.initValue,
+    this.maxLines,
+    this.hintText,
+    this.helperText,
+    this.errorText,
+    this.validate,
+    this.onSubmit,
+    this.keyboardType,
+    this.autofocus = true,
+  }) : showNumButton = false;
+
+  InputCancelOkDialog.number({
+    super.key,
+    this.title,
+    int? initValue,
+    this.maxLines,
+    this.hintText,
+    this.helperText,
+    this.errorText,
+    bool Function(int v)? validate,
+    ValueChanged<int>? onSubmit,
+    this.keyboardType = TextInputType.number,
+    this.autofocus = true,
+    this.showNumButton = true,
+  }) : initValue = initValue?.toString(),
+       validate = ((String s) {
+         final v = int.parse(s);
+         if (validate != null) return validate(v);
+         return true;
+       }),
+       onSubmit = (onSubmit == null ? null : (String s) => onSubmit(int.parse(s)));
+
+  @override
+  State<StatefulWidget> createState() => _InputCancelOkDialogState();
+}
+
+class _InputCancelOkDialogState extends State<InputCancelOkDialog> {
+  late TextEditingController _controller;
+  bool validation = true;
+
+  bool _validate(String v) {
+    try {
+      if (widget.validate != null) {
+        return widget.validate!(v);
+      }
+    } catch (_) {
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final text = widget.initValue ?? '';
+    _controller = TextEditingController.fromValue(
+      TextEditingValue(
+        text: text,
+        selection:
+            text.isEmpty
+                ? const TextSelection.collapsed(offset: -1)
+                : TextSelection(baseOffset: 0, extentOffset: text.length),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    validation = _validate(_controller.text);
+    Widget field = TextFormField(
+      controller: _controller,
+      autofocus: widget.autofocus,
+      autocorrect: false,
+      keyboardType: widget.keyboardType,
+      maxLines: widget.maxLines ?? 1,
+      decoration: InputDecoration(
+        hintText: widget.hintText,
+        helperText: widget.helperText,
+        errorText: validation || _controller.text.isEmpty ? null : 'Invalid input',
+      ),
+      onChanged: (v) {
+        if (widget.validate != null) {
+          setState(() {
+            validation = _validate(v);
+          });
+        }
+      },
+      onFieldSubmitted: (v) {
+        if (!_validate(v)) {
+          return;
+        }
+        FocusScope.of(context).unfocus();
+        Navigator.pop(context, v);
+        if (widget.onSubmit != null) {
+          widget.onSubmit!(v);
+        }
+      },
+    );
+    if (widget.showNumButton) {
+      field = Row(
+        spacing: 8,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(child: field),
+          Column(
+            spacing: 8,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              InkWell(
+                onTap: () {
+                  try {
+                    _controller.text = (double.parse(_controller.text).floor() + 1).toString();
+                  } catch (e) {
+                    //do nothing
+                  }
+                  setState(() {});
+                },
+                child: Icon(Icons.add_circle_outline, size: 16),
+              ),
+              InkWell(
+                onTap: () {
+                  try {
+                    _controller.text = (double.parse(_controller.text).ceil() - 1).toString();
+                  } catch (e) {
+                    //do nothing
+                  }
+                  setState(() {});
+                },
+                child: Icon(Icons.remove_circle_outline, size: 16),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+    return AlertDialog(
+      title: widget.title == null ? null : Text(widget.title!),
+      content: field,
+      actions: <Widget>[
+        TextButton(child: Text('Cancel'), onPressed: () => Navigator.pop(context)),
+        TextButton(
+          onPressed:
+              validation
+                  ? () {
+                    String value = _controller.text;
+                    validation = _validate(value);
+                    setState(() {
+                      if (validation) {
+                        Navigator.pop(context, value);
+                        if (widget.onSubmit != null) {
+                          widget.onSubmit!(value);
+                        }
+                      }
+                    });
+                  }
+                  : null,
+          child: Text('OK'),
+        ),
+      ],
+    );
+  }
+}

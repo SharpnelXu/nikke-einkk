@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:nikke_einkk/module/common/custom_widgets.dart';
 
 /// copied from Chaldea...
 class SliderWithPrefix extends StatelessWidget {
@@ -16,6 +17,7 @@ class SliderWithPrefix extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final TextStyle? labelStyle;
   final bool? constraint;
+  final bool enableInput;
 
   const SliderWithPrefix({
     super.key,
@@ -32,24 +34,24 @@ class SliderWithPrefix extends StatelessWidget {
     this.padding,
     this.labelStyle,
     this.constraint,
+    this.enableInput = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    Color? labelColor = labelStyle?.color;
+    Color? labelColor = enableInput ? Theme.of(context).colorScheme.primary : null;
     Widget header;
     final valueText = valueFormatter?.call(value) ?? value.toString();
     if (titled) {
       header = Text.rich(
         TextSpan(
           text: label,
-          children: [const TextSpan(text: ': '), TextSpan(text: valueText, style: labelStyle)],
-          style: labelStyle,
+          children: [const TextSpan(text: ': '), TextSpan(text: valueText, style: TextStyle(color: labelColor))],
         ),
       );
     } else {
       header = Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           AutoSizeText(
@@ -57,13 +59,27 @@ class SliderWithPrefix extends StatelessWidget {
             maxLines: 1,
             minFontSize: 10,
             maxFontSize: 16,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: labelColor),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: labelColor),
           ),
-          AutoSizeText(valueText, maxLines: 1, minFontSize: 9, maxFontSize: 9, style: labelStyle),
+          AutoSizeText(valueText, maxLines: 1, minFontSize: 9, maxFontSize: 14, style: TextStyle(color: labelColor)),
         ],
       );
     }
-
+    if (enableInput) {
+      header = InkWell(
+        onTap: () {
+          showDialog(context: context, useRootNavigator: false, builder: getInputDialog);
+        },
+        child: Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Theme.of(context).primaryColor, width: 2),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: header,
+        ),
+      );
+    }
     Widget slider = SliderTheme(
       data: SliderTheme.of(context).copyWith(thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8)),
       child: Slider(
@@ -89,11 +105,31 @@ class SliderWithPrefix extends StatelessWidget {
         children: [header, slider],
       );
     } else {
-      child = Row(children: [if (!titled) SizedBox(width: leadingWidth, child: header), Flexible(child: slider)]);
+      child = Row(children: [SizedBox(width: leadingWidth, child: header), Flexible(child: slider)]);
     }
     if (padding != null) {
       child = Padding(padding: padding!, child: child);
     }
     return child;
+  }
+
+  Widget getInputDialog(BuildContext context) {
+    String helperText = '$min~$max';
+    return InputCancelOkDialog.number(
+      title: label,
+      initValue: value,
+      helperText: helperText,
+      keyboardType: const TextInputType.numberWithOptions(signed: true),
+      validate: (v) => v >= min && v <= max,
+      onSubmit: (v) {
+        if (v >= min && v <= max) {
+          if (onEdit != null) {
+            onEdit!(v.toDouble());
+          } else {
+            onChange(v.toDouble());
+          }
+        }
+      },
+    );
   }
 }

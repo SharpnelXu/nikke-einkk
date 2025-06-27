@@ -9,7 +9,6 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/skills.dart';
-import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_list.dart';
@@ -445,33 +444,29 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
   bool get advanced => widget.advancedOption;
   NikkeDatabaseV2 get db => userDb.gameDb;
 
+  static const sliderWidth = 80.0;
+
   @override
   Widget build(BuildContext context) {
-    option.errorCorrection();
-
     final groupedData = db.characterResourceGardeTable[option.nikkeResourceId];
     final characterData = groupedData?[option.coreLevel];
     final weapon = db.characterShotTable[characterData?.shotId];
     final List<Widget> children = [
       Align(child: NikkeIcon(characterData: characterData, weapon: weapon, isSelected: false)),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        spacing: 15,
-        children: [
-          Text('Sync'),
-          SizedBox(
-            width: 100,
-            child: RangedNumberTextField(
-              minValue: 1,
-              maxValue: db.maxSyncLevel,
-              defaultValue: option.syncLevel,
-              onChangeFunction:
-                  (newValue) => setState(() {
-                    option.syncLevel = newValue;
-                  }),
-            ),
-          ),
-        ],
+      SliderWithPrefix(
+        constraint: false,
+        titled: false,
+        leadingWidth: sliderWidth,
+        label: 'Sync',
+        min: 1,
+        max: db.maxSyncLevel,
+        value: option.syncLevel,
+        valueFormatter: (v) => 'Lv$v',
+        onChange: (newValue) {
+          option.syncLevel = newValue.round();
+
+          if (mounted) setState(() {});
+        },
       ),
       const Divider(),
       ...List.generate(
@@ -479,6 +474,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
         (index) => SliderWithPrefix(
           constraint: false,
           titled: false,
+          leadingWidth: sliderWidth,
           label: 'Skill ${index + 1}',
           min: 1,
           max: 10,
@@ -500,6 +496,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
           constraint: false,
           titled: false,
           label: 'Core',
+          leadingWidth: sliderWidth,
           min: 1,
           max: coreLevels.length,
           value: coreLevels.indexOf(option.coreLevel) + 1,
@@ -514,6 +511,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
           constraint: false,
           titled: false,
           label: 'Attract',
+          leadingWidth: sliderWidth,
           min: 1,
           max: characterData.maxAttractLv,
           value: option.attractLevel,

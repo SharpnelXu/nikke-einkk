@@ -31,6 +31,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   void initState() {
     super.initState();
     option.nikkeResourceId = data.resourceId;
+    option.coreLevel = data.gradeCoreId;
   }
 
   @override
@@ -83,7 +84,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
       ),
       buildTabs(),
       Divider(),
-      getTab(),
+      tabs[tab].$2(),
     ];
     return Scaffold(
       appBar: AppBar(title: Text('Nikke Data')),
@@ -101,36 +102,25 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   Widget buildTabs() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: List.generate(tabTitle.length, (idx) {
+      children: List.generate(tabs.length, (idx) {
         return TextButton(
           onPressed: () {
             tab = idx;
             setState(() {});
           },
-          child: Text(tabTitle[idx], style: TextStyle(fontWeight: tab == idx ? FontWeight.bold : null)),
+          child: Text(tabs[idx].$1, style: TextStyle(fontWeight: tab == idx ? FontWeight.bold : null)),
         );
       }),
     );
   }
 
-  List<String> get tabTitle => ['Setup', 'Weapon', 'Skill 1', 'Skill 2', 'Burst'];
-
-  Widget getTab() {
-    switch (tab) {
-      case 0:
-        return NikkeSetupColumn(option: option);
-      case 1:
-        return WeaponDataDisplay(character: data, weaponId: data.shotId);
-      case 2:
-        return buildSkillTab(data.skill1Id, data.skill1Table, 0);
-      case 3:
-        return buildSkillTab(data.skill2Id, data.skill2Table, 1);
-      case 4:
-        return buildSkillTab(data.ultiSkillId, SkillType.characterSkill, 2);
-      default:
-        return Text('Not implemented');
-    }
-  }
+  List<(String, Widget Function())> get tabs => [
+    ('Setup', () => NikkeSetupColumn(option: option)),
+    ('Weapon', () => WeaponDataDisplay(character: data, weaponId: data.shotId)),
+    ('Skill 1', () => buildSkillTab(data.skill1Id, data.skill1Table, 0)),
+    ('Skill 2', () => buildSkillTab(data.skill2Id, data.skill2Table, 1)),
+    ('Burst', () => buildSkillTab(data.ultiSkillId, SkillType.characterSkill, 2)),
+  ];
 
   Widget buildSkillTab(int skillId, SkillType skillType, int index) {
     final level = skillLevels[index];
