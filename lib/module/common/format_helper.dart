@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
@@ -30,9 +31,17 @@ extension CaseHelper on String {
   });
 }
 
+extension FormatHelper on num {
+  static final format = NumberFormat.decimalPattern();
+  String get percentValue => (this / 100).toStringAsFixed(2);
+  String get percentString => '$percentValue%';
+  String get timeString => '$percentValue s';
+  String get decimalPattern => format.format(round());
+}
+
 String coreString(int coreLevel) {
-  if (coreLevel < 1 || coreLevel > 11) return '$coreLevel';
-  final gradeLevel = coreLevel > 4 ? 4 : coreLevel;
+  final actualCoreLv = coreLevel % 100;
+  final gradeLevel = actualCoreLv > 4 ? 4 : actualCoreLv;
   String result = '';
   for (int count = 1; count < gradeLevel; count += 1) {
     result += '★';
@@ -41,10 +50,10 @@ String coreString(int coreLevel) {
     result += '☆';
   }
 
-  if (coreLevel == 11) {
+  if (actualCoreLv == 11) {
     result += ' MAX';
-  } else if (coreLevel > 4) {
-    result += ' C${coreLevel - 4}';
+  } else if (actualCoreLv > 4) {
+    result += ' C${actualCoreLv - 4}';
   }
 
   return result;
@@ -71,48 +80,6 @@ String dollLvString(FavoriteItemData? doll, int dollLevel) {
 
 const avatarSize = 120.0;
 
-Widget buildNikkeIcon(NikkeCharacterData? characterData, bool isSelected, [String defaultText = 'None']) {
-  final name = dbLegacy.getTranslation(characterData?.nameLocalkey)?.zhCN ?? characterData?.resourceId ?? defaultText;
-  final weapon = dbLegacy.characterShotTable[characterData?.shotId];
-
-  final colors =
-      characterData?.elementId
-          .map((eleId) => NikkeElement.fromId(eleId).color.withAlpha(isSelected ? 255 : 50))
-          .toList();
-
-  final textStyle = TextStyle(fontSize: 15, color: isSelected && characterData != null ? Colors.white : Colors.black);
-  return Container(
-    width: avatarSize,
-    height: avatarSize,
-    margin: const EdgeInsets.all(5.0),
-    padding: const EdgeInsets.all(3.0),
-    decoration: BoxDecoration(
-      border: Border.all(color: characterData?.originalRare.color ?? Colors.black, width: 3),
-      borderRadius: BorderRadius.circular(5),
-      gradient: colors != null && colors.length > 1 ? LinearGradient(colors: colors) : null,
-      color: colors != null && colors.length == 1 ? colors.first : null,
-    ),
-    child: Stack(
-      alignment: Alignment.center,
-      fit: StackFit.loose,
-      children: [
-        Text('$name', style: textStyle),
-        if (characterData != null)
-          Positioned(top: 2, left: 2, child: Text(characterData.corporation.name.toUpperCase(), style: textStyle)),
-        if (characterData != null)
-          Positioned(
-            bottom: 2,
-            left: 2,
-            child: Text(characterData.characterClass.name.toUpperCase(), style: textStyle),
-          ),
-        if (weapon != null) Positioned(top: 2, right: 2, child: Text(weapon.weaponType.toString(), style: textStyle)),
-        if (characterData != null)
-          Positioned(bottom: 2, right: 2, child: Text(characterData.useBurstSkill.toString(), style: textStyle)),
-      ],
-    ),
-  );
-}
-
 Widget buildRaptureIcon(BattleRaptureOptions option) {
   final textStyle = TextStyle(fontSize: 15, color: Colors.white);
   return Container(
@@ -137,20 +104,12 @@ String frameDataToNiceTimeString(int frame, int fps) {
       '${(timeData % 6000 / 100).toStringAsFixed(3)}';
 }
 
-String toPercentString(num value) {
-  return '${(value / 100).toStringAsFixed(2)}%';
-}
-
-String timeString(int value) {
-  return '${(value / 100).toStringAsFixed(2)} s';
-}
-
 String? valueString(int value, ValueType type) {
   switch (type) {
     case ValueType.integer:
       return '$value';
     case ValueType.percent:
-      return toPercentString(value);
+      return value.percentString;
     case ValueType.none:
     case ValueType.unknown:
       return null;
@@ -161,7 +120,7 @@ String? durationString(int value, DurationType type) {
   switch (type) {
     case DurationType.timeSec:
     case DurationType.timeSecVer2:
-      return value == 0 ? null : timeString(value);
+      return value == 0 ? null : value.timeString;
     case DurationType.shots:
       return value == 0 ? null : '$value shots';
     case DurationType.battles:
@@ -169,7 +128,7 @@ String? durationString(int value, DurationType type) {
     case DurationType.hits:
       return value == 0 ? null : '$value hits';
     case DurationType.timeSecBattles:
-      return 'Every ${timeString(value)}';
+      return 'Every ${value.timeString}';
     case DurationType.none:
     case DurationType.unknown:
       return null;
@@ -208,22 +167,20 @@ String? functionStandardString(StandardType funcStandard) {
 
 String formatWeaponDescription(WeaponData weapon) {
   String result = locale.getTranslation(weapon.descriptionLocalkey) ?? weapon.descriptionLocalkey ?? '';
-  result = result.replaceAll('{damage}', (weapon.damage / 100).toStringAsFixed(2));
-  result = result.replaceAll('{core_damage_rate}', (weapon.coreDamageRate / 100).toStringAsFixed(2));
-  result = result.replaceAll('{charge_time}', (weapon.chargeTime / 100).toStringAsFixed(2));
-  result = result.replaceAll('{full_charge_damage}', (weapon.fullChargeDamage / 100).toStringAsFixed(2));
+  result = result.replaceAll('{damage}', weapon.damage.percentValue);
+  result = result.replaceAll('{core_damage_rate}', weapon.coreDamageRate.percentValue);
+  result = result.replaceAll('{charge_time}', weapon.chargeTime.percentValue);
+  result = result.replaceAll('{full_charge_damage}', weapon.fullChargeDamage.percentValue);
 
   return result;
 }
 
 String formatFunctionDescription(FunctionData func) {
   String result = locale.getTranslation(func.descriptionLocalkey) ?? func.descriptionLocalkey ?? '';
-  final replaceValue = (func.functionValue / 100).toStringAsFixed(2);
-  final replaceValueAbs = (func.functionValue / 100).abs().toStringAsFixed(2);
   result = result.replaceAll('{function_value01}', '${func.functionValue}');
-  result = result.replaceAll('{function_value02}', replaceValue);
+  result = result.replaceAll('{function_value02}', func.functionValue.percentValue);
   result = result.replaceAll('{function_dec_value01}', '${func.functionValue.abs()}');
-  result = result.replaceAll('{function_dec_value02}', replaceValueAbs);
+  result = result.replaceAll('{function_dec_value02}', func.functionValue.abs().percentValue);
 
   return result;
 }

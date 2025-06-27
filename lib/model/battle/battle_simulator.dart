@@ -9,6 +9,7 @@ import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/db.dart';
 
 part '../../generated/model/battle/battle_simulator.g.dart';
 
@@ -59,6 +60,9 @@ class BattlePlayerOptions {
 
 class BattleSimulation {
   static const burstMeterCap = 1000000; // 9000 = 0.9%
+
+  bool useGlobal = true;
+  NikkeDatabaseV2 get db => useGlobal ? global : cn;
 
   BattlePlayerOptions playerOptions;
 

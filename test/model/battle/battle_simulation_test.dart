@@ -34,14 +34,14 @@ void main() async {
       attractLevel: 40,
       skillLevels: [10, 10, 10],
       equips: [
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.head,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAmmo, 9), EquipLine(EquipLineType.increaseElementalDamage, 9)],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.body,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
@@ -52,14 +52,14 @@ void main() async {
             EquipLine(EquipLineType.statDef, 9),
           ],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.arm,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAtk, 10), EquipLine(EquipLineType.statAmmo, 3)],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.leg,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
@@ -211,7 +211,7 @@ void main() async {
       attractLevel: 30,
       skillLevels: [10, 6, 10],
       equips: [
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.head,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
@@ -222,21 +222,21 @@ void main() async {
             EquipLine(EquipLineType.statAmmo, 13),
           ],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.body,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAmmo, 11), EquipLine(EquipLineType.statAtk, 5)],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.arm,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAtk, 11), EquipLine(EquipLineType.statChargeTime, 9)],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.leg,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
@@ -363,28 +363,28 @@ void main() async {
         attractLevel: 40,
         skillLevels: [7, 10, 10],
         equips: [
-          BattleEquipment(
+          BattleEquipmentOption(
             type: EquipType.head,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAtk, 5)],
           ),
-          BattleEquipment(
+          BattleEquipmentOption(
             type: EquipType.body,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAtk, 8)],
           ),
-          BattleEquipment(
+          BattleEquipmentOption(
             type: EquipType.arm,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAtk, 5)],
           ),
-          BattleEquipment(
+          BattleEquipmentOption(
             type: EquipType.leg,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
@@ -441,28 +441,28 @@ void main() async {
       attractLevel: 30,
       skillLevels: [10, 6, 10],
       equips: [
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.head,
           equipClass: NikkeClass.supporter,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.increaseElementalDamage, 11)],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.body,
           equipClass: NikkeClass.supporter,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAmmo, 11), EquipLine(EquipLineType.startAccuracyCircle, 11)],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.arm,
           equipClass: NikkeClass.supporter,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statDef, 11), EquipLine(EquipLineType.statAmmo, 11)],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.leg,
           equipClass: NikkeClass.supporter,
           rarity: EquipRarity.t10,
@@ -565,28 +565,28 @@ void main() async {
       attractLevel: 40,
       skillLevels: [10, 10, 10],
       equips: [
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.head,
           equipClass: NikkeClass.defender,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.body,
           equipClass: NikkeClass.defender,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.arm,
           equipClass: NikkeClass.defender,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
         ),
-        BattleEquipment(
+        BattleEquipmentOption(
           type: EquipType.leg,
           equipClass: NikkeClass.defender,
           rarity: EquipRarity.t10,

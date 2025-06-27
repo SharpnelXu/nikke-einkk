@@ -208,28 +208,28 @@ void main() async {
         attractLevel: 40,
         skillLevels: [10, 10, 10],
         equips: [
-          BattleEquipment(
+          BattleEquipmentOption(
             type: EquipType.head,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
           ),
-          BattleEquipment(
+          BattleEquipmentOption(
             type: EquipType.body,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAmmo, 5)],
           ),
-          BattleEquipment(
+          BattleEquipmentOption(
             type: EquipType.arm,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
           ),
-          BattleEquipment(
+          BattleEquipmentOption(
             type: EquipType.leg,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,

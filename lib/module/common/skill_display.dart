@@ -68,7 +68,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           if (durationStr != null) Text('Duration: $durationStr'),
-          Text('CD: ${timeString(data.skillCooltime)}'),
+          Text('CD: ${data.skillCooltime.timeString}'),
         ],
       ),
     ];
@@ -387,7 +387,7 @@ class MonsterSkillDataDisplay extends StatelessWidget {
         children: [
           Text('Penetration: ${data.penetration}'),
           Text('Locking: ${data.showLockOn}'),
-          Text('Casting Time: ${(data.castingTime / 100).toStringAsFixed(2)} s'),
+          Text('Casting Time: ${data.castingTime.timeString}'),
         ],
       ),
     ]);
@@ -398,7 +398,7 @@ class MonsterSkillDataDisplay extends StatelessWidget {
           alignment: WrapAlignment.center,
           children: [
             Text('Projectile: '),
-            if (statEnhanceData == null) Text('HP Ratio: ${toPercentString(data.projectileHpRatio)}'),
+            if (statEnhanceData == null) Text('HP Ratio: ${data.projectileHpRatio.percentString}'),
             if (statEnhanceData != null)
               Text('HP: ${format.format(toModifier(data.projectileHpRatio) * statEnhanceData!.levelProjectileHp)}'),
             Text('Destroyable: ${data.isDestroyableProjectile}'),

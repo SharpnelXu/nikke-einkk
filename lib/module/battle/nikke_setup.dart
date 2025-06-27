@@ -326,7 +326,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                 initialSelection: equipment?.rarity ?? EquipRarity.unknown,
                 onSelected: (EquipRarity? value) {
                   if (equipment == null) {
-                    option.equips[equipListIndex] = BattleEquipment(
+                    option.equips[equipListIndex] = BattleEquipmentOption(
                       type: type,
                       equipClass: nikkeClass ?? NikkeClass.unknown,
                       rarity: value!,

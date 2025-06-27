@@ -325,7 +325,7 @@ void main() async {
         for (final equipType in [EquipType.head, EquipType.body, EquipType.arm, EquipType.leg]) {
           final expectedValues = expectedStats[equipType]![nikkeClass]![EquipRarity.t10]!;
           for (final level in [0, 1, 2, 3, 4, 5]) {
-            final equip = BattleEquipment(
+            final equip = BattleEquipmentOption(
               type: equipType,
               equipClass: nikkeClass,
               rarity: EquipRarity.t10,
@@ -389,7 +389,7 @@ void main() async {
     // [I]  supporter leg level 3: [hp: -1, 12295.5]
 
     test('Support leg piece t9 lv5', () {
-      final equip = BattleEquipment(
+      final equip = BattleEquipmentOption(
         type: EquipType.leg,
         equipClass: NikkeClass.supporter,
         rarity: EquipRarity.t9,
@@ -405,7 +405,7 @@ void main() async {
     });
 
     test('Support head piece t9 lv1 corp', () {
-      final equip = BattleEquipment(
+      final equip = BattleEquipmentOption(
         type: EquipType.head,
         equipClass: NikkeClass.supporter,
         rarity: EquipRarity.t9,
@@ -425,7 +425,7 @@ void main() async {
     });
 
     test('Defender body & arm piece t9 lv1 corp', () {
-      final body = BattleEquipment(
+      final body = BattleEquipmentOption(
         type: EquipType.body,
         equipClass: NikkeClass.defender,
         rarity: EquipRarity.t9,
@@ -443,7 +443,7 @@ void main() async {
       expect(body.getStat(StatType.hp, Corporation.missilis), 115537 + 31511);
       expect(body.getStat(StatType.atk, Corporation.missilis), 431 + 118);
 
-      final arm = BattleEquipment(
+      final arm = BattleEquipmentOption(
         type: EquipType.arm,
         equipClass: NikkeClass.defender,
         rarity: EquipRarity.t9,

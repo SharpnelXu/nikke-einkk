@@ -1,10 +1,17 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:nikke_einkk/model/battle/equipment.dart';
+import 'package:nikke_einkk/model/battle/favorite_item.dart';
+import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
+import 'package:nikke_einkk/module/common/slider.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_list.dart';
 
 const avatarSize = 120.0;
@@ -30,7 +37,7 @@ class NikkeIcon extends StatelessWidget {
             .map((eleId) => NikkeElement.fromId(eleId).color.withAlpha(isSelected ? 255 : 50))
             .toList();
 
-    final textStyle = TextStyle(fontSize: 15, color: isSelected && characterData != null ? Colors.white : Colors.black);
+    final textStyle = TextStyle(fontSize: 12, color: isSelected && characterData != null ? Colors.white : Colors.black);
     return Container(
       width: avatarSize,
       height: avatarSize,
@@ -49,7 +56,7 @@ class NikkeIcon extends StatelessWidget {
         alignment: Alignment.center,
         fit: StackFit.loose,
         children: [
-          Text('$name', style: textStyle),
+          Text('$name', style: textStyle.copyWith(fontSize: 18)),
           if (characterData != null)
             Positioned(top: 2, left: 2, child: Text(characterData!.corporation.name.toUpperCase(), style: textStyle)),
           if (characterData != null)
@@ -114,15 +121,15 @@ class WeaponDataDisplay extends StatelessWidget {
           spacing: 15,
           alignment: WrapAlignment.center,
           children: [
-            Text('Base: ${toPercentString(weapon.damage)}'),
+            Text('Base: ${weapon.damage.percentString}'),
             if (character != null)
               Text(
-                'Critical: ${toPercentString(character!.criticalDamage)} '
-                '(${toPercentString(character!.criticalRatio)} chance)',
+                'Critical: ${character!.criticalDamage.percentString} '
+                '(${character!.criticalRatio.percentString} chance)',
               ),
-            Text('Core: ${toPercentString(weapon.coreDamageRate)}'),
+            Text('Core: ${weapon.coreDamageRate.percentString}'),
             if (weapon.fullChargeDamage != 10000)
-              Text('Full Charge: ${toPercentString(weapon.fullChargeDamage)} (${timeString(weapon.chargeTime)})'),
+              Text('Full Charge: ${weapon.fullChargeDamage.percentString} (${weapon.chargeTime.timeString})'),
           ],
         ),
         Text('Burst', style: TextStyle(fontSize: sectionFontSize)),
@@ -130,10 +137,10 @@ class WeaponDataDisplay extends StatelessWidget {
           spacing: 15,
           alignment: WrapAlignment.center,
           children: [
-            Text('Base: ${toPercentString(weapon.burstEnergyPerShot / 100)}'),
-            Text('Target: ${toPercentString(weapon.targetBurstEnergyPerShot / 100)}'),
+            Text('Base: ${(weapon.burstEnergyPerShot / 100).percentString}'),
+            Text('Target: ${(weapon.targetBurstEnergyPerShot / 100).percentString}'),
             if (weapon.fullChargeBurstEnergy != 10000)
-              Text('Full Charge: ${toPercentString(weapon.fullChargeBurstEnergy)}'),
+              Text('Full Charge: ${weapon.fullChargeBurstEnergy.percentString}'),
             Text('Shot Count: ${weapon.shotCount} x ${weapon.muzzleCount}'),
           ],
         ),
@@ -143,9 +150,9 @@ class WeaponDataDisplay extends StatelessWidget {
           alignment: WrapAlignment.center,
           children: [
             Text('Max Ammo: ${weapon.maxAmmo}'),
-            Text('Reload Time: ${timeString(weapon.reloadTime)} (${toPercentString(weapon.reloadBullet)})'),
-            Text('Exit Cover: ${timeString(weapon.spotFirstDelay)}'),
-            Text('Enter Cover: ${timeString(weapon.spotLastDelay)}'),
+            Text('Reload Time: ${weapon.reloadTime.timeString} (${weapon.reloadBullet.percentString})'),
+            Text('Exit Cover: ${weapon.spotFirstDelay.timeString}'),
+            Text('Enter Cover: ${weapon.spotLastDelay.timeString}'),
           ],
         ),
         if (weapon.spotProjectileSpeed > 0) Text('Projectile', style: TextStyle(fontSize: sectionFontSize)),
@@ -174,7 +181,7 @@ class WeaponDataDisplay extends StatelessWidget {
             Text('Rate: ${weapon.rateOfFire} - ${weapon.endRateOfFire}'),
             Text('(${weapon.rateOfFire / 60} - ${weapon.endRateOfFire / 60} shots/s)'),
             Text('Change Per Shot: ${weapon.rateOfFireChangePerShot}'),
-            Text('Reset Time: ${timeString(weapon.rateOfFireResetTime)}'),
+            Text('Reset Time: ${weapon.rateOfFireResetTime.timeString}'),
           ],
         ),
         Wrap(
@@ -223,7 +230,7 @@ class WeaponDataDisplay extends StatelessWidget {
           children: [
             Text('Rate: ${weapon.startAccuracyCircleScale} - ${weapon.endAccuracyCircleScale}'),
             Text('Change Per Shot: ${weapon.accuracyChangePerShot}'),
-            Text('Reset Time: ${timeString(weapon.accuracyChangeSpeed)}'),
+            Text('Reset Time: ${weapon.accuracyChangeSpeed.timeString}'),
           ],
         ),
         Wrap(
@@ -248,8 +255,8 @@ class WeaponDataDisplay extends StatelessWidget {
           alignment: WrapAlignment.center,
           children: [
             Text('Penetration: ${weapon.penetration}'),
-            Text('Maintain Fire Stance: ${timeString(weapon.maintainFireStance)}'),
-            Text('Up Fire Timing: ${toPercentString(weapon.upTypeFireTiming)}'),
+            Text('Maintain Fire Stance: ${weapon.maintainFireStance.timeString}'),
+            Text('Up Fire Timing: ${weapon.upTypeFireTiming.percentString}'),
           ],
         ),
       ]);
@@ -420,6 +427,407 @@ class _NikkeAdvancedFilterDialogState extends State<NikkeAdvancedFilterDialog> {
         ),
       ],
       insetPadding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+    );
+  }
+}
+
+class NikkeSetupColumn extends StatefulWidget {
+  final BattleNikkeOptions option;
+  final bool advancedOption;
+  const NikkeSetupColumn({super.key, required this.option, this.advancedOption = false});
+
+  @override
+  State<NikkeSetupColumn> createState() => _NikkeSetupColumnState();
+}
+
+class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
+  BattleNikkeOptions get option => widget.option;
+  bool get advanced => widget.advancedOption;
+  NikkeDatabaseV2 get db => userDb.gameDb;
+
+  @override
+  Widget build(BuildContext context) {
+    option.errorCorrection();
+
+    final groupedData = db.characterResourceGardeTable[option.nikkeResourceId];
+    final characterData = groupedData?[option.coreLevel];
+    final weapon = db.characterShotTable[characterData?.shotId];
+    final List<Widget> children = [
+      Align(child: NikkeIcon(characterData: characterData, weapon: weapon, isSelected: false)),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        spacing: 15,
+        children: [
+          Text('Sync'),
+          SizedBox(
+            width: 100,
+            child: RangedNumberTextField(
+              minValue: 1,
+              maxValue: db.maxSyncLevel,
+              defaultValue: option.syncLevel,
+              onChangeFunction:
+                  (newValue) => setState(() {
+                    option.syncLevel = newValue;
+                  }),
+            ),
+          ),
+        ],
+      ),
+      const Divider(),
+      ...List.generate(
+        3,
+        (index) => SliderWithPrefix(
+          constraint: false,
+          titled: false,
+          label: 'Skill ${index + 1}',
+          min: 1,
+          max: 10,
+          value: option.skillLevels[index],
+          valueFormatter: (v) => 'Lv$v',
+          onChange: (newValue) {
+            option.skillLevels[index] = newValue.round();
+            if (mounted) setState(() {});
+          },
+        ),
+      ),
+    ];
+
+    if (characterData != null && weapon != null) {
+      final coreLevels = groupedData!.keys.sorted((a, b) => a.compareTo(b));
+
+      children.addAll([
+        SliderWithPrefix(
+          constraint: false,
+          titled: false,
+          label: 'Core',
+          min: 1,
+          max: coreLevels.length,
+          value: coreLevels.indexOf(option.coreLevel) + 1,
+          valueFormatter: (v) => coreString(v),
+          onChange: (newValue) {
+            option.coreLevel = coreLevels[newValue.round() - 1];
+            option.attractLevel = option.attractLevel.clamp(1, groupedData[option.coreLevel]!.maxAttractLv);
+            if (mounted) setState(() {});
+          },
+        ),
+        SliderWithPrefix(
+          constraint: false,
+          titled: false,
+          label: 'Attract',
+          min: 1,
+          max: characterData.maxAttractLv,
+          value: option.attractLevel,
+          valueFormatter: (v) => 'Lv$v',
+          onChange: (newValue) {
+            option.attractLevel = newValue.round();
+            if (mounted) setState(() {});
+          },
+        ),
+        // _buildDollColumn(characterData.nameCode, weapon.weaponType),
+        // ...List.generate(4, (index) => _buildEquipmentOption(characterData, EquipType.values[index + 1])),
+        // if (widget.advancedOption && WeaponType.chargeWeaponTypes.contains(weapon.weaponType))
+        //   _chargeWeaponAdvancedOptionColumn(),
+      ]);
+    }
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      constraints: const BoxConstraints(maxWidth: 600),
+      child: Column(spacing: 5, crossAxisAlignment: CrossAxisAlignment.start, children: children),
+    );
+  }
+
+  Widget _chargeWeaponAdvancedOptionColumn() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 3,
+          children: [
+            Text('Always Focus'),
+            Switch(
+              value: option.alwaysFocus,
+              onChanged: (v) {
+                option.alwaysFocus = v;
+                if (mounted) setState(() {});
+              },
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 3,
+          children: [
+            Text('Cancel Charge Delay'),
+            Switch(
+              value: option.forceCancelShootDelay,
+              onChanged: (v) {
+                option.forceCancelShootDelay = v;
+                if (mounted) setState(() {});
+              },
+            ),
+          ],
+        ),
+        Text('Charge Mode:'),
+        DropdownMenu<NikkeFullChargeMode>(
+          textStyle: TextStyle(fontSize: 12),
+          initialSelection: option.chargeMode,
+          onSelected: (NikkeFullChargeMode? value) {
+            option.chargeMode = value!;
+            setState(() {});
+          },
+          dropdownMenuEntries: UnmodifiableListView<DropdownMenuEntry<NikkeFullChargeMode>>(
+            NikkeFullChargeMode.values.map<DropdownMenuEntry<NikkeFullChargeMode>>(
+              (NikkeFullChargeMode mode) => DropdownMenuEntry<NikkeFullChargeMode>(value: mode, label: mode.name),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDollColumn(int nameCode, WeaponType? weaponType) {
+    final doll = option.favoriteItem;
+    final allowedRare = [Rarity.unknown, Rarity.r, Rarity.sr];
+    if (db.nameCodeFavItemTable.containsKey(nameCode)) {
+      allowedRare.add(Rarity.ssr);
+    }
+    final entries = UnmodifiableListView<DropdownMenuEntry<Rarity>>(
+      allowedRare.map<DropdownMenuEntry<Rarity>>(
+        (Rarity rare) =>
+            DropdownMenuEntry<Rarity>(value: rare, label: rare == Rarity.unknown ? 'None' : rare.name.toUpperCase()),
+      ),
+    );
+    return Container(
+      padding: const EdgeInsets.all(3.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: doll?.rarity.color ?? Colors.grey, width: 2),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        spacing: 2,
+        children:
+            [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                spacing: 3,
+                children: [
+                  Text('Doll'),
+                  DropdownMenu<Rarity>(
+                    width: 100,
+                    textStyle: TextStyle(fontSize: 12),
+                    initialSelection: option.favoriteItem?.rarity ?? Rarity.unknown,
+                    onSelected: (Rarity? value) {
+                      if (value == Rarity.unknown) {
+                        option.favoriteItem = null;
+                      } else if (doll != null) {
+                        doll.rarity = value!;
+                      } else {
+                        option.favoriteItem = BattleFavoriteItem(
+                          weaponType: weaponType ?? WeaponType.unknown,
+                          rarity: value!,
+                          level: 0,
+                        );
+                      }
+                      if (value == Rarity.ssr) {
+                        if (db.nameCodeFavItemTable.containsKey(nameCode)) {
+                          option.favoriteItem!.nameCode = nameCode;
+                        } else {
+                          option.favoriteItem!.nameCode = 0;
+                          option.favoriteItem!.rarity = Rarity.sr;
+                        }
+                      } else {
+                        option.favoriteItem!.nameCode = 0;
+                      }
+                      setState(() {});
+                    },
+                    dropdownMenuEntries: entries,
+                  ),
+                ],
+              ),
+              SliderWithPrefix(
+                titled: true,
+                label: 'Lv',
+                min: 0,
+                max:
+                    doll == null
+                        ? 0
+                        : doll.rarity == Rarity.ssr
+                        ? 2
+                        : 15,
+                value: doll?.level ?? 0,
+                valueFormatter: (v) {
+                  if (doll == null) {
+                    return v.toString();
+                  }
+
+                  if (doll.rarity == Rarity.ssr) {
+                    String result = '★';
+                    for (int i = 0; i < v; i += 1) {
+                      result += '★';
+                    }
+                    for (int i = v; i < 2; i += 1) {
+                      result += '☆';
+                    }
+                    return result;
+                  } else {
+                    return v.toString();
+                  }
+                },
+                onChange: (newValue) {
+                  if (doll != null) {
+                    doll.level = newValue.round();
+                    if (mounted) setState(() {});
+                  }
+                },
+              ),
+            ].map((widget) => Padding(padding: const EdgeInsets.all(3.0), child: widget)).toList(),
+      ),
+    );
+  }
+
+  static final List<DropdownMenuEntry<EquipRarity>> equipRareEntries =
+      UnmodifiableListView<DropdownMenuEntry<EquipRarity>>(
+        EquipRarity.values.map<DropdownMenuEntry<EquipRarity>>(
+          (EquipRarity rare) => DropdownMenuEntry<EquipRarity>(
+            value: rare,
+            label: rare == EquipRarity.unknown ? 'None' : rare.name.toUpperCase(),
+          ),
+        ),
+      );
+
+  static final List<DropdownMenuEntry<EquipLineType>> equipLineTypeEntries =
+      UnmodifiableListView<DropdownMenuEntry<EquipLineType>>(
+        EquipLineType.values.map<DropdownMenuEntry<EquipLineType>>(
+          (EquipLineType type) => DropdownMenuEntry<EquipLineType>(value: type, label: type.toString()),
+        ),
+      );
+
+  Widget _buildEquipmentOption(NikkeCharacterData? characterData, EquipType type) {
+    final nikkeClass = characterData?.characterClass;
+    final corp = characterData?.corporation;
+    final equipListIndex = type.index - 1;
+    final equipment = option.equips[equipListIndex];
+    return Container(
+      padding: const EdgeInsets.all(3.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: equipment?.rarity.color ?? Colors.grey, width: 2),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        spacing: 2,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            spacing: 3,
+            children: [
+              Text('${type.name.toUpperCase()} Gear:'),
+              DropdownMenu<EquipRarity>(
+                width: 100,
+                textStyle: TextStyle(fontSize: 12),
+                initialSelection: equipment?.rarity ?? EquipRarity.unknown,
+                onSelected: (EquipRarity? value) {
+                  if (equipment == null) {
+                    option.equips[equipListIndex] = BattleEquipmentOption(
+                      type: type,
+                      equipClass: nikkeClass ?? NikkeClass.unknown,
+                      rarity: value!,
+                    );
+                  } else {
+                    equipment.rarity = value!;
+                  }
+                  setState(() {});
+                },
+                dropdownMenuEntries: equipRareEntries,
+              ),
+            ],
+          ),
+          SliderWithPrefix(
+            titled: true,
+            label: 'Lv',
+            min: 0,
+            max: equipment?.rarity.maxLevel ?? 0,
+            value: equipment?.level ?? 0,
+            onChange: (newValue) {
+              equipment?.level = newValue.round();
+              if (mounted) setState(() {});
+            },
+          ),
+          if (equipment?.rarity.canHaveCorp ?? false)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              spacing: 3,
+              children: [
+                Text('Corp ${equipment?.corporation.name}'),
+                Switch(
+                  value: equipment?.corporation == corp,
+                  onChanged: (v) {
+                    equipment?.corporation = v && characterData != null ? characterData.corporation : Corporation.none;
+                    if (mounted) setState(() {});
+                  },
+                ),
+              ],
+            ),
+          if (equipment != null && equipment.rarity == EquipRarity.t10)
+            ...List.generate(equipment.equipLines.length, (index) {
+              final level = equipment.equipLines[index].level;
+              return Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color:
+                        level > 10
+                            ? Colors.orange
+                            : level > 5
+                            ? Colors.purple
+                            : Colors.blue,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(5),
+                  color: level == 15 ? Colors.black.withAlpha(200) : null,
+                ),
+                child: Column(
+                  spacing: 3,
+                  children:
+                      [
+                        DropdownMenu<EquipLineType>(
+                          textStyle: TextStyle(fontSize: 12, color: level == 15 ? Colors.blue : null),
+                          initialSelection: equipment.equipLines[index].type,
+                          onSelected: (EquipLineType? value) {
+                            equipment.equipLines[index].type = value!;
+                            setState(() {});
+                          },
+                          dropdownMenuEntries: equipLineTypeEntries,
+                        ),
+                        SliderWithPrefix(
+                          titled: true,
+                          label: 'Lv',
+                          valueFormatter: (level) {
+                            final stateEffectData = db.stateEffectTable[equipment.equipLines[index].getStateEffectId()];
+                            if (stateEffectData == null) {
+                              return level.toString();
+                            }
+                            for (final functionId in stateEffectData.functions) {
+                              if (functionId.function != 0) {
+                                final function = db.functionTable[functionId.function]!;
+                                return '$level (${function.functionValue.percentString})';
+                              }
+                            }
+                            return level.toString();
+                          },
+                          labelStyle: TextStyle(color: level >= 12 ? Colors.blue : null),
+                          min: 1,
+                          max: 15,
+                          value: level,
+                          onChange: (newValue) {
+                            equipment.equipLines[index].level = newValue.round();
+                            if (mounted) setState(() {});
+                          },
+                        ),
+                      ].map((widget) => Padding(padding: const EdgeInsets.all(3.0), child: widget)).toList(),
+                ),
+              );
+            }),
+        ],
+      ),
     );
   }
 }

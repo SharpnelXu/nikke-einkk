@@ -63,7 +63,7 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
         Text('HP: ${format.format((utils.toModifier(data.hpRatio) * statEnhanceData.levelHp).round())}'),
         Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * statEnhanceData.levelAttack).round())}'),
         Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * statEnhanceData.levelDefence).round())}'),
-        Text('Damage Ratio: ${(statEnhanceData.levelStatDamageRatio / 100).toStringAsFixed(2)}%'),
+        Text('Damage Ratio: ${statEnhanceData.levelStatDamageRatio.percentString}'),
         Text('Part Base HP: ${format.format(statEnhanceData.levelBrokenHp)}'),
         Text('Projectile Base HP: ${format.format(statEnhanceData.levelProjectileHp)}'),
       ]);
@@ -89,12 +89,12 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
                 ),
                 Text(
                   'HP: ${format.format((utils.toModifier(part.hpRatio) * statEnhanceData.levelBrokenHp).round())}'
-                  ' (${(part.hpRatio / 100).toStringAsFixed(2)}%)',
+                  ' (${part.hpRatio.percentString})',
                 ),
                 if (part.damageHpRatio != 0)
                   Text(
                     'Break Bonus: ${format.format((utils.toModifier(part.damageHpRatio) * statEnhanceData.levelBrokenHp).round())}'
-                    ' (${(part.damageHpRatio / 100).toStringAsFixed(2)}%)',
+                    ' (${part.damageHpRatio.percentString})',
                   ),
                 if (part.defenceRatio != 10000)
                   Text(
@@ -220,7 +220,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
             Text('HP: ${format.format((utils.toModifier(data.hpRatio) * stat.levelHp).round())}'),
             Text('ATK: ${format.format((utils.toModifier(data.attackRatio) * stat.levelAttack).round())}'),
             Text('DEF: ${format.format((utils.toModifier(data.defenceRatio) * stat.levelDefence).round())}'),
-            Text('Damage Ratio: ${(stat.levelStatDamageRatio / 100).toStringAsFixed(2)}%'),
+            Text('Damage Ratio: ${stat.levelStatDamageRatio.percentString}'),
           ],
         ),
       buildTabs(),
@@ -339,10 +339,10 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
                   spacing: 15,
                   alignment: WrapAlignment.center,
                   children: [
-                    Text('HP: ${(part.hpRatio / 100).toStringAsFixed(2)}%'),
-                    Text('Break Bonus: ${(part.damageHpRatio / 100).toStringAsFixed(2)}%'),
-                    Text('ATK: ${(part.attackRatio / 100).toStringAsFixed(2)}%'),
-                    Text('DEF: ${(part.defenceRatio / 100).toStringAsFixed(2)}%'),
+                    Text('HP: ${part.hpRatio.percentString}'),
+                    Text('Break Bonus: ${part.damageHpRatio.percentString}'),
+                    Text('ATK: ${part.attackRatio.percentString}'),
+                    Text('DEF: ${part.defenceRatio.percentString}'),
                   ],
                 ),
               if (stat != null)

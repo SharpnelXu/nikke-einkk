@@ -6,7 +6,7 @@ part of '../../../model/battle/equipment.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-BattleEquipment _$BattleEquipmentFromJson(Map<String, dynamic> json) => BattleEquipment(
+BattleEquipmentOption _$BattleEquipmentOptionFromJson(Map<String, dynamic> json) => BattleEquipmentOption(
   type: $enumDecode(_$EquipTypeEnumMap, json['type']),
   equipClass: $enumDecode(_$NikkeClassEnumMap, json['equipClass']),
   rarity: $enumDecode(_$EquipRarityEnumMap, json['rarity']),
@@ -17,7 +17,7 @@ BattleEquipment _$BattleEquipmentFromJson(Map<String, dynamic> json) => BattleEq
       const [],
 );
 
-Map<String, dynamic> _$BattleEquipmentToJson(BattleEquipment instance) => <String, dynamic>{
+Map<String, dynamic> _$BattleEquipmentOptionToJson(BattleEquipmentOption instance) => <String, dynamic>{
   'type': _$EquipTypeEnumMap[instance.type]!,
   'equipClass': _$NikkeClassEnumMap[instance.equipClass]!,
   'rarity': _$EquipRarityEnumMap[instance.rarity]!,

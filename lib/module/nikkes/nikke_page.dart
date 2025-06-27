@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
@@ -24,6 +25,13 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   WeaponData? get weapon => db.characterShotTable[data.shotId];
   List<int> skillLevels = [10, 10, 10];
   bool favoriteItemSkill = true;
+  BattleNikkeOptions option = BattleNikkeOptions(nikkeResourceId: -1);
+
+  @override
+  void initState() {
+    super.initState();
+    option.nikkeResourceId = data.resourceId;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +98,6 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
     );
   }
 
-  List<String> get tabTitle => ['Weapon', 'Skill 1', 'Skill 2', 'Burst'];
-
   Widget buildTabs() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -107,15 +113,19 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
     );
   }
 
+  List<String> get tabTitle => ['Setup', 'Weapon', 'Skill 1', 'Skill 2', 'Burst'];
+
   Widget getTab() {
     switch (tab) {
       case 0:
-        return WeaponDataDisplay(character: data, weaponId: data.shotId);
+        return NikkeSetupColumn(option: option);
       case 1:
-        return buildSkillTab(data.skill1Id, data.skill1Table, 0);
+        return WeaponDataDisplay(character: data, weaponId: data.shotId);
       case 2:
-        return buildSkillTab(data.skill2Id, data.skill2Table, 1);
+        return buildSkillTab(data.skill1Id, data.skill1Table, 0);
       case 3:
+        return buildSkillTab(data.skill2Id, data.skill2Table, 1);
+      case 4:
         return buildSkillTab(data.ultiSkillId, SkillType.characterSkill, 2);
       default:
         return Text('Not implemented');

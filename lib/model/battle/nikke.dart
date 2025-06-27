@@ -26,7 +26,7 @@ class BattleNikkeOptions {
   int coreLevel;
   int syncLevel;
   int attractLevel;
-  List<BattleEquipment?> equips;
+  List<BattleEquipmentOption?> equips;
   List<int> skillLevels;
   BattleHarmonyCube? cube;
   BattleFavoriteItem? favoriteItem;
@@ -40,7 +40,7 @@ class BattleNikkeOptions {
     this.coreLevel = 1,
     this.syncLevel = 1,
     this.attractLevel = 1,
-    List<BattleEquipment?> equips = const [null, null, null, null],
+    List<BattleEquipmentOption?> equips = const [null, null, null, null],
     List<int> skillLevels = const [10, 10, 10],
     this.cube,
     this.favoriteItem,
@@ -70,7 +70,7 @@ class BattleNikkeOptions {
     final groupedData = dbLegacy.characterResourceGardeTable[nikkeResourceId]!;
     final coreLevels = groupedData.keys.toList();
     coreLevels.sort();
-    coreLevel.clamp(coreLevels.first, coreLevels.last);
+    coreLevel = coreLevel.clamp(coreLevels.first, coreLevels.last);
 
     final characterData = groupedData[coreLevel]!;
     final maxAttract = characterData.corporationSubType == CorporationSubType.overspec ? 40 : 30;

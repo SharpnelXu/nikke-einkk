@@ -220,6 +220,24 @@ class NikkeCharacterData {
   });
 
   factory NikkeCharacterData.fromJson(Map<String, dynamic> json) => _$NikkeCharacterDataFromJson(json);
+
+  bool get isOverspec => corporationSubType == CorporationSubType.overspec || corporation == Corporation.pilgrim;
+  int get maxAttractLv {
+    switch (originalRare) {
+      case Rarity.r:
+        return 1;
+      case Rarity.sr:
+        return (gradeCoreId % 100) * 10;
+      case Rarity.ssr:
+        return gradeCoreId >= 4
+            ? isOverspec
+                ? 40
+                : 30
+            : gradeCoreId * 10;
+      default:
+        return 1;
+    }
+  }
 }
 
 @JsonEnum(fieldRename: FieldRename.screamingSnake)

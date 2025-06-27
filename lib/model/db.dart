@@ -84,6 +84,7 @@ class NikkeDatabaseV2 {
 
   NikkeDatabaseV2(this.isGlobal);
 
+  int maxSyncLevel = 1;
   final Map<int, List<UnionRaidWaveData>> unionRaidData = {}; // key is presetId
   final Map<int, String> waveGroupDict = {};
   final Map<String, Map<int, WaveData>> waveData = {};
@@ -100,7 +101,17 @@ class NikkeDatabaseV2 {
   final Map<int, SkillData> characterSkillTable = {};
   final Map<int, SkillInfoData> skillInfoTable = {};
   final Map<String, List<WordGroupData>> wordGroupTable = {};
+  final Map<int, CoverStatData> coverStatTable = {};
+  final Map<int, Map<int, SkillInfoData>> groupedSkillInfoTable = {}; // grouped by skillGroupId, skillLevel
+  final Map<int, Map<int, CharacterStatData>> groupedCharacterStatTable = {};
+  final Map<int, CharacterStatEnhanceData> characterStatEnhanceTable = {};
+  final Map<int, AttractiveStatData> attractiveStatTable = {};
+  final Map<EquipType, Map<NikkeClass, Map<EquipRarity, EquipmentData>>> groupedEquipTable = {};
+  final Map<WeaponType, Map<Rarity, FavoriteItemData>> dollTable = {};
   final Map<int, FavoriteItemData> nameCodeFavItemTable = {};
+  final Map<int, Map<int, FavoriteItemLevelData>> favoriteItemLevelTable = {};
+  final Map<int, HarmonyCubeData> harmonyCubeTable = {};
+  final Map<int, Map<int, HarmonyCubeLevelData>> harmonyCubeLevelTable = {};
 
   final Map<int, Set<CharacterSkillType>> nameCodeSkillTypes = {};
   final Map<int, Set<FunctionType>> nameCodeFuncTypes = {};
@@ -129,50 +140,34 @@ class NikkeDatabaseV2 {
     nameCodeFuncTypes.clear();
     nameCodeTimingTypes.clear();
     nameCodeStatusTypes.clear();
+    groupedCharacterStatTable.clear();
+    groupedEquipTable.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
-    initialized = true;
-    initialized &= loadData(
-      getDesignatedDirectory(extractFolderPath, 'UnionRaidPresetTable.json'),
-      processUnionRaidWaveData,
-    );
-    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'MonsterTable.json'), processRaptureData);
-    initialized &= loadData(
-      getDesignatedDirectory(extractFolderPath, 'MonsterPartsTable.json'),
-      processRapturePartData,
-    );
-    initialized &= loadData(
-      getDesignatedDirectory(extractFolderPath, 'MonsterStatEnhanceTable.json'),
-      processMonsterStatEnhanceData,
-    );
-    initialized &= loadData(
-      getDesignatedDirectory(extractFolderPath, 'MonsterStageLvChangeTable.json'),
-      processMonsterStageLvChangeData,
-    );
-    initialized &= loadData(
-      getDesignatedDirectory(extractFolderPath, 'SoloRaidPresetTable.json'),
-      processSoloRaidWaveData,
-    );
-    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'StateEffectTable.json'), processStateEffectData);
-    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'FunctionTable.json'), processFunctionData);
-    initialized &= loadData(
-      getDesignatedDirectory(extractFolderPath, 'MonsterSkillTable.json'),
-      processMonsterSkillData,
-    );
-    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'CharacterTable.json'), processCharacterData);
-    initialized &= loadData(
-      getDesignatedDirectory(extractFolderPath, 'CharacterShotTable.json'),
-      processCharacterShotData,
-    );
-    initialized &= loadData(
-      getDesignatedDirectory(extractFolderPath, 'CharacterSkillTable.json'),
-      processCharacterSkillData,
-    );
-    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'SkillInfoTable.json'), processSkillInfoData);
-    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'WordTable.json'), processWordGroupData);
-    initialized &= loadData(getDesignatedDirectory(extractFolderPath, 'FavoriteItemTable.json'), processDollData);
+    String directory(String fileName) {
+      return getDesignatedDirectory(extractFolderPath, fileName);
+    }
 
-    initialized &= loadCsv(getDesignatedDirectory(extractFolderPath, 'WaveData.GroupDict.csv'), processWaveDict);
+    initialized = true;
+    initialized &= loadData(directory('UnionRaidPresetTable.json'), processUnionRaidWaveData);
+    initialized &= loadData(directory('MonsterTable.json'), processRaptureData);
+    initialized &= loadData(directory('MonsterPartsTable.json'), processRapturePartData);
+    initialized &= loadData(directory('MonsterStatEnhanceTable.json'), processMonsterStatEnhanceData);
+    initialized &= loadData(directory('MonsterStageLvChangeTable.json'), processMonsterStageLvChangeData);
+    initialized &= loadData(directory('SoloRaidPresetTable.json'), processSoloRaidWaveData);
+    initialized &= loadData(directory('StateEffectTable.json'), processStateEffectData);
+    initialized &= loadData(directory('FunctionTable.json'), processFunctionData);
+    initialized &= loadData(directory('MonsterSkillTable.json'), processMonsterSkillData);
+    initialized &= loadData(directory('CharacterTable.json'), processCharacterData);
+    initialized &= loadData(directory('CharacterShotTable.json'), processCharacterShotData);
+    initialized &= loadData(directory('CharacterSkillTable.json'), processCharacterSkillData);
+    initialized &= loadData(directory('SkillInfoTable.json'), processSkillInfoData);
+    initialized &= loadData(directory('WordTable.json'), processWordGroupData);
+    initialized &= loadData(directory('FavoriteItemTable.json'), processDollData);
+    initialized &= loadData(directory('CharacterStatTable.json'), processCharacterStatData);
+    initialized &= loadData(directory('ItemEquipTable.json'), processEquipData);
+
+    initialized &= loadCsv(directory('WaveData.GroupDict.csv'), processWaveDict);
 
     if (initialized) {
       _buildFilterTable();
@@ -396,6 +391,22 @@ class NikkeDatabaseV2 {
       nameCodeFavItemTable[data.nameCode] = data;
     }
   }
+
+  void processCharacterStatData(dynamic record) {
+    final stat = CharacterStatData.fromJson(record);
+    groupedCharacterStatTable.putIfAbsent(stat.group, () => {});
+    groupedCharacterStatTable[stat.group]![stat.level] = stat;
+    maxSyncLevel = max(maxSyncLevel, stat.level);
+  }
+
+  void processEquipData(dynamic record) {
+    final equip = EquipmentData.fromJson(record);
+    if (equip.characterClass == NikkeClass.unknown) return;
+
+    groupedEquipTable.putIfAbsent(equip.itemSubType, () => {});
+    groupedEquipTable[equip.itemSubType]!.putIfAbsent(equip.characterClass, () => {});
+    groupedEquipTable[equip.itemSubType]![equip.characterClass]![equip.itemRarity] = equip;
+  }
 }
 
 class UserDatabase {
@@ -481,12 +492,12 @@ class NikkeDatabase {
   final Map<int, SkillData> characterSkillTable = {};
   final Map<int, StateEffectData> stateEffectTable = {};
   final Map<int, FunctionData> functionTable = {};
-  final Map<int, HarmonyCubeData> harmonyCubeTable = {};
-  final Map<int, CoverStatData> coverStatTable = {};
   final Map<int, SkillInfoData> skillInfoTable = {};
   final Map<String, Translation> localeCharacterTable = {};
   final Map<String, Translation> localeSkillTable = {};
 
+  final Map<int, HarmonyCubeData> harmonyCubeTable = {};
+  final Map<int, CoverStatData> coverStatTable = {};
   // character stats
   // grouped by enhanceId, level
   final Map<int, Map<int, CharacterStatData>> groupedCharacterStatTable = {};

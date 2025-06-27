@@ -13,7 +13,7 @@ BattleNikkeOptions _$BattleNikkeOptionsFromJson(Map<String, dynamic> json) => Ba
   attractLevel: (json['attractLevel'] as num?)?.toInt() ?? 1,
   equips:
       (json['equips'] as List<dynamic>?)
-          ?.map((e) => e == null ? null : BattleEquipment.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => e == null ? null : BattleEquipmentOption.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [null, null, null, null],
   skillLevels: (json['skillLevels'] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList() ?? const [10, 10, 10],
