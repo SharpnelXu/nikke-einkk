@@ -193,15 +193,15 @@ enum EquipType {
 /// from EquipmentOptionTable.json
 enum EquipLineType {
   none(0),
-  increaseElementalDamage(7000500),
-  startAccuracyCircle(7000600),
-  statAmmo(7000700),
   statAtk(7000800),
-  statChargeDamage(7000900),
-  statChargeTime(7001000),
+  statDef(7001300),
+  increaseElementalDamage(7000500),
   statCriticalDamage(7001200),
   statCritical(7001100),
-  statDef(7001300);
+  statAmmo(7000700),
+  statChargeDamage(7000900),
+  statChargeTime(7001000),
+  startAccuracyCircle(7000600);
 
   final int stateEffectIdBase;
 

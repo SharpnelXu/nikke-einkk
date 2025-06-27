@@ -19,6 +19,7 @@ class SliderWithPrefix extends StatelessWidget {
   final bool? constraint;
   final bool enableInput;
   final Color? preferColor;
+  final Color? preferLabelColor;
 
   const SliderWithPrefix({
     super.key,
@@ -37,11 +38,12 @@ class SliderWithPrefix extends StatelessWidget {
     this.constraint,
     this.enableInput = true,
     this.preferColor,
+    this.preferLabelColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    Color? labelColor = enableInput ? Theme.of(context).colorScheme.primary : null;
+    Color? labelColor = preferLabelColor ?? (enableInput ? Theme.of(context).colorScheme.primary : null);
     Widget header;
     final valueText = valueFormatter?.call(value) ?? value.toString();
     if (titled) {

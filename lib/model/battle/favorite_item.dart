@@ -18,9 +18,9 @@ class BattleFavoriteItemOption {
 
   BattleFavoriteItemOption({required this.weaponType, required this.rarity, this.level = 0, this.nameCode = 0});
 
-  factory BattleFavoriteItemOption.fromJson(Map<String, dynamic> json) => _$BattleFavoriteItemFromJson(json);
+  factory BattleFavoriteItemOption.fromJson(Map<String, dynamic> json) => _$BattleFavoriteItemOptionFromJson(json);
 
-  Map<String, dynamic> toJson() => _$BattleFavoriteItemToJson(this);
+  Map<String, dynamic> toJson() => _$BattleFavoriteItemOptionToJson(this);
 
   FavoriteItemData get data =>
       rarity == Rarity.ssr ? dbLegacy.nameCodeFavItemTable[nameCode]! : dbLegacy.dollTable[weaponType]![rarity]!;

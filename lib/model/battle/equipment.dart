@@ -18,19 +18,9 @@ class BattleEquipmentOption {
   NikkeClass equipClass;
   EquipRarity rarity;
   EquipmentData get equipData => dbLegacy.groupedEquipTable[type]![equipClass]![rarity]!;
-  Corporation _corporation = Corporation.none;
-  Corporation get corporation => _corporation;
-  set corporation(Corporation newCorp) {
-    if (rarity.canHaveCorp) _corporation = newCorp;
-  }
 
-  int _level = 0;
-  int get level => _level;
-  set level(int newLevel) {
-    validateLevel(newLevel);
-
-    _level = newLevel;
-  }
+  Corporation corporation = Corporation.none;
+  int level = 0;
 
   List<EquipLine> equipLines = [];
 
@@ -38,29 +28,26 @@ class BattleEquipmentOption {
     required this.type,
     required this.equipClass,
     required this.rarity,
-    Corporation corporation = Corporation.none,
-    int level = 0,
+    this.corporation = Corporation.none,
+    this.level = 0,
     List<EquipLine> equipLines = const [],
-  }) : _level = level,
-       _corporation = corporation {
-    if (equipLines.length > 3) {
-      throw ArgumentError('Too many lines: ${equipLines.length}');
+  }) {
+    if (rarity == EquipRarity.t10) {
+      if (equipLines.length > 3) {
+        throw ArgumentError('Too many lines: ${equipLines.length}');
+      }
+      this.equipLines.addAll(equipLines.map((equipLine) => equipLine.copy()));
+      while (this.equipLines.length < 3) {
+        this.equipLines.add(EquipLine.none());
+      }
     }
-
-    this.equipLines.addAll(equipLines.map((equipLine) => equipLine.copy()));
-    validateLevel(level);
-    if (!rarity.canHaveCorp) _corporation = Corporation.none;
+    level = level.clamp(0, rarity.maxLevel);
+    if (!rarity.canHaveCorp) corporation = Corporation.none;
   }
 
   factory BattleEquipmentOption.fromJson(Map<String, dynamic> json) => _$BattleEquipmentOptionFromJson(json);
 
   Map<String, dynamic> toJson() => _$BattleEquipmentOptionToJson(this);
-
-  void validateLevel(int newLevel) {
-    if (newLevel < 0 || newLevel > rarity.maxLevel) {
-      throw ArgumentError('New Level: $newLevel, max level: ${rarity.maxLevel}');
-    }
-  }
 
   int getStat(StatType statType, [Corporation? ownerCorp]) {
     final equipStat = equipData.stat.firstWhereOrNull((stat) => stat.statType == statType);

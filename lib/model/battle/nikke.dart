@@ -35,6 +35,8 @@ class BattleNikkeOptions {
   bool forceCancelShootDelay;
   NikkeFullChargeMode chargeMode;
 
+  static List<EquipType> equipTypes = [EquipType.head, EquipType.body, EquipType.arm, EquipType.leg];
+
   BattleNikkeOptions({
     required this.nikkeResourceId,
     this.coreLevel = 1,
@@ -48,13 +50,7 @@ class BattleNikkeOptions {
     this.forceCancelShootDelay = false,
     this.chargeMode = NikkeFullChargeMode.always,
   }) : equips = equips.map((equip) => equip?.copy()).toList(),
-       skillLevels = skillLevels.toList() {
-    final favoriteItemNameCode = favoriteItem?.data.nameCode ?? -1;
-    if (favoriteItemNameCode > 0 &&
-        favoriteItemNameCode != dbLegacy.characterResourceGardeTable[nikkeResourceId]?[coreLevel]?.nameCode) {
-      favoriteItem = null;
-    }
-  }
+       skillLevels = skillLevels.toList();
 
   factory BattleNikkeOptions.fromJson(Map<String, dynamic> json) => _$BattleNikkeOptionsFromJson(json);
 

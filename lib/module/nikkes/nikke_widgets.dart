@@ -525,10 +525,13 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
       children.addAll([
         const Divider(),
         _buildDollColumn(characterData.nameCode, weapon.weaponType),
-        // ...List.generate(4, (index) => _buildEquipmentOption(characterData, EquipType.values[index + 1])),
-        // if (widget.advancedOption && WeaponType.chargeWeaponTypes.contains(weapon.weaponType))
-        //   _chargeWeaponAdvancedOptionColumn(),
+        const Divider(),
+        ...List.generate(BattleNikkeOptions.equipTypes.length, (index) => _buildEquipmentOption(characterData, index)),
       ]);
+
+      if (widget.advancedOption && WeaponType.chargeWeaponTypes.contains(weapon.weaponType)) {
+        children.addAll([const Divider(), _chargeWeaponAdvancedOptionColumn()]);
+      }
     }
     return Container(
       padding: const EdgeInsets.all(8.0),
@@ -539,6 +542,8 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
 
   Widget _chargeWeaponAdvancedOptionColumn() {
     return Column(
+      spacing: 5,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -568,19 +573,22 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
             ),
           ],
         ),
-        Text('Charge Mode:'),
-        DropdownMenu<NikkeFullChargeMode>(
-          textStyle: TextStyle(fontSize: 12),
-          initialSelection: option.chargeMode,
-          onSelected: (NikkeFullChargeMode? value) {
-            option.chargeMode = value!;
-            setState(() {});
-          },
-          dropdownMenuEntries: UnmodifiableListView<DropdownMenuEntry<NikkeFullChargeMode>>(
-            NikkeFullChargeMode.values.map<DropdownMenuEntry<NikkeFullChargeMode>>(
-              (NikkeFullChargeMode mode) => DropdownMenuEntry<NikkeFullChargeMode>(value: mode, label: mode.name),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 3,
+          children: [
+            Text('Charge Mode:'),
+            DropdownMenu<NikkeFullChargeMode>(
+              textStyle: TextStyle(fontSize: 12),
+              initialSelection: option.chargeMode,
+              onSelected: (NikkeFullChargeMode? value) {
+                option.chargeMode = value!;
+                setState(() {});
+              },
+              dropdownMenuEntries:
+                  NikkeFullChargeMode.values.map((mode) => DropdownMenuEntry(value: mode, label: mode.name)).toList(),
             ),
-          ),
+          ],
         ),
       ],
     );
@@ -594,7 +602,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
     }
     return Column(
       mainAxisSize: MainAxisSize.min,
-      spacing: 2,
+      spacing: 5,
       children: [
         SliderWithPrefix(
           constraint: false,
@@ -641,144 +649,171 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
     );
   }
 
-  static final List<DropdownMenuEntry<EquipRarity>> equipRareEntries =
-      UnmodifiableListView<DropdownMenuEntry<EquipRarity>>(
-        EquipRarity.values.map<DropdownMenuEntry<EquipRarity>>(
-          (EquipRarity rare) => DropdownMenuEntry<EquipRarity>(
-            value: rare,
-            label: rare == EquipRarity.unknown ? 'None' : rare.name.toUpperCase(),
-          ),
-        ),
-      );
+  Widget _buildEquipmentOption(NikkeCharacterData characterData, int equipListIndex) {
+    final equipOption = option.equips[equipListIndex];
+    final allowedEquipRares = [
+      null,
+      EquipRarity.t1,
+      EquipRarity.t2,
+      EquipRarity.t3,
+      EquipRarity.t4,
+      EquipRarity.t5,
+      EquipRarity.t6,
+      EquipRarity.t7,
+      EquipRarity.t8,
+      EquipRarity.t9,
+      EquipRarity.t10,
+    ];
 
-  static final List<DropdownMenuEntry<EquipLineType>> equipLineTypeEntries =
-      UnmodifiableListView<DropdownMenuEntry<EquipLineType>>(
-        EquipLineType.values.map<DropdownMenuEntry<EquipLineType>>(
-          (EquipLineType type) => DropdownMenuEntry<EquipLineType>(value: type, label: type.toString()),
-        ),
-      );
-
-  Widget _buildEquipmentOption(NikkeCharacterData? characterData, EquipType type) {
-    final nikkeClass = characterData?.characterClass;
-    final corp = characterData?.corporation;
-    final equipListIndex = type.index - 1;
-    final equipment = option.equips[equipListIndex];
     return Container(
-      padding: const EdgeInsets.all(3.0),
+      padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        border: Border.all(color: equipment?.rarity.color ?? Colors.grey, width: 2),
+        border: Border.all(color: equipOption?.rarity.color ?? Colors.grey, width: 2),
         borderRadius: BorderRadius.circular(5),
       ),
       child: Column(
-        spacing: 2,
+        mainAxisSize: MainAxisSize.min,
+        spacing: 5,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            spacing: 3,
-            children: [
-              Text('${type.name.toUpperCase()} Gear:'),
-              DropdownMenu<EquipRarity>(
-                width: 100,
-                textStyle: TextStyle(fontSize: 12),
-                initialSelection: equipment?.rarity ?? EquipRarity.unknown,
-                onSelected: (EquipRarity? value) {
-                  if (equipment == null) {
-                    option.equips[equipListIndex] = BattleEquipmentOption(
-                      type: type,
-                      equipClass: nikkeClass ?? NikkeClass.unknown,
-                      rarity: value!,
-                    );
-                  } else {
-                    equipment.rarity = value!;
-                  }
-                  setState(() {});
-                },
-                dropdownMenuEntries: equipRareEntries,
-              ),
-            ],
+          SliderWithPrefix(
+            constraint: false,
+            titled: false,
+            leadingWidth: sliderWidth,
+            label: '${BattleNikkeOptions.equipTypes[equipListIndex].name.pascal} Gear',
+            min: 0,
+            max: allowedEquipRares.length - 1,
+            value: allowedEquipRares.indexOf(equipOption?.rarity),
+            valueFormatter: (v) => allowedEquipRares[v]?.name.toUpperCase() ?? 'None',
+            preferColor: equipOption?.rarity.color,
+            onChange: (newValue) {
+              final newRare = allowedEquipRares[newValue.round()];
+              if (newRare == null) {
+                option.equips[equipListIndex] = null;
+              } else if (equipOption == null) {
+                option.equips[equipListIndex] = BattleEquipmentOption(
+                  type: BattleNikkeOptions.equipTypes[equipListIndex],
+                  equipClass: characterData.characterClass,
+                  rarity: newRare,
+                  corporation: newRare.canHaveCorp ? characterData.corporation : Corporation.none,
+                );
+              } else {
+                equipOption.rarity = newRare;
+                equipOption.level = equipOption.level.clamp(0, newRare.maxLevel);
+                if (!newRare.canHaveCorp) {
+                  equipOption.corporation = Corporation.none;
+                }
+                if (newRare != EquipRarity.t10) {
+                  equipOption.equipLines.clear();
+                } else {
+                  equipOption.equipLines.addAll(List.generate(3, (idx) => EquipLine.none()));
+                }
+              }
+
+              setState(() {});
+            },
           ),
           SliderWithPrefix(
-            titled: true,
-            label: 'Lv',
+            constraint: false,
+            titled: false,
+            leadingWidth: sliderWidth,
+            label: 'Gear Lv',
             min: 0,
-            max: equipment?.rarity.maxLevel ?? 0,
-            value: equipment?.level ?? 0,
+            max: equipOption?.rarity.maxLevel ?? 0,
+            value: equipOption?.level ?? 0,
+            valueFormatter: (v) => 'Lv$v',
+            preferColor: equipOption?.rarity.color,
             onChange: (newValue) {
-              equipment?.level = newValue.round();
+              equipOption?.level = newValue.round();
               if (mounted) setState(() {});
             },
           ),
-          if (equipment?.rarity.canHaveCorp ?? false)
+          if (equipOption?.rarity.canHaveCorp ?? false)
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              spacing: 3,
+              mainAxisAlignment: MainAxisAlignment.start,
+              spacing: 5,
               children: [
-                Text('Corp ${equipment?.corporation.name}'),
-                Switch(
-                  value: equipment?.corporation == corp,
+                Checkbox(
+                  value: equipOption?.corporation == characterData.corporation,
                   onChanged: (v) {
-                    equipment?.corporation = v && characterData != null ? characterData.corporation : Corporation.none;
+                    equipOption?.corporation = v! ? characterData.corporation : Corporation.none;
                     if (mounted) setState(() {});
                   },
                 ),
+                Text('Use Corporation Label: ${equipOption?.corporation.name.toUpperCase()}'),
               ],
             ),
-          if (equipment != null && equipment.rarity == EquipRarity.t10)
-            ...List.generate(equipment.equipLines.length, (index) {
-              final level = equipment.equipLines[index].level;
+          if (equipOption != null && equipOption.rarity == EquipRarity.t10)
+            ...List.generate(equipOption.equipLines.length, (index) {
+              final equipLine = equipOption.equipLines[index];
+              final level = equipOption.equipLines[index].level;
+              final lineRare =
+                  level > 10
+                      ? Colors.orange
+                      : level > 5
+                      ? Colors.purple
+                      : Colors.blue;
+              final levelTextColor = level >= 12 ? Colors.blue : null;
               return Container(
+                padding: const EdgeInsets.all(8.0),
+                constraints: BoxConstraints(minWidth: double.infinity),
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color:
-                        level > 10
-                            ? Colors.orange
-                            : level > 5
-                            ? Colors.purple
-                            : Colors.blue,
-                    width: 2,
-                  ),
+                  border: Border.all(color: lineRare, width: 2),
                   borderRadius: BorderRadius.circular(5),
-                  color: level == 15 ? Colors.black.withAlpha(200) : null,
                 ),
                 child: Column(
-                  spacing: 3,
-                  children:
-                      [
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 5,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Equip Line Type: '),
                         DropdownMenu<EquipLineType>(
-                          textStyle: TextStyle(fontSize: 12, color: level == 15 ? Colors.blue : null),
-                          initialSelection: equipment.equipLines[index].type,
+                          textStyle: TextStyle(fontSize: 14),
+                          initialSelection: equipLine.type,
                           onSelected: (EquipLineType? value) {
-                            equipment.equipLines[index].type = value!;
+                            equipLine.type = value!;
+                            if (equipLine.type == EquipLineType.none) {
+                              equipLine.level = 1;
+                            }
                             setState(() {});
                           },
-                          dropdownMenuEntries: equipLineTypeEntries,
+                          dropdownMenuEntries:
+                              EquipLineType.values
+                                  .map((type) => DropdownMenuEntry(value: type, label: type.toString()))
+                                  .toList(),
                         ),
-                        SliderWithPrefix(
-                          titled: true,
-                          label: 'Lv',
-                          valueFormatter: (level) {
-                            final stateEffectData = db.stateEffectTable[equipment.equipLines[index].getStateEffectId()];
-                            if (stateEffectData == null) {
-                              return level.toString();
-                            }
+                      ],
+                    ),
+                    if (equipLine.type != EquipLineType.none)
+                      SliderWithPrefix(
+                        constraint: false,
+                        titled: false,
+                        leadingWidth: sliderWidth,
+                        label: 'Lv$level',
+                        valueFormatter: (level) {
+                          final stateEffectData = db.stateEffectTable[equipOption.equipLines[index].getStateEffectId()];
+                          if (stateEffectData != null) {
                             for (final functionId in stateEffectData.functions) {
                               if (functionId.function != 0) {
                                 final function = db.functionTable[functionId.function]!;
-                                return '$level (${function.functionValue.percentString})';
+                                return function.functionValue.percentString;
                               }
                             }
-                            return level.toString();
-                          },
-                          labelStyle: TextStyle(color: level >= 12 ? Colors.blue : null),
-                          min: 1,
-                          max: 15,
-                          value: level,
-                          onChange: (newValue) {
-                            equipment.equipLines[index].level = newValue.round();
-                            if (mounted) setState(() {});
-                          },
-                        ),
-                      ].map((widget) => Padding(padding: const EdgeInsets.all(3.0), child: widget)).toList(),
+                          }
+                          return level.toString();
+                        },
+                        min: 1,
+                        max: 15,
+                        value: level,
+                        preferColor: lineRare,
+                        preferLabelColor: levelTextColor,
+                        onChange: (newValue) {
+                          equipLine.level = newValue.round();
+                          if (mounted) setState(() {});
+                        },
+                      ),
+                  ],
                 ),
               );
             }),
