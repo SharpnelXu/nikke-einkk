@@ -365,8 +365,10 @@ class MonsterSkillDataDisplay extends StatelessWidget {
         ),
       );
     }
-    final skillValue1Str = valueString(data.skillValue1, data.skillValueType1);
-    final skillValue2Str = valueString(data.skillValue2, data.skillValueType2);
+    final extraRate =
+        data.fireType.isDamageType && statEnhanceData != null ? toModifier(statEnhanceData!.levelStatDamageRatio) : 1;
+    final skillValue1Str = valueString(data.skillValue1 * extraRate, data.skillValueType1);
+    final skillValue2Str = valueString(data.skillValue2 * extraRate, data.skillValueType2);
     final valueStr = [skillValue1Str, skillValue2Str].where((s) => s != null).join(', ');
     children.addAll([
       Text('Skill ID: ${data.id}'),

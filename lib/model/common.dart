@@ -1027,6 +1027,19 @@ enum FireType {
   instantNumber,
   projectileCurveV2;
 
+  bool get isDamageType => [
+    instant,
+    homingProjectile,
+    mechaShiftyShot,
+    projectileCurve,
+    projectileDirect,
+    stickyProjectileDirect,
+    instantAll_FrontRay,
+    instantAll,
+    instantNumber,
+    projectileCurveV2,
+  ].contains(this);
+
   static final Map<String, FireType> _reverseMap = Map.fromIterable(
     FireType.values,
     key: (v) => (v as FireType).name.pascal,
