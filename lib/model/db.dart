@@ -40,6 +40,7 @@ class Locale {
     result &= loadGeneral('Locale_Skill');
     result &= loadGeneral('Locale_System');
     result &= loadGeneral('Locale_Monster');
+    result &= loadGeneral('Locale_Item');
 
     logger.i('Locale init result: $result');
 
@@ -111,7 +112,7 @@ class NikkeDatabaseV2 {
   final Map<int, FavoriteItemData> nameCodeFavItemTable = {};
   final Map<int, Map<int, FavoriteItemLevelData>> favoriteItemLevelTable = {};
   final Map<int, HarmonyCubeData> harmonyCubeTable = {};
-  final Map<int, Map<int, HarmonyCubeLevelData>> harmonyCubeLevelTable = {};
+  final Map<int, Map<int, HarmonyCubeLevelData>> harmonyCubeEnhanceLvTable = {};
 
   final Map<int, Set<CharacterSkillType>> nameCodeSkillTypes = {};
   final Map<int, Set<FunctionType>> nameCodeFuncTypes = {};
@@ -142,6 +143,9 @@ class NikkeDatabaseV2 {
     nameCodeStatusTypes.clear();
     groupedCharacterStatTable.clear();
     groupedEquipTable.clear();
+    harmonyCubeTable.clear();
+    harmonyCubeEnhanceLvTable.clear();
+    groupedSkillInfoTable.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     String directory(String fileName) {
@@ -166,6 +170,8 @@ class NikkeDatabaseV2 {
     initialized &= loadData(directory('FavoriteItemTable.json'), processDollData);
     initialized &= loadData(directory('CharacterStatTable.json'), processCharacterStatData);
     initialized &= loadData(directory('ItemEquipTable.json'), processEquipData);
+    initialized &= loadData(directory('ItemHarmonyCubeTable.json'), processCubeData);
+    initialized &= loadData(directory('ItemHarmonyCubeLevelTable.json'), processCubeLevelData);
 
     initialized &= loadCsv(directory('WaveData.GroupDict.csv'), processWaveDict);
 
@@ -377,6 +383,8 @@ class NikkeDatabaseV2 {
   void processSkillInfoData(dynamic record) {
     final data = SkillInfoData.fromJson(record);
     skillInfoTable[data.id] = data;
+    groupedSkillInfoTable.putIfAbsent(data.groupId, () => {});
+    groupedSkillInfoTable[data.groupId]![data.skillLevel] = data;
   }
 
   void processWordGroupData(dynamic record) {
@@ -406,6 +414,17 @@ class NikkeDatabaseV2 {
     groupedEquipTable.putIfAbsent(equip.itemSubType, () => {});
     groupedEquipTable[equip.itemSubType]!.putIfAbsent(equip.characterClass, () => {});
     groupedEquipTable[equip.itemSubType]![equip.characterClass]![equip.itemRarity] = equip;
+  }
+
+  void processCubeData(dynamic record) {
+    final data = HarmonyCubeData.fromJson(record);
+    harmonyCubeTable[data.id] = data;
+  }
+
+  void processCubeLevelData(dynamic record) {
+    final data = HarmonyCubeLevelData.fromJson(record);
+    harmonyCubeEnhanceLvTable.putIfAbsent(data.levelEnhanceId, () => {});
+    harmonyCubeEnhanceLvTable[data.levelEnhanceId]![data.level] = data;
   }
 }
 

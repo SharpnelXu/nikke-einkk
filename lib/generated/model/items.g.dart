@@ -48,15 +48,15 @@ Map<String, dynamic> _$EquipLineToJson(EquipLine instance) => <String, dynamic>{
 
 const _$EquipLineTypeEnumMap = {
   EquipLineType.none: 'none',
-  EquipLineType.increaseElementalDamage: 'increaseElementalDamage',
-  EquipLineType.startAccuracyCircle: 'startAccuracyCircle',
-  EquipLineType.statAmmo: 'statAmmo',
   EquipLineType.statAtk: 'statAtk',
-  EquipLineType.statChargeDamage: 'statChargeDamage',
-  EquipLineType.statChargeTime: 'statChargeTime',
+  EquipLineType.statDef: 'statDef',
+  EquipLineType.increaseElementalDamage: 'increaseElementalDamage',
   EquipLineType.statCriticalDamage: 'statCriticalDamage',
   EquipLineType.statCritical: 'statCritical',
-  EquipLineType.statDef: 'statDef',
+  EquipLineType.statAmmo: 'statAmmo',
+  EquipLineType.statChargeDamage: 'statChargeDamage',
+  EquipLineType.statChargeTime: 'statChargeTime',
+  EquipLineType.startAccuracyCircle: 'startAccuracyCircle',
 };
 
 HarmonyCubeSkillGroup _$HarmonyCubeSkillGroupFromJson(Map<String, dynamic> json) =>

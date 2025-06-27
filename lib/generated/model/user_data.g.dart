@@ -17,7 +17,9 @@ UserData _$UserDataFromJson(Map<String, dynamic> json) => UserData(
       ) ??
       const {},
   cubes:
-      (json['cubes'] as List<dynamic>?)?.map((e) => BattleHarmonyCube.fromJson(e as Map<String, dynamic>)).toList() ??
+      (json['cubes'] as List<dynamic>?)
+          ?.map((e) => BattleHarmonyCubeOption.fromJson(e as Map<String, dynamic>))
+          .toList() ??
       const [],
 );
 

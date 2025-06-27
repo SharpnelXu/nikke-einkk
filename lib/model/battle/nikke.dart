@@ -28,7 +28,7 @@ class BattleNikkeOptions {
   int attractLevel;
   List<BattleEquipmentOption?> equips;
   List<int> skillLevels;
-  BattleHarmonyCube? cube;
+  BattleHarmonyCubeOption? cube;
   BattleFavoriteItemOption? favoriteItem;
 
   bool alwaysFocus;

@@ -10,17 +10,18 @@ import 'package:nikke_einkk/model/items.dart';
 part '../../generated/model/battle/harmony_cube.g.dart';
 
 @JsonSerializable()
-class BattleHarmonyCube {
-  HarmonyCubeType type;
+class BattleHarmonyCubeOption {
+  int cubeId;
   int cubeLevel;
 
-  BattleHarmonyCube(this.type, this.cubeLevel);
+  BattleHarmonyCubeOption(this.cubeId, this.cubeLevel);
+  BattleHarmonyCubeOption.fromType(HarmonyCubeType type, this.cubeLevel) : cubeId = type.cubeId;
 
-  factory BattleHarmonyCube.fromJson(Map<String, dynamic> json) => _$BattleHarmonyCubeFromJson(json);
+  factory BattleHarmonyCubeOption.fromJson(Map<String, dynamic> json) => _$BattleHarmonyCubeOptionFromJson(json);
 
-  Map<String, dynamic> toJson() => _$BattleHarmonyCubeToJson(this);
+  Map<String, dynamic> toJson() => _$BattleHarmonyCubeOptionToJson(this);
 
-  HarmonyCubeData get cubeData => dbLegacy.harmonyCubeTable[type.cubeId]!;
+  HarmonyCubeData get cubeData => dbLegacy.harmonyCubeTable[cubeId]!;
 
   HarmonyCubeLevelData get levelData => dbLegacy.harmonyCubeLevelTable[cubeData.levelEnhanceId]![cubeLevel]!;
 
@@ -55,7 +56,7 @@ class BattleHarmonyCube {
     }
   }
 
-  BattleHarmonyCube copy() {
-    return BattleHarmonyCube(type, cubeLevel);
+  BattleHarmonyCubeOption copy() {
+    return BattleHarmonyCubeOption(cubeId, cubeLevel);
   }
 }

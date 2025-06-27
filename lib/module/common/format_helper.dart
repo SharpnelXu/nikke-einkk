@@ -68,7 +68,7 @@ int maxDollLv(Rarity? dollRare) {
 
 String dollLvString(Rarity? dollRare, int dollLevel) {
   if (dollRare == null || dollRare != Rarity.ssr) {
-    return dollLevel.toString();
+    return 'Lv$dollLevel';
   } else {
     String result = '★';
     for (int i = 0; i < dollLevel; i += 1) {
@@ -218,10 +218,10 @@ List<InlineSpan> buildDescriptionTextSpans(String curText, TextStyle style, Nikk
 
     // Process color tag
     if (match.group(1) != null) {
-      final colorCode = match.group(2)!;
       final content = match.group(3)!;
+      final colorCode = int.tryParse('0xFF${match.group(2)!}');
       textSpans.addAll(
-        buildDescriptionTextSpans(content, style.copyWith(color: Color(int.parse('0xFF$colorCode'))), db),
+        buildDescriptionTextSpans(content, style.copyWith(color: colorCode != null ? Color(colorCode) : null), db),
       );
     }
     // Process word_group tag

@@ -10,12 +10,12 @@ part '../generated/model/user_data.g.dart';
 class UserData {
   BattlePlayerOptions playerOptions = BattlePlayerOptions();
   Map<int, BattleNikkeOptions> nikkeOptions = {};
-  List<BattleHarmonyCube> cubes = [];
+  List<BattleHarmonyCubeOption> cubes = [];
 
   UserData({
     BattlePlayerOptions? playerOptions,
     Map<int, BattleNikkeOptions> nikkeOptions = const {},
-    List<BattleHarmonyCube> cubes = const [],
+    List<BattleHarmonyCubeOption> cubes = const [],
   }) {
     if (playerOptions != null) {
       this.playerOptions = playerOptions.copy();

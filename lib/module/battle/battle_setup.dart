@@ -32,8 +32,8 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
   BattleRaptureOptions raptureOption = BattleRaptureOptions();
   List<BattleNikkeOptions> nikkeOptions = List.generate(5, (_) => BattleNikkeOptions(nikkeResourceId: -1));
   BattlePlayerOptions playerOptions = BattlePlayerOptions();
-  List<BattleHarmonyCube> cubes = List.generate(HarmonyCubeType.values.length, (index) {
-    return BattleHarmonyCube(HarmonyCubeType.values[index], 1);
+  List<BattleHarmonyCubeOption> cubes = List.generate(HarmonyCubeType.values.length, (index) {
+    return BattleHarmonyCubeOption.fromType(HarmonyCubeType.values[index], 1);
   });
   int globalSyncLevel = 1;
 
@@ -42,13 +42,13 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
     super.initState();
 
     playerOptions = dbLegacy.userData.playerOptions.copy();
-    final Map<HarmonyCubeType, int> storedCubeLevel = {};
+    final Map<int, int> storedCubeLevel = {};
     for (final cube in dbLegacy.userData.cubes) {
-      storedCubeLevel[cube.type] = cube.cubeLevel;
+      storedCubeLevel[cube.cubeId] = cube.cubeLevel;
     }
     for (final cube in cubes) {
-      if (storedCubeLevel.containsKey(cube.type)) {
-        cube.cubeLevel = storedCubeLevel[cube.type]!;
+      if (storedCubeLevel.containsKey(cube.cubeId)) {
+        cube.cubeLevel = storedCubeLevel[cube.cubeId]!;
       }
     }
   }
@@ -249,7 +249,7 @@ class _RaptureDisplayState extends State<RaptureDisplay> {
 class NikkeDisplay extends StatefulWidget {
   final BattleNikkeOptions option;
   final BattlePlayerOptions playerOptions;
-  final List<BattleHarmonyCube> cubes;
+  final List<BattleHarmonyCubeOption> cubes;
 
   const NikkeDisplay({super.key, required this.option, required this.cubes, required this.playerOptions});
 
@@ -399,7 +399,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
         ),
         TextButton.icon(
           onPressed: () async {
-            final result = await showDialog<BattleHarmonyCube?>(
+            final result = await showDialog<BattleHarmonyCubeOption?>(
               context: context,
               builder: (ctx) {
                 return SimpleConfirmDialog(
@@ -415,7 +415,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
             setState(() {});
           },
           icon: Icon(Icons.grid_view_sharp, size: 12),
-          label: Text('Cube: ${option.cube != null ? '${option.cube!.type} Lv ${option.cube!.cubeLevel}' : 'None'}'),
+          label: Text('Cube: ${option.cube != null ? '${option.cube!.cubeId} Lv ${option.cube!.cubeLevel}' : 'None'}'),
         ),
       ]);
 
@@ -459,8 +459,8 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
 }
 
 class CubeSettingDialog extends StatefulWidget {
-  final List<BattleHarmonyCube> cubes;
-  final BattleHarmonyCube? currentSelection;
+  final List<BattleHarmonyCubeOption> cubes;
+  final BattleHarmonyCubeOption? currentSelection;
   final bool selectMode;
   const CubeSettingDialog({super.key, required this.cubes, this.selectMode = false, this.currentSelection});
 
@@ -491,7 +491,7 @@ class _CubeSettingDialogState extends State<CubeSettingDialog> {
               Flexible(
                 child: SliderWithPrefix(
                   titled: true,
-                  label: cube.type.toString(),
+                  label: cube.cubeId.toString(),
                   min: 1,
                   max: 15,
                   valueFormatter: (v) => 'Lv $v',

@@ -482,7 +482,7 @@ void main() async {
   test('Cube Effect Exists', () {
     for (final cubeType in HarmonyCubeType.values) {
       for (int level = 1; level <= 15; level += 1) {
-        final cube = BattleHarmonyCube(cubeType, level);
+        final cube = BattleHarmonyCubeOption.fromType(cubeType, level);
 
         final stateEffectIds = cube.getCubeStateEffectIds();
         expect(stateEffectIds.length, isNonZero);

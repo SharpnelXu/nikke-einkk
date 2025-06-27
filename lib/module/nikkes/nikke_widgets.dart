@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/equipment.dart';
 import 'package:nikke_einkk/model/battle/favorite_item.dart';
+import 'package:nikke_einkk/model/battle/harmony_cube.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
@@ -519,6 +520,8 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
           },
         ),
       ),
+      const Divider(),
+      _buildCubeColumn(),
     ];
 
     if (characterData != null && weapon != null) {
@@ -628,24 +631,134 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
             setState(() {});
           },
         ),
+        if (doll != null)
+          SliderWithPrefix(
+            constraint: false,
+            titled: false,
+            leadingWidth: sliderWidth,
+            label: 'Doll Lv',
+            min: 0,
+            max: maxDollLv(doll.rarity),
+            value: doll.level,
+            valueFormatter: (v) => dollLvString(doll.rarity, v),
+            preferColor: doll.rarity.color,
+            onChange: (newValue) {
+              doll.level = newValue.round();
+              if (mounted) setState(() {});
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildCubeColumn() {
+    final cubeOption = option.cube;
+    final availableCubes = [
+      null,
+      ...db.harmonyCubeTable.values.sorted((a, b) => a.order.compareTo(b.order)).map((data) => data.id),
+    ];
+    final cube = db.harmonyCubeTable[cubeOption?.cubeId];
+    final cubeEnhanceData = db.harmonyCubeEnhanceLvTable[cube?.levelEnhanceId];
+
+    final List<Widget> children = [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Harmony Cube: '),
+          DropdownMenu<int?>(
+            textStyle: TextStyle(fontSize: 14),
+            initialSelection: cubeOption?.cubeId,
+            onSelected: (int? value) {
+              if (value == null) {
+                option.cube = null;
+              } else if (cubeOption == null) {
+                option.cube = BattleHarmonyCubeOption(value, 1);
+              } else {
+                cubeOption.cubeId = value;
+              }
+              setState(() {});
+            },
+            dropdownMenuEntries:
+                availableCubes
+                    .map(
+                      (id) => DropdownMenuEntry(
+                        value: id,
+                        label: locale.getTranslation(db.harmonyCubeTable[id]?.nameLocalkey) ?? 'None',
+                      ),
+                    )
+                    .toList(),
+          ),
+        ],
+      ),
+    ];
+    if (cubeOption != null && cube != null && cubeEnhanceData != null) {
+      final colorCode = int.tryParse('0xFF${cube.bgColor}');
+      children.add(
         SliderWithPrefix(
           constraint: false,
           titled: false,
           leadingWidth: sliderWidth,
-          label: 'Lv',
-          min: 0,
-          max: maxDollLv(doll?.rarity),
-          value: doll?.level ?? 0,
-          valueFormatter: (v) => dollLvString(doll?.rarity, v),
-          preferColor: doll?.rarity.color,
+          label: 'Cube Lv',
+          min: 1,
+          max: cubeEnhanceData.keys.sorted((a, b) => a.compareTo(b)).last,
+          value: cubeOption.cubeLevel,
+          valueFormatter: (v) => 'Lv${cubeOption.cubeLevel}',
+          preferColor: colorCode != null ? Color(colorCode) : null,
           onChange: (newValue) {
-            if (doll != null) {
-              doll.level = newValue.round();
-              if (mounted) setState(() {});
-            }
+            cubeOption.cubeLevel = newValue.round();
+            if (mounted) setState(() {});
           },
         ),
-      ],
+      );
+      final cubeLevelData = cubeEnhanceData[cubeOption.cubeLevel]!;
+      final List<Widget> wrapChildren = [];
+      for (int idx = 0; idx < cubeLevelData.skillLevels.length; idx += 1) {
+        if (cube.harmonyCubeSkillGroups.length > idx && cubeLevelData.skillLevels.length > idx) {
+          final skillGroupId = cube.harmonyCubeSkillGroups[idx].skillGroupId;
+          final skillLv = cubeLevelData.skillLevels[idx].level;
+          if (skillGroupId == 0 || skillLv == 0) continue;
+
+          final skillInfo = db.groupedSkillInfoTable[skillGroupId]?[skillLv];
+          if (skillInfo == null) {
+            wrapChildren.add(Text('Cube skill group $skillGroupId Lv $skillLv not found.'));
+          } else {
+            wrapChildren.addAll([
+              Tooltip(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey, width: 2),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                richMessage: TextSpan(
+                  children: buildDescriptionTextSpans(
+                    formatSkillInfoDescription(skillInfo),
+                    DefaultTextStyle.of(context).style,
+                    db,
+                  ),
+                ),
+                child: Icon(Icons.info_outline, size: 16),
+              ),
+              Text(locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey),
+              Text('Lv$skillLv'),
+            ]);
+          }
+        }
+      }
+      children.add(
+        Wrap(
+          alignment: WrapAlignment.start,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 5,
+          children: wrapChildren,
+        ),
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 5,
+      children: children,
     );
   }
 

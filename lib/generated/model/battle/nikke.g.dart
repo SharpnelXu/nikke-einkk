@@ -17,7 +17,7 @@ BattleNikkeOptions _$BattleNikkeOptionsFromJson(Map<String, dynamic> json) => Ba
           .toList() ??
       const [null, null, null, null],
   skillLevels: (json['skillLevels'] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList() ?? const [10, 10, 10],
-  cube: json['cube'] == null ? null : BattleHarmonyCube.fromJson(json['cube'] as Map<String, dynamic>),
+  cube: json['cube'] == null ? null : BattleHarmonyCubeOption.fromJson(json['cube'] as Map<String, dynamic>),
   favoriteItem:
       json['favoriteItem'] == null
           ? null
