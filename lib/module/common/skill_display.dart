@@ -23,7 +23,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
 
     final durationStr = durationString(data.durationValue, data.durationType);
     final valueStr = data.skillValueData
-        .map((valueData) => valueString(valueData.skillValue, valueData.skillValueType))
+        .map((valueData) => skillValueString(valueData.skillValue, valueData.skillValueType))
         .join(', ');
     final List<Widget> children = [
       if (skillInfo != null)
@@ -233,7 +233,7 @@ class SimpleFunctionDisplay extends StatelessWidget {
           ),
         );
       }
-      final funcValueString = valueString(func.functionValue, func.functionValueType);
+      final funcValueString = skillValueString(func.functionValue, func.functionValueType);
       final funcStandardString = functionStandardString(func.functionStandard);
       final durationStr = durationString(func.durationValue, func.durationType);
       final delayStr = durationString(func.delayValue, func.delayType);
@@ -367,8 +367,8 @@ class MonsterSkillDataDisplay extends StatelessWidget {
     }
     final extraRate =
         data.fireType.isDamageType && statEnhanceData != null ? toModifier(statEnhanceData!.levelStatDamageRatio) : 1;
-    final skillValue1Str = valueString(data.skillValue1 * extraRate, data.skillValueType1);
-    final skillValue2Str = valueString(data.skillValue2 * extraRate, data.skillValueType2);
+    final skillValue1Str = skillValueString(data.skillValue1, data.skillValueType1, extraRate);
+    final skillValue2Str = skillValueString(data.skillValue2, data.skillValueType2, extraRate);
     final valueStr = [skillValue1Str, skillValue2Str].where((s) => s != null).join(', ');
     children.addAll([
       Text('Skill ID: ${data.id}'),

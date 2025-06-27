@@ -104,12 +104,12 @@ String frameDataToNiceTimeString(int frame, int fps) {
       '${(timeData % 6000 / 100).toStringAsFixed(3)}';
 }
 
-String? valueString(num value, ValueType type) {
+String? skillValueString(int value, ValueType type, [num extraRate = 1]) {
   switch (type) {
     case ValueType.integer:
-      return '${value.round()}';
+      return '$value';
     case ValueType.percent:
-      return value.percentString;
+      return (value * extraRate).percentString;
     case ValueType.none:
     case ValueType.unknown:
       return null;
