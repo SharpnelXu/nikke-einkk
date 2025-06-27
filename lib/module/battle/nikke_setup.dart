@@ -221,7 +221,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                       } else if (doll != null) {
                         doll.rarity = value!;
                       } else {
-                        option.favoriteItem = BattleFavoriteItem(
+                        option.favoriteItem = BattleFavoriteItemOption(
                           weaponType: weaponType ?? WeaponType.unknown,
                           rarity: value!,
                           level: 0,

@@ -6,14 +6,14 @@ part of '../../../model/battle/favorite_item.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-BattleFavoriteItem _$BattleFavoriteItemFromJson(Map<String, dynamic> json) => BattleFavoriteItem(
+BattleFavoriteItemOption _$BattleFavoriteItemOptionFromJson(Map<String, dynamic> json) => BattleFavoriteItemOption(
   weaponType: $enumDecode(_$WeaponTypeEnumMap, json['weaponType']),
   rarity: $enumDecode(_$RarityEnumMap, json['rarity']),
   level: (json['level'] as num?)?.toInt() ?? 0,
   nameCode: (json['nameCode'] as num?)?.toInt() ?? 0,
 );
 
-Map<String, dynamic> _$BattleFavoriteItemToJson(BattleFavoriteItem instance) => <String, dynamic>{
+Map<String, dynamic> _$BattleFavoriteItemOptionToJson(BattleFavoriteItemOption instance) => <String, dynamic>{
   'weaponType': _$WeaponTypeEnumMap[instance.weaponType]!,
   'rarity': _$RarityEnumMap[instance.rarity]!,
   'level': instance.level,

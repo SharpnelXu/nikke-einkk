@@ -19,7 +19,9 @@ BattleNikkeOptions _$BattleNikkeOptionsFromJson(Map<String, dynamic> json) => Ba
   skillLevels: (json['skillLevels'] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList() ?? const [10, 10, 10],
   cube: json['cube'] == null ? null : BattleHarmonyCube.fromJson(json['cube'] as Map<String, dynamic>),
   favoriteItem:
-      json['favoriteItem'] == null ? null : BattleFavoriteItem.fromJson(json['favoriteItem'] as Map<String, dynamic>),
+      json['favoriteItem'] == null
+          ? null
+          : BattleFavoriteItemOption.fromJson(json['favoriteItem'] as Map<String, dynamic>),
   alwaysFocus: json['alwaysFocus'] as bool? ?? false,
   forceCancelShootDelay: json['forceCancelShootDelay'] as bool? ?? false,
   chargeMode: $enumDecodeNullable(_$NikkeFullChargeModeEnumMap, json['chargeMode']) ?? NikkeFullChargeMode.always,

@@ -18,6 +18,7 @@ class SliderWithPrefix extends StatelessWidget {
   final TextStyle? labelStyle;
   final bool? constraint;
   final bool enableInput;
+  final Color? preferColor;
 
   const SliderWithPrefix({
     super.key,
@@ -35,6 +36,7 @@ class SliderWithPrefix extends StatelessWidget {
     this.labelStyle,
     this.constraint,
     this.enableInput = true,
+    this.preferColor,
   });
 
   @override
@@ -61,7 +63,7 @@ class SliderWithPrefix extends StatelessWidget {
             maxFontSize: 16,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: labelColor),
           ),
-          AutoSizeText(valueText, maxLines: 1, minFontSize: 9, maxFontSize: 14, style: TextStyle(color: labelColor)),
+          AutoSizeText(valueText, maxLines: 1, minFontSize: 8, maxFontSize: 14, style: TextStyle(color: labelColor)),
         ],
       );
     }
@@ -73,7 +75,7 @@ class SliderWithPrefix extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(3.0),
           decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).primaryColor, width: 2),
+            border: Border.all(color: preferColor ?? Theme.of(context).primaryColor, width: 2),
             borderRadius: BorderRadius.circular(5),
           ),
           child: header,
@@ -81,7 +83,11 @@ class SliderWithPrefix extends StatelessWidget {
       );
     }
     Widget slider = SliderTheme(
-      data: SliderTheme.of(context).copyWith(thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8)),
+      data: SliderTheme.of(context).copyWith(
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+        activeTrackColor: preferColor,
+        thumbColor: preferColor,
+      ),
       child: Slider(
         min: min.toDouble(),
         max: max.toDouble(),

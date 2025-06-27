@@ -269,9 +269,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
 
     final doll = option.favoriteItem;
     final dollString =
-        doll == null
-            ? 'None'
-            : '${doll.rarity.name.toUpperCase()} (Lv ${doll.rarity == Rarity.ssr ? dollLvString(doll.data, doll.level) : doll.level})';
+        doll == null ? 'None' : '${doll.rarity.name.toUpperCase()} (${dollLvString(doll.rarity, doll.level)})';
 
     final List<Widget> statDisplays = [];
 

@@ -10,15 +10,15 @@ import 'package:nikke_einkk/model/items.dart';
 part '../../generated/model/battle/favorite_item.g.dart';
 
 @JsonSerializable()
-class BattleFavoriteItem {
+class BattleFavoriteItemOption {
   WeaponType weaponType;
   Rarity rarity;
   int level;
   int nameCode;
 
-  BattleFavoriteItem({required this.weaponType, required this.rarity, this.level = 0, this.nameCode = 0});
+  BattleFavoriteItemOption({required this.weaponType, required this.rarity, this.level = 0, this.nameCode = 0});
 
-  factory BattleFavoriteItem.fromJson(Map<String, dynamic> json) => _$BattleFavoriteItemFromJson(json);
+  factory BattleFavoriteItemOption.fromJson(Map<String, dynamic> json) => _$BattleFavoriteItemFromJson(json);
 
   Map<String, dynamic> toJson() => _$BattleFavoriteItemToJson(this);
 
@@ -58,7 +58,7 @@ class BattleFavoriteItem {
     }
   }
 
-  BattleFavoriteItem copy() {
-    return BattleFavoriteItem(weaponType: weaponType, rarity: rarity, level: level, nameCode: nameCode);
+  BattleFavoriteItemOption copy() {
+    return BattleFavoriteItemOption(weaponType: weaponType, rarity: rarity, level: level, nameCode: nameCode);
   }
 }

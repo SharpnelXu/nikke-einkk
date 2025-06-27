@@ -71,7 +71,7 @@ void main() async {
           ],
         ),
       ],
-      favoriteItem: BattleFavoriteItem(weaponType: WeaponType.ar, rarity: Rarity.sr, level: 5),
+      favoriteItem: BattleFavoriteItemOption(weaponType: WeaponType.ar, rarity: Rarity.sr, level: 5),
       cube: null,
     );
 
@@ -244,7 +244,7 @@ void main() async {
           equipLines: [EquipLine(EquipLineType.statAtk, 11), EquipLine(EquipLineType.statAmmo, 7)],
         ),
       ],
-      favoriteItem: BattleFavoriteItem(weaponType: WeaponType.sr, rarity: Rarity.sr, level: 15),
+      favoriteItem: BattleFavoriteItemOption(weaponType: WeaponType.sr, rarity: Rarity.sr, level: 15),
       cube: null,
     );
 
@@ -392,7 +392,7 @@ void main() async {
             equipLines: [EquipLine(EquipLineType.statAtk, 11)],
           ),
         ],
-        favoriteItem: BattleFavoriteItem(weaponType: WeaponType.ar, rarity: Rarity.r, level: 0),
+        favoriteItem: BattleFavoriteItemOption(weaponType: WeaponType.ar, rarity: Rarity.r, level: 0),
         cube: null,
       );
 
@@ -473,7 +473,7 @@ void main() async {
           ],
         ),
       ],
-      favoriteItem: BattleFavoriteItem(weaponType: WeaponType.smg, rarity: Rarity.r, level: 0),
+      favoriteItem: BattleFavoriteItemOption(weaponType: WeaponType.smg, rarity: Rarity.r, level: 0),
       cube: null,
     );
 
@@ -594,7 +594,7 @@ void main() async {
           equipLines: [],
         ),
       ],
-      favoriteItem: BattleFavoriteItem(weaponType: WeaponType.mg, rarity: Rarity.sr, level: 15),
+      favoriteItem: BattleFavoriteItemOption(weaponType: WeaponType.mg, rarity: Rarity.sr, level: 15),
       cube: null,
     );
 

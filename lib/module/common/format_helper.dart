@@ -5,7 +5,6 @@ import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
-import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 /// From source_helper:CaseHelper package
@@ -51,20 +50,26 @@ String coreString(int coreLevel) {
   }
 
   if (actualCoreLv == 11) {
-    result += ' MAX';
+    result += 'MAX';
   } else if (actualCoreLv > 4) {
-    result += ' C${actualCoreLv - 4}';
+    result += 'C${actualCoreLv - 4}';
   }
 
   return result;
 }
 
-String dollLvString(FavoriteItemData? doll, int dollLevel) {
-  if (doll == null) {
-    return dollLevel.toString();
-  }
+int maxDollLv(Rarity? dollRare) {
+  return dollRare == null
+      ? 0
+      : dollRare == Rarity.ssr
+      ? 2
+      : 15;
+}
 
-  if (doll.favoriteRare == Rarity.ssr) {
+String dollLvString(Rarity? dollRare, int dollLevel) {
+  if (dollRare == null || dollRare != Rarity.ssr) {
+    return dollLevel.toString();
+  } else {
     String result = '★';
     for (int i = 0; i < dollLevel; i += 1) {
       result += '★';
@@ -73,8 +78,6 @@ String dollLvString(FavoriteItemData? doll, int dollLevel) {
       result += '☆';
     }
     return result;
-  } else {
-    return dollLevel.toString();
   }
 }
 

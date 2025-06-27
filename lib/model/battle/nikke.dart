@@ -29,7 +29,7 @@ class BattleNikkeOptions {
   List<BattleEquipmentOption?> equips;
   List<int> skillLevels;
   BattleHarmonyCube? cube;
-  BattleFavoriteItem? favoriteItem;
+  BattleFavoriteItemOption? favoriteItem;
 
   bool alwaysFocus;
   bool forceCancelShootDelay;

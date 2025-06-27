@@ -451,6 +451,8 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
     final groupedData = db.characterResourceGardeTable[option.nikkeResourceId];
     final characterData = groupedData?[option.coreLevel];
     final weapon = db.characterShotTable[characterData?.shotId];
+    final coreLevels = groupedData!.keys.sorted((a, b) => a.compareTo(b));
+    final showCoreAndAttract = characterData != null && characterData.originalRare != Rarity.r;
     final List<Widget> children = [
       Align(child: NikkeIcon(characterData: characterData, weapon: weapon, isSelected: false)),
       SliderWithPrefix(
@@ -468,6 +470,37 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
           if (mounted) setState(() {});
         },
       ),
+      if (showCoreAndAttract)
+        SliderWithPrefix(
+          constraint: false,
+          titled: false,
+          label: 'Core',
+          leadingWidth: sliderWidth,
+          min: 1,
+          max: coreLevels.length,
+          value: coreLevels.indexOf(option.coreLevel) + 1,
+          valueFormatter: (v) => coreString(v),
+          onChange: (newValue) {
+            option.coreLevel = coreLevels[newValue.round() - 1];
+            option.attractLevel = option.attractLevel.clamp(1, groupedData[option.coreLevel]!.maxAttractLv);
+            if (mounted) setState(() {});
+          },
+        ),
+      if (showCoreAndAttract)
+        SliderWithPrefix(
+          constraint: false,
+          titled: false,
+          label: 'Attract',
+          leadingWidth: sliderWidth,
+          min: 1,
+          max: characterData.maxAttractLv,
+          value: option.attractLevel,
+          valueFormatter: (v) => 'Lv$v',
+          onChange: (newValue) {
+            option.attractLevel = newValue.round();
+            if (mounted) setState(() {});
+          },
+        ),
       const Divider(),
       ...List.generate(
         3,
@@ -489,39 +522,9 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
     ];
 
     if (characterData != null && weapon != null) {
-      final coreLevels = groupedData!.keys.sorted((a, b) => a.compareTo(b));
-
       children.addAll([
-        SliderWithPrefix(
-          constraint: false,
-          titled: false,
-          label: 'Core',
-          leadingWidth: sliderWidth,
-          min: 1,
-          max: coreLevels.length,
-          value: coreLevels.indexOf(option.coreLevel) + 1,
-          valueFormatter: (v) => coreString(v),
-          onChange: (newValue) {
-            option.coreLevel = coreLevels[newValue.round() - 1];
-            option.attractLevel = option.attractLevel.clamp(1, groupedData[option.coreLevel]!.maxAttractLv);
-            if (mounted) setState(() {});
-          },
-        ),
-        SliderWithPrefix(
-          constraint: false,
-          titled: false,
-          label: 'Attract',
-          leadingWidth: sliderWidth,
-          min: 1,
-          max: characterData.maxAttractLv,
-          value: option.attractLevel,
-          valueFormatter: (v) => 'Lv$v',
-          onChange: (newValue) {
-            option.attractLevel = newValue.round();
-            if (mounted) setState(() {});
-          },
-        ),
-        // _buildDollColumn(characterData.nameCode, weapon.weaponType),
+        const Divider(),
+        _buildDollColumn(characterData.nameCode, weapon.weaponType),
         // ...List.generate(4, (index) => _buildEquipmentOption(characterData, EquipType.values[index + 1])),
         // if (widget.advancedOption && WeaponType.chargeWeaponTypes.contains(weapon.weaponType))
         //   _chargeWeaponAdvancedOptionColumn(),
@@ -583,103 +586,58 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
     );
   }
 
-  Widget _buildDollColumn(int nameCode, WeaponType? weaponType) {
+  Widget _buildDollColumn(int nameCode, WeaponType weaponType) {
     final doll = option.favoriteItem;
-    final allowedRare = [Rarity.unknown, Rarity.r, Rarity.sr];
+    final allowedRare = [null, Rarity.r, Rarity.sr];
     if (db.nameCodeFavItemTable.containsKey(nameCode)) {
       allowedRare.add(Rarity.ssr);
     }
-    final entries = UnmodifiableListView<DropdownMenuEntry<Rarity>>(
-      allowedRare.map<DropdownMenuEntry<Rarity>>(
-        (Rarity rare) =>
-            DropdownMenuEntry<Rarity>(value: rare, label: rare == Rarity.unknown ? 'None' : rare.name.toUpperCase()),
-      ),
-    );
-    return Container(
-      padding: const EdgeInsets.all(3.0),
-      decoration: BoxDecoration(
-        border: Border.all(color: doll?.rarity.color ?? Colors.grey, width: 2),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Column(
-        spacing: 2,
-        children:
-            [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                spacing: 3,
-                children: [
-                  Text('Doll'),
-                  DropdownMenu<Rarity>(
-                    width: 100,
-                    textStyle: TextStyle(fontSize: 12),
-                    initialSelection: option.favoriteItem?.rarity ?? Rarity.unknown,
-                    onSelected: (Rarity? value) {
-                      if (value == Rarity.unknown) {
-                        option.favoriteItem = null;
-                      } else if (doll != null) {
-                        doll.rarity = value!;
-                      } else {
-                        option.favoriteItem = BattleFavoriteItem(
-                          weaponType: weaponType ?? WeaponType.unknown,
-                          rarity: value!,
-                          level: 0,
-                        );
-                      }
-                      if (value == Rarity.ssr) {
-                        if (db.nameCodeFavItemTable.containsKey(nameCode)) {
-                          option.favoriteItem!.nameCode = nameCode;
-                        } else {
-                          option.favoriteItem!.nameCode = 0;
-                          option.favoriteItem!.rarity = Rarity.sr;
-                        }
-                      } else {
-                        option.favoriteItem!.nameCode = 0;
-                      }
-                      setState(() {});
-                    },
-                    dropdownMenuEntries: entries,
-                  ),
-                ],
-              ),
-              SliderWithPrefix(
-                titled: true,
-                label: 'Lv',
-                min: 0,
-                max:
-                    doll == null
-                        ? 0
-                        : doll.rarity == Rarity.ssr
-                        ? 2
-                        : 15,
-                value: doll?.level ?? 0,
-                valueFormatter: (v) {
-                  if (doll == null) {
-                    return v.toString();
-                  }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 2,
+      children: [
+        SliderWithPrefix(
+          constraint: false,
+          titled: false,
+          leadingWidth: sliderWidth,
+          label: 'Doll',
+          min: 0,
+          max: allowedRare.length - 1,
+          value: allowedRare.indexOf(doll?.rarity),
+          valueFormatter: (v) => allowedRare[v]?.name.toUpperCase() ?? 'None',
+          preferColor: doll?.rarity.color,
+          onChange: (newValue) {
+            final newRare = allowedRare[newValue.round()];
+            if (newRare == null) {
+              option.favoriteItem = null;
+            } else if (doll != null) {
+              doll.rarity = newRare;
+              doll.level = doll.level.clamp(0, maxDollLv(newRare));
+            } else {
+              option.favoriteItem = BattleFavoriteItemOption(weaponType: weaponType, rarity: newRare, level: 0);
+            }
 
-                  if (doll.rarity == Rarity.ssr) {
-                    String result = '★';
-                    for (int i = 0; i < v; i += 1) {
-                      result += '★';
-                    }
-                    for (int i = v; i < 2; i += 1) {
-                      result += '☆';
-                    }
-                    return result;
-                  } else {
-                    return v.toString();
-                  }
-                },
-                onChange: (newValue) {
-                  if (doll != null) {
-                    doll.level = newValue.round();
-                    if (mounted) setState(() {});
-                  }
-                },
-              ),
-            ].map((widget) => Padding(padding: const EdgeInsets.all(3.0), child: widget)).toList(),
-      ),
+            setState(() {});
+          },
+        ),
+        SliderWithPrefix(
+          constraint: false,
+          titled: false,
+          leadingWidth: sliderWidth,
+          label: 'Lv',
+          min: 0,
+          max: maxDollLv(doll?.rarity),
+          value: doll?.level ?? 0,
+          valueFormatter: (v) => dollLvString(doll?.rarity, v),
+          preferColor: doll?.rarity.color,
+          onChange: (newValue) {
+            if (doll != null) {
+              doll.level = newValue.round();
+              if (mounted) setState(() {});
+            }
+          },
+        ),
+      ],
     );
   }
 

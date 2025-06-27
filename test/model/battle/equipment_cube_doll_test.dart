@@ -498,7 +498,7 @@ void main() async {
     for (final groupedData in dbLegacy.dollTable.values) {
       for (final favoriteItemData in groupedData.values) {
         for (int level = 0; level <= 15; level += 1) {
-          final doll = BattleFavoriteItem(
+          final doll = BattleFavoriteItemOption(
             weaponType: favoriteItemData.weaponType,
             rarity: favoriteItemData.favoriteRare,
             level: level,
@@ -516,7 +516,7 @@ void main() async {
 
     for (final favoriteItemData in dbLegacy.nameCodeFavItemTable.values) {
       for (int level = 0; level <= 2; level += 1) {
-        final doll = BattleFavoriteItem(
+        final doll = BattleFavoriteItemOption(
           weaponType: favoriteItemData.weaponType,
           rarity: favoriteItemData.favoriteRare,
           level: level,

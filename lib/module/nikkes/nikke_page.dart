@@ -154,7 +154,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
         alignment: WrapAlignment.center,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          if (dollData != null) Text('Favorite Item Skill: ${dollLvString(dollData, dollGrade)}'),
+          if (dollData != null) Text('Favorite Item Skill: ${dollLvString(dollData.favoriteRare, dollGrade)}'),
           if (dollData != null)
             Checkbox(
               value: favoriteItemSkill,
