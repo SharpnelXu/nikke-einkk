@@ -12,7 +12,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
   packageInfo = await PackageInfo.fromPlatform();
-  await dbLegacy.loadData();
+  // await dbLegacy.loadData();
 
   if (Platform.isWindows || Platform.isLinux) {
     // Initialize FFI
@@ -28,7 +28,7 @@ Future<void> main() async {
   cn.init();
 
   WindowOptions windowOptions = WindowOptions(
-    size: Size(1200, 800),
+    size: Size(1800, 1200),
     minimumSize: Size(800, 600),
     center: true,
     backgroundColor: Colors.transparent,

@@ -111,7 +111,7 @@ HarmonyCubeLevelData _$HarmonyCubeLevelDataFromJson(Map<String, dynamic> json) =
 );
 
 CollectionItemSkillGroup _$CollectionItemSkillGroupFromJson(Map<String, dynamic> json) =>
-    CollectionItemSkillGroup(skillId: (json['collection_skill_id'] as num?)?.toInt() ?? 0);
+    CollectionItemSkillGroup(skillGroupId: (json['collection_skill_id'] as num?)?.toInt() ?? 0);
 
 FavoriteItemSkillGroup _$FavoriteItemSkillGroupFromJson(Map<String, dynamic> json) => FavoriteItemSkillGroup(
   skillId: (json['favorite_skill_id'] as num?)?.toInt() ?? 0,

@@ -26,6 +26,12 @@ UserData _$UserDataFromJson(Map<String, dynamic> json) => UserData(
         (k, e) => MapEntry(int.parse(k), BattleNikkeOptions.fromJson(e as Map<String, dynamic>)),
       ) ??
       const {},
+  globalCubeLvs:
+      (json['globalCubeLvs'] as Map<String, dynamic>?)?.map((k, e) => MapEntry(int.parse(k), (e as num).toInt())) ??
+      const {},
+  cnCubeLvs:
+      (json['cnCubeLvs'] as Map<String, dynamic>?)?.map((k, e) => MapEntry(int.parse(k), (e as num).toInt())) ??
+      const {},
 );
 
 Map<String, dynamic> _$UserDataToJson(UserData instance) => <String, dynamic>{
@@ -34,6 +40,8 @@ Map<String, dynamic> _$UserDataToJson(UserData instance) => <String, dynamic>{
   'globalNikkeOptions': instance.globalNikkeOptions.map((k, e) => MapEntry(k.toString(), e.toJson())),
   'cnPlayerOptions': instance.cnPlayerOptions.toJson(),
   'cnNikkeOptions': instance.cnNikkeOptions.map((k, e) => MapEntry(k.toString(), e.toJson())),
+  'globalCubeLvs': instance.globalCubeLvs.map((k, e) => MapEntry(k.toString(), e)),
+  'cnCubeLvs': instance.cnCubeLvs.map((k, e) => MapEntry(k.toString(), e)),
 };
 
 const _$LanguageEnumMap = {

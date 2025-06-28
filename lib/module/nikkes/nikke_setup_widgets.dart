@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/equipment.dart';
@@ -36,6 +38,44 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
     final weapon = db.characterShotTable[characterData?.shotId];
     final List<Widget> children = [
       Align(child: NikkeIcon(characterData: characterData, weapon: weapon, isSelected: false)),
+      Align(
+        child: FilledButton(
+          onPressed: () {
+            if (characterData != null && weapon != null) {
+              option.coreLevel = groupedData!.keys.fold(0, max);
+              option.attractLevel = characterData.maxAttractLv;
+              option.skillLevels = [10, 10, 10];
+              if (option.cube != null) {
+                final cube = db.harmonyCubeTable[option.cube?.cubeId];
+                final cubeEnhanceData = db.harmonyCubeEnhanceLvTable[cube?.levelEnhanceId];
+                if (cubeEnhanceData != null) {
+                  option.cube!.cubeLevel = cubeEnhanceData.keys.fold(1, max);
+                }
+              }
+              final dollRare = db.nameCodeFavItemTable.containsKey(characterData.nameCode) ? Rarity.ssr : Rarity.sr;
+              final dollLv = maxDollLv(dollRare);
+              final nameCode = dollRare == Rarity.ssr ? characterData.nameCode : 0;
+              option.favoriteItem = BattleFavoriteItemOption(
+                weaponType: weapon.weaponType,
+                rarity: dollRare,
+                level: dollLv,
+                nameCode: nameCode,
+              );
+              for (int idx = 0; idx < BattleNikkeOptions.equipTypes.length; idx += 1) {
+                option.equips[idx] = BattleEquipmentOption(
+                  type: BattleNikkeOptions.equipTypes[idx],
+                  equipClass: characterData.characterClass,
+                  rarity: EquipRarity.t10,
+                  level: 5,
+                );
+              }
+
+              setState(() {});
+            }
+          },
+          child: Text('Maximize Setup'),
+        ),
+      ),
       NikkeBasicSetupWidgets(option: option, useGlobal: useGlobal),
       const Divider(),
       ...List.generate(
@@ -163,6 +203,12 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
               option.favoriteItem = BattleFavoriteItemOption(weaponType: weaponType, rarity: newRare, level: 0);
             }
 
+            if (newRare == Rarity.ssr) {
+              option.favoriteItem!.nameCode = nameCode;
+            } else {
+              option.favoriteItem!.nameCode = 0;
+            }
+
             setState(() {});
           },
         ),
@@ -207,9 +253,10 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
               if (value == null) {
                 option.cube = null;
               } else if (cubeOption == null) {
-                option.cube = BattleHarmonyCubeOption(value, 1);
+                option.cube = BattleHarmonyCubeOption(value, userDb.cubeLvs[value] ?? 1);
               } else {
                 cubeOption.cubeId = value;
+                cubeOption.cubeLevel = userDb.cubeLvs[value] ?? cubeOption.cubeLevel;
               }
               setState(() {});
             },
@@ -235,7 +282,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
           leadingWidth: sliderWidth,
           label: 'Cube Lv',
           min: 1,
-          max: cubeEnhanceData.keys.sorted((a, b) => a.compareTo(b)).last,
+          max: cubeEnhanceData.keys.fold(1, max),
           value: cubeOption.cubeLevel,
           valueFormatter: (v) => 'Lv${cubeOption.cubeLevel}',
           preferColor: colorCode != null ? Color(colorCode) : null,
@@ -245,38 +292,35 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
           },
         ),
       );
-      final cubeLevelData = cubeEnhanceData[cubeOption.cubeLevel]!;
-      final List<Widget> wrapChildren = [];
-      for (int idx = 0; idx < cubeLevelData.skillLevels.length; idx += 1) {
-        if (cube.harmonyCubeSkillGroups.length > idx && cubeLevelData.skillLevels.length > idx) {
-          final skillGroupId = cube.harmonyCubeSkillGroups[idx].skillGroupId;
-          final skillLv = cubeLevelData.skillLevels[idx].level;
-          if (skillGroupId == 0 || skillLv == 0) continue;
 
-          final skillInfo = db.groupedSkillInfoTable[skillGroupId]?[skillLv];
-          if (skillInfo == null) {
-            wrapChildren.add(Text('Cube skill group $skillGroupId Lv $skillLv not found.'));
-          } else {
-            wrapChildren.addAll([
-              Tooltip(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey, width: 2),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                richMessage: TextSpan(
-                  children: buildDescriptionTextSpans(
-                    formatSkillInfoDescription(skillInfo),
-                    DefaultTextStyle.of(context).style,
-                    db,
-                  ),
-                ),
-                child: Icon(Icons.info_outline, size: 16),
+      final List<Widget> wrapChildren = [];
+      for (final tuple in cubeOption.getValidCubeSkills(db)) {
+        final skillGroupId = tuple.$1;
+        final skillLv = tuple.$2;
+
+        final skillInfo = db.groupedSkillInfoTable[skillGroupId]?[skillLv];
+        if (skillInfo == null) {
+          wrapChildren.add(Text('Cube skill group $skillGroupId Lv $skillLv not found.'));
+        } else {
+          wrapChildren.addAll([
+            Tooltip(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey, width: 2),
+                borderRadius: BorderRadius.circular(5),
               ),
-              Text(locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey),
-              Text('Lv$skillLv'),
-            ]);
-          }
+              richMessage: TextSpan(
+                children: buildDescriptionTextSpans(
+                  formatSkillInfoDescription(skillInfo),
+                  DefaultTextStyle.of(context).style,
+                  db,
+                ),
+              ),
+              child: Icon(Icons.info_outline, size: 16),
+            ),
+            Text(locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey),
+            Text('Lv$skillLv'),
+          ]);
         }
       }
       children.add(
@@ -353,7 +397,9 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
                 if (newRare != EquipRarity.t10) {
                   equipOption.equipLines.clear();
                 } else {
-                  equipOption.equipLines.addAll(List.generate(3, (idx) => EquipLine.none()));
+                  while (equipOption.equipLines.length < 3) {
+                    equipOption.equipLines.add(EquipLine.none());
+                  }
                 }
               }
 
@@ -420,10 +466,12 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
                           textStyle: TextStyle(fontSize: 14),
                           initialSelection: equipLine.type,
                           onSelected: (EquipLineType? value) {
-                            equipLine.type = value!;
-                            if (equipLine.type == EquipLineType.none) {
+                            if (value == EquipLineType.none) {
                               equipLine.level = 1;
+                            } else if (equipLine.type == EquipLineType.none) {
+                              equipLine.level = 11;
                             }
+                            equipLine.type = value!;
                             setState(() {});
                           },
                           dropdownMenuEntries:

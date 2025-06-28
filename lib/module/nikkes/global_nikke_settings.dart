@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/common.dart';
@@ -8,12 +10,16 @@ class GlobalSettingPage extends StatefulWidget {
   final BattlePlayerOptions playerOptions;
   final int maxSync;
   final void Function(int) onGlobalSyncChange;
+  final Map<int, int> cubeLvs;
+  final NikkeDatabaseV2 db;
 
   const GlobalSettingPage({
     super.key,
     required this.playerOptions,
     required this.maxSync,
     required this.onGlobalSyncChange,
+    required this.cubeLvs,
+    required this.db,
   });
 
   @override
@@ -22,16 +28,13 @@ class GlobalSettingPage extends StatefulWidget {
 
 class _GlobalSettingPageState extends State<GlobalSettingPage> {
   BattlePlayerOptions get option => widget.playerOptions;
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  NikkeDatabaseV2 get db => widget.db;
 
   @override
   Widget build(BuildContext context) {
     final sliderWidth = 80.0;
     final maxResearchSync = maxResearchLevel(widget.maxSync);
+    final cubeIds = db.harmonyCubeTable.keys.toList();
     final List<Widget> children = [
       Text('Set Global Sync Lv', style: TextStyle(fontSize: 20)),
       SliderWithPrefix(
@@ -115,6 +118,27 @@ class _GlobalSettingPageState extends State<GlobalSettingPage> {
           valueFormatter: (v) => 'Lv$v',
           onChange: (newValue) {
             option.corpRecycleLevels[type] = newValue.round();
+            if (mounted) setState(() {});
+          },
+        );
+      }),
+      Divider(),
+      Text('Cube Lv', style: TextStyle(fontSize: 20)),
+      ...List.generate(cubeIds.length, (idx) {
+        final cubeId = cubeIds[idx];
+        final cubeData = db.harmonyCubeTable[cubeId]!;
+        final cubeEnhanceData = db.harmonyCubeEnhanceLvTable[cubeData.levelEnhanceId];
+        return SliderWithPrefix(
+          constraint: false,
+          titled: false,
+          leadingWidth: sliderWidth,
+          label: locale.getTranslation(cubeData.nameLocalkey) ?? cubeData.nameLocalkey,
+          min: 1,
+          max: cubeEnhanceData == null ? 1 : cubeEnhanceData.keys.fold(1, max),
+          value: widget.cubeLvs[cubeId] ?? 1,
+          valueFormatter: (v) => 'Lv$v',
+          onChange: (newValue) {
+            widget.cubeLvs[cubeId] = newValue.round();
             if (mounted) setState(() {});
           },
         );

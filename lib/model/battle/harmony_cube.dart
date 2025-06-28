@@ -52,6 +52,26 @@ class BattleHarmonyCubeOption {
     return result;
   }
 
+  List<(int, int)> getValidCubeSkills(NikkeDatabaseV2 db) {
+    final cubeData = db.harmonyCubeTable[cubeId];
+    final levelData = db.harmonyCubeEnhanceLvTable[cubeData?.levelEnhanceId]?[cubeLevel];
+    if (cubeData == null || levelData == null) {
+      return [];
+    }
+
+    final List<(int, int)> result = [];
+    for (int index = 0; index < cubeData.harmonyCubeSkillGroups.length; index += 1) {
+      if (levelData.skillLevels.length <= index) continue;
+
+      final skillGroupId = cubeData.harmonyCubeSkillGroups[index].skillGroupId;
+      final skillLevel = levelData.skillLevels[index].level;
+      if (skillGroupId == 0 || skillLevel == 0) continue;
+
+      result.add((skillGroupId, skillLevel));
+    }
+    return result;
+  }
+
   void applyCubeEffect(BattleSimulation simulation, BattleNikke wearer) {
     for (final stateEffectId in getCubeStateEffectIds()) {
       final stateEffectData = dbLegacy.stateEffectTable[stateEffectId]!;

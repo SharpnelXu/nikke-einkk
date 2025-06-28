@@ -33,9 +33,33 @@ class BattleFavoriteItemOption {
   }
 
   int getDollStat(StatType statType, NikkeDatabaseV2 db) {
-    final data = rarity == Rarity.ssr ? db.nameCodeFavItemTable[nameCode] : db.dollTable[weaponType]?[rarity];
+    final data = getData(db);
     final levelData = db.favoriteItemLevelTable[data?.levelEnhanceId]?[level];
     return levelData?.stats.firstWhereOrNull((stat) => stat.type == statType)?.value ?? 0;
+  }
+
+  FavoriteItemData? getData(NikkeDatabaseV2 db) {
+    return rarity == Rarity.ssr ? db.nameCodeFavItemTable[nameCode] : db.dollTable[weaponType]?[rarity];
+  }
+
+  List<(int, int)> getValidDollSkills(NikkeDatabaseV2 db) {
+    final data = getData(db);
+    final levelData = db.favoriteItemLevelTable[data?.levelEnhanceId]?[level];
+    if (data == null || levelData == null) {
+      return [];
+    }
+
+    final List<(int, int)> result = [];
+    for (int index = 0; index < data.collectionSkills.length; index += 1) {
+      if (levelData.skillLevels.length <= index) continue;
+
+      final skillGroupId = data.collectionSkills[index].skillGroupId;
+      final skillLevel = levelData.skillLevels[index].level;
+      if (skillGroupId == 0 || skillLevel == 0) continue;
+
+      result.add((skillGroupId, skillLevel));
+    }
+    return result;
   }
 
   List<int> getCollectionItemStateEffectIds() {
@@ -43,7 +67,7 @@ class BattleFavoriteItemOption {
     for (int index = 0; index < data.collectionSkills.length; index += 1) {
       if (levelData.skillLevels.length <= index) continue;
 
-      final skillGroupId = data.collectionSkills[index].skillId;
+      final skillGroupId = data.collectionSkills[index].skillGroupId;
       final skillLevel = levelData.skillLevels[index].level;
       final skillLevelData = dbLegacy.groupedSkillInfoTable[skillGroupId]?[skillLevel];
 

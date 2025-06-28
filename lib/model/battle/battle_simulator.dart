@@ -34,6 +34,7 @@ class BattlePlayerOptions {
 
   BattlePlayerOptions copy() {
     return BattlePlayerOptions(
+      globalSync: globalSync,
       personalRecycleLevel: personalRecycleLevel,
       corpRecycleLevels: corpRecycleLevels,
       classRecycleLevels: classRecycleLevels,

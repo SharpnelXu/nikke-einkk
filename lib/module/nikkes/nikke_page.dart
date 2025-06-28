@@ -115,6 +115,8 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
                   builder:
                       (ctx) => GlobalSettingPage(
                         playerOptions: userDb.playerOptions,
+                        cubeLvs: userDb.cubeLvs,
+                        db: userDb.gameDb,
                         maxSync: db.maxSyncLevel,
                         onGlobalSyncChange: (v) {
                           for (final option in userDb.nikkeOptions.values) {
@@ -160,18 +162,103 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   ];
 
   Widget buildStatTab() {
+    final children = [NikkeBaseStatColumn(option: option), const Divider()];
+
+    final Map<EquipLineType, int> equipLineVals = {};
+    for (final equip in option.equips) {
+      if (equip == null) continue;
+
+      for (final equipLine in equip.equipLines) {
+        final stateEffectData = db.stateEffectTable[equipLine.getStateEffectId()];
+        if (stateEffectData == null) {
+          continue;
+        }
+
+        for (final functionId in stateEffectData.functions) {
+          if (functionId.function != 0) {
+            final function = db.functionTable[functionId.function]!;
+            equipLineVals.putIfAbsent(equipLine.type, () => 0);
+            equipLineVals[equipLine.type] = equipLineVals[equipLine.type]! + function.functionValue;
+          }
+        }
+      }
+    }
+
+    if (equipLineVals.isEmpty) {
+      children.add(Text('Equip Lines: None', style: TextStyle(fontSize: 18)));
+    } else {
+      children.add(Text('Equip Lines:', style: TextStyle(fontSize: 18)));
+      children.add(
+        DataTable(
+          columns: [
+            DataColumn(label: Text('Line Type'), headingRowAlignment: MainAxisAlignment.center),
+            DataColumn(label: Text('Value'), headingRowAlignment: MainAxisAlignment.center),
+          ],
+          rows:
+              equipLineVals.keys.map((type) {
+                return DataRow(
+                  cells: [DataCell(Text(type.toString())), DataCell(Text(equipLineVals[type]!.percentString))],
+                );
+              }).toList(),
+        ),
+      );
+    }
+
+    children.add(const Divider());
+
     final cubeOption = option.cube;
-    final children = [
-      NikkeBaseStatColumn(option: option),
-      const Divider(),
-      Text(
-        'Cube: ${locale.getTranslation(db.harmonyCubeTable[cubeOption?.cubeId]?.nameLocalkey) ?? 'None'}',
-        style: TextStyle(fontSize: 18),
-      ),
-    ];
-    final cube = db.harmonyCubeTable[cubeOption?.cubeId];
-    final cubeEnhanceData = db.harmonyCubeEnhanceLvTable[cube?.levelEnhanceId];
-    if (cubeOption != null && cube != null && cubeEnhanceData != null) {}
+    if (cubeOption != null) {
+      final localeKey = db.harmonyCubeTable[cubeOption.cubeId]?.nameLocalkey;
+      children.add(
+        Text(
+          'Cube: ${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'} Lv${cubeOption.cubeLevel}',
+          style: TextStyle(fontSize: 18),
+        ),
+      );
+      for (final tuple in cubeOption.getValidCubeSkills(db)) {
+        final skillGroupId = tuple.$1;
+        final skillLv = tuple.$2;
+        final skillInfo = db.groupedSkillInfoTable[skillGroupId]?[skillLv];
+        final stateEffect = db.stateEffectTable[skillInfo?.id];
+
+        final child =
+            stateEffect != null
+                ? StateEffectDataDisplay(data: stateEffect)
+                : Text('Cube skill not found for group $skillGroupId & lv $skillLv');
+        children.add(child);
+      }
+    } else {
+      children.add(Text('Cube: None', style: TextStyle(fontSize: 18)));
+    }
+
+    children.add(const Divider());
+
+    final doll = option.favoriteItem;
+    if (doll != null) {
+      final localeKey = doll.getData(db)?.nameLocalkey;
+      children.add(
+        Text(
+          'Doll: ${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'}'
+          ' ${dollLvString(doll.rarity, doll.level)}',
+          style: TextStyle(fontSize: 18),
+        ),
+      );
+      for (final tuple in doll.getValidDollSkills(db)) {
+        final skillGroupId = tuple.$1;
+        final skillLv = tuple.$2;
+        final skillInfo = db.groupedSkillInfoTable[skillGroupId]?[skillLv];
+        final stateEffect = db.stateEffectTable[skillInfo?.id];
+
+        final child =
+            stateEffect != null
+                ? StateEffectDataDisplay(data: stateEffect)
+                : Text('Doll skill not found for group $skillGroupId & lv $skillLv');
+        children.add(child);
+      }
+    } else {
+      children.add(Text('Doll: None', style: TextStyle(fontSize: 18)));
+    }
+
     return Container(
       padding: const EdgeInsets.all(8.0),
       constraints: const BoxConstraints(maxWidth: 700),
@@ -225,7 +312,8 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
       ),
       if (skillInfo != null) DescriptionTextWidget(formatSkillInfoDescription(skillInfo)),
       SliderWithPrefix(
-        titled: true,
+        titled: false,
+        constraint: false,
         label: 'Skill ${index + 1}',
         min: 1,
         max: 10,
@@ -270,7 +358,11 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
         );
       }
     }
-    return Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children);
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      constraints: const BoxConstraints(maxWidth: 700),
+      child: Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children),
+    );
   }
 }
 
@@ -341,6 +433,8 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
       spacing: 5,
       children: [
         Text('Base Stat', style: TextStyle(fontSize: 18)),
+        Text('Cover Base HP: ${db.coverStatTable[option.syncLevel]?.levelHp.decimalPattern}'),
+        Text('Cover Base DEF: ${db.coverStatTable[option.syncLevel]?.levelDefence.decimalPattern}'),
         DataTable(
           columns: [
             DataColumn(label: Text(' ')),

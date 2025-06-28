@@ -14,6 +14,8 @@ class UserData {
   Map<int, BattleNikkeOptions> globalNikkeOptions = {};
   BattlePlayerOptions cnPlayerOptions = BattlePlayerOptions();
   Map<int, BattleNikkeOptions> cnNikkeOptions = {};
+  Map<int, int> globalCubeLvs = {};
+  Map<int, int> cnCubeLvs = {};
 
   UserData({
     this.language = Language.en,
@@ -22,6 +24,8 @@ class UserData {
     BattlePlayerOptions? cnPlayerOptions,
     Map<int, BattleNikkeOptions> cnNikkeOptions = const {},
     List<BattleHarmonyCubeOption> cubes = const [],
+    Map<int, int> globalCubeLvs = const {},
+    Map<int, int> cnCubeLvs = const {},
   }) {
     if (globalPlayerOptions != null) {
       this.globalPlayerOptions = globalPlayerOptions.copy();
@@ -35,6 +39,8 @@ class UserData {
     for (final id in cnNikkeOptions.keys) {
       this.cnNikkeOptions[id] = cnNikkeOptions[id]!.copy();
     }
+    this.globalCubeLvs.addAll(globalCubeLvs);
+    this.cnCubeLvs.addAll(cnCubeLvs);
   }
 
   factory UserData.fromJson(Map<String, dynamic> json) => _$UserDataFromJson(json);

@@ -50,6 +50,8 @@ class _NikkeListPageState extends State<NikkeListPage> {
                       (ctx) => GlobalSettingPage(
                         playerOptions: userDb.playerOptions,
                         maxSync: userDb.gameDb.maxSyncLevel,
+                        cubeLvs: userDb.cubeLvs,
+                        db: userDb.gameDb,
                         onGlobalSyncChange: (v) {
                           for (final option in userDb.nikkeOptions.values) {
                             option.syncLevel = v;

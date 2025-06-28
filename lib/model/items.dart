@@ -412,9 +412,9 @@ enum FavoriteItemType {
 @JsonSerializable(createToJson: false)
 class CollectionItemSkillGroup {
   @JsonKey(name: 'collection_skill_id')
-  final int skillId;
+  final int skillGroupId;
 
-  CollectionItemSkillGroup({this.skillId = 0});
+  CollectionItemSkillGroup({this.skillGroupId = 0});
 
   factory CollectionItemSkillGroup.fromJson(Map<String, dynamic> json) => _$CollectionItemSkillGroupFromJson(json);
 }

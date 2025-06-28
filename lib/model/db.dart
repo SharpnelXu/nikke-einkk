@@ -471,6 +471,7 @@ class UserDatabase {
 
   BattlePlayerOptions get playerOptions => useGlobal ? userData.globalPlayerOptions : userData.cnPlayerOptions;
   Map<int, BattleNikkeOptions> get nikkeOptions => useGlobal ? userData.globalNikkeOptions : userData.cnNikkeOptions;
+  Map<int, int> get cubeLvs => useGlobal ? userData.globalCubeLvs : userData.cnCubeLvs;
 
   NikkeDatabaseV2 get gameDb => useGlobal ? global : cn;
 
