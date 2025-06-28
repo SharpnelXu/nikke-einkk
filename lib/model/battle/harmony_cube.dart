@@ -25,8 +25,15 @@ class BattleHarmonyCubeOption {
 
   HarmonyCubeLevelData get levelData => dbLegacy.harmonyCubeLevelTable[cubeData.levelEnhanceId]![cubeLevel]!;
 
+  @Deprecated('use getCubeStat')
   int getStat(StatType statType) {
     return levelData.stats.firstWhereOrNull((stat) => stat.type == statType)?.rate ?? 0;
+  }
+
+  int getCubeStat(StatType statType, NikkeDatabaseV2 db) {
+    final cubeData = db.harmonyCubeTable[cubeId];
+    final levelData = db.harmonyCubeEnhanceLvTable[cubeData?.levelEnhanceId]?[cubeLevel];
+    return levelData?.stats.firstWhereOrNull((stat) => stat.type == statType)?.rate ?? 0;
   }
 
   List<int> getCubeStateEffectIds() {

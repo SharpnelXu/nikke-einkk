@@ -123,7 +123,7 @@ class _GlobalSettingPageState extends State<GlobalSettingPage> {
       appBar: AppBar(title: Text('Global Settings')),
       body: Align(
         child: Container(
-          constraints: BoxConstraints(maxWidth: 600),
+          constraints: BoxConstraints(maxWidth: 700),
           padding: const EdgeInsets.all(8.0),
           child: ListView.builder(
             itemBuilder: (ctx, idx) => Align(child: Padding(padding: const EdgeInsets.all(2.0), child: children[idx])),

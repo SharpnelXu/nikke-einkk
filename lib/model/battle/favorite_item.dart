@@ -27,8 +27,15 @@ class BattleFavoriteItemOption {
 
   FavoriteItemLevelData get levelData => dbLegacy.favoriteItemLevelTable[data.levelEnhanceId]![level]!;
 
+  @Deprecated('use getDollStat')
   int getStat(StatType statType) {
     return levelData.stats.firstWhereOrNull((stat) => stat.type == statType)?.value ?? 0;
+  }
+
+  int getDollStat(StatType statType, NikkeDatabaseV2 db) {
+    final data = rarity == Rarity.ssr ? db.nameCodeFavItemTable[nameCode] : db.dollTable[weaponType]?[rarity];
+    final levelData = db.favoriteItemLevelTable[data?.levelEnhanceId]?[level];
+    return levelData?.stats.firstWhereOrNull((stat) => stat.type == statType)?.value ?? 0;
   }
 
   List<int> getCollectionItemStateEffectIds() {

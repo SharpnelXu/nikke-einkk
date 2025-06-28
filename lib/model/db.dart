@@ -146,6 +146,11 @@ class NikkeDatabaseV2 {
     harmonyCubeTable.clear();
     harmonyCubeEnhanceLvTable.clear();
     groupedSkillInfoTable.clear();
+    characterStatEnhanceTable.clear();
+    attractiveStatTable.clear();
+    coverStatTable.clear();
+    dollTable.clear();
+    favoriteItemLevelTable.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     String directory(String fileName) {
@@ -172,6 +177,10 @@ class NikkeDatabaseV2 {
     initialized &= loadData(directory('ItemEquipTable.json'), processEquipData);
     initialized &= loadData(directory('ItemHarmonyCubeTable.json'), processCubeData);
     initialized &= loadData(directory('ItemHarmonyCubeLevelTable.json'), processCubeLevelData);
+    initialized &= loadData(directory('CharacterStatEnhanceTable.json'), processCharacterStatEnhanceData);
+    initialized &= loadData(directory('CoverStatEnhanceTable.json'), processCoverStatData);
+    initialized &= loadData(directory('AttractiveLevelTable.json'), processAttractiveLevelTable);
+    initialized &= loadData(directory('FavoriteItemLevelTable.json'), processFavoriteItemLevelData);
 
     initialized &= loadCsv(directory('WaveData.GroupDict.csv'), processWaveDict);
 
@@ -397,6 +406,9 @@ class NikkeDatabaseV2 {
     final data = FavoriteItemData.fromJson(record);
     if (data.favoriteRare == Rarity.ssr) {
       nameCodeFavItemTable[data.nameCode] = data;
+    } else {
+      dollTable.putIfAbsent(data.weaponType, () => {});
+      dollTable[data.weaponType]![data.favoriteRare] = data;
     }
   }
 
@@ -425,6 +437,27 @@ class NikkeDatabaseV2 {
     final data = HarmonyCubeLevelData.fromJson(record);
     harmonyCubeEnhanceLvTable.putIfAbsent(data.levelEnhanceId, () => {});
     harmonyCubeEnhanceLvTable[data.levelEnhanceId]![data.level] = data;
+  }
+
+  void processCharacterStatEnhanceData(dynamic record) {
+    final data = CharacterStatEnhanceData.fromJson(record);
+    characterStatEnhanceTable[data.id] = data;
+  }
+
+  void processCoverStatData(dynamic record) {
+    final data = CoverStatData.fromJson(record);
+    coverStatTable[data.lv] = data;
+  }
+
+  void processAttractiveLevelTable(dynamic record) {
+    final data = AttractiveStatData.fromJson(record);
+    attractiveStatTable[data.attractiveLevel] = data;
+  }
+
+  void processFavoriteItemLevelData(dynamic record) {
+    final data = FavoriteItemLevelData.fromJson(record);
+    favoriteItemLevelTable.putIfAbsent(data.levelEnhanceId, () => {});
+    favoriteItemLevelTable[data.levelEnhanceId]![data.level] = data;
   }
 }
 

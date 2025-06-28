@@ -49,8 +49,23 @@ class BattleEquipmentOption {
 
   Map<String, dynamic> toJson() => _$BattleEquipmentOptionToJson(this);
 
+  @Deprecated('use getEquipStat')
   int getStat(StatType statType, [Corporation? ownerCorp]) {
     final equipStat = equipData.stat.firstWhereOrNull((stat) => stat.statType == statType);
+    if (equipStat == null) return 0;
+
+    final sameCorp = rarity.canHaveCorp && corporation != Corporation.none && ownerCorp == corporation;
+    final levelStat = (level * 0.1 * equipStat.statValue).roundHalfToEven();
+    final corpStat = (sameCorp ? 0.3 * equipStat.statValue : 0).roundHalfToEven();
+
+    final result = equipStat.statValue + levelStat + corpStat;
+
+    return result;
+  }
+
+  int getEquipStat(StatType statType, NikkeDatabaseV2 db, [Corporation? ownerCorp]) {
+    final equipData = db.groupedEquipTable[type]?[equipClass]?[rarity];
+    final equipStat = equipData?.stat.firstWhereOrNull((stat) => stat.statType == statType);
     if (equipStat == null) return 0;
 
     final sameCorp = rarity.canHaveCorp && corporation != Corporation.none && ownerCorp == corporation;
