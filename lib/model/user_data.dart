@@ -10,23 +10,31 @@ part '../generated/model/user_data.g.dart';
 @JsonSerializable()
 class UserData {
   Language language;
-  BattlePlayerOptions playerOptions = BattlePlayerOptions();
-  Map<int, BattleNikkeOptions> nikkeOptions = {};
-  List<BattleHarmonyCubeOption> cubes = [];
+  BattlePlayerOptions globalPlayerOptions = BattlePlayerOptions();
+  Map<int, BattleNikkeOptions> globalNikkeOptions = {};
+  BattlePlayerOptions cnPlayerOptions = BattlePlayerOptions();
+  Map<int, BattleNikkeOptions> cnNikkeOptions = {};
 
   UserData({
     this.language = Language.en,
-    BattlePlayerOptions? playerOptions,
-    Map<int, BattleNikkeOptions> nikkeOptions = const {},
+    BattlePlayerOptions? globalPlayerOptions,
+    Map<int, BattleNikkeOptions> globalNikkeOptions = const {},
+    BattlePlayerOptions? cnPlayerOptions,
+    Map<int, BattleNikkeOptions> cnNikkeOptions = const {},
     List<BattleHarmonyCubeOption> cubes = const [],
   }) {
-    if (playerOptions != null) {
-      this.playerOptions = playerOptions.copy();
+    if (globalPlayerOptions != null) {
+      this.globalPlayerOptions = globalPlayerOptions.copy();
     }
-    for (final id in nikkeOptions.keys) {
-      this.nikkeOptions[id] = nikkeOptions[id]!.copy();
+    for (final id in globalNikkeOptions.keys) {
+      this.globalNikkeOptions[id] = globalNikkeOptions[id]!.copy();
     }
-    this.cubes.addAll(cubes.map((cube) => cube.copy()));
+    if (cnPlayerOptions != null) {
+      this.cnPlayerOptions = cnPlayerOptions.copy();
+    }
+    for (final id in cnNikkeOptions.keys) {
+      this.cnNikkeOptions[id] = cnNikkeOptions[id]!.copy();
+    }
   }
 
   factory UserData.fromJson(Map<String, dynamic> json) => _$UserDataFromJson(json);

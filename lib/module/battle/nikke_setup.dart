@@ -170,8 +170,8 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
             child: NikkeGrids(
               onCall: (data) {
                 option.nikkeResourceId = data.resourceId;
-                if (dbLegacy.userData.nikkeOptions.containsKey(option.nikkeResourceId)) {
-                  option.copyFrom(dbLegacy.userData.nikkeOptions[option.nikkeResourceId]!);
+                if (dbLegacy.userData.globalNikkeOptions.containsKey(option.nikkeResourceId)) {
+                  option.copyFrom(dbLegacy.userData.globalNikkeOptions[option.nikkeResourceId]!);
                 }
                 if (mounted) setState(() {});
               },

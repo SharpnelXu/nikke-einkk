@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:logger/logger.dart';
+import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/data_path.dart';
 import 'package:nikke_einkk/model/items.dart';
@@ -466,6 +468,9 @@ class UserDatabase {
   final Map<String, String> customizeDirectory = {};
   UserData userData = UserData();
   bool useGlobal = true;
+
+  BattlePlayerOptions get playerOptions => useGlobal ? userData.globalPlayerOptions : userData.cnPlayerOptions;
+  Map<int, BattleNikkeOptions> get nikkeOptions => useGlobal ? userData.globalNikkeOptions : userData.cnNikkeOptions;
 
   NikkeDatabaseV2 get gameDb => useGlobal ? global : cn;
 

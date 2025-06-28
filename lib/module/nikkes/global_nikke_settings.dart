@@ -8,6 +8,7 @@ class GlobalSettingPage extends StatefulWidget {
   final BattlePlayerOptions playerOptions;
   final int maxSync;
   final void Function(int) onGlobalSyncChange;
+
   const GlobalSettingPage({
     super.key,
     required this.playerOptions,

@@ -33,13 +33,13 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   void initState() {
     super.initState();
     final resourceId = data.resourceId;
-    if (userDb.userData.nikkeOptions[resourceId] != null) {
-      option = userDb.userData.nikkeOptions[resourceId]!;
+    if (userDb.nikkeOptions[resourceId] != null) {
+      option = userDb.nikkeOptions[resourceId]!;
     } else {
-      userDb.userData.nikkeOptions[resourceId] = option;
+      userDb.nikkeOptions[resourceId] = option;
       option.nikkeResourceId = resourceId;
       option.coreLevel = data.gradeCoreId;
-      option.syncLevel = userDb.userData.playerOptions.globalSync;
+      option.syncLevel = userDb.playerOptions.globalSync;
     }
   }
 
@@ -114,10 +114,10 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
                 MaterialPageRoute(
                   builder:
                       (ctx) => GlobalSettingPage(
-                        playerOptions: userDb.userData.playerOptions,
+                        playerOptions: userDb.playerOptions,
                         maxSync: db.maxSyncLevel,
                         onGlobalSyncChange: (v) {
-                          for (final option in userDb.userData.nikkeOptions.values) {
+                          for (final option in userDb.nikkeOptions.values) {
                             option.syncLevel = v;
                           }
                           setState(() {});
@@ -160,10 +160,22 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   ];
 
   Widget buildStatTab() {
+    final cubeOption = option.cube;
+    final children = [
+      NikkeBaseStatColumn(option: option),
+      const Divider(),
+      Text(
+        'Cube: ${locale.getTranslation(db.harmonyCubeTable[cubeOption?.cubeId]?.nameLocalkey) ?? 'None'}',
+        style: TextStyle(fontSize: 18),
+      ),
+    ];
+    final cube = db.harmonyCubeTable[cubeOption?.cubeId];
+    final cubeEnhanceData = db.harmonyCubeEnhanceLvTable[cube?.levelEnhanceId];
+    if (cubeOption != null && cube != null && cubeEnhanceData != null) {}
     return Container(
       padding: const EdgeInsets.all(8.0),
       constraints: const BoxConstraints(maxWidth: 700),
-      child: Column(mainAxisSize: MainAxisSize.min, spacing: 5, children: [NikkeBaseStatColumn(option: option)]),
+      child: Column(mainAxisSize: MainAxisSize.min, spacing: 5, children: children),
     );
   }
 
@@ -289,7 +301,7 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
     final attractiveStatData =
         db.attractiveStatTable[option.attractLevel]?.getStatData(characterData.characterClass) ??
         ClassAttractiveStatData.emptyData;
-    final playerOption = userDb.userData.playerOptions;
+    final playerOption = userDb.playerOptions;
     final statTypes = [StatType.hp, StatType.atk, StatType.defence];
     final baseStat = [baseStatData.hp, baseStatData.attack, baseStatData.defence];
     final gradeStat = [statEnhanceData.gradeHp, statEnhanceData.gradeAttack, statEnhanceData.gradeDefence];

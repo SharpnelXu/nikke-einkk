@@ -41,11 +41,8 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
   void initState() {
     super.initState();
 
-    playerOptions = dbLegacy.userData.playerOptions.copy();
+    playerOptions = dbLegacy.userData.globalPlayerOptions.copy();
     final Map<int, int> storedCubeLevel = {};
-    for (final cube in dbLegacy.userData.cubes) {
-      storedCubeLevel[cube.cubeId] = cube.cubeLevel;
-    }
     for (final cube in cubes) {
       if (storedCubeLevel.containsKey(cube.cubeId)) {
         cube.cubeLevel = storedCubeLevel[cube.cubeId]!;
@@ -149,13 +146,11 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                       await file.writeAsString(jsonEncode(battleSetup.toJson()), encoding: utf8);
 
                       final userData = dbLegacy.userData;
-                      userData.cubes.clear();
-                      userData.cubes.addAll(cubes);
 
-                      userData.playerOptions = playerOptions.copy();
+                      userData.globalPlayerOptions = playerOptions.copy();
                       for (final nikkeOption in nikkeOptions) {
                         if (nikkeOption.nikkeResourceId != -1) {
-                          userData.nikkeOptions[nikkeOption.nikkeResourceId] = nikkeOption.copy()..cube = null;
+                          userData.globalNikkeOptions[nikkeOption.nikkeResourceId] = nikkeOption.copy()..cube = null;
                         }
                       }
                       dbLegacy.writeUserData();

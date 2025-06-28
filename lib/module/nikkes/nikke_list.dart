@@ -48,10 +48,10 @@ class _NikkeListPageState extends State<NikkeListPage> {
                 MaterialPageRoute(
                   builder:
                       (ctx) => GlobalSettingPage(
-                        playerOptions: userDb.userData.playerOptions,
+                        playerOptions: userDb.playerOptions,
                         maxSync: userDb.gameDb.maxSyncLevel,
                         onGlobalSyncChange: (v) {
-                          for (final option in userDb.userData.nikkeOptions.values) {
+                          for (final option in userDb.nikkeOptions.values) {
                             option.syncLevel = v;
                           }
                           setState(() {});
