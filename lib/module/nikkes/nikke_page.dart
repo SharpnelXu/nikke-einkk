@@ -209,10 +209,19 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
     final cubeOption = option.cube;
     if (cubeOption != null) {
       final localeKey = db.harmonyCubeTable[cubeOption.cubeId]?.nameLocalkey;
+      final colorCode = int.tryParse('0xFF${db.harmonyCubeTable[cubeOption.cubeId]?.bgColor}');
       children.add(
-        Text(
-          'Cube: ${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'} Lv${cubeOption.cubeLevel}',
-          style: TextStyle(fontSize: 18),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 5,
+          children: [
+            Icon(Icons.square, color: colorCode != null ? Color(colorCode) : null),
+            Text(
+              'Cube: ${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'} Lv${cubeOption.cubeLevel}',
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
         ),
       );
       for (final tuple in cubeOption.getValidCubeSkills(db)) {
@@ -237,10 +246,18 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
     if (doll != null) {
       final localeKey = doll.getData(db)?.nameLocalkey;
       children.add(
-        Text(
-          'Doll: ${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'}'
-          ' ${dollLvString(doll.rarity, doll.level)}',
-          style: TextStyle(fontSize: 18),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 5,
+          children: [
+            Icon(Icons.person, color: doll.rarity.color),
+            Text(
+              'Doll: ${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'}'
+              ' ${dollLvString(doll.rarity, doll.level)}',
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
         ),
       );
       for (final tuple in doll.getValidDollSkills(db)) {
