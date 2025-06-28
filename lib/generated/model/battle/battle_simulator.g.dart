@@ -7,6 +7,7 @@ part of '../../../model/battle/battle_simulator.dart';
 // **************************************************************************
 
 BattlePlayerOptions _$BattlePlayerOptionsFromJson(Map<String, dynamic> json) => BattlePlayerOptions(
+  globalSync: (json['globalSync'] as num?)?.toInt() ?? 1,
   personalRecycleLevel: (json['personalRecycleLevel'] as num?)?.toInt() ?? 0,
   corpRecycleLevels:
       (json['corpRecycleLevels'] as Map<String, dynamic>?)?.map(
@@ -22,6 +23,7 @@ BattlePlayerOptions _$BattlePlayerOptionsFromJson(Map<String, dynamic> json) => 
 );
 
 Map<String, dynamic> _$BattlePlayerOptionsToJson(BattlePlayerOptions instance) => <String, dynamic>{
+  'globalSync': instance.globalSync,
   'personalRecycleLevel': instance.personalRecycleLevel,
   'corpRecycleLevels': instance.corpRecycleLevels.map((k, e) => MapEntry(_$CorporationEnumMap[k]!, e)),
   'classRecycleLevels': instance.classRecycleLevels.map((k, e) => MapEntry(_$NikkeClassEnumMap[k]!, e)),

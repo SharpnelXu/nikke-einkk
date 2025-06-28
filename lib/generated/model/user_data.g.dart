@@ -7,6 +7,7 @@ part of '../../model/user_data.dart';
 // **************************************************************************
 
 UserData _$UserDataFromJson(Map<String, dynamic> json) => UserData(
+  language: $enumDecodeNullable(_$LanguageEnumMap, json['language']) ?? Language.en,
   playerOptions:
       json['playerOptions'] == null
           ? null
@@ -24,9 +25,23 @@ UserData _$UserDataFromJson(Map<String, dynamic> json) => UserData(
 );
 
 Map<String, dynamic> _$UserDataToJson(UserData instance) => <String, dynamic>{
+  'language': _$LanguageEnumMap[instance.language]!,
   'playerOptions': instance.playerOptions.toJson(),
   'nikkeOptions': instance.nikkeOptions.map((k, e) => MapEntry(k.toString(), e.toJson())),
   'cubes': instance.cubes.map((e) => e.toJson()).toList(),
+};
+
+const _$LanguageEnumMap = {
+  Language.unknown: 'unknown',
+  Language.ko: 'ko',
+  Language.en: 'en',
+  Language.ja: 'ja',
+  Language.zhTW: 'zhTW',
+  Language.zhCN: 'zhCN',
+  Language.th: 'th',
+  Language.de: 'de',
+  Language.fr: 'fr',
+  Language.debug: 'debug',
 };
 
 BattleSetup _$BattleSetupFromJson(Map<String, dynamic> json) => BattleSetup(

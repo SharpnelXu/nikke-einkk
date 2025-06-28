@@ -103,7 +103,7 @@ class _NumberRangeInputFormatter extends TextInputFormatter {
   }
 }
 
-Widget commonBottomNavigationBar(void Function() setState) {
+Widget commonBottomNavigationBar(void Function() setState, {List<Widget> actions = const []}) {
   final languageDropDown =
       Language.values
           .whereNot((lang) => lang == Language.unknown)
@@ -116,6 +116,7 @@ Widget commonBottomNavigationBar(void Function() setState) {
       mainAxisAlignment: MainAxisAlignment.end,
       spacing: 5,
       children: [
+        ...actions,
         Text('Language: '),
         DropdownMenu(
           initialSelection: locale.language,

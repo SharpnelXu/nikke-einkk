@@ -6,9 +6,11 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/module/home_page.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:window_manager/window_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
   packageInfo = await PackageInfo.fromPlatform();
   await dbLegacy.loadData();
 
@@ -25,13 +27,45 @@ Future<void> main() async {
   global.init();
   cn.init();
 
-  runApp(const Einkk());
+  WindowOptions windowOptions = WindowOptions(
+    size: Size(1200, 800),
+    minimumSize: Size(800, 600),
+    center: true,
+    backgroundColor: Colors.transparent,
+  );
+  await windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+
+  runApp(Einkk());
 }
 
-class Einkk extends StatelessWidget {
-  const Einkk({super.key});
+class Einkk extends StatefulWidget {
+  Einkk({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<Einkk> createState() => _EinkkState();
+}
+
+class _EinkkState extends State<Einkk> with WindowListener {
+  @override
+  void initState() {
+    super.initState();
+    windowManager.addListener(this);
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onWindowClose() {
+    userDb.save();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

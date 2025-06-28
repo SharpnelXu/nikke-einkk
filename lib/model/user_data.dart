@@ -3,16 +3,19 @@ import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/harmony_cube.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
+import 'package:nikke_einkk/model/db.dart';
 
 part '../generated/model/user_data.g.dart';
 
 @JsonSerializable()
 class UserData {
+  Language language;
   BattlePlayerOptions playerOptions = BattlePlayerOptions();
   Map<int, BattleNikkeOptions> nikkeOptions = {};
   List<BattleHarmonyCubeOption> cubes = [];
 
   UserData({
+    this.language = Language.en,
     BattlePlayerOptions? playerOptions,
     Map<int, BattleNikkeOptions> nikkeOptions = const {},
     List<BattleHarmonyCubeOption> cubes = const [],

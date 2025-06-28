@@ -431,15 +431,27 @@ class NikkeDatabaseV2 {
 class UserDatabase {
   bool initialized = false;
   final Map<String, String> customizeDirectory = {};
+  UserData userData = UserData();
   bool useGlobal = true;
 
   NikkeDatabaseV2 get gameDb => useGlobal ? global : cn;
+
+  String directory(String fileName) {
+    return join(userDataPath, fileName);
+  }
 
   void init() {
     customizeDirectory.clear();
 
     initialized = true;
-    initialized &= loadCsv(join(userDataPath, 'DataDirectory.csv'), processCustomizeDirectory);
+    initialized &= loadCsv(directory('DataDirectory.csv'), processCustomizeDirectory);
+    initialized &= loadRawData(directory('userData.json'), processUserData);
+  }
+
+  void processUserData(dynamic record) {
+    final data = UserData.fromJson(record);
+    userData = data;
+    locale.language = userData.language;
   }
 
   void processCustomizeDirectory(List<String> data) {
@@ -448,6 +460,16 @@ class UserDatabase {
       final folder = data.last;
       customizeDirectory[prefix] = folder;
     }
+  }
+
+  void save() {
+    final userDataFile = File(directory('userData.json'));
+    if (!userDataFile.parent.existsSync()) {
+      userDataFile.parent.createSync(recursive: true);
+    }
+    userData.language = locale.language;
+    final jsonEncoder = JsonEncoder.withIndent('  ');
+    userDataFile.writeAsStringSync(jsonEncoder.convert(userData.toJson()));
   }
 }
 
@@ -463,6 +485,15 @@ bool loadCsv(String filePath, void Function(List<String>) process) {
     }
   }
 
+  return exists;
+}
+
+bool loadRawData(String filePath, void Function(dynamic) process) {
+  final table = File(filePath);
+  final exists = table.existsSync();
+  if (exists) {
+    process(jsonDecode(table.readAsStringSync()));
+  }
   return exists;
 }
 

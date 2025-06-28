@@ -15,12 +15,14 @@ part '../../generated/model/battle/battle_simulator.g.dart';
 
 @JsonSerializable()
 class BattlePlayerOptions {
+  int globalSync;
   int personalRecycleLevel;
   Map<Corporation, int> corpRecycleLevels = {};
   Map<NikkeClass, int> classRecycleLevels = {};
   bool forceFillBurst = false;
 
   BattlePlayerOptions({
+    this.globalSync = 1,
     this.personalRecycleLevel = 0,
     Map<Corporation, int> corpRecycleLevels = const {},
     Map<NikkeClass, int> classRecycleLevels = const {},

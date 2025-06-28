@@ -7,6 +7,7 @@ import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/skill_display.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
+import 'package:nikke_einkk/module/nikkes/global_nikke_settings.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
 class NikkeCharacterPage extends StatefulWidget {
@@ -23,15 +24,21 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   NikkeDatabaseV2 get db => userDb.gameDb;
   NikkeCharacterData get data => widget.data;
   WeaponData? get weapon => db.characterShotTable[data.shotId];
-  List<int> skillLevels = [10, 10, 10];
   bool favoriteItemSkill = true;
   BattleNikkeOptions option = BattleNikkeOptions(nikkeResourceId: -1);
 
   @override
   void initState() {
     super.initState();
-    option.nikkeResourceId = data.resourceId;
-    option.coreLevel = data.gradeCoreId;
+    final resourceId = data.resourceId;
+    if (userDb.userData.nikkeOptions[resourceId] != null) {
+      option = userDb.userData.nikkeOptions[resourceId]!;
+    } else {
+      userDb.userData.nikkeOptions[resourceId] = option;
+      option.nikkeResourceId = resourceId;
+      option.coreLevel = data.gradeCoreId;
+      option.syncLevel = userDb.userData.playerOptions.globalSync;
+    }
   }
 
   @override
@@ -95,7 +102,34 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
           itemCount: children.length,
         ),
       ),
-      bottomNavigationBar: commonBottomNavigationBar(() => setState(() {})),
+      bottomNavigationBar: commonBottomNavigationBar(
+        () => setState(() {}),
+        actions: [
+          FilledButton.icon(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (ctx) => GlobalSettingPage(
+                        playerOptions: userDb.userData.playerOptions,
+                        maxSync: db.maxSyncLevel,
+                        onGlobalSyncChange: (v) {
+                          for (final option in userDb.userData.nikkeOptions.values) {
+                            option.syncLevel = v;
+                          }
+                          setState(() {});
+                        },
+                      ),
+                ),
+              );
+              if (mounted) setState(() {});
+            },
+            icon: Icon(Icons.recycling),
+            label: Text('Global Settings'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -115,6 +149,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   }
 
   List<(String, Widget Function())> get tabs => [
+    ('Info', () => Text('data')),
     ('Setup', () => NikkeSetupColumn(option: option)),
     ('Weapon', () => WeaponDataDisplay(character: data, weaponId: data.shotId)),
     ('Skill 1', () => buildSkillTab(data.skill1Id, data.skill1Table, 0)),
@@ -123,7 +158,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   ];
 
   Widget buildSkillTab(int skillId, SkillType skillType, int index) {
-    final level = skillLevels[index];
+    final level = option.skillLevels[index];
 
     final dollData = db.nameCodeFavItemTable[data.nameCode];
     int dollGrade = 0;
@@ -175,7 +210,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
         value: level,
         valueFormatter: (v) => 'Lv$v',
         onChange: (newValue) {
-          skillLevels[index] = newValue.round();
+          option.skillLevels[index] = newValue.round();
           if (mounted) setState(() {});
         },
       ),

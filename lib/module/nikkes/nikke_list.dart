@@ -3,6 +3,7 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
+import 'package:nikke_einkk/module/nikkes/global_nikke_settings.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_page.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
@@ -37,7 +38,34 @@ class _NikkeListPageState extends State<NikkeListPage> {
           Navigator.push(context, MaterialPageRoute(builder: (ctx) => NikkeCharacterPage(data: data)));
         },
       ),
-      bottomNavigationBar: commonBottomNavigationBar(() => setState(() {})),
+      bottomNavigationBar: commonBottomNavigationBar(
+        () => setState(() {}),
+        actions: [
+          FilledButton.icon(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (ctx) => GlobalSettingPage(
+                        playerOptions: userDb.userData.playerOptions,
+                        maxSync: userDb.gameDb.maxSyncLevel,
+                        onGlobalSyncChange: (v) {
+                          for (final option in userDb.userData.nikkeOptions.values) {
+                            option.syncLevel = v;
+                          }
+                          setState(() {});
+                        },
+                      ),
+                ),
+              );
+              if (mounted) setState(() {});
+            },
+            icon: Icon(Icons.recycling),
+            label: Text('Global Settings'),
+          ),
+        ],
+      ),
     );
   }
 
