@@ -208,8 +208,9 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
 
     final cubeOption = option.cube;
     if (cubeOption != null) {
-      final localeKey = db.harmonyCubeTable[cubeOption.cubeId]?.nameLocalkey;
-      final colorCode = int.tryParse('0xFF${db.harmonyCubeTable[cubeOption.cubeId]?.bgColor}');
+      final cubeData = db.harmonyCubeTable[cubeOption.cubeId];
+      final localeKey = cubeData?.nameLocalkey;
+      final colorCode = int.tryParse('0xFF${cubeData?.bgColor}');
       children.add(
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -224,6 +225,9 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
           ],
         ),
       );
+      if (cubeData != null) {
+        children.add(Text(locale.getTranslation(cubeData.descriptionLocalkey) ?? cubeData.descriptionLocalkey));
+      }
       for (final tuple in cubeOption.getValidCubeSkills(db)) {
         final skillGroupId = tuple.$1;
         final skillLv = tuple.$2;
@@ -244,7 +248,8 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
 
     final doll = option.favoriteItem;
     if (doll != null) {
-      final localeKey = doll.getData(db)?.nameLocalkey;
+      final dollData = doll.getData(db);
+      final localeKey = dollData?.nameLocalkey;
       children.add(
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -260,6 +265,9 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
           ],
         ),
       );
+      if (dollData != null) {
+        children.add(Text(locale.getTranslation(dollData.descriptionLocalkey) ?? dollData.descriptionLocalkey));
+      }
       for (final tuple in doll.getValidDollSkills(db)) {
         final skillGroupId = tuple.$1;
         final skillLv = tuple.$2;

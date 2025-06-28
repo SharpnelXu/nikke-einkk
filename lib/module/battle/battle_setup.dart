@@ -563,7 +563,7 @@ class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             spacing: 5,
             children: [
-              Text('Personal Research'),
+              Text('General Research'),
               SizedBox(
                 width: 100,
                 child: RangedNumberTextField(

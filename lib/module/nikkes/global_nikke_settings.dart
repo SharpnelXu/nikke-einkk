@@ -53,7 +53,7 @@ class _GlobalSettingPageState extends State<GlobalSettingPage> {
         },
       ),
       Divider(),
-      Text('Personal Research Lv', style: TextStyle(fontSize: 20)),
+      Text('General Research Lv', style: TextStyle(fontSize: 20)),
       SliderWithPrefix(
         constraint: false,
         titled: false,
@@ -128,15 +128,17 @@ class _GlobalSettingPageState extends State<GlobalSettingPage> {
         final cubeId = cubeIds[idx];
         final cubeData = db.harmonyCubeTable[cubeId]!;
         final cubeEnhanceData = db.harmonyCubeEnhanceLvTable[cubeData.levelEnhanceId];
+        final colorCode = int.tryParse('0xFF${cubeData.bgColor}');
         return SliderWithPrefix(
           constraint: false,
           titled: false,
-          leadingWidth: sliderWidth,
+          leadingWidth: 160,
           label: locale.getTranslation(cubeData.nameLocalkey) ?? cubeData.nameLocalkey,
           min: 1,
           max: cubeEnhanceData == null ? 1 : cubeEnhanceData.keys.fold(1, max),
           value: widget.cubeLvs[cubeId] ?? 1,
           valueFormatter: (v) => 'Lv$v',
+          preferColor: colorCode != null ? Color(colorCode) : null,
           onChange: (newValue) {
             widget.cubeLvs[cubeId] = newValue.round();
             if (mounted) setState(() {});
