@@ -31,7 +31,7 @@ class AboutPage extends StatelessWidget {
       Text('Also I just realized I cannot own the app icon and may need to swap it later.', style: commentStyle),
       Divider(),
       Text('Special Thanks', style: TextStyle(fontSize: 20)),
-      Text('WindChaser, Lim, YaRou, Hiro, Misha, Narumi', style: commentStyle),
+      Text('WindChaser, Lim, YaRou, Hiro, Misha, Narumi, Pro, Kira', style: commentStyle),
       Text('For testing and data unpacking.', style: commentStyle),
       Text('Contact yome1561 at Discord if you have questions or concerns.', style: commentStyle),
     ];

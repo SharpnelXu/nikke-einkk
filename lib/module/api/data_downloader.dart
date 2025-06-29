@@ -74,7 +74,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
                 Text('CN', style: TextStyle(fontWeight: !useGlobal ? FontWeight.bold : null)),
                 FilledButton.icon(
                   onPressed: () async {
-                    await EasyLoading.show(status: 'Downloading');
+                    await EasyLoading.show(status: 'Downloading', maskType: EasyLoadingMaskType.clear);
                     await downloadStaticData();
                     await EasyLoading.dismiss();
 
