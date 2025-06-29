@@ -1527,5 +1527,42 @@ void main() async {
       expect(labelSet, expectedLabels, reason: 'Unexpected description value');
       expect(tagSet, expectedTags, reason: 'Unexpected tags');
     });
+
+    test('Check MultiplayerRaidData unexpected fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'name',
+          'player_count',
+          'character_select_time_limit',
+          'character_lv',
+          'stage_level',
+          'monster_stage_lv',
+          'dynamic_object_stage_lv',
+          'cover_stage_lv',
+          'monster_stage_lv_change_group',
+          'spot_id',
+          'condition_reward_group',
+          'reward_limit_count',
+          'rank_condition_reward_group',
+          'monster_stage_lv_change_group_easy',
+          'spot_id_easy',
+        };
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'MultiRaidTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          recordKeys.removeAll(expectedKeys);
+
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected keys in MultiplayerRaidData: $folder');
+      }
+    });
   });
 }

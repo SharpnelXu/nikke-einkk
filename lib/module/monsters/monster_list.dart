@@ -46,7 +46,7 @@ class _MonsterListPageState extends State<MonsterListPage> {
             },
             child: Text('Search ID or Name'),
           ),
-          Expanded(child: TextField(controller: searchController)),
+          Expanded(child: TextFormField(controller: searchController)),
         ],
       ),
     );

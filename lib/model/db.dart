@@ -89,26 +89,29 @@ class NikkeDatabaseV2 {
 
   int maxSyncLevel = 1;
   final Map<int, List<UnionRaidWaveData>> unionRaidData = {}; // key is presetId
+  final Map<int, List<SoloRaidWaveData>> soloRaidData = {}; // key is presetId
+  final Map<int, MultiplayerRaidData> coopRaidData = {};
   final Map<int, String> waveGroupDict = {};
   final Map<String, Map<int, WaveData>> waveData = {};
   final Map<int, MonsterData> raptureData = {};
   final Map<int, List<MonsterPartData>> rapturePartData = {}; // key is modelId
   final Map<int, Map<int, MonsterStatEnhanceData>> monsterStatEnhanceData = {}; // key is groupId, lv
   final Map<int, List<MonsterStageLevelChangeData>> monsterStageLvChangeData = {};
-  final Map<int, List<SoloRaidWaveData>> soloRaidData = {}; // key is presetId
-  final Map<int, StateEffectData> stateEffectTable = {};
-  final Map<int, FunctionData> functionTable = {};
   final Map<int, MonsterSkillData> monsterSkillTable = {};
+
   final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
   final Map<int, WeaponData> characterShotTable = {};
   final Map<int, SkillData> characterSkillTable = {};
+  final Map<int, StateEffectData> stateEffectTable = {};
+  final Map<int, FunctionData> functionTable = {};
   final Map<int, SkillInfoData> skillInfoTable = {};
+  final Map<int, Map<int, SkillInfoData>> groupedSkillInfoTable = {}; // grouped by skillGroupId, skillLevel
   final Map<String, List<WordGroupData>> wordGroupTable = {};
   final Map<int, CoverStatData> coverStatTable = {};
-  final Map<int, Map<int, SkillInfoData>> groupedSkillInfoTable = {}; // grouped by skillGroupId, skillLevel
   final Map<int, Map<int, CharacterStatData>> groupedCharacterStatTable = {};
   final Map<int, CharacterStatEnhanceData> characterStatEnhanceTable = {};
   final Map<int, AttractiveStatData> attractiveStatTable = {};
+
   final Map<EquipType, Map<NikkeClass, Map<EquipRarity, EquipmentData>>> groupedEquipTable = {};
   final Map<WeaponType, Map<Rarity, FavoriteItemData>> dollTable = {};
   final Map<int, FavoriteItemData> nameCodeFavItemTable = {};
@@ -153,6 +156,7 @@ class NikkeDatabaseV2 {
     coverStatTable.clear();
     dollTable.clear();
     favoriteItemLevelTable.clear();
+    coopRaidData.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     String directory(String fileName) {
@@ -183,6 +187,7 @@ class NikkeDatabaseV2 {
     initialized &= loadData(directory('CoverStatEnhanceTable.json'), processCoverStatData);
     initialized &= loadData(directory('AttractiveLevelTable.json'), processAttractiveLevelTable);
     initialized &= loadData(directory('FavoriteItemLevelTable.json'), processFavoriteItemLevelData);
+    initialized &= loadData(directory('MultiRaidTable.json'), processCoopRaidData);
 
     initialized &= loadCsv(directory('WaveData.GroupDict.csv'), processWaveDict);
 
@@ -289,7 +294,9 @@ class NikkeDatabaseV2 {
     }
   }
 
-  WaveData? getWaveData(int stageId) {
+  WaveData? getWaveData(int? stageId) {
+    if (stageId == null) return null;
+
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     final group = waveGroupDict[stageId];
     if (group == null) {
@@ -460,6 +467,11 @@ class NikkeDatabaseV2 {
     final data = FavoriteItemLevelData.fromJson(record);
     favoriteItemLevelTable.putIfAbsent(data.levelEnhanceId, () => {});
     favoriteItemLevelTable[data.levelEnhanceId]![data.level] = data;
+  }
+
+  void processCoopRaidData(dynamic record) {
+    final data = MultiplayerRaidData.fromJson(record);
+    coopRaidData[data.id] = data;
   }
 }
 

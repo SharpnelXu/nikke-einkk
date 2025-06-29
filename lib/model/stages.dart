@@ -230,3 +230,58 @@ class SoloRaidWaveData {
 
   factory SoloRaidWaveData.fromJson(Map<String, dynamic> json) => _$SoloRaidWaveDataFromJson(json);
 }
+
+@JsonSerializable(createToJson: false)
+class MultiplayerRaidData {
+  final int id;
+  final String name;
+  @JsonKey(name: 'player_count')
+  final int playerCount;
+  @JsonKey(name: 'character_select_time_limit')
+  final int characterSelectTimeLimit;
+  @JsonKey(name: 'character_lv')
+  final int characterLevel;
+  @JsonKey(name: 'stage_level')
+  final int stageLevel;
+  @JsonKey(name: 'monster_stage_lv')
+  final int monsterStageLevel;
+  @JsonKey(name: 'dynamic_object_stage_lv')
+  final int dynamicObjectStageLevel;
+  @JsonKey(name: 'cover_stage_lv')
+  final int coverStageLevel;
+  @JsonKey(name: 'monster_stage_lv_change_group')
+  final int monsterStageLevelChangeGroup;
+  @JsonKey(name: 'spot_id')
+  final int spotId;
+  @JsonKey(name: 'condition_reward_group')
+  final int conditionRewardGroup;
+  @JsonKey(name: 'reward_limit_count')
+  final int rewardLimitCount;
+  @JsonKey(name: 'rank_condition_reward_group')
+  final int rankConditionRewardGroup;
+  @JsonKey(name: 'monster_stage_lv_change_group_easy')
+  final int? monsterStageLvChangeGroupEasy;
+  @JsonKey(name: 'spot_id_easy')
+  final int? spotIdEasy;
+
+  MultiplayerRaidData({
+    this.id = 0,
+    this.name = '',
+    this.playerCount = 0,
+    this.characterSelectTimeLimit = 0,
+    this.characterLevel = 0,
+    this.stageLevel = 0,
+    this.monsterStageLevel = 0,
+    this.dynamicObjectStageLevel = 0,
+    this.coverStageLevel = 0,
+    this.monsterStageLevelChangeGroup = 0,
+    this.spotId = 0,
+    this.conditionRewardGroup = 0,
+    this.rewardLimitCount = 0,
+    this.rankConditionRewardGroup = 0,
+    this.monsterStageLvChangeGroupEasy,
+    this.spotIdEasy,
+  });
+
+  factory MultiplayerRaidData.fromJson(Map<String, dynamic> json) => _$MultiplayerRaidDataFromJson(json);
+}

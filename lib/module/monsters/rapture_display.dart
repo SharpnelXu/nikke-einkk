@@ -37,7 +37,7 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
                 '\nNormal Stage AI: ${data.spotAi}'
                 '\nDefence Stage AI: ${data.spotAiDefense}'
                 '\nBase Defence Stage AI: ${data.spotAiBaseDefense}',
-            child: Text(locale.getTranslation(data.nameKey) ?? data.nameKey),
+            child: Text(locale.getTranslation(data.nameKey) ?? data.nameKey, style: TextStyle(fontSize: 20)),
           ),
           IconButton(
             padding: EdgeInsets.zero,

@@ -88,3 +88,22 @@ SoloRaidWaveData _$SoloRaidWaveDataFromJson(Map<String, dynamic> json) => SoloRa
   firstClearRewardId: (json['first_clear_reward_id'] as num?)?.toInt() ?? 0,
   rewardId: (json['reward_id'] as num?)?.toInt() ?? 0,
 );
+
+MultiplayerRaidData _$MultiplayerRaidDataFromJson(Map<String, dynamic> json) => MultiplayerRaidData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  name: json['name'] as String? ?? '',
+  playerCount: (json['player_count'] as num?)?.toInt() ?? 0,
+  characterSelectTimeLimit: (json['character_select_time_limit'] as num?)?.toInt() ?? 0,
+  characterLevel: (json['character_lv'] as num?)?.toInt() ?? 0,
+  stageLevel: (json['stage_level'] as num?)?.toInt() ?? 0,
+  monsterStageLevel: (json['monster_stage_lv'] as num?)?.toInt() ?? 0,
+  dynamicObjectStageLevel: (json['dynamic_object_stage_lv'] as num?)?.toInt() ?? 0,
+  coverStageLevel: (json['cover_stage_lv'] as num?)?.toInt() ?? 0,
+  monsterStageLevelChangeGroup: (json['monster_stage_lv_change_group'] as num?)?.toInt() ?? 0,
+  spotId: (json['spot_id'] as num?)?.toInt() ?? 0,
+  conditionRewardGroup: (json['condition_reward_group'] as num?)?.toInt() ?? 0,
+  rewardLimitCount: (json['reward_limit_count'] as num?)?.toInt() ?? 0,
+  rankConditionRewardGroup: (json['rank_condition_reward_group'] as num?)?.toInt() ?? 0,
+  monsterStageLvChangeGroupEasy: (json['monster_stage_lv_change_group_easy'] as num?)?.toInt(),
+  spotIdEasy: (json['spot_id_easy'] as num?)?.toInt(),
+);

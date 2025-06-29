@@ -1,9 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/module/about/about.dart';
 import 'package:nikke_einkk/module/api/data_downloader.dart';
 import 'package:nikke_einkk/module/api/locale_unpacker.dart';
-import 'package:nikke_einkk/module/battle/battle_setup.dart';
+import 'package:nikke_einkk/module/coop/coop_raid_presets.dart';
 import 'package:nikke_einkk/module/monsters/monster_list.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_list.dart';
 import 'package:nikke_einkk/module/soloraid/solo_raid_presets.dart';
@@ -63,10 +62,10 @@ class EinkkHomePage extends StatelessWidget {
           iconSize: 30,
         ),
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (ctx) => UnionRaidPresetPage()));
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => SoloRaidPresetPage()));
         },
-        icon: Icon(Icons.groups),
-        label: Text('Union Raid Data'),
+        icon: Icon(Icons.person),
+        label: Text('Solo Raid Data'),
       ),
       TextButton.icon(
         style: TextButton.styleFrom(
@@ -76,10 +75,23 @@ class EinkkHomePage extends StatelessWidget {
           iconSize: 30,
         ),
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (ctx) => SoloRaidPresetPage()));
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => CoopRaidPresetPage()));
         },
-        icon: Icon(Icons.person),
-        label: Text('Solo Raid Data'),
+        icon: Icon(Icons.people),
+        label: Text('Coop Raid Data'),
+      ),
+      TextButton.icon(
+        style: TextButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          iconAlignment: IconAlignment.start,
+          textStyle: TextStyle(fontSize: 30),
+          iconSize: 30,
+        ),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => UnionRaidPresetPage()));
+        },
+        icon: Icon(Icons.groups),
+        label: Text('Union Raid Data'),
       ),
       TextButton.icon(
         style: TextButton.styleFrom(

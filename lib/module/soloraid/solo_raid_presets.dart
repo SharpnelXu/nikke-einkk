@@ -194,7 +194,7 @@ class SoloRaidBossDisplay extends StatelessWidget {
           Row(
             spacing: 3,
             children: [
-              Text('Boss: ${locale.getTranslation(data.waveName) ?? data.waveName}'),
+              Text('Boss: ${locale.getTranslation(data.waveName) ?? data.waveName}', style: TextStyle(fontSize: 20)),
               Tooltip(
                 message: 'Wave: ${data.wave}\n${locale.getTranslation(data.waveDescription) ?? data.waveDescription}',
                 child: Icon(Icons.info_outline, size: 16),
