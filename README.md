@@ -8,26 +8,34 @@ Data sourced from Internet and not included in repo at the moment.
 - Locale data unpack
 - UR data display
 - SR data display
+- Coop data display
 - Rapture data display
-- Nikke data display
+- Nikke data display & config
 
 ## Developing Tools
 - Simple damage calculator
 - Simple calculator for specific buff types like chargeTime
 - Simulation
 
-## Damage & Stat Formula
+## Stat Formula
+Base Stat = Level Stat (Classified by Nikke Class + Weapon Type) + Limit Break Stat + Bond Stat + Console Stat + Core Break Stat + Gear Stat + Cube Stat + Doll Stat
+- Limit Break Stat = Level Stat * Limit Break Ratio (Usually 2%) * Limit Break Count (Range 0 ~ 3) + Limit Break Add Stat (Fixed Value) * Limit Break Count (Range 0 ~ 3)
+- Console Stat = Common Research + Class Research + Corporation Research
+- Core Break Stat = (Level Stat + Max Limit Break (Limit Break Count = 3) Stat + Bond Stat + Console Stat) * Core Break Ratio (Usually 2%)
+- Gear Stat = Gear Base Stat * (1 + 0.1 * Level + Same Corporation Factor)
+  - Same Corporation Factor = 0.3 if gear corporation label matches wearer's corporation, 0 otherwise
+  - Note that T10 gears **do not** have corp label hence won't have this factor
+
+Battle Point = Stat Multiplier * (1.3 + Skill Point)
+- Stat Multiplier = 0.1935 * Base Atk + 0.7 * Base Def + 0.007 * Base Hp
+- Skill Point = 0.01 * Skill1 Lv + 0.01 * Skill2 Lv + 0.02 * Burst Lv + 0.0001 * (Equip Lines BP Mult + Doll BP Mult + Cube BP Mult)
+  - Item BP Mult is tied to the actual functions
+
+## Damage Formula
 
 Final Damage = Final Attack * Final Damage Rate * Total Corrections * Elements * Charge Rate * Add Damage Rate * Receive Damage Rate
 
 Final Attack = Base Attack + Attack Buffs - Base Defence - Defence Buffs
-- Base Stat = Level Stat (Classified by Nikke Class + Weapon Type) + Limit Break Stat + Bond Stat + Console Stat + Core Break Stat + Gear Stat + Cube Stat + Doll Stat
-  - Limit Break Stat = Level Stat * Limit Break Ratio (Usually 2%) * Limit Break Count (Range 0 ~ 3) + Limit Break Add Stat (Fixed Value) * Limit Break Count (Range 0 ~ 3)
-  - Console Stat = Common Research + Class Research + Corporation Research
-  - Core Break Stat = (Level Stat + Max Limit Break (Limit Break Count = 3) Stat + Bond Stat + Console Stat) * Core Break Ratio (Usually 2%) 
-  - Gear Stat = Gear Base Stat * (1 + 0.1 * Level + Same Corporation Factor)
-    - Same Corporation Factor = 0.3 if gear corporation label matches wearer's corporation, 0 otherwise
-    - Note that T10 gears **do not** have corp label hence won't have this factor
    
 Final Damage Rate = Damage Rate + Damage Rate Buffs
   - Damage Rate: Specified by skill or weapon
