@@ -86,12 +86,15 @@ class WeaponDataDisplay extends StatelessWidget {
     final weapon = db.characterShotTable[weaponId];
     final List<Widget> children = [
       CustomTableRow.fromTexts(
+        texts: [if (weapon != null && weapon.nameLocalkey != null) 'Name', 'Weapon ID'],
+        defaults: headerData,
+      ),
+      CustomTableRow.fromTexts(
         texts: [
           if (weapon != null && weapon.nameLocalkey != null)
             locale.getTranslation(weapon.nameLocalkey!) ?? weapon.nameLocalkey!,
-          'Weapon ID: $weaponId',
+          '$weaponId',
         ],
-        defaults: headerData,
       ),
       if (weapon != null && weapon.descriptionLocalkey != null)
         CustomTableRow.fromTexts(texts: ['Description'], defaults: headerData),
@@ -253,11 +256,12 @@ class WeaponDataDisplay extends StatelessWidget {
           defaults: headerData,
           children: [
             Text('Penetration', style: boldStyle),
+            Text('Multi-Target', style: boldStyle),
             Row(
               mainAxisSize: MainAxisSize.min,
               spacing: 3,
               children: [
-                Text('Maintain Fire Stance', style: boldStyle),
+                Text('Maintain Stance', style: boldStyle),
                 Tooltip(
                   message:
                       'Note: A forced time for characters to stay outside cover after each shot'
@@ -286,6 +290,7 @@ class WeaponDataDisplay extends StatelessWidget {
         CustomTableRow.fromTexts(
           texts: [
             weapon.penetration != 0 ? 'True' : 'False',
+            '${weapon.multiTargetCount}',
             weapon.maintainFireStance != 0 ? weapon.maintainFireStance.timeString : 'N/A',
             weapon.upTypeFireTiming != 0
                 ? '${(weapon.maintainFireStance * toModifier(weapon.upTypeFireTiming)).timeString} (${weapon.upTypeFireTiming.percentString})'

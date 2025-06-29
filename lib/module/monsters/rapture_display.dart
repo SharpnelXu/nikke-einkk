@@ -4,6 +4,7 @@ import 'package:nikke_einkk/model/battle/utils.dart' as utils;
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/monster.dart';
+import 'package:nikke_einkk/module/common/custom_table.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/skill_display.dart';
@@ -257,7 +258,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
     );
   }
 
-  List<String> get tabTitle => ['Parts', 'Skills'];
+  List<String> get tabTitle => ['Parts', 'Passive Skills', 'Active Skills'];
 
   Widget buildTabs() {
     return Row(
@@ -277,8 +278,10 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
   Widget getTab() {
     switch (tab) {
       case 0:
-        return buildPartsTab();
+        return buildPartsTab(false);
       case 1:
+        return buildPartsTab(true);
+      case 2:
         return buildSkillsTab();
       default:
         return Text('Not implemented');
@@ -291,10 +294,32 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
     final List<Widget> children = [];
     for (final skill in skills) {
       final skillData = db.monsterSkillTable[skill.skillId];
-      final funcs = skill.validFunctionIds;
       if (skillData != null) {
+        final funcs = skill.validFunctionIds;
+        final connectedFuncs = [
+          if (funcs.isNotEmpty) const Divider(),
+          if (funcs.isNotEmpty) Text('↓↓↓ Functions ↓↓↓', style: TextStyle(fontSize: 16)),
+          for (int idx = 0; idx < funcs.length; idx += 1)
+            Container(
+              padding: const EdgeInsets.all(3.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: buffTypeColor(db.functionTable[funcs[idx]]?.buff), width: 2),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 3,
+                children: [
+                  Text('Function ${idx + 1}', style: TextStyle(fontSize: 16)),
+                  SimpleFunctionDisplay(functionId: funcs[idx], connectFuncPrefix: '${idx + 1}-'),
+                ],
+              ),
+            ),
+        ];
+
         children.add(
           Container(
+            constraints: BoxConstraints(maxWidth: 700),
             padding: const EdgeInsets.all(3.0),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey, width: 2),
@@ -302,18 +327,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
             ),
             child: Column(
               spacing: 3,
-              children: [
-                MonsterSkillDataDisplay(data: skillData, statEnhanceData: statEnhanceData),
-                for (final funcId in funcs)
-                  Container(
-                    padding: const EdgeInsets.all(3.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: buffTypeColor(db.functionTable[funcId]?.buff), width: 2),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: SimpleFunctionDisplay(functionId: funcId),
-                  ),
-              ],
+              children: [MonsterSkillDataDisplay(data: skillData, statEnhanceData: statEnhanceData), ...connectedFuncs],
             ),
           ),
         );
@@ -323,11 +337,16 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
     return Column(spacing: 3, children: children);
   }
 
-  Widget buildPartsTab() {
+  static final boldStyle = TextStyle(fontWeight: FontWeight.bold);
+  static final headerData = TableCellData(isHeader: true, style: boldStyle);
+
+  Widget buildPartsTab(bool mainPart) {
     final parts = db.rapturePartData[data.monsterModelId] ?? [];
     final stat = statEnhanceData;
     final List<Widget> children = [];
     for (final part in parts) {
+      if (mainPart != part.isMainPart) continue;
+
       final partName = locale.getTranslation(part.partsNameKey) ?? part.partsNameKey;
       children.add(
         Container(
@@ -341,44 +360,42 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
             spacing: 3,
             children: [
               if (partName != null) Text(partName, style: TextStyle(fontSize: 20)),
-              Wrap(
-                spacing: 15,
-                alignment: WrapAlignment.center,
-                children: [
-                  Text('Type: ${part.partsType}'),
-                  Text('Main Part: ${part.isMainPart}'),
-                  Text('Damageable: ${part.isPartsDamageable}'),
-                ],
-              ),
-              if (stat == null)
-                Wrap(
-                  spacing: 15,
-                  alignment: WrapAlignment.center,
+              Container(
+                constraints: BoxConstraints(maxWidth: 700),
+                child: CustomTable(
                   children: [
-                    Text('HP: ${part.hpRatio.percentString}'),
-                    Text('Break Bonus: ${part.damageHpRatio.percentString}'),
-                    Text('ATK: ${part.attackRatio.percentString}'),
-                    Text('DEF: ${part.defenceRatio.percentString}'),
-                  ],
-                ),
-              if (stat != null)
-                Wrap(
-                  spacing: 15,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    Text(
-                      'HP: ${(utils.toModifier(part.hpRatio) * (part.isMainPart ? stat.levelHp : stat.levelBrokenHp)).decimalPattern}',
+                    CustomTableRow.fromTexts(texts: ['Type', 'Main Part', 'Damageable'], defaults: headerData),
+                    CustomTableRow.fromTexts(
+                      texts: [part.partsType, '${part.isMainPart}', '${part.isPartsDamageable}'],
                     ),
-                    if (!part.isMainPart)
-                      Text(
-                        'Break Bonus: ${(utils.toModifier(part.damageHpRatio) * stat.levelBrokenHp).decimalPattern}',
+                    CustomTableRow.fromTexts(texts: ['HP', 'Break Bonus', 'ATK', 'DEF'], defaults: headerData),
+                    if (stat == null)
+                      CustomTableRow.fromTexts(
+                        texts: [
+                          part.hpRatio.percentString,
+                          part.isMainPart ? 'N/A' : part.damageHpRatio.percentString,
+                          part.attackRatio.percentString,
+                          part.defenceRatio.percentString,
+                        ],
                       ),
-                    Text('ATK: ${(utils.toModifier(part.attackRatio) * stat.levelAttack).decimalPattern}'),
-                    Text('DEF: ${(utils.toModifier(part.defenceRatio) * stat.levelDefence).decimalPattern}'),
+                    if (stat != null)
+                      CustomTableRow.fromTexts(
+                        texts: [
+                          (utils.toModifier(part.hpRatio) * (part.isMainPart ? stat.levelHp : stat.levelBrokenHp))
+                              .decimalPattern,
+                          part.isMainPart
+                              ? 'N/A'
+                              : (utils.toModifier(part.damageHpRatio) * stat.levelBrokenHp).decimalPattern,
+                          (utils.toModifier(part.attackRatio) * stat.levelAttack).decimalPattern,
+                          (utils.toModifier(part.defenceRatio) * stat.levelDefence).decimalPattern,
+                        ],
+                      ),
                   ],
                 ),
-              if (part.passiveSkillId != 0 && db.stateEffectTable[part.passiveSkillId] != null)
+              ),
+              if (part.isMainPart && part.passiveSkillId != 0 && db.stateEffectTable[part.passiveSkillId] != null)
                 Container(
+                  constraints: BoxConstraints(maxWidth: 700),
                   padding: const EdgeInsets.all(3.0),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey, width: 2),

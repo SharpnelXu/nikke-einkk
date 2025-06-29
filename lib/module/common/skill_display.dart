@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
-import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/monster.dart';
 import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/module/common/custom_table.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
@@ -14,100 +14,70 @@ class CharacterSkillDataDisplay extends StatelessWidget {
 
   NikkeDatabaseV2 get db => userDb.gameDb;
 
+  static final boldStyle = TextStyle(fontWeight: FontWeight.bold);
+  static final headerData = TableCellData(isHeader: true, style: boldStyle);
+
   @override
   Widget build(BuildContext context) {
-    final defaultStyle = DefaultTextStyle.of(context).style;
     final functionIds = data.allValidFuncIds;
-
     final skillInfo = db.skillInfoTable[data.id];
-
-    final durationStr = durationString(data.durationValue, data.durationType);
-    final valueStr = data.skillValueData
-        .map((valueData) => skillValueString(valueData.skillValue, valueData.skillValueType))
-        .join(', ');
     final List<Widget> children = [
       if (skillInfo != null)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          spacing: 3,
-          children: [
-            Text(
-              locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey,
-              style: TextStyle(fontSize: 18),
-            ),
-            Tooltip(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey, width: 2),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              richMessage: TextSpan(
-                children: buildDescriptionTextSpans(formatSkillInfoDescription(skillInfo), defaultStyle, db),
-              ),
-              child: Icon(Icons.info_outline, size: 16),
-            ),
-          ],
-        ),
-      Text('Active Skill ID: ${data.id}'),
-      Wrap(
-        spacing: 10,
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Text('Type: ${data.rawSkillType}'),
-          if (data.preferTarget != PreferTarget.none) Text('Target: ${data.rawPreferTarget}'),
-          if (data.preferTargetCondition != PreferTargetCondition.none) Text('(${data.rawPreferTargetCondition})'),
+        Text(locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey, style: TextStyle(fontSize: 18)),
+      Text('Active Skill ID: ${data.id}', style: skillInfo == null ? TextStyle(fontSize: 18) : null),
+      if (skillInfo != null) DescriptionTextWidget(formatSkillInfoDescription(skillInfo)),
+      const Divider(),
+      Text('Parameters', style: TextStyle(fontSize: 16)),
+    ];
+
+    final List<Widget> dataRows = [
+      CustomTableRow.fromTexts(texts: ['Skill Type', 'CD', 'Duration'], defaults: headerData),
+      CustomTableRow.fromTexts(
+        texts: [
+          data.rawSkillType,
+          (data.skillCooltime.timeString),
+          durationString(data.durationValue, data.durationType) ?? 'N/A',
         ],
       ),
-      if (valueStr.isNotEmpty) Text('Skill Values: $valueStr'),
-      Wrap(
-        spacing: 10,
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          if (durationStr != null) Text('Duration: $durationStr'),
-          Text('CD: ${data.skillCooltime.timeString}'),
-        ],
+      CustomTableRow.fromTexts(texts: ['Target', 'Condition'], defaults: headerData),
+      CustomTableRow.fromTexts(texts: [data.rawPreferTarget, data.rawPreferTargetCondition]),
+      CustomTableRow.fromTexts(texts: ['Skill Values'], defaults: headerData),
+      CustomTableRow.fromTexts(
+        texts:
+            data.skillValueData
+                .map((valueData) => skillValueString(valueData.skillValue, valueData.skillValueType) ?? 'None')
+                .toList(),
       ),
     ];
 
-    if (data.skillType == CharacterSkillType.changeWeapon) {
-      final skillColumn = Container(
-        padding: const EdgeInsets.all(3.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey, width: 2),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Column(
-          spacing: 5,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('↓↓↓ Equip This Weapon  ↓↓↓', style: TextStyle(fontSize: 16)),
-            WeaponDataDisplay(weaponId: data.skillValueData[2].skillValue),
-          ],
-        ),
-      );
-      children.add(skillColumn);
-    }
+    children.add(Container(constraints: BoxConstraints(maxWidth: 700), child: CustomTable(children: dataRows)));
 
-    if (data.skillType == CharacterSkillType.launchWeapon) {
-      final skillColumn = Container(
-        padding: const EdgeInsets.all(3.0),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey, width: 2),
-          borderRadius: BorderRadius.circular(5),
+    if (data.skillType == CharacterSkillType.changeWeapon) {
+      children.addAll([
+        const Divider(),
+        Text('↓↓↓ Equip This Weapon  ↓↓↓', style: TextStyle(fontSize: 16)),
+        Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey, width: 2),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: WeaponDataDisplay(weaponId: data.skillValueData[2].skillValue),
         ),
-        child: Column(
-          spacing: 5,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('↓↓↓ Launch This Weapon  ↓↓↓', style: TextStyle(fontSize: 16)),
-            WeaponDataDisplay(weaponId: data.skillValueData[2].skillValue),
-          ],
+      ]);
+    } else if (data.skillType == CharacterSkillType.launchWeapon) {
+      children.addAll([
+        const Divider(),
+        Text('↓↓↓ Launch This Weapon  ↓↓↓', style: TextStyle(fontSize: 16)),
+        Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey, width: 2),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: WeaponDataDisplay(weaponId: data.skillValueData[2].skillValue),
         ),
-      );
-      children.add(skillColumn);
+      ]);
     }
 
     final connectedFunctions = [
@@ -121,13 +91,19 @@ class CharacterSkillDataDisplay extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
-            children: [Text('Function ${idx + 1}'), SimpleFunctionDisplay(functionId: functionIds[idx])],
+            children: [
+              Text('Function ${idx + 1}', style: TextStyle(fontSize: 16)),
+              SimpleFunctionDisplay(functionId: functionIds[idx], connectFuncPrefix: '${idx + 1}-'),
+            ],
           ),
         ),
     ];
     if (connectedFunctions.isNotEmpty) {
-      children.add(Text('↓↓↓ Connected Functions ↓↓↓', style: TextStyle(fontSize: 16)));
-      children.addAll(connectedFunctions);
+      children.addAll([
+        const Divider(),
+        Text('↓↓↓ Functions ↓↓↓', style: TextStyle(fontSize: 16)),
+        ...connectedFunctions,
+      ]);
     }
 
     return Column(spacing: 5, mainAxisSize: MainAxisSize.min, children: children);
@@ -143,39 +119,18 @@ class StateEffectDataDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultStyle = DefaultTextStyle.of(context).style;
     final functionIds = data.allValidFuncIds;
-
     final skillInfo = db.skillInfoTable[data.id];
-
     return Column(
       spacing: 5,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (skillInfo != null)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            spacing: 3,
-            children: [
-              Text(
-                locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey,
-                style: TextStyle(fontSize: 18),
-              ),
-              Tooltip(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey, width: 2),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                richMessage: TextSpan(
-                  children: buildDescriptionTextSpans(formatSkillInfoDescription(skillInfo), defaultStyle, db),
-                ),
-                child: Icon(Icons.info_outline, size: 16),
-              ),
-            ],
-          ),
-        Text('Passive Skill ID: ${data.id}'),
+          Text(locale.getTranslation(skillInfo.nameLocalkey) ?? skillInfo.nameLocalkey, style: TextStyle(fontSize: 18)),
+        Text('Passive Skill ID: ${data.id}', style: skillInfo == null ? TextStyle(fontSize: 18) : null),
+        if (skillInfo != null) DescriptionTextWidget(formatSkillInfoDescription(skillInfo)),
+        if (functionIds.isNotEmpty) const Divider(),
+        if (functionIds.isNotEmpty) Text('↓↓↓ Functions ↓↓↓', style: TextStyle(fontSize: 16)),
         for (int idx = 0; idx < functionIds.length; idx += 1)
           Container(
             padding: const EdgeInsets.all(3.0),
@@ -186,7 +141,10 @@ class StateEffectDataDisplay extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               spacing: 3,
-              children: [Text('Function ${idx + 1}'), SimpleFunctionDisplay(functionId: functionIds[idx])],
+              children: [
+                Text('Function ${idx + 1}', style: TextStyle(fontSize: 16)),
+                SimpleFunctionDisplay(functionId: functionIds[idx], connectFuncPrefix: '${idx + 1}-'),
+              ],
             ),
           ),
       ],
@@ -196,139 +154,124 @@ class StateEffectDataDisplay extends StatelessWidget {
 
 class SimpleFunctionDisplay extends StatelessWidget {
   final int functionId;
+  final String? connectFuncPrefix;
 
   NikkeDatabaseV2 get db => userDb.gameDb;
 
-  const SimpleFunctionDisplay({super.key, required this.functionId});
+  const SimpleFunctionDisplay({super.key, required this.functionId, this.connectFuncPrefix});
+
+  static final boldStyle = TextStyle(fontWeight: FontWeight.bold);
+  static final headerData = TableCellData(isHeader: true, style: boldStyle);
 
   @override
   Widget build(BuildContext context) {
     final func = db.functionTable[functionId];
-    final List<Widget> children = [];
     if (func == null) {
-      children.add(Text('Function not found!'));
-    } else {
-      if (func.nameLocalkey != null) {
-        final description = formatFunctionDescription(func);
-        children.add(
-          Wrap(
-            spacing: 5,
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Text(func.rawBuffType, style: TextStyle(fontSize: 16)),
-              Text(locale.getTranslation(func.nameLocalkey) ?? func.nameLocalkey!, style: TextStyle(fontSize: 16)),
-              if (description.isNotEmpty)
-                Tooltip(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey, width: 2),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  textStyle: TextStyle(fontSize: 14, color: Colors.black),
-                  message: description,
-                  child: Icon(Icons.info_outline, size: 16),
-                ),
-            ],
-          ),
-        );
-      }
-      final funcValueString = skillValueString(func.functionValue, func.functionValueType);
-      final funcStandardString = functionStandardString(func.functionStandard);
-      final durationStr = durationString(func.durationValue, func.durationType);
-      final delayStr = durationString(func.delayValue, func.delayType);
-      final miscRow = [
-        if (delayStr != null) Text('Delay: $delayStr'),
-        if (durationStr != null) Text('Remove: ${func.rawBuffRemove}'),
-        if (durationStr != null) Text('Duration: $durationStr'),
-        if (func.limitValue != 0) Text('Use Limit Per Battle: ${func.limitValue}'),
-      ];
+      return Text('Function not found!');
+    }
 
-      final List<Widget> triggerRow = [];
-      if (func.timingTriggerType != TimingTriggerType.none) {
-        triggerRow.addAll([
-          Text('Trigger: ${func.rawTimingTriggerType}'),
-          if (func.timingTriggerValue != 0) Text('${func.timingTriggerValue}'),
-          if (func.timingTriggerStandard != StandardType.none) Text('(of ${func.rawTimingTriggerStandard})'),
-        ]);
-      }
-
-      final List<Widget> statusRow = [];
-      if (func.statusTriggerType != StatusTriggerType.none) {
-        statusRow.addAll([
-          Text('Check: ${func.rawStatusTriggerType}'),
-          if (func.statusTriggerValue != 0) Text('${func.statusTriggerValue}'),
-          if (func.statusTriggerStandard != StandardType.none) Text('(of ${func.rawStatusTriggerStandard})'),
-        ]);
-      }
-      if (func.statusTrigger2Type != StatusTriggerType.none) {
-        statusRow.addAll([
-          Text('Check: ${func.rawStatusTrigger2Type}'),
-          if (func.statusTrigger2Value != 0) Text('${func.statusTrigger2Value}'),
-          if (func.statusTrigger2Standard != StandardType.none) Text('(of ${func.rawStatusTrigger2Standard})'),
-        ]);
-      }
-      final connectedFuncs = [
-        for (final connectedFunc in func.connectedFunction.where((funcId) => funcId != 0))
-          Container(
-            padding: const EdgeInsets.all(3.0),
-            decoration: BoxDecoration(
-              border: Border.all(color: buffTypeColor(db.functionTable[connectedFunc]?.buff), width: 2),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: SimpleFunctionDisplay(functionId: connectedFunc),
-          ),
-      ];
-      children.addAll([
-        Wrap(
-          spacing: 10,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Function ID: $functionId'),
-            if (func.fullCount != 1) Text('Max Stack: ${func.fullCount}'),
-            if (func.functionBattlepower != null) Text('BP Mult: ${func.functionBattlepower!}'),
-          ],
+    final List<Widget> children = [];
+    final List<Widget> dataRows = [
+      CustomTableRow.fromTexts(texts: [if (func.nameLocalkey != null) 'Name', 'Function ID'], defaults: headerData),
+      CustomTableRow.fromTexts(
+        texts: [
+          if (func.nameLocalkey != null) locale.getTranslation(func.nameLocalkey) ?? func.nameLocalkey!,
+          '${func.id}',
+        ],
+      ),
+      if (func.descriptionLocalkey != null) CustomTableRow.fromTexts(texts: ['Description'], defaults: headerData),
+      if (func.descriptionLocalkey != null)
+        CustomTableRow.fromChildren(children: [DescriptionTextWidget(formatFunctionDescription(func))]),
+      CustomTableRow.fromTexts(texts: ['Function Type', 'Target', 'Buff Type', 'Remove Type'], defaults: headerData),
+      CustomTableRow.fromTexts(
+        texts: [func.rawFunctionType, func.rawFunctionTarget, func.rawBuffType, func.rawBuffRemove],
+      ),
+      CustomTableRow.fromTexts(texts: ['Value', 'Standard', 'Duration', 'Delay'], defaults: headerData),
+      CustomTableRow.fromTexts(
+        texts: [
+          skillValueString(func.functionValue, func.functionValueType) ?? 'N/A',
+          functionStandardString(func.functionStandard) ?? 'N/A',
+          durationString(func.durationValue, func.durationType) ?? 'N/A',
+          durationString(func.delayValue, func.delayType) ?? 'N/A',
+        ],
+      ),
+      CustomTableRow.fromTexts(
+        texts: ['Max Stack', 'Group ID', 'Lv', 'Use Limit', if (func.functionBattlepower != null) 'BP Mult'],
+        defaults: headerData,
+      ),
+      CustomTableRow.fromTexts(
+        texts: [
+          '${func.fullCount}',
+          '${func.groupId}',
+          '${func.level}',
+          func.limitValue != 0 ? '${func.limitValue}' : 'None',
+          if (func.functionBattlepower != null) '${func.functionBattlepower}',
+        ],
+      ),
+      if (func.timingTriggerType != TimingTriggerType.none)
+        CustomTableRow.fromTexts(texts: ['Timing Trigger', 'Value', 'Standard'], defaults: headerData),
+      if (func.timingTriggerType != TimingTriggerType.none)
+        CustomTableRow.fromTexts(
+          texts: [func.rawTimingTriggerType, '${func.timingTriggerValue}', func.rawTimingTriggerStandard],
         ),
-        Wrap(
-          spacing: 10,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Target: ${func.rawFunctionTarget}'),
-            Text('Type: ${func.rawFunctionType}'),
-            if (funcValueString != null) Text('Value: $funcValueString'),
-            if (funcStandardString != null) Text('(of $funcStandardString)'),
-          ],
+      if (func.statusTriggerType != StatusTriggerType.none)
+        CustomTableRow.fromTexts(texts: ['Status Trigger 1', 'Value', 'Standard'], defaults: headerData),
+      if (func.statusTriggerType != StatusTriggerType.none)
+        CustomTableRow.fromTexts(
+          texts: [func.rawStatusTriggerType, '${func.statusTriggerValue}', func.rawStatusTriggerStandard],
         ),
-        if (triggerRow.isNotEmpty) Wrap(spacing: 5, alignment: WrapAlignment.center, children: triggerRow),
-        if (statusRow.isNotEmpty) Wrap(spacing: 5, alignment: WrapAlignment.center, children: statusRow),
-        if (miscRow.isNotEmpty) Wrap(spacing: 10, alignment: WrapAlignment.center, children: miscRow),
-      ]);
+      if (func.statusTrigger2Type != StatusTriggerType.none)
+        CustomTableRow.fromTexts(texts: ['Status Trigger 2', 'Value', 'Standard'], defaults: headerData),
+      if (func.statusTrigger2Type != StatusTriggerType.none)
+        CustomTableRow.fromTexts(
+          texts: [func.rawStatusTrigger2Type, '${func.statusTrigger2Value}', func.rawStatusTrigger2Standard],
+        ),
+      CustomTableRow.fromTexts(texts: ['Is Cancel', 'Keeping Type'], defaults: headerData),
+      CustomTableRow.fromTexts(texts: ['${func.isCancel}', func.rawKeepingType]),
+    ];
 
-      if (func.functionType == FunctionType.useCharacterSkillId) {
-        final skillData = db.characterSkillTable[func.functionValue];
-        final skillColumn = Container(
+    children.add(Container(constraints: BoxConstraints(maxWidth: 700), child: CustomTable(children: dataRows)));
+
+    final validFuncIds = func.connectedFunction.where((funcId) => funcId != 0).toList();
+    final connectedFuncs = [
+      if (validFuncIds.isNotEmpty) const Divider(),
+      if (validFuncIds.isNotEmpty) Text('↓↓↓ Connected Functions ↓↓↓', style: TextStyle(fontSize: 16)),
+      for (int idx = 0; idx < validFuncIds.length; idx += 1)
+        Container(
           padding: const EdgeInsets.all(3.0),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey, width: 2),
+            border: Border.all(color: buffTypeColor(db.functionTable[validFuncIds[idx]]?.buff), width: 2),
             borderRadius: BorderRadius.circular(5),
           ),
           child: Column(
-            spacing: 5,
             mainAxisSize: MainAxisSize.min,
+            spacing: 3,
             children: [
-              Text('↓↓↓ Invoke This Skill ↓↓↓', style: TextStyle(fontSize: 16)),
-              skillData == null ? Text('Not Found!') : CharacterSkillDataDisplay(data: skillData),
+              Text('Connected Function ${connectFuncPrefix ?? ''}${idx + 1}', style: TextStyle(fontSize: 16)),
+              SimpleFunctionDisplay(
+                functionId: validFuncIds[idx],
+                connectFuncPrefix: '${connectFuncPrefix ?? ''}${idx + 1}-',
+              ),
             ],
           ),
-        );
-        children.add(skillColumn);
-      }
+        ),
+    ];
 
-      if (connectedFuncs.isNotEmpty) {
-        children.add(Text('↓↓↓ Connected Functions ↓↓↓', style: TextStyle(fontSize: 16)));
-        children.addAll(connectedFuncs);
-      }
+    if (func.functionType == FunctionType.useCharacterSkillId) {
+      final skillData = db.characterSkillTable[func.functionValue];
+      children.add(Text('↓↓↓ Invoke This Skill ↓↓↓', style: TextStyle(fontSize: 16)));
+      final skillColumn = Container(
+        padding: const EdgeInsets.all(3.0),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey, width: 2),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: skillData == null ? Text('Not Found!') : CharacterSkillDataDisplay(data: skillData),
+      );
+      children.add(skillColumn);
     }
+
+    children.addAll(connectedFuncs);
 
     return Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children);
   }
@@ -340,76 +283,66 @@ class MonsterSkillDataDisplay extends StatelessWidget {
 
   NikkeDatabaseV2 get db => userDb.gameDb;
 
+  static final boldStyle = TextStyle(fontWeight: FontWeight.bold);
+  static final headerData = TableCellData(isHeader: true, style: boldStyle);
+
   const MonsterSkillDataDisplay({super.key, required this.data, this.statEnhanceData});
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> children = [];
-    if (data.nameKey != null) {
-      final description = locale.getTranslation(data.descriptionKey) ?? data.descriptionKey;
-      children.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          spacing: 3,
-          children: [
-            Text(locale.getTranslation(data.nameKey) ?? data.nameKey!, style: TextStyle(fontSize: 18)),
-            if (description != null)
-              Tooltip(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey, width: 2),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                textStyle: TextStyle(fontSize: 14, color: Colors.black),
-                message: description,
-                child: Icon(Icons.info_outline, size: 16),
-              ),
-          ],
-        ),
-      );
-    }
+    final List<Widget> children = [
+      if (data.nameKey != null)
+        Text(locale.getTranslation(data.nameKey) ?? data.nameKey!, style: TextStyle(fontSize: 18)),
+      Text('Monster Skill ID: ${data.id}', style: data.nameKey == null ? TextStyle(fontSize: 18) : null),
+      if (data.descriptionKey != null) Text(locale.getTranslation(data.descriptionKey) ?? data.descriptionKey!),
+      const Divider(),
+      Text('Parameters', style: TextStyle(fontSize: 16)),
+    ];
+
     final extraRate =
         data.fireType.isDamageType && statEnhanceData != null ? toModifier(statEnhanceData!.levelStatDamageRatio) : 1;
-    final skillValue1Str = skillValueString(data.skillValue1, data.skillValueType1, extraRate);
-    final skillValue2Str = skillValueString(data.skillValue2, data.skillValueType2, extraRate);
-    final valueStr = [skillValue1Str, skillValue2Str].where((s) => s != null).join(', ');
-    children.addAll([
-      Text('Skill ID: ${data.id}'),
-      Wrap(
-        spacing: 10,
-        alignment: WrapAlignment.center,
-        children: [
-          Text('Type: ${data.rawFireType}'),
-          if (valueStr.isNotEmpty) Text('($valueStr)'),
-          Text('Target: ${data.rawPreferTarget} (${data.shotCount} shots)'),
+
+    final List<Widget> dataRows = [
+      CustomTableRow.fromTexts(texts: ['Skill Type', 'Target', 'Shots'], defaults: headerData),
+      CustomTableRow.fromTexts(texts: [data.rawFireType, data.rawPreferTarget, '${data.shotCount}']),
+      CustomTableRow.fromTexts(texts: ['Show Locking', 'Casting Time', 'Delay', 'Shot Timing'], defaults: headerData),
+      CustomTableRow.fromTexts(
+        texts: ['${data.showLockOn}', data.castingTime.timeString, data.delayTime.timeString, data.shotTiming],
+      ),
+      CustomTableRow.fromTexts(
+        texts: ['Penetration', 'Hit Character', 'Hit Cover', 'Hit Nothing'],
+        defaults: headerData,
+      ),
+      CustomTableRow.fromTexts(
+        texts: [
+          '${data.penetration}',
+          data.targetCharacterRatio.percentString,
+          data.targetCoverRatio.percentString,
+          data.targetNothingRatio.percentString,
         ],
       ),
-      Wrap(
-        spacing: 10,
-        alignment: WrapAlignment.center,
-        children: [
-          Text('Penetration: ${data.penetration}'),
-          Text('Locking: ${data.showLockOn}'),
-          Text('Casting Time: ${data.castingTime.timeString}'),
+      CustomTableRow.fromTexts(texts: ['Skill Values'], defaults: headerData),
+      CustomTableRow.fromTexts(
+        texts: [
+          skillValueString(data.skillValue1, data.skillValueType1, extraRate) ?? 'None',
+          skillValueString(data.skillValue2, data.skillValueType2, extraRate) ?? 'None',
         ],
       ),
-    ]);
-    if (data.projectileHpRatio != 0) {
-      children.add(
-        Wrap(
-          spacing: 10,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Projectile: '),
-            if (statEnhanceData == null) Text('HP Ratio: ${data.projectileHpRatio.percentString}'),
+      if (data.projectileHpRatio != 0)
+        CustomTableRow.fromTexts(texts: ['Projectile HP', 'Explosion Range', 'Destroyable'], defaults: headerData),
+      if (data.projectileHpRatio != 0)
+        CustomTableRow.fromTexts(
+          texts: [
+            if (statEnhanceData == null) data.projectileHpRatio.percentString,
             if (statEnhanceData != null)
-              Text('HP: ${(toModifier(data.projectileHpRatio) * statEnhanceData!.levelProjectileHp).decimalPattern}'),
-            Text('Destroyable: ${data.isDestroyableProjectile}'),
+              (toModifier(data.projectileHpRatio) * statEnhanceData!.levelProjectileHp).decimalPattern,
+            '${data.explosionRange}',
+            '${data.isDestroyableProjectile}',
           ],
         ),
-      );
-    }
+    ];
+
+    children.add(Container(constraints: BoxConstraints(maxWidth: 700), child: CustomTable(children: dataRows)));
 
     return Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children);
   }
