@@ -283,7 +283,11 @@ class SimpleFunctionDisplay extends StatelessWidget {
         Wrap(
           spacing: 10,
           alignment: WrapAlignment.center,
-          children: [Text('Function ID: $functionId'), if (func.fullCount != 1) Text('Max Stack: ${func.fullCount}')],
+          children: [
+            Text('Function ID: $functionId'),
+            if (func.fullCount != 1) Text('Max Stack: ${func.fullCount}'),
+            if (func.functionBattlepower != null) Text('BP Mult: ${func.functionBattlepower!}'),
+          ],
         ),
         Wrap(
           spacing: 10,

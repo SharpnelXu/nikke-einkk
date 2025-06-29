@@ -4,6 +4,7 @@ import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/skill_display.dart';
@@ -162,132 +163,10 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   ];
 
   Widget buildStatTab() {
-    final children = [NikkeBaseStatColumn(option: option), const Divider()];
-
-    final Map<EquipLineType, int> equipLineVals = {};
-    for (final equip in option.equips) {
-      if (equip == null) continue;
-
-      for (final equipLine in equip.equipLines) {
-        final stateEffectData = db.stateEffectTable[equipLine.getStateEffectId()];
-        if (stateEffectData == null) {
-          continue;
-        }
-
-        for (final functionId in stateEffectData.functions) {
-          if (functionId.function != 0) {
-            final function = db.functionTable[functionId.function]!;
-            equipLineVals.putIfAbsent(equipLine.type, () => 0);
-            equipLineVals[equipLine.type] = equipLineVals[equipLine.type]! + function.functionValue;
-          }
-        }
-      }
-    }
-
-    if (equipLineVals.isEmpty) {
-      children.add(Text('Equip Lines: None', style: TextStyle(fontSize: 18)));
-    } else {
-      children.add(Text('Equip Lines:', style: TextStyle(fontSize: 18)));
-      children.add(
-        DataTable(
-          columns: [
-            DataColumn(label: Text('Line Type'), headingRowAlignment: MainAxisAlignment.center),
-            DataColumn(label: Text('Value'), headingRowAlignment: MainAxisAlignment.center),
-          ],
-          rows:
-              equipLineVals.keys.map((type) {
-                return DataRow(
-                  cells: [DataCell(Text(type.toString())), DataCell(Text(equipLineVals[type]!.percentString))],
-                );
-              }).toList(),
-        ),
-      );
-    }
-
-    children.add(const Divider());
-
-    final cubeOption = option.cube;
-    if (cubeOption != null) {
-      final cubeData = db.harmonyCubeTable[cubeOption.cubeId];
-      final localeKey = cubeData?.nameLocalkey;
-      final colorCode = int.tryParse('0xFF${cubeData?.bgColor}');
-      children.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: 5,
-          children: [
-            Icon(Icons.square, color: colorCode != null ? Color(colorCode) : null),
-            Text(
-              'Cube: ${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'} Lv${cubeOption.cubeLevel}',
-              style: TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
-      );
-      if (cubeData != null) {
-        children.add(Text(locale.getTranslation(cubeData.descriptionLocalkey) ?? cubeData.descriptionLocalkey));
-      }
-      for (final tuple in cubeOption.getValidCubeSkills(db)) {
-        final skillGroupId = tuple.$1;
-        final skillLv = tuple.$2;
-        final skillInfo = db.groupedSkillInfoTable[skillGroupId]?[skillLv];
-        final stateEffect = db.stateEffectTable[skillInfo?.id];
-
-        final child =
-            stateEffect != null
-                ? StateEffectDataDisplay(data: stateEffect)
-                : Text('Cube skill not found for group $skillGroupId & lv $skillLv');
-        children.add(child);
-      }
-    } else {
-      children.add(Text('Cube: None', style: TextStyle(fontSize: 18)));
-    }
-
-    children.add(const Divider());
-
-    final doll = option.favoriteItem;
-    if (doll != null) {
-      final dollData = doll.getData(db);
-      final localeKey = dollData?.nameLocalkey;
-      children.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: 5,
-          children: [
-            Icon(Icons.person, color: doll.rarity.color),
-            Text(
-              'Doll: ${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'}'
-              ' ${dollLvString(doll.rarity, doll.level)}',
-              style: TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
-      );
-      if (dollData != null) {
-        children.add(Text(locale.getTranslation(dollData.descriptionLocalkey) ?? dollData.descriptionLocalkey));
-      }
-      for (final tuple in doll.getValidDollSkills(db)) {
-        final skillGroupId = tuple.$1;
-        final skillLv = tuple.$2;
-        final skillInfo = db.groupedSkillInfoTable[skillGroupId]?[skillLv];
-        final stateEffect = db.stateEffectTable[skillInfo?.id];
-
-        final child =
-            stateEffect != null
-                ? StateEffectDataDisplay(data: stateEffect)
-                : Text('Doll skill not found for group $skillGroupId & lv $skillLv');
-        children.add(child);
-      }
-    } else {
-      children.add(Text('Doll: None', style: TextStyle(fontSize: 18)));
-    }
-
     return Container(
       padding: const EdgeInsets.all(8.0),
       constraints: const BoxConstraints(maxWidth: 700),
-      child: Column(mainAxisSize: MainAxisSize.min, spacing: 5, children: children),
+      child: NikkeBaseStatColumn(option: option),
     );
   }
 
@@ -439,7 +318,7 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
     }
 
     final totalStat = List.generate(statTypes.length, (idx) {
-      return BattleUtils.getBaseStat(
+      return getBaseStat(
         coreLevel: option.coreLevel,
         baseStat: baseStat[idx],
         gradeRatio: statEnhanceData.gradeRatio,
@@ -453,35 +332,202 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
       );
     });
 
+    int funcBpSum = 0;
+
+    final Map<EquipLineType, List<FunctionData>> equipLineVals = {};
+    for (final equip in option.equips) {
+      if (equip == null) continue;
+
+      for (final equipLine in equip.equipLines) {
+        final stateEffectData = db.stateEffectTable[equipLine.getStateEffectId()];
+        if (stateEffectData == null) {
+          continue;
+        }
+
+        for (final functionId in stateEffectData.functions) {
+          if (functionId.function != 0) {
+            final function = db.functionTable[functionId.function]!;
+            equipLineVals.putIfAbsent(equipLine.type, () => []);
+            equipLineVals[equipLine.type]!.add(function);
+            funcBpSum += function.functionBattlepower ?? 0;
+          }
+        }
+      }
+    }
+
+    final coverStat = [
+      db.coverStatTable[option.syncLevel]?.levelHp,
+      null,
+      db.coverStatTable[option.syncLevel]?.levelDefence,
+    ];
+
+    final children = [
+      DataTable(
+        columns: [
+          DataColumn(label: Text(' ')),
+          ...statTypes.map(
+            (type) => DataColumn(label: Text(type.name.toUpperCase()), headingRowAlignment: MainAxisAlignment.center),
+          ),
+        ],
+        rows: [
+          DataRow(
+            cells: [
+              DataCell(Text('Cover', style: TextStyle(fontWeight: FontWeight.bold))),
+              ..._statArrayToDataCell(coverStat),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(Text('Total', style: TextStyle(fontWeight: FontWeight.bold))),
+              ..._statArrayToDataCell(totalStat),
+            ],
+          ),
+          DataRow(cells: [DataCell(Text('Bond')), ..._statArrayToDataCell(attractiveStat)]),
+          DataRow(cells: [DataCell(Text('Console')), ..._statArrayToDataCell(consoleStat)]),
+          DataRow(cells: [DataCell(Text('Cube')), ..._statArrayToDataCell(cubeStat)]),
+          DataRow(cells: [DataCell(Text('Doll')), ..._statArrayToDataCell(dollStat)]),
+          ...BattleNikkeOptions.equipTypes.map((type) {
+            return DataRow(
+              cells: [DataCell(Text('${type.name.pascal} Gear')), ..._statArrayToDataCell(equipStats[type]!)],
+            );
+          }),
+        ],
+      ),
+      NikkeBasicSetupWidgets(option: option, useGlobal: userDb.useGlobal, onChange: () => setState(() {})),
+      const Divider(),
+    ];
+
+    if (equipLineVals.isEmpty) {
+      children.add(Text('Equip Lines: None', style: TextStyle(fontSize: 18)));
+    } else {
+      children.add(Text('Equip Lines:', style: TextStyle(fontSize: 18)));
+      children.add(
+        DataTable(
+          columns: [
+            DataColumn(label: Text('Line Type'), headingRowAlignment: MainAxisAlignment.center),
+            DataColumn(label: Text('Value'), headingRowAlignment: MainAxisAlignment.center),
+            DataColumn(label: Text('BP Mult')),
+          ],
+          rows:
+              equipLineVals.keys.map((type) {
+                return DataRow(
+                  cells: [
+                    DataCell(Text(type.toString())),
+                    DataCell(
+                      Text(equipLineVals[type]!.fold(0, (prev, data) => prev + data.functionValue).percentString),
+                    ),
+                    DataCell(
+                      Text('${equipLineVals[type]!.fold(0, (prev, data) => prev + (data.functionBattlepower ?? 0))}'),
+                    ),
+                  ],
+                );
+              }).toList(),
+        ),
+      );
+    }
+
+    children.add(const Divider());
+
+    final cubeOption = option.cube;
+    if (cubeOption != null) {
+      final cubeData = db.harmonyCubeTable[cubeOption.cubeId];
+      final localeKey = cubeData?.nameLocalkey;
+      final colorCode = int.tryParse('0xFF${cubeData?.bgColor}');
+      children.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 5,
+          children: [
+            Icon(Icons.square, color: colorCode != null ? Color(colorCode) : null),
+            Text(
+              'Cube: ${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'} Lv${cubeOption.cubeLevel}',
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+      );
+      if (cubeData != null) {
+        children.add(Text(locale.getTranslation(cubeData.descriptionLocalkey) ?? cubeData.descriptionLocalkey));
+      }
+      for (final tuple in cubeOption.getValidCubeSkills(db)) {
+        final skillGroupId = tuple.$1;
+        final skillLv = tuple.$2;
+        final skillInfo = db.groupedSkillInfoTable[skillGroupId]?[skillLv];
+        final stateEffect = db.stateEffectTable[skillInfo?.id];
+
+        final child =
+            stateEffect != null
+                ? StateEffectDataDisplay(data: stateEffect)
+                : Text('Cube skill not found for group $skillGroupId & lv $skillLv');
+        for (final funcId in stateEffect?.allValidFuncIds ?? []) {
+          final func = db.functionTable[funcId];
+          funcBpSum += func?.functionBattlepower ?? 0;
+        }
+
+        children.add(child);
+      }
+    } else {
+      children.add(Text('Cube: None', style: TextStyle(fontSize: 18)));
+    }
+
+    children.add(const Divider());
+
+    final doll = option.favoriteItem;
+    if (doll != null) {
+      final dollData = doll.getData(db);
+      final localeKey = dollData?.nameLocalkey;
+      children.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 5,
+          children: [
+            Icon(Icons.person, color: doll.rarity.color),
+            Text(
+              'Doll: ${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'}'
+              ' ${dollLvString(doll.rarity, doll.level)}',
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+      );
+      if (dollData != null) {
+        children.add(Text(locale.getTranslation(dollData.descriptionLocalkey) ?? dollData.descriptionLocalkey));
+      }
+      for (final tuple in doll.getValidDollSkills(db)) {
+        final skillGroupId = tuple.$1;
+        final skillLv = tuple.$2;
+        final skillInfo = db.groupedSkillInfoTable[skillGroupId]?[skillLv];
+        final stateEffect = db.stateEffectTable[skillInfo?.id];
+
+        final child =
+            stateEffect != null
+                ? StateEffectDataDisplay(data: stateEffect)
+                : Text('Doll skill not found for group $skillGroupId & lv $skillLv');
+        for (final funcId in stateEffect?.allValidFuncIds ?? []) {
+          final func = db.functionTable[funcId];
+          funcBpSum += func?.functionBattlepower ?? 0;
+        }
+
+        children.add(child);
+      }
+    } else {
+      children.add(Text('Doll: None', style: TextStyle(fontSize: 18)));
+    }
+
+    final bp = getBattlePoint(
+      hp: totalStat[0],
+      atk: totalStat[1],
+      def: totalStat[2],
+      skillLvs: option.skillLevels,
+      funcBpSum: funcBpSum,
+    );
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       spacing: 5,
-      children: [
-        Text('Base Stat', style: TextStyle(fontSize: 18)),
-        Text('Cover Base HP: ${db.coverStatTable[option.syncLevel]?.levelHp.decimalPattern}'),
-        Text('Cover Base DEF: ${db.coverStatTable[option.syncLevel]?.levelDefence.decimalPattern}'),
-        DataTable(
-          columns: [
-            DataColumn(label: Text(' ')),
-            ...statTypes.map(
-              (type) => DataColumn(label: Text(type.name.toUpperCase()), headingRowAlignment: MainAxisAlignment.center),
-            ),
-          ],
-          rows: [
-            DataRow(cells: [DataCell(Text('Total')), ..._statArrayToDataCell(totalStat)]),
-            DataRow(cells: [DataCell(Text('Bond')), ..._statArrayToDataCell(attractiveStat)]),
-            DataRow(cells: [DataCell(Text('Console')), ..._statArrayToDataCell(consoleStat)]),
-            DataRow(cells: [DataCell(Text('Cube')), ..._statArrayToDataCell(cubeStat)]),
-            DataRow(cells: [DataCell(Text('Doll')), ..._statArrayToDataCell(dollStat)]),
-            ...BattleNikkeOptions.equipTypes.map((type) {
-              return DataRow(
-                cells: [DataCell(Text('${type.name.pascal} Gear')), ..._statArrayToDataCell(equipStats[type]!)],
-              );
-            }),
-          ],
-        ),
-        NikkeBasicSetupWidgets(option: option, useGlobal: userDb.useGlobal, onChange: () => setState(() {})),
-      ],
+      children: [Text('Battle Point: ${bp.decimalPattern}', style: TextStyle(fontSize: 18)), ...children],
     );
   }
 

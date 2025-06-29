@@ -28,43 +28,55 @@ class BattleUtils {
   static int timeDataToFrame(num timeData, int fps) {
     return (timeData * fps / 100).round();
   }
+}
 
-  // CharacterStatTable[statEnhanceId = groupId][lv] to get baseStat
-  // CharacterStateEnhanceTable[statEnhanceId = id] to get gradeEnhanceStat
-  // grade is [1, 4]
-  // gradeStat = baseStat * gradeRatio (usually 2%) * (grade - 1) + gradeStat * (grade - 1)
-  // MLBStat = baseStat + gradeStat
-  // core is [1, 7]
-  // coreStat = (MLBStat (which is gradeStat + baseStat) + bond stat + console stat) * coreRatio (2%)
-  // finalStat = baseStat + gradeStat + coreStat + bondStat + consoleStat + cubeStat + gearStat + dollStat
-  // However, it is unclear if this value is stored as int or double
-  static int getBaseStat({
-    required int coreLevel,
-    required int baseStat,
-    required int gradeRatio,
-    required int gradeEnhanceBase,
-    required int coreEnhanceBaseRatio,
-    required int consoleStat,
-    required int bondStat,
-    required int equipStat,
-    required int cubeStat,
-    required int dollStat,
-  }) {
-    final gradeLevel = min(4, coreLevel) - 1;
-    final gradeFlat = gradeLevel * gradeEnhanceBase;
-    final gradeRatioStat = baseStat * gradeLevel * BattleUtils.toModifier(gradeRatio);
-    final gradeAddStat = gradeRatioStat + gradeFlat;
-    final gradeStat = baseStat + consoleStat + bondStat + gradeAddStat.floor();
+// CharacterStatTable[statEnhanceId = groupId][lv] to get baseStat
+// CharacterStateEnhanceTable[statEnhanceId = id] to get gradeEnhanceStat
+// grade is [1, 4]
+// gradeStat = baseStat * gradeRatio (usually 2%) * (grade - 1) + gradeStat * (grade - 1)
+// MLBStat = baseStat + gradeStat
+// core is [1, 7]
+// coreStat = (MLBStat (which is gradeStat + baseStat) + bond stat + console stat) * coreRatio (2%)
+// finalStat = baseStat + gradeStat + coreStat + bondStat + consoleStat + cubeStat + gearStat + dollStat
+// However, it is unclear if this value is stored as int or double
+int getBaseStat({
+  required int coreLevel,
+  required int baseStat,
+  required int gradeRatio,
+  required int gradeEnhanceBase,
+  required int coreEnhanceBaseRatio,
+  required int consoleStat,
+  required int bondStat,
+  required int equipStat,
+  required int cubeStat,
+  required int dollStat,
+}) {
+  final gradeLevel = min(4, coreLevel) - 1;
+  final gradeFlat = gradeLevel * gradeEnhanceBase;
+  final gradeRatioStat = baseStat * gradeLevel * BattleUtils.toModifier(gradeRatio);
+  final gradeAddStat = gradeRatioStat + gradeFlat;
+  final gradeStat = baseStat + consoleStat + bondStat + gradeAddStat.floor();
 
-    final coreActualLevel = coreLevel - 4;
-    final coreStat =
-        coreActualLevel > 0 ? gradeStat * coreActualLevel * BattleUtils.toModifier(coreEnhanceBaseRatio) : 0;
+  final coreActualLevel = coreLevel - 4;
+  final coreStat = coreActualLevel > 0 ? gradeStat * coreActualLevel * BattleUtils.toModifier(coreEnhanceBaseRatio) : 0;
 
-    // here it seems to be a simple rounding without roundHalfToEven, tested via Brid's HP stat
-    final result = gradeStat + coreStat.round() + equipStat + cubeStat + dollStat;
+  // here it seems to be a simple rounding without roundHalfToEven, tested via Brid's HP stat
+  final result = gradeStat + coreStat.round() + equipStat + cubeStat + dollStat;
 
-    return result;
-  }
+  return result;
+}
+
+/// credit: https://ngabbs.com/read.php?tid=40380218
+int getBattlePoint({
+  required int hp,
+  required int atk,
+  required int def,
+  required List<int> skillLvs,
+  required int funcBpSum,
+}) {
+  final statMult = (1.075 * atk * 18 + (def * 100 + hp) * 0.7) / 100;
+  final skillPoint = 0.01 * (skillLvs[0] + skillLvs[1] + 2 * skillLvs[2]) + funcBpSum / 10000;
+  return (statMult * (1.3 + skillPoint)).round();
 }
 
 class NikkeDamageParameter {

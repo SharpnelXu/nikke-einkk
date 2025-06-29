@@ -224,7 +224,7 @@ class BattleNikke extends BattleEntity {
       dbLegacy.attractiveStatTable[option.attractLevel]?.getStatData(nikkeClass) ?? ClassAttractiveStatData.emptyData;
 
   @override
-  int get baseHp => BattleUtils.getBaseStat(
+  int get baseHp => getBaseStat(
     coreLevel: coreLevel,
     baseStat: baseStat.hp,
     gradeRatio: statEnhanceData.gradeRatio,
@@ -238,7 +238,7 @@ class BattleNikke extends BattleEntity {
   );
 
   @override
-  int get baseAttack => BattleUtils.getBaseStat(
+  int get baseAttack => getBaseStat(
     coreLevel: coreLevel,
     baseStat: baseStat.attack,
     gradeRatio: statEnhanceData.gradeRatio,
@@ -252,7 +252,7 @@ class BattleNikke extends BattleEntity {
   );
 
   @override
-  int get baseDefence => BattleUtils.getBaseStat(
+  int get baseDefence => getBaseStat(
     coreLevel: coreLevel,
     baseStat: baseStat.defence,
     gradeRatio: statEnhanceData.gradeRatio,

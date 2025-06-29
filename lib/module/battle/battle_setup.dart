@@ -298,7 +298,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
           dbLegacy.attractiveStatTable[option.attractLevel]?.getStatData(characterData.characterClass) ??
           ClassAttractiveStatData.emptyData;
 
-      final baseHp = BattleUtils.getBaseStat(
+      final baseHp = getBaseStat(
         coreLevel: option.coreLevel,
         baseStat: baseStat.hp,
         gradeRatio: statEnhanceData.gradeRatio,
@@ -313,7 +313,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
         cubeStat: option.cube?.getStat(StatType.hp) ?? 0,
         dollStat: option.favoriteItem?.getStat(StatType.hp) ?? 0,
       );
-      final baseAtk = BattleUtils.getBaseStat(
+      final baseAtk = getBaseStat(
         coreLevel: option.coreLevel,
         baseStat: baseStat.attack,
         gradeRatio: statEnhanceData.gradeRatio,
@@ -328,7 +328,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
         cubeStat: option.cube?.getStat(StatType.atk) ?? 0,
         dollStat: option.favoriteItem?.getStat(StatType.atk) ?? 0,
       );
-      final baseDef = BattleUtils.getBaseStat(
+      final baseDef = getBaseStat(
         coreLevel: option.coreLevel,
         baseStat: baseStat.defence,
         gradeRatio: statEnhanceData.gradeRatio,
