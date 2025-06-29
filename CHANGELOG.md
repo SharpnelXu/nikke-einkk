@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.1.5
+- Format data, but seems to be at the cost of slower processing time
+
 ## 0.1.4
 - Nikke setup & stat calculation
 - Coop raid display
