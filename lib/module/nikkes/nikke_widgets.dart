@@ -1,9 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/module/common/custom_table.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_list.dart';
 
@@ -76,185 +78,223 @@ class WeaponDataDisplay extends StatelessWidget {
 
   const WeaponDataDisplay({super.key, this.character, required this.weaponId});
 
+  static final boldStyle = TextStyle(fontWeight: FontWeight.bold);
+  static final headerData = TableCellData(isHeader: true, style: boldStyle);
+
   @override
   Widget build(BuildContext context) {
-    final sectionFontSize = 16.0;
     final weapon = db.characterShotTable[weaponId];
     final List<Widget> children = [
-      if (weapon != null && weapon.nameLocalkey != null)
-        Text(locale.getTranslation(weapon.nameLocalkey!) ?? weapon.nameLocalkey!, style: TextStyle(fontSize: 18)),
-      Text('Weapon ID: $weaponId'),
-      if (weapon != null && weapon.descriptionLocalkey != null) DescriptionTextWidget(formatWeaponDescription(weapon)),
+      CustomTableRow.fromTexts(
+        texts: [
+          if (weapon != null && weapon.nameLocalkey != null)
+            locale.getTranslation(weapon.nameLocalkey!) ?? weapon.nameLocalkey!,
+          'Weapon ID: $weaponId',
+        ],
+        defaults: headerData,
+      ),
+      if (weapon != null && weapon.descriptionLocalkey != null)
+        CustomTableRow.fromTexts(texts: ['Description'], defaults: headerData),
+      if (weapon != null && weapon.descriptionLocalkey != null)
+        CustomTableRow.fromChildren(children: [DescriptionTextWidget(formatWeaponDescription(weapon))]),
     ];
     if (weapon != null) {
       children.addAll([
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Weapon Type: ${weapon.rawWeaponType}'),
-            if (character != null) Text('Bonus Range: ${character!.bonusRangeMin} - ${character!.bonusRangeMax}'),
-            Text('Shot Timing: ${weapon.rawShotTiming}'),
-            Text('Fire Type: ${weapon.rawFireType}'),
+        CustomTableRow.fromTexts(
+          texts: ['Weapon Type', 'Input Type', 'Shot Timing', 'Fire Type'],
+          defaults: headerData,
+        ),
+        CustomTableRow.fromTexts(
+          texts: [weapon.rawWeaponType, weapon.rawInputType, weapon.rawShotTiming, weapon.rawFireType],
+        ),
+        CustomTableRow.fromTexts(
+          texts: ['Damage Rate', 'Core Damage', 'Full Charge Damage', 'Charge Time'],
+          defaults: headerData,
+        ),
+        CustomTableRow.fromTexts(
+          texts: [
+            weapon.damage.percentString,
+            weapon.coreDamageRate.percentString,
+            weapon.fullChargeDamage != 10000 ? weapon.fullChargeDamage.percentString : 'N/A',
+            weapon.chargeTime != 0 ? weapon.chargeTime.timeString : 'N/A',
           ],
         ),
-        Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 5,
-          children: [
-            Text('Damage', style: TextStyle(fontSize: sectionFontSize)),
-            Tooltip(
-              message: 'Note: crit & range is tied to character model',
-              child: Icon(Icons.info_outline, size: 16),
-            ),
-          ],
-        ),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Base: ${weapon.damage.percentString}'),
-            if (character != null)
-              Text(
-                'Critical: ${character!.criticalDamage.percentString} '
-                '(${character!.criticalRatio.percentString} chance)',
-              ),
-            Text('Core: ${weapon.coreDamageRate.percentString}'),
-            if (weapon.fullChargeDamage != 10000)
-              Text('Full Charge: ${weapon.fullChargeDamage.percentString} (${weapon.chargeTime.timeString})'),
-          ],
-        ),
-        Text('Burst', style: TextStyle(fontSize: sectionFontSize)),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Base: ${(weapon.burstEnergyPerShot / 100).percentString}'),
-            Text('Target: ${(weapon.targetBurstEnergyPerShot / 100).percentString}'),
-            if (weapon.fullChargeBurstEnergy != 10000)
-              Text('Full Charge: ${weapon.fullChargeBurstEnergy.percentString}'),
-            Text('Shot Count: ${weapon.shotCount} x ${weapon.muzzleCount}'),
-          ],
-        ),
-        Text('Ammo', style: TextStyle(fontSize: sectionFontSize)),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Max Ammo: ${weapon.maxAmmo}'),
-            Text('Reload Time: ${weapon.reloadTime.timeString} (${weapon.reloadBullet.percentString})'),
-            Text('Exit Cover: ${weapon.spotFirstDelay.timeString}'),
-            Text('Enter Cover: ${weapon.spotLastDelay.timeString}'),
-          ],
-        ),
-        if (weapon.spotProjectileSpeed > 0) Text('Projectile', style: TextStyle(fontSize: sectionFontSize)),
-        if (weapon.spotProjectileSpeed > 0)
-          Wrap(
-            spacing: 15,
-            alignment: WrapAlignment.center,
+        if (character != null)
+          CustomTableRow.fromChildren(
+            defaults: headerData,
             children: [
-              Text('Speed: ${weapon.spotProjectileSpeed}'),
-              Text('Explosion Range: ${weapon.spotExplosionRange}'),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 3,
+                children: [
+                  Text('Bonus Range', style: boldStyle),
+                  Tooltip(message: 'Note: tied to character model', child: Icon(Icons.info_outline, size: 16)),
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 3,
+                children: [
+                  Text('Critical Damage', style: boldStyle),
+                  Tooltip(message: 'Note: tied to character model', child: Icon(Icons.info_outline, size: 16)),
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 3,
+                children: [
+                  Text('Critical Chance', style: boldStyle),
+                  Tooltip(message: 'Note: tied to character model', child: Icon(Icons.info_outline, size: 16)),
+                ],
+              ),
             ],
           ),
-        Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 5,
-          children: [
-            Text('Rate Of Fire', style: TextStyle(fontSize: sectionFontSize)),
-            Tooltip(message: 'Note: capped to 60 due to frame rate', child: Icon(Icons.info_outline, size: 16)),
+        if (character != null)
+          CustomTableRow.fromTexts(
+            texts: [
+              '${character!.bonusRangeMin} - ${character!.bonusRangeMax}',
+              character!.criticalDamage.percentString,
+              character!.criticalRatio.percentString,
+            ],
+          ),
+        CustomTableRow.fromTexts(
+          texts: ['Burst', 'Target Burst', 'Full Charge Burst', 'Shot Count'],
+          defaults: headerData,
+        ),
+        CustomTableRow.fromTexts(
+          texts: [
+            (weapon.burstEnergyPerShot / 100).percentString,
+            (weapon.targetBurstEnergyPerShot / 100).percentString,
+            weapon.fullChargeBurstEnergy != 10000 ? weapon.fullChargeBurstEnergy.percentString : 'N/A',
+            '${weapon.shotCount} x ${weapon.muzzleCount}',
           ],
         ),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Rate: ${weapon.rateOfFire} - ${weapon.endRateOfFire}'),
-            Text('(${weapon.rateOfFire / 60} - ${weapon.endRateOfFire / 60} shots/s)'),
-            Text('Change Per Shot: ${weapon.rateOfFireChangePerShot}'),
-            Text('Reset Time: ${weapon.rateOfFireResetTime.timeString}'),
+        CustomTableRow.fromTexts(
+          texts: ['Max Ammo', 'Reload Time', 'Reload %', 'Exit Cover Time', 'Enter Cover Time'],
+          defaults: headerData,
+        ),
+        CustomTableRow.fromTexts(
+          texts: [
+            '${weapon.maxAmmo}',
+            weapon.reloadTime.timeString,
+            weapon.reloadBullet.percentString,
+            weapon.spotFirstDelay.timeString,
+            weapon.spotLastDelay.timeString,
           ],
         ),
-        Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 5,
+        if (weapon.spotProjectileSpeed > 0)
+          CustomTableRow.fromTexts(texts: ['Projectile Speed', 'Explosion Range', 'Radius'], defaults: headerData),
+        if (weapon.spotProjectileSpeed > 0)
+          CustomTableRow.fromTexts(
+            texts: ['${weapon.spotProjectileSpeed}', '${weapon.spotExplosionRange}', '${weapon.spotRadius}'],
+          ),
+        CustomTableRow.fromTexts(texts: ['Fire Rate', 'Change Per Shot', 'Reset Time'], defaults: headerData),
+        CustomTableRow.fromTexts(
+          texts: [
+            '${weapon.rateOfFire} - ${weapon.endRateOfFire} RPM',
+            '${weapon.rateOfFireChangePerShot}',
+            weapon.rateOfFireResetTime.timeString,
+          ],
+        ),
+        CustomTableRow.fromChildren(
+          defaults: headerData,
           children: [
-            Text('Accuracy', style: TextStyle(fontSize: sectionFontSize)),
-            Tooltip(
-              richMessage: WidgetSpan(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Positioned(
-                      child: Container(
-                        height: max(1, weapon.endAccuracyCircleScale * 0.75),
-                        width: max(1, weapon.endAccuracyCircleScale * 0.75),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 3),
-                          color: null,
-                          shape: BoxShape.circle,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 3,
+              children: [
+                Text('Accuracy', style: boldStyle),
+                Tooltip(
+                  richMessage: WidgetSpan(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Positioned(
+                          child: Container(
+                            height: max(1, weapon.endAccuracyCircleScale * 0.75),
+                            width: max(1, weapon.endAccuracyCircleScale * 0.75),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey, width: 3),
+                              color: null,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    Positioned(
-                      child: Container(
-                        height: max(1, weapon.startAccuracyCircleScale * 0.75),
-                        width: max(1, weapon.startAccuracyCircleScale * 0.75),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 3),
-                          color: null,
-                          shape: BoxShape.circle,
+                        Positioned(
+                          child: Container(
+                            height: max(1, weapon.startAccuracyCircleScale * 0.75),
+                            width: max(1, weapon.startAccuracyCircleScale * 0.75),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white, width: 3),
+                              color: null,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
+                  child: Icon(Icons.info_outline, size: 16),
                 ),
-              ),
-              child: Icon(Icons.info_outline, size: 16),
+              ],
+            ),
+            Text('Change Per Shot', style: boldStyle),
+            Text('Reset Time', style: boldStyle),
+          ],
+        ),
+        CustomTableRow.fromTexts(
+          texts: [
+            '${weapon.startAccuracyCircleScale} - ${weapon.endAccuracyCircleScale}',
+            '${weapon.accuracyChangePerShot}',
+            weapon.accuracyChangeSpeed.timeString,
+          ],
+        ),
+        CustomTableRow.fromChildren(
+          defaults: headerData,
+          children: [
+            Text('Penetration', style: boldStyle),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 3,
+              children: [
+                Text('Maintain Fire Stance', style: boldStyle),
+                Tooltip(
+                  message:
+                      'Note: A forced time for characters to stay outside cover after each shot'
+                      ' (E.g. SBS, A2, Raven)\n\n'
+                      'Pending verification as A2 seems to stay outside 9 frames longer.',
+                  child: Icon(Icons.info_outline, size: 16),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 3,
+              children: [
+                Text('Fire Timing', style: boldStyle),
+                Tooltip(
+                  message:
+                      'Note: how long during the fire animation until the shot is actually fired'
+                      ' (For characters with UP Input Type, E.g. SBS, A2, Raven)\n\n'
+                      'Pending verification.',
+                  child: Icon(Icons.info_outline, size: 16),
+                ),
+              ],
             ),
           ],
         ),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Rate: ${weapon.startAccuracyCircleScale} - ${weapon.endAccuracyCircleScale}'),
-            Text('Change Per Shot: ${weapon.accuracyChangePerShot}'),
-            Text('Reset Time: ${weapon.accuracyChangeSpeed.timeString}'),
-          ],
-        ),
-        Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 5,
-          children: [
-            Text('Misc', style: TextStyle(fontSize: sectionFontSize)),
-            Tooltip(
-              message:
-                  'Note: Maintain Fire Stance: whether RL characters stay outside cover after each shot'
-                  ' (E.g. SBS, A2, Raven)\n\n'
-                  'Up Fire Timing: how long until the shot is actually fired for the characters above\n'
-                  '(E.g. 50% means the bullet is fired after the maintain fire stance animation plays 50%)\n\n'
-                  'Pending further verifications',
-              child: Icon(Icons.info_outline, size: 16),
-            ),
-          ],
-        ),
-        Wrap(
-          spacing: 15,
-          alignment: WrapAlignment.center,
-          children: [
-            Text('Penetration: ${weapon.penetration}'),
-            Text('Maintain Fire Stance: ${weapon.maintainFireStance.timeString}'),
-            Text('Up Fire Timing: ${weapon.upTypeFireTiming.percentString}'),
+        CustomTableRow.fromTexts(
+          texts: [
+            weapon.penetration != 0 ? 'True' : 'False',
+            weapon.maintainFireStance != 0 ? weapon.maintainFireStance.timeString : 'N/A',
+            weapon.upTypeFireTiming != 0
+                ? '${(weapon.maintainFireStance * toModifier(weapon.upTypeFireTiming)).timeString} (${weapon.upTypeFireTiming.percentString})'
+                : 'N/A',
           ],
         ),
       ]);
     }
-    return Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children);
+    return Container(constraints: BoxConstraints(maxWidth: 700), child: CustomTable(children: children));
   }
 }
 

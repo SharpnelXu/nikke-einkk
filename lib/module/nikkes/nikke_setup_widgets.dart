@@ -202,7 +202,12 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
               doll.level = doll.level.clamp(0, maxDollLv(newRare));
               doll.nameCode = newNameCode;
             } else {
-              option.favoriteItem = BattleFavoriteItemOption(weaponType: weaponType, rarity: newRare, level: 0, nameCode: newNameCode);
+              option.favoriteItem = BattleFavoriteItemOption(
+                weaponType: weaponType,
+                rarity: newRare,
+                level: 0,
+                nameCode: newNameCode,
+              );
             }
 
             setState(() {});
