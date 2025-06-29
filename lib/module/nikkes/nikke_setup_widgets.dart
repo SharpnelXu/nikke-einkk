@@ -194,19 +194,15 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
           preferColor: doll?.rarity.color,
           onChange: (newValue) {
             final newRare = allowedRare[newValue.round()];
+            final newNameCode = newRare == Rarity.ssr ? nameCode : 0;
             if (newRare == null) {
               option.favoriteItem = null;
             } else if (doll != null) {
               doll.rarity = newRare;
               doll.level = doll.level.clamp(0, maxDollLv(newRare));
+              doll.nameCode = newNameCode;
             } else {
-              option.favoriteItem = BattleFavoriteItemOption(weaponType: weaponType, rarity: newRare, level: 0);
-            }
-
-            if (newRare == Rarity.ssr) {
-              option.favoriteItem!.nameCode = nameCode;
-            } else {
-              option.favoriteItem!.nameCode = 0;
+              option.favoriteItem = BattleFavoriteItemOption(weaponType: weaponType, rarity: newRare, level: 0, nameCode: newNameCode);
             }
 
             setState(() {});
