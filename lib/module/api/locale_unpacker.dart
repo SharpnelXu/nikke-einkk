@@ -61,8 +61,14 @@ class LocaleUnpackerPage extends StatelessWidget {
                   return;
                 }
 
-                await EasyLoading.show(status: 'Reading Locale', maskType: EasyLoadingMaskType.clear);
-                for (final filePath in dir.listSync(recursive: true)) {
+                final allFilePaths = dir.listSync(recursive: true);
+                for (final (i, filePath) in dir.listSync(recursive: true).indexed) {
+                  EasyLoading.showProgress(
+                    (i + 1) / allFilePaths.length,
+                    status: 'Reading Locale ${i + 1}/${allFilePaths.length}',
+                    maskType: EasyLoadingMaskType.clear,
+                  );
+                  await Future.delayed(const Duration(milliseconds: 5));
                   final inputFile = File(filePath.path);
                   if (!filePath.path.endsWith('lsc') || inputFile.statSync().type != FileSystemEntityType.file) {
                     continue;
