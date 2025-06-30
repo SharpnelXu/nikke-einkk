@@ -19,7 +19,6 @@ class CharacterSkillDataDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final functionIds = data.allValidFuncIds;
     final skillInfo = db.skillInfoTable[data.id];
     final List<Widget> children = [
       if (skillInfo != null)
@@ -80,29 +79,57 @@ class CharacterSkillDataDisplay extends StatelessWidget {
       ]);
     }
 
-    final connectedFunctions = [
-      for (int idx = 0; idx < functionIds.length; idx += 1)
+    final preFunctionIds = data.validPreFuncIds;
+    final preFunctions = [
+      for (int idx = 0; idx < preFunctionIds.length; idx += 1)
         Container(
           padding: const EdgeInsets.all(3.0),
           decoration: BoxDecoration(
-            border: Border.all(color: buffTypeColor(db.functionTable[functionIds[idx]]?.buff), width: 2),
+            border: Border.all(color: buffTypeColor(db.functionTable[preFunctionIds[idx]]?.buff), width: 2),
             borderRadius: BorderRadius.circular(5),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
             children: [
-              Text('Function ${idx + 1}', style: TextStyle(fontSize: 16)),
-              SimpleFunctionDisplay(functionId: functionIds[idx], connectFuncPrefix: '${idx + 1}-'),
+              Text('Pre Skill Function ${idx + 1}', style: TextStyle(fontSize: 16)),
+              SimpleFunctionDisplay(functionId: preFunctionIds[idx], connectFuncPrefix: '${idx + 1}-'),
             ],
           ),
         ),
     ];
-    if (connectedFunctions.isNotEmpty) {
+    if (preFunctions.isNotEmpty) {
       children.addAll([
         const Divider(),
-        Text('↓↓↓ Functions ↓↓↓', style: TextStyle(fontSize: 16)),
-        ...connectedFunctions,
+        Text('↓↓↓ Pre SKill Functions ↓↓↓', style: TextStyle(fontSize: 16)),
+        ...preFunctions,
+      ]);
+    }
+
+    final postFunctionIds = data.validPostFuncIds;
+    final postFunctions = [
+      for (int idx = 0; idx < postFunctionIds.length; idx += 1)
+        Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: buffTypeColor(db.functionTable[postFunctionIds[idx]]?.buff), width: 2),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 3,
+            children: [
+              Text('Post Skill Function ${idx + 1}', style: TextStyle(fontSize: 16)),
+              SimpleFunctionDisplay(functionId: postFunctionIds[idx], connectFuncPrefix: '${idx + 1}-'),
+            ],
+          ),
+        ),
+    ];
+    if (postFunctions.isNotEmpty) {
+      children.addAll([
+        const Divider(),
+        Text('↓↓↓ Post Skill Functions ↓↓↓', style: TextStyle(fontSize: 16)),
+        ...postFunctions,
       ]);
     }
 

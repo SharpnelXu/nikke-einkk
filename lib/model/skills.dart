@@ -151,6 +151,12 @@ class SkillData {
         ...afterHurtFunctionIdList,
       ].where((id) => id != 0).toList();
 
+  List<int> get validPreFuncIds =>
+      [...beforeUseFunctionIdList, ...beforeHurtFunctionIdList].where((id) => id != 0).toList();
+
+  List<int> get validPostFuncIds =>
+      [...afterUseFunctionIdList, ...afterHurtFunctionIdList].where((id) => id != 0).toList();
+
   SkillData({
     this.id = 0,
     this.skillCooltime = 0,
