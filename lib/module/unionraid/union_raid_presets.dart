@@ -153,8 +153,8 @@ class _UnionRaidDataDisplayState extends State<UnionRaidDataDisplay> {
               ),
             ],
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.start,
             spacing: 5,
             children: [for (final data in sortedCurrentWave) UnionRaidBossDisplay(data: data)],
           ),
@@ -186,6 +186,7 @@ class UnionRaidBossDisplay extends StatelessWidget {
         spacing: 5,
         children: [
           Row(
+            mainAxisSize: MainAxisSize.min,
             spacing: 3,
             children: [
               Text(

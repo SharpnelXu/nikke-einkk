@@ -29,6 +29,7 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
 
     final List<Widget> children = [
       Row(
+        mainAxisSize: MainAxisSize.min,
         spacing: 3,
         children: [
           Tooltip(
