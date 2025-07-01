@@ -343,9 +343,9 @@ class MonsterSkillDataDisplay extends StatelessWidget {
       CustomTableRow.fromTexts(
         texts: [
           '${data.penetration}',
-          data.targetCharacterRatio.percentString,
-          data.targetCoverRatio.percentString,
-          data.targetNothingRatio.percentString,
+          (data.targetCharacterRatio * 100).percentString,
+          (data.targetCoverRatio * 100).percentString,
+          (data.targetNothingRatio * 100).percentString,
         ],
       ),
       CustomTableRow.fromTexts(texts: ['Skill Values'], defaults: headerData),
