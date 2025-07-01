@@ -1,29 +1,150 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:nikke_einkk/model/battle/battle_simulator.dart';
-import 'package:nikke_einkk/model/battle/harmony_cube.dart';
-import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
+import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/equipment.dart';
+import 'package:nikke_einkk/model/favorite_item.dart';
+import 'package:nikke_einkk/model/harmony_cube.dart';
+import 'package:nikke_einkk/model/items.dart';
 
 part '../generated/model/user_data.g.dart';
 
 @JsonSerializable()
+class PlayerOptions {
+  int globalSync;
+  int personalRecycleLevel;
+  Map<Corporation, int> corpRecycleLevels = {};
+  Map<NikkeClass, int> classRecycleLevels = {};
+  bool forceFillBurst = false;
+
+  PlayerOptions({
+    this.globalSync = 1,
+    this.personalRecycleLevel = 0,
+    Map<Corporation, int> corpRecycleLevels = const {},
+    Map<NikkeClass, int> classRecycleLevels = const {},
+    this.forceFillBurst = false,
+  }) {
+    this.corpRecycleLevels.addAll(corpRecycleLevels);
+    this.classRecycleLevels.addAll(classRecycleLevels);
+  }
+
+  PlayerOptions copy() {
+    return PlayerOptions(
+      globalSync: globalSync,
+      personalRecycleLevel: personalRecycleLevel,
+      corpRecycleLevels: corpRecycleLevels,
+      classRecycleLevels: classRecycleLevels,
+      forceFillBurst: forceFillBurst,
+    );
+  }
+
+  factory PlayerOptions.fromJson(Map<String, dynamic> json) => _$PlayerOptionsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PlayerOptionsToJson(this);
+
+  int getRecycleHp(NikkeClass nikkeClass) {
+    return personalRecycleLevel * RecycleStat.personal.hp +
+        RecycleStat.nikkeClass.hp * (classRecycleLevels[nikkeClass] ?? 0);
+  }
+
+  int getRecycleAttack(Corporation corporation) {
+    return RecycleStat.corporation.atk * (corpRecycleLevels[corporation] ?? 0);
+  }
+
+  int getRecycleDefence(NikkeClass nikkeClass, Corporation corporation) {
+    return RecycleStat.nikkeClass.def * (classRecycleLevels[nikkeClass] ?? 0) +
+        RecycleStat.corporation.def * (corpRecycleLevels[corporation] ?? 0);
+  }
+}
+
+@JsonSerializable()
+class NikkeOptions {
+  int nikkeResourceId;
+  int coreLevel;
+  int syncLevel;
+  int attractLevel;
+  List<EquipmentOption?> equips;
+  List<int> skillLevels;
+  HarmonyCubeOption? cube;
+  FavoriteItemOption? favoriteItem;
+
+  bool alwaysFocus;
+  bool forceCancelShootDelay;
+  NikkeFullChargeMode chargeMode;
+
+  static List<EquipType> equipTypes = [EquipType.head, EquipType.body, EquipType.arm, EquipType.leg];
+
+  NikkeOptions({
+    required this.nikkeResourceId,
+    this.coreLevel = 1,
+    this.syncLevel = 1,
+    this.attractLevel = 1,
+    List<EquipmentOption?> equips = const [null, null, null, null],
+    List<int> skillLevels = const [10, 10, 10],
+    this.cube,
+    this.favoriteItem,
+    this.alwaysFocus = false,
+    this.forceCancelShootDelay = false,
+    this.chargeMode = NikkeFullChargeMode.always,
+  }) : equips = equips.map((equip) => equip?.copy()).toList(),
+       skillLevels = skillLevels.toList();
+
+  factory NikkeOptions.fromJson(Map<String, dynamic> json) => _$NikkeOptionsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$NikkeOptionsToJson(this);
+
+  NikkeOptions copy() {
+    return NikkeOptions(
+      nikkeResourceId: nikkeResourceId,
+      coreLevel: coreLevel,
+      syncLevel: syncLevel,
+      attractLevel: attractLevel,
+      equips: equips,
+      skillLevels: skillLevels.toList(),
+      cube: cube?.copy(),
+      favoriteItem: favoriteItem?.copy(),
+      alwaysFocus: alwaysFocus,
+      forceCancelShootDelay: forceCancelShootDelay,
+      chargeMode: chargeMode,
+    );
+  }
+
+  void copyFrom(NikkeOptions other) {
+    nikkeResourceId = other.nikkeResourceId;
+    coreLevel = other.coreLevel;
+    syncLevel = other.syncLevel;
+    attractLevel = other.attractLevel;
+    equips.clear();
+    equips.addAll(other.equips.map((equip) => equip?.copy()).toList());
+    skillLevels.clear();
+    skillLevels.addAll(other.skillLevels);
+    cube = other.cube?.copy();
+    favoriteItem = other.favoriteItem?.copy();
+    alwaysFocus = other.alwaysFocus;
+    forceCancelShootDelay = other.forceCancelShootDelay;
+    chargeMode = other.chargeMode;
+  }
+}
+
+enum NikkeFullChargeMode { always, never, whenExitingBurst }
+
+@JsonSerializable()
 class UserData {
   Language language;
-  BattlePlayerOptions globalPlayerOptions = BattlePlayerOptions();
-  Map<int, BattleNikkeOptions> globalNikkeOptions = {};
-  BattlePlayerOptions cnPlayerOptions = BattlePlayerOptions();
-  Map<int, BattleNikkeOptions> cnNikkeOptions = {};
+  PlayerOptions globalPlayerOptions = PlayerOptions();
+  Map<int, NikkeOptions> globalNikkeOptions = {};
+  PlayerOptions cnPlayerOptions = PlayerOptions();
+  Map<int, NikkeOptions> cnNikkeOptions = {};
   Map<int, int> globalCubeLvs = {};
   Map<int, int> cnCubeLvs = {};
 
   UserData({
     this.language = Language.en,
-    BattlePlayerOptions? globalPlayerOptions,
-    Map<int, BattleNikkeOptions> globalNikkeOptions = const {},
-    BattlePlayerOptions? cnPlayerOptions,
-    Map<int, BattleNikkeOptions> cnNikkeOptions = const {},
-    List<BattleHarmonyCubeOption> cubes = const [],
+    PlayerOptions? globalPlayerOptions,
+    Map<int, NikkeOptions> globalNikkeOptions = const {},
+    PlayerOptions? cnPlayerOptions,
+    Map<int, NikkeOptions> cnNikkeOptions = const {},
+    List<HarmonyCubeOption> cubes = const [],
     Map<int, int> globalCubeLvs = const {},
     Map<int, int> cnCubeLvs = const {},
   }) {
@@ -50,13 +171,13 @@ class UserData {
 
 @JsonSerializable()
 class BattleSetup {
-  late BattlePlayerOptions playerOptions;
-  List<BattleNikkeOptions> nikkeOptions = [];
+  late PlayerOptions playerOptions;
+  List<NikkeOptions> nikkeOptions = [];
   late BattleRaptureOptions raptureOptions;
 
   BattleSetup({
-    required BattlePlayerOptions playerOptions,
-    List<BattleNikkeOptions> nikkeOptions = const [],
+    required PlayerOptions playerOptions,
+    List<NikkeOptions> nikkeOptions = const [],
     required BattleRaptureOptions raptureOptions,
   }) {
     this.playerOptions = playerOptions.copy();

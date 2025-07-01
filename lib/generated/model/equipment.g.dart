@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../../model/battle/equipment.dart';
+part of '../../model/equipment.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-BattleEquipmentOption _$BattleEquipmentOptionFromJson(Map<String, dynamic> json) => BattleEquipmentOption(
+EquipmentOption _$EquipmentOptionFromJson(Map<String, dynamic> json) => EquipmentOption(
   type: $enumDecode(_$EquipTypeEnumMap, json['type']),
   equipClass: $enumDecode(_$NikkeClassEnumMap, json['equipClass']),
   rarity: $enumDecode(_$EquipRarityEnumMap, json['rarity']),
@@ -17,7 +17,7 @@ BattleEquipmentOption _$BattleEquipmentOptionFromJson(Map<String, dynamic> json)
       const [],
 );
 
-Map<String, dynamic> _$BattleEquipmentOptionToJson(BattleEquipmentOption instance) => <String, dynamic>{
+Map<String, dynamic> _$EquipmentOptionToJson(EquipmentOption instance) => <String, dynamic>{
   'type': _$EquipTypeEnumMap[instance.type]!,
   'equipClass': _$NikkeClassEnumMap[instance.equipClass]!,
   'rarity': _$EquipRarityEnumMap[instance.rarity]!,

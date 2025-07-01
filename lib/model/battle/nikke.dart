@@ -1,173 +1,18 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/battle/barrier.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/battle_skill.dart';
-import 'package:nikke_einkk/model/battle/equipment.dart';
-import 'package:nikke_einkk/model/battle/favorite_item.dart';
 import 'package:nikke_einkk/model/battle/function.dart';
-import 'package:nikke_einkk/model/battle/harmony_cube.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
-import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/skills.dart';
-
-part '../../generated/model/battle/nikke.g.dart';
-
-@JsonSerializable()
-class BattleNikkeOptions {
-  int nikkeResourceId;
-  int coreLevel;
-  int syncLevel;
-  int attractLevel;
-  List<BattleEquipmentOption?> equips;
-  List<int> skillLevels;
-  BattleHarmonyCubeOption? cube;
-  BattleFavoriteItemOption? favoriteItem;
-
-  bool alwaysFocus;
-  bool forceCancelShootDelay;
-  NikkeFullChargeMode chargeMode;
-
-  static List<EquipType> equipTypes = [EquipType.head, EquipType.body, EquipType.arm, EquipType.leg];
-
-  BattleNikkeOptions({
-    required this.nikkeResourceId,
-    this.coreLevel = 1,
-    this.syncLevel = 1,
-    this.attractLevel = 1,
-    List<BattleEquipmentOption?> equips = const [null, null, null, null],
-    List<int> skillLevels = const [10, 10, 10],
-    this.cube,
-    this.favoriteItem,
-    this.alwaysFocus = false,
-    this.forceCancelShootDelay = false,
-    this.chargeMode = NikkeFullChargeMode.always,
-  }) : equips = equips.map((equip) => equip?.copy()).toList(),
-       skillLevels = skillLevels.toList();
-
-  factory BattleNikkeOptions.fromJson(Map<String, dynamic> json) => _$BattleNikkeOptionsFromJson(json);
-
-  Map<String, dynamic> toJson() => _$BattleNikkeOptionsToJson(this);
-
-  void errorCorrection() {
-    if (!dbLegacy.characterResourceGardeTable.containsKey(nikkeResourceId)) {
-      return;
-    }
-
-    syncLevel = syncLevel.clamp(1, dbLegacy.maxSyncLevel);
-
-    final groupedData = dbLegacy.characterResourceGardeTable[nikkeResourceId]!;
-    final coreLevels = groupedData.keys.toList();
-    coreLevels.sort();
-    coreLevel = coreLevel.clamp(coreLevels.first, coreLevels.last);
-
-    final characterData = groupedData[coreLevel]!;
-    final maxAttract = characterData.corporationSubType == CorporationSubType.overspec ? 40 : 30;
-    attractLevel = attractLevel.clamp(1, maxAttract);
-
-    for (int index = 0; index < 4; index += 1) {
-      if (equips.length <= index) {
-        equips.add(null);
-      } else if (equips[index] != null) {
-        final equipment = equips[index]!;
-        final type = EquipType.values[index + 1];
-        equipment.type = type;
-        equipment.equipClass = characterData.characterClass;
-        if (equipment.rarity.canHaveCorp && equipment.corporation != Corporation.none) {
-          equipment.corporation = characterData.corporation;
-        } else {
-          equipment.corporation = Corporation.none;
-        }
-        if (equipment.level > equipment.rarity.maxLevel) {
-          equipment.level = equipment.rarity.maxLevel;
-        }
-
-        if (equipment.rarity == EquipRarity.t10) {
-          for (int index = 0; index < 3; index += 1) {
-            if (equipment.equipLines.length <= index) {
-              equipment.equipLines.add(EquipLine.none());
-            } else {
-              equipment.equipLines[index].level = equipment.equipLines[index].level.clamp(1, 15);
-            }
-          }
-          if (equipment.equipLines.length > 3) {
-            equipment.equipLines = equipment.equipLines.sublist(0, 3);
-          }
-        } else {
-          equipment.equipLines.clear();
-        }
-      }
-    }
-    if (equips.length > 4) {
-      equips = equips.sublist(0, 4);
-    }
-
-    for (int index = 0; index < 3; index += 1) {
-      if (skillLevels.length <= index) {
-        skillLevels.add(1);
-      } else {
-        skillLevels[index] = skillLevels[index].clamp(1, 10);
-      }
-    }
-    if (skillLevels.length > 3) {
-      skillLevels = skillLevels.sublist(0, 3);
-    }
-
-    final doll = favoriteItem;
-    final weapon = dbLegacy.characterShotTable[characterData.shotId]!;
-    if (doll != null) {
-      doll.weaponType = weapon.weaponType;
-      if (doll.rarity == Rarity.ssr && !dbLegacy.nameCodeFavItemTable.containsKey(characterData.nameCode)) {
-        doll.rarity = Rarity.sr;
-        doll.nameCode = 0;
-      }
-
-      final maxLevel = doll.rarity == Rarity.ssr ? 2 : 15;
-      doll.level = doll.level.clamp(0, maxLevel);
-    }
-  }
-
-  BattleNikkeOptions copy() {
-    return BattleNikkeOptions(
-      nikkeResourceId: nikkeResourceId,
-      coreLevel: coreLevel,
-      syncLevel: syncLevel,
-      attractLevel: attractLevel,
-      equips: equips,
-      skillLevels: skillLevels.toList(),
-      cube: cube?.copy(),
-      favoriteItem: favoriteItem?.copy(),
-      alwaysFocus: alwaysFocus,
-      forceCancelShootDelay: forceCancelShootDelay,
-      chargeMode: chargeMode,
-    );
-  }
-
-  void copyFrom(BattleNikkeOptions other) {
-    nikkeResourceId = other.nikkeResourceId;
-    coreLevel = other.coreLevel;
-    syncLevel = other.syncLevel;
-    attractLevel = other.attractLevel;
-    equips.clear();
-    equips.addAll(other.equips.map((equip) => equip?.copy()).toList());
-    skillLevels.clear();
-    skillLevels.addAll(other.skillLevels);
-    cube = other.cube?.copy();
-    favoriteItem = other.favoriteItem?.copy();
-    alwaysFocus = other.alwaysFocus;
-    forceCancelShootDelay = other.forceCancelShootDelay;
-    chargeMode = other.chargeMode;
-  }
-}
-
-enum NikkeFullChargeMode { always, never, whenExitingBurst }
+import 'package:nikke_einkk/model/user_data.dart';
 
 enum BattleNikkeStatus { behindCover, reloading, forceReloading, shooting }
 
@@ -195,8 +40,8 @@ class BattleCover extends BattleEntity {
 }
 
 class BattleNikke extends BattleEntity {
-  BattlePlayerOptions playerOptions;
-  BattleNikkeOptions option;
+  PlayerOptions playerOptions;
+  NikkeOptions option;
 
   int fps = 60;
 

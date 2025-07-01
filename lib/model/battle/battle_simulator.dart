@@ -2,64 +2,13 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
-import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
-
-part '../../generated/model/battle/battle_simulator.g.dart';
-
-@JsonSerializable()
-class BattlePlayerOptions {
-  int globalSync;
-  int personalRecycleLevel;
-  Map<Corporation, int> corpRecycleLevels = {};
-  Map<NikkeClass, int> classRecycleLevels = {};
-  bool forceFillBurst = false;
-
-  BattlePlayerOptions({
-    this.globalSync = 1,
-    this.personalRecycleLevel = 0,
-    Map<Corporation, int> corpRecycleLevels = const {},
-    Map<NikkeClass, int> classRecycleLevels = const {},
-    this.forceFillBurst = false,
-  }) {
-    this.corpRecycleLevels.addAll(corpRecycleLevels);
-    this.classRecycleLevels.addAll(classRecycleLevels);
-  }
-
-  BattlePlayerOptions copy() {
-    return BattlePlayerOptions(
-      globalSync: globalSync,
-      personalRecycleLevel: personalRecycleLevel,
-      corpRecycleLevels: corpRecycleLevels,
-      classRecycleLevels: classRecycleLevels,
-      forceFillBurst: forceFillBurst,
-    );
-  }
-
-  factory BattlePlayerOptions.fromJson(Map<String, dynamic> json) => _$BattlePlayerOptionsFromJson(json);
-
-  Map<String, dynamic> toJson() => _$BattlePlayerOptionsToJson(this);
-
-  int getRecycleHp(NikkeClass nikkeClass) {
-    return personalRecycleLevel * RecycleStat.personal.hp +
-        RecycleStat.nikkeClass.hp * (classRecycleLevels[nikkeClass] ?? 0);
-  }
-
-  int getRecycleAttack(Corporation corporation) {
-    return RecycleStat.corporation.atk * (corpRecycleLevels[corporation] ?? 0);
-  }
-
-  int getRecycleDefence(NikkeClass nikkeClass, Corporation corporation) {
-    return RecycleStat.nikkeClass.def * (classRecycleLevels[nikkeClass] ?? 0) +
-        RecycleStat.corporation.def * (corpRecycleLevels[corporation] ?? 0);
-  }
-}
+import 'package:nikke_einkk/model/user_data.dart';
 
 class BattleSimulation {
   static const burstMeterCap = 1000000; // 9000 = 0.9%
@@ -67,7 +16,7 @@ class BattleSimulation {
   bool useGlobal = true;
   NikkeDatabaseV2 get db => useGlobal ? global : cn;
 
-  BattlePlayerOptions playerOptions;
+  PlayerOptions playerOptions;
 
   List<BattleNikke> nikkes = [];
   List<BattleRapture> raptures = [];
@@ -96,7 +45,7 @@ class BattleSimulation {
 
   BattleSimulation({
     required this.playerOptions,
-    required List<BattleNikkeOptions?> nikkeOptions,
+    required List<NikkeOptions?> nikkeOptions,
     required List<BattleRaptureOptions> raptureOptions,
   }) {
     nikkes.addAll(nikkeOptions.nonNulls.map((option) => BattleNikke(playerOptions: playerOptions, option: option)));

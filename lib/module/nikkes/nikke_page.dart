@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/skill_display.dart';
@@ -28,7 +28,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   NikkeCharacterData get data => widget.data;
   WeaponData? get weapon => db.characterShotTable[data.shotId];
   bool favoriteItemSkill = true;
-  BattleNikkeOptions option = BattleNikkeOptions(nikkeResourceId: -1);
+  NikkeOptions option = NikkeOptions(nikkeResourceId: -1);
 
   @override
   void initState() {
@@ -271,7 +271,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
 }
 
 class NikkeBaseStatColumn extends StatefulWidget {
-  final BattleNikkeOptions option;
+  final NikkeOptions option;
   const NikkeBaseStatColumn({super.key, required this.option});
 
   @override
@@ -279,7 +279,7 @@ class NikkeBaseStatColumn extends StatefulWidget {
 }
 
 class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
-  BattleNikkeOptions get option => widget.option;
+  NikkeOptions get option => widget.option;
   NikkeDatabaseV2 get db => userDb.gameDb;
 
   @override
@@ -311,8 +311,8 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
     final cubeStat = statTypes.map((type) => option.cube?.getCubeStat(type, db)).toList();
     final dollStat = statTypes.map((type) => option.favoriteItem?.getDollStat(type, db)).toList();
     final Map<EquipType, List<int?>> equipStats = {};
-    for (int idx = 0; idx < BattleNikkeOptions.equipTypes.length; idx += 1) {
-      final equipType = BattleNikkeOptions.equipTypes[idx];
+    for (int idx = 0; idx < NikkeOptions.equipTypes.length; idx += 1) {
+      final equipType = NikkeOptions.equipTypes[idx];
       final equipStat = statTypes.map((type) => option.equips[idx]?.getEquipStat(type, db, characterData.corporation));
       equipStats[equipType] = equipStat.toList();
     }
@@ -386,7 +386,7 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
           DataRow(cells: [DataCell(Text('Console')), ..._statArrayToDataCell(consoleStat)]),
           DataRow(cells: [DataCell(Text('Cube')), ..._statArrayToDataCell(cubeStat)]),
           DataRow(cells: [DataCell(Text('Doll')), ..._statArrayToDataCell(dollStat)]),
-          ...BattleNikkeOptions.equipTypes.map((type) {
+          ...NikkeOptions.equipTypes.map((type) {
             return DataRow(
               cells: [DataCell(Text('${type.name.pascal} Gear')), ..._statArrayToDataCell(equipStats[type]!)],
             );

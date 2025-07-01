@@ -2,13 +2,13 @@ import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
-import 'package:nikke_einkk/model/battle/equipment.dart';
-import 'package:nikke_einkk/model/battle/favorite_item.dart';
-import 'package:nikke_einkk/model/battle/harmony_cube.dart';
-import 'package:nikke_einkk/model/battle/nikke.dart';
+import 'package:nikke_einkk/model/equipment.dart';
+import 'package:nikke_einkk/model/favorite_item.dart';
+import 'package:nikke_einkk/model/harmony_cube.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/user_data.dart';
 
 import '../../test_helper.dart';
 
@@ -16,7 +16,7 @@ void main() async {
   await TestHelper.loadData();
 
   group('Nikke Simulation Test', () {
-    final BattlePlayerOptions playerOptions = BattlePlayerOptions(
+    final PlayerOptions playerOptions = PlayerOptions(
       personalRecycleLevel: 420,
       corpRecycleLevels: {
         Corporation.pilgrim: 405,
@@ -27,21 +27,21 @@ void main() async {
       },
       classRecycleLevels: {NikkeClass.attacker: 211, NikkeClass.supporter: 193, NikkeClass.defender: 184},
     );
-    final BattleNikkeOptions scarletOption = BattleNikkeOptions(
+    final NikkeOptions scarletOption = NikkeOptions(
       nikkeResourceId: 222,
       coreLevel: 11,
       syncLevel: 884,
       attractLevel: 40,
       skillLevels: [10, 10, 10],
       equips: [
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.head,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAmmo, 9), EquipLine(EquipLineType.increaseElementalDamage, 9)],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.body,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
@@ -52,14 +52,14 @@ void main() async {
             EquipLine(EquipLineType.statDef, 9),
           ],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.arm,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAtk, 10), EquipLine(EquipLineType.statAmmo, 3)],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.leg,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
@@ -71,14 +71,14 @@ void main() async {
           ],
         ),
       ],
-      favoriteItem: BattleFavoriteItemOption(weaponType: WeaponType.ar, rarity: Rarity.sr, level: 5),
+      favoriteItem: FavoriteItemOption(weaponType: WeaponType.ar, rarity: Rarity.sr, level: 5),
       cube: null,
     );
 
     test('Scarlet resourceId 222', () {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
-        nikkeOptions: [scarletOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.reload, 15)],
+        nikkeOptions: [scarletOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.reload, 15)],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
 
@@ -146,10 +146,10 @@ void main() async {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
         nikkeOptions: [
-          scarletOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.reload, 15),
-          scarletOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.gainAmmo, 15),
-          scarletOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.ammoCapacity, 7),
-          scarletOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
+          scarletOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.reload, 15),
+          scarletOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.gainAmmo, 15),
+          scarletOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.ammoCapacity, 7),
+          scarletOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
         ],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
@@ -204,14 +204,14 @@ void main() async {
       expect(reloadEventScarlet2.reloadFrames, 150);
     });
 
-    final BattleNikkeOptions aliceOption = BattleNikkeOptions(
+    final NikkeOptions aliceOption = NikkeOptions(
       nikkeResourceId: 191,
       coreLevel: 11,
       syncLevel: 884,
       attractLevel: 30,
       skillLevels: [10, 6, 10],
       equips: [
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.head,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
@@ -222,21 +222,21 @@ void main() async {
             EquipLine(EquipLineType.statAmmo, 13),
           ],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.body,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAmmo, 11), EquipLine(EquipLineType.statAtk, 5)],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.arm,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAtk, 11), EquipLine(EquipLineType.statChargeTime, 9)],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.leg,
           equipClass: NikkeClass.attacker,
           rarity: EquipRarity.t10,
@@ -244,7 +244,7 @@ void main() async {
           equipLines: [EquipLine(EquipLineType.statAtk, 11), EquipLine(EquipLineType.statAmmo, 7)],
         ),
       ],
-      favoriteItem: BattleFavoriteItemOption(weaponType: WeaponType.sr, rarity: Rarity.sr, level: 15),
+      favoriteItem: FavoriteItemOption(weaponType: WeaponType.sr, rarity: Rarity.sr, level: 15),
       cube: null,
     );
 
@@ -252,10 +252,10 @@ void main() async {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
         nikkeOptions: [
-          aliceOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.reload, 15),
-          aliceOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.chargeDamage, 7),
-          aliceOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.chargeSpeed, 7),
-          aliceOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
+          aliceOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.reload, 15),
+          aliceOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.chargeDamage, 7),
+          aliceOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.chargeSpeed, 7),
+          aliceOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
         ],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
@@ -290,7 +290,7 @@ void main() async {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
         nikkeOptions: [
-          BattleNikkeOptions(
+          NikkeOptions(
             nikkeResourceId: 226,
             coreLevel: 11,
             syncLevel: 884,
@@ -313,9 +313,7 @@ void main() async {
     test('Scarlet with emergency max hp cube', () {
       final simulation = BattleSimulation(
         playerOptions: playerOptions,
-        nikkeOptions: [
-          scarletOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.emergencyMaxHp, 15),
-        ],
+        nikkeOptions: [scarletOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.emergencyMaxHp, 15)],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
 
@@ -358,35 +356,35 @@ void main() async {
     });
 
     test('SnowWhite attack & normal skill damage tests resource Id 220', () {
-      final BattleNikkeOptions snowWhiteOption = BattleNikkeOptions(
+      final NikkeOptions snowWhiteOption = NikkeOptions(
         nikkeResourceId: 220,
         coreLevel: 11,
         syncLevel: 884,
         attractLevel: 40,
         skillLevels: [7, 10, 10],
         equips: [
-          BattleEquipmentOption(
+          EquipmentOption(
             type: EquipType.head,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAtk, 5)],
           ),
-          BattleEquipmentOption(
+          EquipmentOption(
             type: EquipType.body,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAtk, 8)],
           ),
-          BattleEquipmentOption(
+          EquipmentOption(
             type: EquipType.arm,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAtk, 5)],
           ),
-          BattleEquipmentOption(
+          EquipmentOption(
             type: EquipType.leg,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
@@ -394,17 +392,17 @@ void main() async {
             equipLines: [EquipLine(EquipLineType.statAtk, 11)],
           ),
         ],
-        favoriteItem: BattleFavoriteItemOption(weaponType: WeaponType.ar, rarity: Rarity.r, level: 0),
+        favoriteItem: FavoriteItemOption(weaponType: WeaponType.ar, rarity: Rarity.r, level: 0),
         cube: null,
       );
 
       final simulation = BattleSimulation(
-        playerOptions: BattlePlayerOptions(
+        playerOptions: PlayerOptions(
           personalRecycleLevel: 420,
           corpRecycleLevels: {Corporation.pilgrim: 417},
           classRecycleLevels: {NikkeClass.attacker: 212},
         ),
-        nikkeOptions: [snowWhiteOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.reload, 15)],
+        nikkeOptions: [snowWhiteOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.reload, 15)],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.electric, startDefence: 140)],
       );
 
@@ -436,35 +434,35 @@ void main() async {
       expect(damageEventSkill2SnowWhite.damageParameter.calculateDamage(), 2422566);
     });
 
-    final BattleNikkeOptions literOption = BattleNikkeOptions(
+    final NikkeOptions literOption = NikkeOptions(
       nikkeResourceId: 82,
       coreLevel: 11,
       syncLevel: 884,
       attractLevel: 30,
       skillLevels: [10, 6, 10],
       equips: [
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.head,
           equipClass: NikkeClass.supporter,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.increaseElementalDamage, 11)],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.body,
           equipClass: NikkeClass.supporter,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAmmo, 11), EquipLine(EquipLineType.startAccuracyCircle, 11)],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.arm,
           equipClass: NikkeClass.supporter,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statDef, 11), EquipLine(EquipLineType.statAmmo, 11)],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.leg,
           equipClass: NikkeClass.supporter,
           rarity: EquipRarity.t10,
@@ -475,31 +473,21 @@ void main() async {
           ],
         ),
       ],
-      favoriteItem: BattleFavoriteItemOption(weaponType: WeaponType.smg, rarity: Rarity.r, level: 0),
+      favoriteItem: FavoriteItemOption(weaponType: WeaponType.smg, rarity: Rarity.r, level: 0),
       cube: null,
     );
 
     test('Liter skill test on minus CD', () {
       final simulation = BattleSimulation(
-        playerOptions: BattlePlayerOptions(forceFillBurst: true),
+        playerOptions: PlayerOptions(forceFillBurst: true),
         nikkeOptions: [
-          literOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.gainAmmo, 15),
-          BattleNikkeOptions(
-            nikkeResourceId: 80,
-            coreLevel: 11,
-            syncLevel: 884,
-            attractLevel: 30,
-            skillLevels: [4, 4, 4],
-          )..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
-          aliceOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
+          literOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.gainAmmo, 15),
+          NikkeOptions(nikkeResourceId: 80, coreLevel: 11, syncLevel: 884, attractLevel: 30, skillLevels: [4, 4, 4])
+            ..cube = HarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
+          aliceOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
           scarletOption.copy(),
-          BattleNikkeOptions(
-            nikkeResourceId: 80,
-            coreLevel: 11,
-            syncLevel: 884,
-            attractLevel: 30,
-            skillLevels: [4, 4, 4],
-          )..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
+          NikkeOptions(nikkeResourceId: 80, coreLevel: 11, syncLevel: 884, attractLevel: 30, skillLevels: [4, 4, 4])
+            ..cube = HarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
         ],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
@@ -560,35 +548,35 @@ void main() async {
       expect(fourthLiterBurst.nextStage, 2);
     });
 
-    final crownOption = BattleNikkeOptions(
+    final crownOption = NikkeOptions(
       nikkeResourceId: 330,
       coreLevel: 11,
       syncLevel: 884,
       attractLevel: 40,
       skillLevels: [10, 10, 10],
       equips: [
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.head,
           equipClass: NikkeClass.defender,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.body,
           equipClass: NikkeClass.defender,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.arm,
           equipClass: NikkeClass.defender,
           rarity: EquipRarity.t10,
           level: 5,
           equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
         ),
-        BattleEquipmentOption(
+        EquipmentOption(
           type: EquipType.leg,
           equipClass: NikkeClass.defender,
           rarity: EquipRarity.t10,
@@ -596,12 +584,12 @@ void main() async {
           equipLines: [],
         ),
       ],
-      favoriteItem: BattleFavoriteItemOption(weaponType: WeaponType.mg, rarity: Rarity.sr, level: 15),
+      favoriteItem: FavoriteItemOption(weaponType: WeaponType.mg, rarity: Rarity.sr, level: 15),
       cube: null,
     );
 
     test('Crown skill tests', () {
-      final BattlePlayerOptions updatedPlayerOptions = BattlePlayerOptions(
+      final PlayerOptions updatedPlayerOptions = PlayerOptions(
         personalRecycleLevel: 420,
         corpRecycleLevels: {
           Corporation.pilgrim: 417,
@@ -615,8 +603,8 @@ void main() async {
       final simulation = BattleSimulation(
         playerOptions: updatedPlayerOptions,
         nikkeOptions: [
-          literOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.gainAmmo, 15),
-          crownOption.copy()..cube = BattleHarmonyCubeOption.fromType(HarmonyCubeType.reload, 15),
+          literOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.gainAmmo, 15),
+          crownOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.reload, 15),
           scarletOption.copy(),
           scarletOption.copy(),
         ],

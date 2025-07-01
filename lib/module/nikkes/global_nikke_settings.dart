@@ -1,13 +1,13 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
 
 class GlobalSettingPage extends StatefulWidget {
-  final BattlePlayerOptions playerOptions;
+  final PlayerOptions playerOptions;
   final int maxSync;
   final void Function(int) onGlobalSyncChange;
   final Map<int, int> cubeLvs;
@@ -27,7 +27,7 @@ class GlobalSettingPage extends StatefulWidget {
 }
 
 class _GlobalSettingPageState extends State<GlobalSettingPage> {
-  BattlePlayerOptions get option => widget.playerOptions;
+  PlayerOptions get option => widget.playerOptions;
   NikkeDatabaseV2 get db => widget.db;
 
   @override

@@ -2,19 +2,19 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:nikke_einkk/model/battle/equipment.dart';
-import 'package:nikke_einkk/model/battle/favorite_item.dart';
-import 'package:nikke_einkk/model/battle/harmony_cube.dart';
-import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/equipment.dart';
+import 'package:nikke_einkk/model/favorite_item.dart';
+import 'package:nikke_einkk/model/harmony_cube.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
 class NikkeSetupColumn extends StatefulWidget {
-  final BattleNikkeOptions option;
+  final NikkeOptions option;
   final bool advancedOption;
   final bool useGlobal;
   const NikkeSetupColumn({super.key, required this.option, this.advancedOption = false, this.useGlobal = true});
@@ -24,7 +24,7 @@ class NikkeSetupColumn extends StatefulWidget {
 }
 
 class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
-  BattleNikkeOptions get option => widget.option;
+  NikkeOptions get option => widget.option;
   bool get advanced => widget.advancedOption;
   bool get useGlobal => widget.useGlobal;
   NikkeDatabaseV2 get db => useGlobal ? global : cn;
@@ -55,15 +55,15 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
               final dollRare = db.nameCodeFavItemTable.containsKey(characterData.nameCode) ? Rarity.ssr : Rarity.sr;
               final dollLv = maxDollLv(dollRare);
               final nameCode = dollRare == Rarity.ssr ? characterData.nameCode : 0;
-              option.favoriteItem = BattleFavoriteItemOption(
+              option.favoriteItem = FavoriteItemOption(
                 weaponType: weapon.weaponType,
                 rarity: dollRare,
                 level: dollLv,
                 nameCode: nameCode,
               );
-              for (int idx = 0; idx < BattleNikkeOptions.equipTypes.length; idx += 1) {
-                option.equips[idx] = BattleEquipmentOption(
-                  type: BattleNikkeOptions.equipTypes[idx],
+              for (int idx = 0; idx < NikkeOptions.equipTypes.length; idx += 1) {
+                option.equips[idx] = EquipmentOption(
+                  type: NikkeOptions.equipTypes[idx],
                   equipClass: characterData.characterClass,
                   rarity: EquipRarity.t10,
                   level: 5,
@@ -104,7 +104,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
         const Divider(),
         _buildDollColumn(characterData.nameCode, weapon.weaponType),
         const Divider(),
-        ...List.generate(BattleNikkeOptions.equipTypes.length, (index) => _buildEquipmentOption(characterData, index)),
+        ...List.generate(NikkeOptions.equipTypes.length, (index) => _buildEquipmentOption(characterData, index)),
       ]);
 
       if (widget.advancedOption && WeaponType.chargeWeaponTypes.contains(weapon.weaponType)) {
@@ -202,7 +202,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
               doll.level = doll.level.clamp(0, maxDollLv(newRare));
               doll.nameCode = newNameCode;
             } else {
-              option.favoriteItem = BattleFavoriteItemOption(
+              option.favoriteItem = FavoriteItemOption(
                 weaponType: weaponType,
                 rarity: newRare,
                 level: 0,
@@ -254,7 +254,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
               if (value == null) {
                 option.cube = null;
               } else if (cubeOption == null) {
-                option.cube = BattleHarmonyCubeOption(value, userDb.cubeLvs[value] ?? 1);
+                option.cube = HarmonyCubeOption(value, userDb.cubeLvs[value] ?? 1);
               } else {
                 cubeOption.cubeId = value;
                 cubeOption.cubeLevel = userDb.cubeLvs[value] ?? cubeOption.cubeLevel;
@@ -372,7 +372,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
             constraint: false,
             titled: false,
             leadingWidth: sliderWidth,
-            label: '${BattleNikkeOptions.equipTypes[equipListIndex].name.pascal} Gear',
+            label: '${NikkeOptions.equipTypes[equipListIndex].name.pascal} Gear',
             min: 0,
             max: allowedEquipRares.length - 1,
             value: allowedEquipRares.indexOf(equipOption?.rarity),
@@ -383,8 +383,8 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
               if (newRare == null) {
                 option.equips[equipListIndex] = null;
               } else if (equipOption == null) {
-                option.equips[equipListIndex] = BattleEquipmentOption(
-                  type: BattleNikkeOptions.equipTypes[equipListIndex],
+                option.equips[equipListIndex] = EquipmentOption(
+                  type: NikkeOptions.equipTypes[equipListIndex],
                   equipClass: characterData.characterClass,
                   rarity: newRare,
                   corporation: newRare.canHaveCorp ? characterData.corporation : Corporation.none,
@@ -521,7 +521,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
 }
 
 class NikkeBasicSetupWidgets extends StatefulWidget {
-  final BattleNikkeOptions option;
+  final NikkeOptions option;
   final bool useGlobal;
   final void Function()? onChange;
 
@@ -532,7 +532,7 @@ class NikkeBasicSetupWidgets extends StatefulWidget {
 }
 
 class _NikkeBasicSetupWidgetsState extends State<NikkeBasicSetupWidgets> {
-  BattleNikkeOptions get option => widget.option;
+  NikkeOptions get option => widget.option;
   NikkeDatabaseV2 get db => widget.useGlobal ? global : cn;
   void Function()? get onChange => widget.onChange;
 

@@ -1,19 +1,19 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../../model/battle/favorite_item.dart';
+part of '../../model/favorite_item.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-BattleFavoriteItemOption _$BattleFavoriteItemOptionFromJson(Map<String, dynamic> json) => BattleFavoriteItemOption(
+FavoriteItemOption _$FavoriteItemOptionFromJson(Map<String, dynamic> json) => FavoriteItemOption(
   weaponType: $enumDecode(_$WeaponTypeEnumMap, json['weaponType']),
   rarity: $enumDecode(_$RarityEnumMap, json['rarity']),
   level: (json['level'] as num?)?.toInt() ?? 0,
   nameCode: (json['nameCode'] as num?)?.toInt() ?? 0,
 );
 
-Map<String, dynamic> _$BattleFavoriteItemOptionToJson(BattleFavoriteItemOption instance) => <String, dynamic>{
+Map<String, dynamic> _$FavoriteItemOptionToJson(FavoriteItemOption instance) => <String, dynamic>{
   'weaponType': _$WeaponTypeEnumMap[instance.weaponType]!,
   'rarity': _$RarityEnumMap[instance.rarity]!,
   'level': instance.level,

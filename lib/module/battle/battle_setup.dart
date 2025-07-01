@@ -4,13 +4,11 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:nikke_einkk/model/battle/battle_simulator.dart';
-import 'package:nikke_einkk/model/battle/harmony_cube.dart';
-import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/harmony_cube.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/battle/nikke_setup.dart';
@@ -30,10 +28,10 @@ class BattleSetupPage extends StatefulWidget {
 
 class _BattleSetupPageState extends State<BattleSetupPage> {
   BattleRaptureOptions raptureOption = BattleRaptureOptions();
-  List<BattleNikkeOptions> nikkeOptions = List.generate(5, (_) => BattleNikkeOptions(nikkeResourceId: -1));
-  BattlePlayerOptions playerOptions = BattlePlayerOptions();
-  List<BattleHarmonyCubeOption> cubes = List.generate(HarmonyCubeType.values.length, (index) {
-    return BattleHarmonyCubeOption.fromType(HarmonyCubeType.values[index], 1);
+  List<NikkeOptions> nikkeOptions = List.generate(5, (_) => NikkeOptions(nikkeResourceId: -1));
+  PlayerOptions playerOptions = PlayerOptions();
+  List<HarmonyCubeOption> cubes = List.generate(HarmonyCubeType.values.length, (index) {
+    return HarmonyCubeOption.fromType(HarmonyCubeType.values[index], 1);
   });
   int globalSyncLevel = 1;
 
@@ -178,7 +176,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                       raptureOption = battleSetup.raptureOptions;
                       nikkeOptions = battleSetup.nikkeOptions;
                       while (nikkeOptions.length < 5) {
-                        nikkeOptions.add(BattleNikkeOptions(nikkeResourceId: -1));
+                        nikkeOptions.add(NikkeOptions(nikkeResourceId: -1));
                       }
                       nikkeOptions = nikkeOptions.sublist(0, 5);
                     }
@@ -242,9 +240,9 @@ class _RaptureDisplayState extends State<RaptureDisplay> {
 }
 
 class NikkeDisplay extends StatefulWidget {
-  final BattleNikkeOptions option;
-  final BattlePlayerOptions playerOptions;
-  final List<BattleHarmonyCubeOption> cubes;
+  final NikkeOptions option;
+  final PlayerOptions playerOptions;
+  final List<HarmonyCubeOption> cubes;
 
   const NikkeDisplay({super.key, required this.option, required this.cubes, required this.playerOptions});
 
@@ -253,7 +251,7 @@ class NikkeDisplay extends StatefulWidget {
 }
 
 class _NikkeDisplayState extends State<NikkeDisplay> {
-  BattleNikkeOptions get option => widget.option;
+  NikkeOptions get option => widget.option;
 
   @override
   Widget build(BuildContext context) {
@@ -394,7 +392,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
         ),
         TextButton.icon(
           onPressed: () async {
-            final result = await showDialog<BattleHarmonyCubeOption?>(
+            final result = await showDialog<HarmonyCubeOption?>(
               context: context,
               builder: (ctx) {
                 return SimpleConfirmDialog(
@@ -454,8 +452,8 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
 }
 
 class CubeSettingDialog extends StatefulWidget {
-  final List<BattleHarmonyCubeOption> cubes;
-  final BattleHarmonyCubeOption? currentSelection;
+  final List<HarmonyCubeOption> cubes;
+  final HarmonyCubeOption? currentSelection;
   final bool selectMode;
   const CubeSettingDialog({super.key, required this.cubes, this.selectMode = false, this.currentSelection});
 
@@ -506,7 +504,7 @@ class _CubeSettingDialogState extends State<CubeSettingDialog> {
 }
 
 class GlobalSettingDialog extends StatefulWidget {
-  final BattlePlayerOptions playerOptions;
+  final PlayerOptions playerOptions;
   final int defaultGlobalSync;
   final void Function(int) onGlobalSyncChange;
   const GlobalSettingDialog({
@@ -521,7 +519,7 @@ class GlobalSettingDialog extends StatefulWidget {
 }
 
 class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
-  BattlePlayerOptions get option => widget.playerOptions;
+  PlayerOptions get option => widget.playerOptions;
   int globalSync = 0;
 
   @override

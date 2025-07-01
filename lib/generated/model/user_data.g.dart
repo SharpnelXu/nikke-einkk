@@ -6,24 +6,103 @@ part of '../../model/user_data.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+PlayerOptions _$PlayerOptionsFromJson(Map<String, dynamic> json) => PlayerOptions(
+  globalSync: (json['globalSync'] as num?)?.toInt() ?? 1,
+  personalRecycleLevel: (json['personalRecycleLevel'] as num?)?.toInt() ?? 0,
+  corpRecycleLevels:
+      (json['corpRecycleLevels'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry($enumDecode(_$CorporationEnumMap, k), (e as num).toInt()),
+      ) ??
+      const {},
+  classRecycleLevels:
+      (json['classRecycleLevels'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry($enumDecode(_$NikkeClassEnumMap, k), (e as num).toInt()),
+      ) ??
+      const {},
+  forceFillBurst: json['forceFillBurst'] as bool? ?? false,
+);
+
+Map<String, dynamic> _$PlayerOptionsToJson(PlayerOptions instance) => <String, dynamic>{
+  'globalSync': instance.globalSync,
+  'personalRecycleLevel': instance.personalRecycleLevel,
+  'corpRecycleLevels': instance.corpRecycleLevels.map((k, e) => MapEntry(_$CorporationEnumMap[k]!, e)),
+  'classRecycleLevels': instance.classRecycleLevels.map((k, e) => MapEntry(_$NikkeClassEnumMap[k]!, e)),
+  'forceFillBurst': instance.forceFillBurst,
+};
+
+const _$CorporationEnumMap = {
+  Corporation.unknown: 'UNKNOWN',
+  Corporation.none: 'NONE',
+  Corporation.missilis: 'MISSILIS',
+  Corporation.elysion: 'ELYSION',
+  Corporation.tetra: 'TETRA',
+  Corporation.pilgrim: 'PILGRIM',
+  Corporation.abnormal: 'ABNORMAL',
+};
+
+const _$NikkeClassEnumMap = {
+  NikkeClass.unknown: 'Unknown',
+  NikkeClass.attacker: 'Attacker',
+  NikkeClass.defender: 'Defender',
+  NikkeClass.supporter: 'Supporter',
+  NikkeClass.all: 'All',
+};
+
+NikkeOptions _$NikkeOptionsFromJson(Map<String, dynamic> json) => NikkeOptions(
+  nikkeResourceId: (json['nikkeResourceId'] as num).toInt(),
+  coreLevel: (json['coreLevel'] as num?)?.toInt() ?? 1,
+  syncLevel: (json['syncLevel'] as num?)?.toInt() ?? 1,
+  attractLevel: (json['attractLevel'] as num?)?.toInt() ?? 1,
+  equips:
+      (json['equips'] as List<dynamic>?)
+          ?.map((e) => e == null ? null : EquipmentOption.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [null, null, null, null],
+  skillLevels: (json['skillLevels'] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList() ?? const [10, 10, 10],
+  cube: json['cube'] == null ? null : HarmonyCubeOption.fromJson(json['cube'] as Map<String, dynamic>),
+  favoriteItem:
+      json['favoriteItem'] == null ? null : FavoriteItemOption.fromJson(json['favoriteItem'] as Map<String, dynamic>),
+  alwaysFocus: json['alwaysFocus'] as bool? ?? false,
+  forceCancelShootDelay: json['forceCancelShootDelay'] as bool? ?? false,
+  chargeMode: $enumDecodeNullable(_$NikkeFullChargeModeEnumMap, json['chargeMode']) ?? NikkeFullChargeMode.always,
+);
+
+Map<String, dynamic> _$NikkeOptionsToJson(NikkeOptions instance) => <String, dynamic>{
+  'nikkeResourceId': instance.nikkeResourceId,
+  'coreLevel': instance.coreLevel,
+  'syncLevel': instance.syncLevel,
+  'attractLevel': instance.attractLevel,
+  'equips': instance.equips.map((e) => e?.toJson()).toList(),
+  'skillLevels': instance.skillLevels,
+  'cube': instance.cube?.toJson(),
+  'favoriteItem': instance.favoriteItem?.toJson(),
+  'alwaysFocus': instance.alwaysFocus,
+  'forceCancelShootDelay': instance.forceCancelShootDelay,
+  'chargeMode': _$NikkeFullChargeModeEnumMap[instance.chargeMode]!,
+};
+
+const _$NikkeFullChargeModeEnumMap = {
+  NikkeFullChargeMode.always: 'always',
+  NikkeFullChargeMode.never: 'never',
+  NikkeFullChargeMode.whenExitingBurst: 'whenExitingBurst',
+};
+
 UserData _$UserDataFromJson(Map<String, dynamic> json) => UserData(
   language: $enumDecodeNullable(_$LanguageEnumMap, json['language']) ?? Language.en,
   globalPlayerOptions:
       json['globalPlayerOptions'] == null
           ? null
-          : BattlePlayerOptions.fromJson(json['globalPlayerOptions'] as Map<String, dynamic>),
+          : PlayerOptions.fromJson(json['globalPlayerOptions'] as Map<String, dynamic>),
   globalNikkeOptions:
       (json['globalNikkeOptions'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(int.parse(k), BattleNikkeOptions.fromJson(e as Map<String, dynamic>)),
+        (k, e) => MapEntry(int.parse(k), NikkeOptions.fromJson(e as Map<String, dynamic>)),
       ) ??
       const {},
   cnPlayerOptions:
-      json['cnPlayerOptions'] == null
-          ? null
-          : BattlePlayerOptions.fromJson(json['cnPlayerOptions'] as Map<String, dynamic>),
+      json['cnPlayerOptions'] == null ? null : PlayerOptions.fromJson(json['cnPlayerOptions'] as Map<String, dynamic>),
   cnNikkeOptions:
       (json['cnNikkeOptions'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(int.parse(k), BattleNikkeOptions.fromJson(e as Map<String, dynamic>)),
+        (k, e) => MapEntry(int.parse(k), NikkeOptions.fromJson(e as Map<String, dynamic>)),
       ) ??
       const {},
   globalCubeLvs:
@@ -58,11 +137,9 @@ const _$LanguageEnumMap = {
 };
 
 BattleSetup _$BattleSetupFromJson(Map<String, dynamic> json) => BattleSetup(
-  playerOptions: BattlePlayerOptions.fromJson(json['playerOptions'] as Map<String, dynamic>),
+  playerOptions: PlayerOptions.fromJson(json['playerOptions'] as Map<String, dynamic>),
   nikkeOptions:
-      (json['nikkeOptions'] as List<dynamic>?)
-          ?.map((e) => BattleNikkeOptions.fromJson(e as Map<String, dynamic>))
-          .toList() ??
+      (json['nikkeOptions'] as List<dynamic>?)?.map((e) => NikkeOptions.fromJson(e as Map<String, dynamic>)).toList() ??
       const [],
   raptureOptions: BattleRaptureOptions.fromJson(json['raptureOptions'] as Map<String, dynamic>),
 );

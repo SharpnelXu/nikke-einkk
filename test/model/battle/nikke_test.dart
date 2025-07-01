@@ -1,10 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
-import 'package:nikke_einkk/model/battle/equipment.dart';
+import 'package:nikke_einkk/model/equipment.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/user_data.dart';
 
 import '../../test_helper.dart';
 
@@ -14,8 +15,8 @@ void main() async {
   group('Nikke Stat Calculation Test', () {
     test('Dorothy resourceId 233', () {
       final dorothy = BattleNikke(
-        playerOptions: BattlePlayerOptions(personalRecycleLevel: 0, corpRecycleLevels: {}, classRecycleLevels: {}),
-        option: BattleNikkeOptions(nikkeResourceId: 233, coreLevel: 1),
+        playerOptions: PlayerOptions(personalRecycleLevel: 0, corpRecycleLevels: {}, classRecycleLevels: {}),
+        option: NikkeOptions(nikkeResourceId: 233, coreLevel: 1),
       );
 
       // default lv1 lb0
@@ -54,12 +55,12 @@ void main() async {
 
     test('Rosanna: Chic Ocean resourceId 283', () {
       final rosanna = BattleNikke(
-        playerOptions: BattlePlayerOptions(
+        playerOptions: PlayerOptions(
           personalRecycleLevel: 410,
           corpRecycleLevels: {Corporation.tetra: 217},
           classRecycleLevels: {NikkeClass.supporter: 187},
         ),
-        option: BattleNikkeOptions(nikkeResourceId: 283, coreLevel: 5, syncLevel: 866, attractLevel: 29),
+        option: NikkeOptions(nikkeResourceId: 283, coreLevel: 5, syncLevel: 866, attractLevel: 29),
       );
 
       expect(rosanna.baseHp, 18537879);
@@ -69,12 +70,12 @@ void main() async {
 
     test('Mica: Snow Buddy resourceId 62', () {
       final mica = BattleNikke(
-        playerOptions: BattlePlayerOptions(
+        playerOptions: PlayerOptions(
           personalRecycleLevel: 410,
           corpRecycleLevels: {Corporation.tetra: 217},
           classRecycleLevels: {NikkeClass.supporter: 187},
         ),
-        option: BattleNikkeOptions(nikkeResourceId: 62, coreLevel: 9, syncLevel: 866, attractLevel: 22),
+        option: NikkeOptions(nikkeResourceId: 62, coreLevel: 9, syncLevel: 866, attractLevel: 22),
       );
 
       expect(mica.baseHp, 19979208);
@@ -84,12 +85,12 @@ void main() async {
 
     test('Flora resourceId 411', () {
       final flora = BattleNikke(
-        playerOptions: BattlePlayerOptions(
+        playerOptions: PlayerOptions(
           personalRecycleLevel: 420,
           corpRecycleLevels: {Corporation.missilis: 197},
           classRecycleLevels: {NikkeClass.supporter: 193},
         ),
-        option: BattleNikkeOptions(nikkeResourceId: 411, coreLevel: 11, syncLevel: 884, attractLevel: 13),
+        option: NikkeOptions(nikkeResourceId: 411, coreLevel: 11, syncLevel: 884, attractLevel: 13),
       );
 
       expect(flora.baseHp, 22070775);
@@ -121,12 +122,12 @@ void main() async {
 
     test('Brid resourceId 70', () {
       final brid = BattleNikke(
-        playerOptions: BattlePlayerOptions(
+        playerOptions: PlayerOptions(
           personalRecycleLevel: 420,
           corpRecycleLevels: {Corporation.elysion: 197},
           classRecycleLevels: {NikkeClass.attacker: 211},
         ),
-        option: BattleNikkeOptions(nikkeResourceId: 70, coreLevel: 11, syncLevel: 884, attractLevel: 15),
+        option: NikkeOptions(nikkeResourceId: 70, coreLevel: 11, syncLevel: 884, attractLevel: 15),
       );
 
       expect(brid.baseHp, 19921125);
@@ -201,35 +202,35 @@ void main() async {
     });
 
     test('Yarou Scarlet ammo rounding test', () {
-      final BattleNikkeOptions scarletOption = BattleNikkeOptions(
+      final NikkeOptions scarletOption = NikkeOptions(
         nikkeResourceId: 222,
         coreLevel: 11,
         syncLevel: 884,
         attractLevel: 40,
         skillLevels: [10, 10, 10],
         equips: [
-          BattleEquipmentOption(
+          EquipmentOption(
             type: EquipType.head,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
           ),
-          BattleEquipmentOption(
+          EquipmentOption(
             type: EquipType.body,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAmmo, 5)],
           ),
-          BattleEquipmentOption(
+          EquipmentOption(
             type: EquipType.arm,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
             level: 5,
             equipLines: [EquipLine(EquipLineType.statAmmo, 11)],
           ),
-          BattleEquipmentOption(
+          EquipmentOption(
             type: EquipType.leg,
             equipClass: NikkeClass.attacker,
             rarity: EquipRarity.t10,
@@ -239,7 +240,7 @@ void main() async {
         ],
       );
       final simulation = BattleSimulation(
-        playerOptions: BattlePlayerOptions(),
+        playerOptions: PlayerOptions(),
         nikkeOptions: [scarletOption],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 100)],
       );

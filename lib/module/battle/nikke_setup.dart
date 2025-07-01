@@ -1,19 +1,19 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:nikke_einkk/model/battle/equipment.dart';
-import 'package:nikke_einkk/model/battle/favorite_item.dart';
-import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/equipment.dart';
+import 'package:nikke_einkk/model/favorite_item.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_list.dart';
 
 class NikkeSelectorPage extends StatefulWidget {
-  final BattleNikkeOptions option;
+  final NikkeOptions option;
 
   const NikkeSelectorPage({super.key, required this.option});
 
@@ -22,12 +22,10 @@ class NikkeSelectorPage extends StatefulWidget {
 }
 
 class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
-  BattleNikkeOptions get option => widget.option;
+  NikkeOptions get option => widget.option;
 
   @override
   Widget build(BuildContext context) {
-    option.errorCorrection();
-
     final characterData = dbLegacy.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
     final weapon = dbLegacy.characterShotTable[characterData?.shotId];
     final name = dbLegacy.getTranslation(characterData?.nameLocalkey)?.zhCN;
@@ -221,7 +219,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                       } else if (doll != null) {
                         doll.rarity = value!;
                       } else {
-                        option.favoriteItem = BattleFavoriteItemOption(
+                        option.favoriteItem = FavoriteItemOption(
                           weaponType: weaponType ?? WeaponType.unknown,
                           rarity: value!,
                           level: 0,
@@ -326,7 +324,7 @@ class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
                 initialSelection: equipment?.rarity ?? EquipRarity.unknown,
                 onSelected: (EquipRarity? value) {
                   if (equipment == null) {
-                    option.equips[equipListIndex] = BattleEquipmentOption(
+                    option.equips[equipListIndex] = EquipmentOption(
                       type: type,
                       equipClass: nikkeClass ?? NikkeClass.unknown,
                       rarity: value!,

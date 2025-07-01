@@ -7,20 +7,20 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 
-part '../../generated/model/battle/favorite_item.g.dart';
+part '../generated/model/favorite_item.g.dart';
 
 @JsonSerializable()
-class BattleFavoriteItemOption {
+class FavoriteItemOption {
   WeaponType weaponType;
   Rarity rarity;
   int level;
   int nameCode;
 
-  BattleFavoriteItemOption({required this.weaponType, required this.rarity, this.level = 0, this.nameCode = 0});
+  FavoriteItemOption({required this.weaponType, required this.rarity, this.level = 0, this.nameCode = 0});
 
-  factory BattleFavoriteItemOption.fromJson(Map<String, dynamic> json) => _$BattleFavoriteItemOptionFromJson(json);
+  factory FavoriteItemOption.fromJson(Map<String, dynamic> json) => _$FavoriteItemOptionFromJson(json);
 
-  Map<String, dynamic> toJson() => _$BattleFavoriteItemOptionToJson(this);
+  Map<String, dynamic> toJson() => _$FavoriteItemOptionToJson(this);
 
   FavoriteItemData get data =>
       rarity == Rarity.ssr ? dbLegacy.nameCodeFavItemTable[nameCode]! : dbLegacy.dollTable[weaponType]![rarity]!;
@@ -89,7 +89,7 @@ class BattleFavoriteItemOption {
     }
   }
 
-  BattleFavoriteItemOption copy() {
-    return BattleFavoriteItemOption(weaponType: weaponType, rarity: rarity, level: level, nameCode: nameCode);
+  FavoriteItemOption copy() {
+    return FavoriteItemOption(weaponType: weaponType, rarity: rarity, level: level, nameCode: nameCode);
   }
 }

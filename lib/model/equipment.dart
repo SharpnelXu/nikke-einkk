@@ -8,10 +8,10 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 
-part '../../generated/model/battle/equipment.g.dart';
+part '../generated/model/equipment.g.dart';
 
 @JsonSerializable()
-class BattleEquipmentOption {
+class EquipmentOption {
   // equipment stat formula: baseStat * (100% + 10% * (level (0~5) + sameCorpFactor (3)))
   // t10 does not have corp label
   EquipType type;
@@ -24,7 +24,7 @@ class BattleEquipmentOption {
 
   List<EquipLine> equipLines = [];
 
-  BattleEquipmentOption({
+  EquipmentOption({
     required this.type,
     required this.equipClass,
     required this.rarity,
@@ -45,9 +45,9 @@ class BattleEquipmentOption {
     if (!rarity.canHaveCorp) corporation = Corporation.none;
   }
 
-  factory BattleEquipmentOption.fromJson(Map<String, dynamic> json) => _$BattleEquipmentOptionFromJson(json);
+  factory EquipmentOption.fromJson(Map<String, dynamic> json) => _$EquipmentOptionFromJson(json);
 
-  Map<String, dynamic> toJson() => _$BattleEquipmentOptionToJson(this);
+  Map<String, dynamic> toJson() => _$EquipmentOptionToJson(this);
 
   @Deprecated('use getEquipStat')
   int getStat(StatType statType, [Corporation? ownerCorp]) {
@@ -99,8 +99,8 @@ class BattleEquipmentOption {
     }
   }
 
-  BattleEquipmentOption copy() {
-    return BattleEquipmentOption(
+  EquipmentOption copy() {
+    return EquipmentOption(
       type: type,
       equipClass: equipClass,
       rarity: rarity,

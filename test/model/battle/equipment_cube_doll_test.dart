@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logger/logger.dart';
-import 'package:nikke_einkk/model/battle/equipment.dart';
-import 'package:nikke_einkk/model/battle/favorite_item.dart';
-import 'package:nikke_einkk/model/battle/harmony_cube.dart';
+import 'package:nikke_einkk/model/equipment.dart';
+import 'package:nikke_einkk/model/favorite_item.dart';
+import 'package:nikke_einkk/model/harmony_cube.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
@@ -325,7 +325,7 @@ void main() async {
         for (final equipType in [EquipType.head, EquipType.body, EquipType.arm, EquipType.leg]) {
           final expectedValues = expectedStats[equipType]![nikkeClass]![EquipRarity.t10]!;
           for (final level in [0, 1, 2, 3, 4, 5]) {
-            final equip = BattleEquipmentOption(
+            final equip = EquipmentOption(
               type: equipType,
               equipClass: nikkeClass,
               rarity: EquipRarity.t10,
@@ -389,7 +389,7 @@ void main() async {
     // [I]  supporter leg level 3: [hp: -1, 12295.5]
 
     test('Support leg piece t9 lv5', () {
-      final equip = BattleEquipmentOption(
+      final equip = EquipmentOption(
         type: EquipType.leg,
         equipClass: NikkeClass.supporter,
         rarity: EquipRarity.t9,
@@ -405,7 +405,7 @@ void main() async {
     });
 
     test('Support head piece t9 lv1 corp', () {
-      final equip = BattleEquipmentOption(
+      final equip = EquipmentOption(
         type: EquipType.head,
         equipClass: NikkeClass.supporter,
         rarity: EquipRarity.t9,
@@ -425,7 +425,7 @@ void main() async {
     });
 
     test('Defender body & arm piece t9 lv1 corp', () {
-      final body = BattleEquipmentOption(
+      final body = EquipmentOption(
         type: EquipType.body,
         equipClass: NikkeClass.defender,
         rarity: EquipRarity.t9,
@@ -443,7 +443,7 @@ void main() async {
       expect(body.getStat(StatType.hp, Corporation.missilis), 115537 + 31511);
       expect(body.getStat(StatType.atk, Corporation.missilis), 431 + 118);
 
-      final arm = BattleEquipmentOption(
+      final arm = EquipmentOption(
         type: EquipType.arm,
         equipClass: NikkeClass.defender,
         rarity: EquipRarity.t9,
@@ -482,7 +482,7 @@ void main() async {
   test('Cube Effect Exists', () {
     for (final cubeType in HarmonyCubeType.values) {
       for (int level = 1; level <= 15; level += 1) {
-        final cube = BattleHarmonyCubeOption.fromType(cubeType, level);
+        final cube = HarmonyCubeOption.fromType(cubeType, level);
 
         final stateEffectIds = cube.getCubeStateEffectIds();
         expect(stateEffectIds.length, isNonZero);
@@ -498,7 +498,7 @@ void main() async {
     for (final groupedData in dbLegacy.dollTable.values) {
       for (final favoriteItemData in groupedData.values) {
         for (int level = 0; level <= 15; level += 1) {
-          final doll = BattleFavoriteItemOption(
+          final doll = FavoriteItemOption(
             weaponType: favoriteItemData.weaponType,
             rarity: favoriteItemData.favoriteRare,
             level: level,
@@ -516,7 +516,7 @@ void main() async {
 
     for (final favoriteItemData in dbLegacy.nameCodeFavItemTable.values) {
       for (int level = 0; level <= 2; level += 1) {
-        final doll = BattleFavoriteItemOption(
+        final doll = FavoriteItemOption(
           weaponType: favoriteItemData.weaponType,
           rarity: favoriteItemData.favoriteRare,
           level: level,
