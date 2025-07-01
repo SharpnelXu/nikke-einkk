@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/module/about/about.dart';
 import 'package:nikke_einkk/module/api/data_downloader.dart';
 import 'package:nikke_einkk/module/api/locale_unpacker.dart';
+import 'package:nikke_einkk/module/battle/battle_setup.dart';
 import 'package:nikke_einkk/module/coop/coop_raid_presets.dart';
 import 'package:nikke_einkk/module/monsters/monster_list.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_list.dart';
@@ -14,20 +16,20 @@ class EinkkHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Widget> items = [
-      // if (kDebugMode)
-      //   TextButton.icon(
-      //     style: TextButton.styleFrom(
-      //       alignment: Alignment.centerLeft,
-      //       iconAlignment: IconAlignment.start,
-      //       textStyle: TextStyle(fontSize: 30),
-      //       iconSize: 30,
-      //     ),
-      //     onPressed: () {
-      //       Navigator.push(context, MaterialPageRoute(builder: (ctx) => BattleSetupPage()));
-      //     },
-      //     icon: Icon(Icons.calculate),
-      //     label: Text('Battle Simulation'),
-      //   ),
+      if (kDebugMode)
+        TextButton.icon(
+          style: TextButton.styleFrom(
+            alignment: Alignment.centerLeft,
+            iconAlignment: IconAlignment.start,
+            textStyle: TextStyle(fontSize: 30),
+            iconSize: 30,
+          ),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (ctx) => BattleSetupPage()));
+          },
+          icon: Icon(Icons.calculate),
+          label: Text('Battle Simulation'),
+        ),
       TextButton.icon(
         style: TextButton.styleFrom(
           alignment: Alignment.centerLeft,

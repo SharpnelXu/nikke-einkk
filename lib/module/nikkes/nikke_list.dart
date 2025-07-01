@@ -56,7 +56,14 @@ class _NikkeListPageState extends State<NikkeListPage> {
                           for (final option in userDb.nikkeOptions.values) {
                             option.syncLevel = v;
                           }
-                          setState(() {});
+                        },
+                        onCubeLvChangeChange: (id, v) {
+                          for (final option in userDb.nikkeOptions.values) {
+                            final cube = option.cube;
+                            if (cube != null && cube.cubeId == id) {
+                              cube.cubeLevel = v;
+                            }
+                          }
                         },
                       ),
                 ),

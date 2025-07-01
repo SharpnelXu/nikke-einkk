@@ -125,6 +125,15 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
                           }
                           setState(() {});
                         },
+                        onCubeLvChangeChange: (id, v) {
+                          for (final option in userDb.nikkeOptions.values) {
+                            final cube = option.cube;
+                            if (cube != null && cube.cubeId == id) {
+                              cube.cubeLevel = v;
+                            }
+                          }
+                          setState(() {});
+                        },
                       ),
                 ),
               );
@@ -155,7 +164,7 @@ class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
 
   List<(String, Widget Function())> get tabs => [
     ('Info', () => buildStatTab()),
-    ('Setup', () => NikkeSetupColumn(option: option, useGlobal: userDb.useGlobal)),
+    ('Setup', () => NikkeSetupColumn(option: option, cubeLvs: userDb.cubeLvs, useGlobal: userDb.useGlobal)),
     ('Weapon', () => WeaponDataDisplay(character: data, weaponId: data.shotId)),
     ('Skill 1', () => buildSkillTab(data.skill1Id, data.skill1Table, 0)),
     ('Skill 2', () => buildSkillTab(data.skill2Id, data.skill2Table, 1)),

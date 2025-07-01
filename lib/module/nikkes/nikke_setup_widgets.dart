@@ -11,13 +11,19 @@ import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/common/slider.dart';
-import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
 class NikkeSetupColumn extends StatefulWidget {
   final NikkeOptions option;
+  final Map<int, int> cubeLvs;
   final bool advancedOption;
   final bool useGlobal;
-  const NikkeSetupColumn({super.key, required this.option, this.advancedOption = false, this.useGlobal = true});
+  const NikkeSetupColumn({
+    super.key,
+    required this.option,
+    this.advancedOption = false,
+    this.useGlobal = true,
+    required this.cubeLvs,
+  });
 
   @override
   State<NikkeSetupColumn> createState() => _NikkeSetupColumnState();
@@ -28,6 +34,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
   bool get advanced => widget.advancedOption;
   bool get useGlobal => widget.useGlobal;
   NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  Map<int, int> get cubeLvs => widget.cubeLvs;
 
   static const sliderWidth = 80.0;
 
@@ -37,7 +44,6 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
     final characterData = groupedData?[option.coreLevel];
     final weapon = db.characterShotTable[characterData?.shotId];
     final List<Widget> children = [
-      Align(child: NikkeIcon(characterData: characterData, weapon: weapon, isSelected: false)),
       Align(
         child: FilledButton(
           onPressed: () {
@@ -254,10 +260,10 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
               if (value == null) {
                 option.cube = null;
               } else if (cubeOption == null) {
-                option.cube = HarmonyCubeOption(value, userDb.cubeLvs[value] ?? 1);
+                option.cube = HarmonyCubeOption(value, cubeLvs[value] ?? 1);
               } else {
                 cubeOption.cubeId = value;
-                cubeOption.cubeLevel = userDb.cubeLvs[value] ?? cubeOption.cubeLevel;
+                cubeOption.cubeLevel = cubeLvs[value] ?? cubeOption.cubeLevel;
               }
               setState(() {});
             },

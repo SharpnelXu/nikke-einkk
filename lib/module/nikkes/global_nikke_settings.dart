@@ -9,7 +9,8 @@ import 'package:nikke_einkk/module/common/slider.dart';
 class GlobalSettingPage extends StatefulWidget {
   final PlayerOptions playerOptions;
   final int maxSync;
-  final void Function(int) onGlobalSyncChange;
+  final void Function(int)? onGlobalSyncChange;
+  final void Function(int, int)? onCubeLvChangeChange;
   final Map<int, int> cubeLvs;
   final NikkeDatabaseV2 db;
 
@@ -17,7 +18,8 @@ class GlobalSettingPage extends StatefulWidget {
     super.key,
     required this.playerOptions,
     required this.maxSync,
-    required this.onGlobalSyncChange,
+    this.onGlobalSyncChange,
+    this.onCubeLvChangeChange,
     required this.cubeLvs,
     required this.db,
   });
@@ -48,7 +50,9 @@ class _GlobalSettingPageState extends State<GlobalSettingPage> {
         valueFormatter: (v) => 'Lv$v',
         onChange: (newValue) {
           option.globalSync = newValue.round();
-          widget.onGlobalSyncChange(newValue.round());
+          if (widget.onGlobalSyncChange != null) {
+            widget.onGlobalSyncChange!(newValue.round());
+          }
           if (mounted) setState(() {});
         },
       ),
@@ -141,6 +145,9 @@ class _GlobalSettingPageState extends State<GlobalSettingPage> {
           preferColor: colorCode != null ? Color(colorCode) : null,
           onChange: (newValue) {
             widget.cubeLvs[cubeId] = newValue.round();
+            if (widget.onCubeLvChangeChange != null) {
+              widget.onCubeLvChangeChange!(cubeId, newValue.round());
+            }
             if (mounted) setState(() {});
           },
         );

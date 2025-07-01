@@ -1,22 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:intl/intl.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
-import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/data_path.dart';
 import 'package:nikke_einkk/model/db.dart';
-import 'package:nikke_einkk/model/harmony_cube.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/battle/nikke_setup.dart';
 import 'package:nikke_einkk/module/battle/rapture_setup.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
-import 'package:nikke_einkk/module/common/simple_dialog.dart';
-import 'package:nikke_einkk/module/common/slider.dart';
+import 'package:nikke_einkk/module/nikkes/global_nikke_settings.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
 
 class BattleSetupPage extends StatefulWidget {
@@ -27,167 +28,160 @@ class BattleSetupPage extends StatefulWidget {
 }
 
 class _BattleSetupPageState extends State<BattleSetupPage> {
-  BattleRaptureOptions raptureOption = BattleRaptureOptions();
-  List<NikkeOptions> nikkeOptions = List.generate(5, (_) => NikkeOptions(nikkeResourceId: -1));
-  PlayerOptions playerOptions = PlayerOptions();
-  List<HarmonyCubeOption> cubes = List.generate(HarmonyCubeType.values.length, (index) {
-    return HarmonyCubeOption.fromType(HarmonyCubeType.values[index], 1);
-  });
-  int globalSyncLevel = 1;
+  bool useGlobal = true;
+  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  BattleSetup setup = BattleSetup(
+    playerOptions: PlayerOptions(),
+    nikkeOptions: List.generate(5, (_) => NikkeOptions(nikkeResourceId: -1)),
+    raptureOptions: BattleRaptureOptions(),
+  );
+  BattleRaptureOptions get raptureOption => setup.raptureOptions;
+  List<NikkeOptions> get nikkeOptions => setup.nikkeOptions;
+  PlayerOptions get playerOptions => setup.playerOptions;
+  final Map<int, int> cubeLvs = {};
 
   @override
   void initState() {
     super.initState();
+    useGlobal = userDb.useGlobal;
+    setup.playerOptions = userDb.playerOptions.copy();
+    cubeLvs.clear();
+    cubeLvs.addAll(userDb.cubeLvs);
+  }
 
-    playerOptions = dbLegacy.userData.globalPlayerOptions.copy();
-    final Map<int, int> storedCubeLevel = {};
-    for (final cube in cubes) {
-      if (storedCubeLevel.containsKey(cube.cubeId)) {
-        cube.cubeLevel = storedCubeLevel[cube.cubeId]!;
+  void serverRadioChange(bool? v) {
+    useGlobal = v ?? useGlobal;
+    for (final nikkeOption in nikkeOptions) {
+      if (db.characterResourceGardeTable[nikkeOption.nikkeResourceId] == null) {
+        nikkeOption.nikkeResourceId = -1;
+      } else {
+        nikkeOption.errorCorrection(db);
       }
     }
+    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Battle Simulation')),
-      body: Column(
+      appBar: AppBar(
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: 5,
+          children: [
+            Text('Battle Simulation'),
+            Radio(value: true, groupValue: useGlobal, onChanged: serverRadioChange),
+            Text('Global', style: TextStyle(fontWeight: useGlobal ? FontWeight.bold : null)),
+            Radio(value: false, groupValue: useGlobal, onChanged: serverRadioChange),
+            Text('CN', style: TextStyle(fontWeight: !useGlobal ? FontWeight.bold : null)),
+          ],
+        ),
+      ),
+      bottomNavigationBar: commonBottomNavigationBar(
+        () => setState(() {}),
+        actions: [
+          FilledButton.icon(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (ctx) => GlobalSettingPage(
+                        playerOptions: playerOptions,
+                        cubeLvs: cubeLvs,
+                        db: db,
+                        maxSync: db.maxSyncLevel,
+                        onGlobalSyncChange: (v) {
+                          for (final option in nikkeOptions) {
+                            option.syncLevel = v;
+                          }
+                          setState(() {});
+                        },
+                        onCubeLvChangeChange: (id, v) {
+                          for (final option in nikkeOptions) {
+                            final cube = option.cube;
+                            if (cube != null && cube.cubeId == id) {
+                              cube.cubeLevel = v;
+                            }
+                          }
+                          setState(() {});
+                        },
+                      ),
+                ),
+              );
+              if (mounted) setState(() {});
+            },
+            icon: Icon(Icons.recycling),
+            label: Text('Global Settings'),
+          ),
+          FilledButton.icon(
+            onPressed: () async {
+              String? outputFile = await FilePicker.platform.saveFile(
+                dialogTitle: 'Save battle setup',
+                fileName: 'battleSetup.json',
+                initialDirectory: userDataPath,
+                type: FileType.custom,
+                allowedExtensions: ['json'],
+              );
+              if (outputFile != null) {
+                final file = File(outputFile);
+                await file.writeAsString(jsonEncode(setup.toJson()), encoding: utf8);
+                EasyLoading.showSuccess('Saved setup!');
+              }
+              if (mounted) setState(() {});
+            },
+            icon: Icon(Icons.save),
+            label: Text('Save'),
+          ),
+          FilledButton.icon(
+            onPressed: () async {
+              final selectResult = await FilePicker.platform.pickFiles(
+                dialogTitle: 'Load battle setup',
+                initialDirectory: userDataPath,
+                type: FileType.custom,
+                allowedExtensions: ['json'],
+                allowMultiple: false,
+                withData: true,
+              );
+              final bytes = selectResult?.files.firstOrNull?.bytes;
+              if (bytes != null) {
+                try {
+                  setup = BattleSetup.fromJson(jsonDecode(utf8.decode(bytes)));
+                  while (nikkeOptions.length < 5) {
+                    nikkeOptions.add(NikkeOptions(nikkeResourceId: -1));
+                  }
+                  setup.nikkeOptions = nikkeOptions.sublist(0, 5);
+                  EasyLoading.showSuccess('Loaded setup!');
+                } catch (e) {
+                  EasyLoading.showError('Invalid file!');
+                }
+                if (mounted) setState(() {});
+              }
+            },
+            icon: Icon(Icons.file_open),
+            label: Text('Load'),
+          ),
+        ],
+      ),
+      body: ListView(
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              // Vertical scrolling
-              scrollDirection: Axis.vertical,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: RaptureDisplay(option: raptureOption)),
-                  ...List.generate(5, (index) {
-                    return Expanded(
-                      child: NikkeDisplay(option: nikkeOptions[index], cubes: cubes, playerOptions: playerOptions),
-                    );
-                  }),
-                ],
-              ),
-            ),
+          Align(child: Text('Nikkes', style: TextStyle(fontSize: 20))),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: List.generate(5, (index) {
+              return Expanded(
+                child: NikkeDisplay(
+                  useGlobal: useGlobal,
+                  option: nikkeOptions[index],
+                  playerOptions: playerOptions,
+                  cubeLvs: cubeLvs,
+                ),
+              );
+            }),
           ),
           Divider(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              spacing: 5,
-              children: [
-                FilledButton.icon(
-                  onPressed: () async {
-                    await showDialog(
-                      context: context,
-                      useRootNavigator: false,
-                      builder: (ctx) {
-                        return SimpleConfirmDialog(
-                          title: Text('Global Settings'),
-                          showCancel: false,
-                          showOk: true,
-                          content: GlobalSettingDialog(
-                            playerOptions: playerOptions,
-                            defaultGlobalSync: globalSyncLevel,
-                            onGlobalSyncChange: (v) {
-                              globalSyncLevel = v;
-                              for (final option in nikkeOptions) {
-                                option.syncLevel = v;
-                              }
-                              setState(() {});
-                            },
-                          ),
-                        );
-                      },
-                    );
-                    if (mounted) setState(() {});
-                  },
-                  icon: Icon(Icons.recycling),
-                  label: Text('Global Settings'),
-                ),
-                FilledButton.icon(
-                  onPressed: () async {
-                    await showDialog(
-                      context: context,
-                      useRootNavigator: false,
-                      builder: (ctx) {
-                        return SimpleConfirmDialog(
-                          title: Text('Cube Settings'),
-                          showCancel: false,
-                          showOk: true,
-                          content: CubeSettingDialog(cubes: cubes),
-                        );
-                      },
-                    );
-                    if (mounted) setState(() {});
-                  },
-                  icon: Icon(Icons.grid_view_sharp),
-                  label: Text('Cube Settings'),
-                ),
-                FilledButton.icon(
-                  onPressed: () async {
-                    String? outputFile = await FilePicker.platform.saveFile(
-                      dialogTitle: 'Save battle setup',
-                      fileName: 'battleSetup.json',
-                      initialDirectory: dbLegacy.userDataPath,
-                      type: FileType.custom,
-                      allowedExtensions: ['json'],
-                    );
-                    if (outputFile != null) {
-                      final battleSetup = BattleSetup(
-                        nikkeOptions: nikkeOptions,
-                        raptureOptions: raptureOption,
-                        playerOptions: playerOptions,
-                      );
-                      final file = File(outputFile);
-                      await file.writeAsString(jsonEncode(battleSetup.toJson()), encoding: utf8);
-
-                      final userData = dbLegacy.userData;
-
-                      userData.globalPlayerOptions = playerOptions.copy();
-                      for (final nikkeOption in nikkeOptions) {
-                        if (nikkeOption.nikkeResourceId != -1) {
-                          userData.globalNikkeOptions[nikkeOption.nikkeResourceId] = nikkeOption.copy()..cube = null;
-                        }
-                      }
-                      dbLegacy.writeUserData();
-                    }
-
-                    if (mounted) setState(() {});
-                  },
-                  icon: Icon(Icons.save),
-                  label: Text('Save Settings'),
-                ),
-                FilledButton.icon(
-                  onPressed: () async {
-                    final selectResult = await FilePicker.platform.pickFiles(
-                      dialogTitle: 'Load battle setup',
-                      initialDirectory: dbLegacy.userDataPath,
-                      type: FileType.custom,
-                      allowedExtensions: ['json'],
-                      allowMultiple: false,
-                      withData: true,
-                    );
-                    final bytes = selectResult?.files.firstOrNull?.bytes;
-                    if (bytes != null) {
-                      final battleSetup = BattleSetup.fromJson(jsonDecode(utf8.decode(bytes)));
-                      playerOptions = battleSetup.playerOptions;
-                      raptureOption = battleSetup.raptureOptions;
-                      nikkeOptions = battleSetup.nikkeOptions;
-                      while (nikkeOptions.length < 5) {
-                        nikkeOptions.add(NikkeOptions(nikkeResourceId: -1));
-                      }
-                      nikkeOptions = nikkeOptions.sublist(0, 5);
-                    }
-                    if (mounted) setState(() {});
-                  },
-                  icon: Icon(Icons.file_open),
-                  label: Text('Load Settings'),
-                ),
-              ],
-            ),
-          ),
+          Align(child: Text('Rapture', style: TextStyle(fontSize: 20))),
+          Align(child: RaptureDisplay(option: raptureOption)),
         ],
       ),
     );
@@ -242,9 +236,16 @@ class _RaptureDisplayState extends State<RaptureDisplay> {
 class NikkeDisplay extends StatefulWidget {
   final NikkeOptions option;
   final PlayerOptions playerOptions;
-  final List<HarmonyCubeOption> cubes;
+  final bool useGlobal;
+  final Map<int, int> cubeLvs;
 
-  const NikkeDisplay({super.key, required this.option, required this.cubes, required this.playerOptions});
+  const NikkeDisplay({
+    super.key,
+    required this.useGlobal,
+    required this.option,
+    required this.playerOptions,
+    required this.cubeLvs,
+  });
 
   @override
   State<NikkeDisplay> createState() => _NikkeDisplayState();
@@ -252,17 +253,13 @@ class NikkeDisplay extends StatefulWidget {
 
 class _NikkeDisplayState extends State<NikkeDisplay> {
   NikkeOptions get option => widget.option;
+  bool get useGlobal => widget.useGlobal;
+  NikkeDatabaseV2 get db => useGlobal ? global : cn;
 
   @override
   Widget build(BuildContext context) {
-    final format = NumberFormat.decimalPattern();
-    final characterData = dbLegacy.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
-    final name = dbLegacy.getTranslation(characterData?.nameLocalkey)?.zhCN ?? characterData?.resourceId;
-    final weapon = dbLegacy.characterShotTable[characterData?.shotId];
-
-    final doll = option.favoriteItem;
-    final dollString =
-        doll == null ? 'None' : '${doll.rarity.name.toUpperCase()} (${dollLvString(doll.rarity, doll.level)})';
+    final characterData = db.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
+    final weapon = db.characterShotTable[characterData?.shotId];
 
     final List<Widget> statDisplays = [];
 
@@ -272,14 +269,14 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
         if (equip == null) continue;
 
         for (final equipLine in equip.equipLines) {
-          final stateEffectData = dbLegacy.stateEffectTable[equipLine.getStateEffectId()];
+          final stateEffectData = db.stateEffectTable[equipLine.getStateEffectId()];
           if (stateEffectData == null) {
             continue;
           }
 
           for (final functionId in stateEffectData.functions) {
             if (functionId.function != 0) {
-              final function = dbLegacy.functionTable[functionId.function]!;
+              final function = db.functionTable[functionId.function]!;
               equipLineVals.putIfAbsent(equipLine.type, () => 0);
               equipLineVals[equipLine.type] = equipLineVals[equipLine.type]! + function.functionValue;
             }
@@ -287,137 +284,102 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
         }
       }
 
-      final baseStat =
-          dbLegacy.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ??
-          CharacterStatData.emptyData;
-      final statEnhanceData =
-          dbLegacy.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
-      final attractiveStat =
-          dbLegacy.attractiveStatTable[option.attractLevel]?.getStatData(characterData.characterClass) ??
-          ClassAttractiveStatData.emptyData;
-
-      final baseHp = getBaseStat(
-        coreLevel: option.coreLevel,
-        baseStat: baseStat.hp,
-        gradeRatio: statEnhanceData.gradeRatio,
-        gradeEnhanceBase: statEnhanceData.gradeHp,
-        coreEnhanceBaseRatio: statEnhanceData.coreHp,
-        consoleStat: widget.playerOptions.getRecycleHp(characterData.characterClass),
-        bondStat: attractiveStat.hpRate,
-        equipStat: option.equips.fold(
-          0,
-          (sum, equip) => sum + (equip?.getStat(StatType.hp, characterData.corporation) ?? 0),
-        ),
-        cubeStat: option.cube?.getStat(StatType.hp) ?? 0,
-        dollStat: option.favoriteItem?.getStat(StatType.hp) ?? 0,
-      );
-      final baseAtk = getBaseStat(
-        coreLevel: option.coreLevel,
-        baseStat: baseStat.attack,
-        gradeRatio: statEnhanceData.gradeRatio,
-        gradeEnhanceBase: statEnhanceData.gradeAttack,
-        coreEnhanceBaseRatio: statEnhanceData.coreAttack,
-        consoleStat: widget.playerOptions.getRecycleAttack(characterData.corporation),
-        bondStat: attractiveStat.attackRate,
-        equipStat: option.equips.fold(
-          0,
-          (sum, equip) => sum + (equip?.getStat(StatType.atk, characterData.corporation) ?? 0),
-        ),
-        cubeStat: option.cube?.getStat(StatType.atk) ?? 0,
-        dollStat: option.favoriteItem?.getStat(StatType.atk) ?? 0,
-      );
-      final baseDef = getBaseStat(
-        coreLevel: option.coreLevel,
-        baseStat: baseStat.defence,
-        gradeRatio: statEnhanceData.gradeRatio,
-        gradeEnhanceBase: statEnhanceData.gradeDefence,
-        coreEnhanceBaseRatio: statEnhanceData.coreDefence,
-        consoleStat: widget.playerOptions.getRecycleDefence(characterData.characterClass, characterData.corporation),
-        bondStat: attractiveStat.defenceRate,
-        equipStat: option.equips.fold(
-          0,
-          (sum, equip) => sum + (equip?.getStat(StatType.defence, characterData.corporation) ?? 0),
-        ),
-        cubeStat: option.cube?.getStat(StatType.defence) ?? 0,
-        dollStat: option.favoriteItem?.getStat(StatType.defence) ?? 0,
-      );
-
       statDisplays.addAll([
-        Text('Base HP: ${format.format(baseHp)}'),
-        Text('Base ATK: ${format.format(baseAtk)}'),
-        Text('Base DEF: ${format.format(baseDef)}'),
-        Divider(),
-        Text('Sync: ${option.syncLevel}'),
-        Text('Core: ${coreString(option.coreLevel)}'),
-        Text('Attract: ${option.attractLevel}'),
-        Text('Skill: ${option.skillLevels.map((lv) => lv.toString()).join('/')}'),
-        Text('Doll: $dollString'),
-        Row(
-          spacing: 5,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              iconSize: 16,
-              constraints: BoxConstraints(maxHeight: 16),
-              padding: EdgeInsets.zero,
-              icon: Icon(Icons.info),
-              onPressed: () {},
-              tooltip:
-                  equipLineVals.isEmpty
-                      ? 'No Lines Set'
-                      : equipLineVals.keys
-                          .map(
-                            (equipLineType) =>
-                                '$equipLineType:'
-                                ' ${(equipLineVals[equipLineType]! / 100).toStringAsFixed(2)}%',
-                          )
-                          .join('\n'),
-            ),
-            Text(
-              'Gear: ${option.equips.map((equip) {
-                if (equip == null || equip.rarity == EquipRarity.unknown) return '-';
+        Text('Lv ${option.syncLevel} ${coreString(option.coreLevel)}'),
+        Text('Attract Lv${option.attractLevel}'),
+        Text(option.skillLevels.map((lv) => lv.toString()).join('/')),
+      ]);
 
-                return '${equip.rarity.name.toUpperCase()}'
-                    '${equip.rarity.canHaveCorp && equip.corporation == characterData.corporation ? 'C' : ''}';
-              }).join('/')}',
-            ),
+      final cube = option.cube;
+      if (cube != null) {
+        final cubeData = db.harmonyCubeTable[cube.cubeId];
+        final localeKey = cubeData?.nameLocalkey;
+        final colorCode = int.tryParse('0xFF${cubeData?.bgColor}');
+
+        statDisplays.add(
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: 5,
+            children: [
+              Icon(Icons.square, color: colorCode != null ? Color(colorCode) : null, size: 14),
+              AutoSizeText('${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'} Lv${cube.cubeLevel}'),
+            ],
+          ),
+        );
+      } else {
+        statDisplays.add(Text('No Cube'));
+      }
+
+      final doll = option.favoriteItem;
+      if (doll != null) {
+        statDisplays.add(
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: 5,
+            children: [
+              Icon(Icons.person, color: doll.rarity.color, size: 14),
+              Text(dollLvString(doll.rarity, doll.level)),
+            ],
+          ),
+        );
+      } else {
+        statDisplays.add(Text('No Doll'));
+      }
+
+      statDisplays.add(
+        Wrap(
+          spacing: 5,
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            if (equipLineVals.isNotEmpty)
+              Tooltip(
+                message: equipLineVals.keys
+                    .map(
+                      (equipLineType) =>
+                          '$equipLineType:'
+                          ' ${(equipLineVals[equipLineType]! / 100).toStringAsFixed(2)}%',
+                    )
+                    .join('\n'),
+                child: Icon(Icons.info_outline, size: 14),
+              ),
+            ...NikkeOptions.equipTypes.mapIndexed((idx, type) {
+              final equip = option.equips[idx];
+              final equipText =
+                  equip == null
+                      ? '-'
+                      : '${equip.rarity.name.toUpperCase()}${equip.rarity.canHaveCorp && equip.corporation == characterData.corporation ? 'C' : ''} Lv${equip.level}';
+              return Text('${type.name}: $equipText');
+            }),
           ],
         ),
-        Text(
-          'Gear Lv: ${option.equips.map((equip) {
-            if (equip == null || equip.rarity == EquipRarity.unknown) return '-';
-
-            return '${equip.level}';
-          }).join('/')}',
-        ),
-        TextButton.icon(
-          onPressed: () async {
-            final result = await showDialog<HarmonyCubeOption?>(
-              context: context,
-              builder: (ctx) {
-                return SimpleConfirmDialog(
-                  title: Text('Select Cube'),
-                  showCancel: false,
-                  showOk: false,
-                  content: CubeSettingDialog(cubes: widget.cubes, selectMode: true, currentSelection: option.cube),
-                );
-              },
-            );
-
-            option.cube = result == option.cube ? null : result ?? option.cube;
-            setState(() {});
-          },
-          icon: Icon(Icons.grid_view_sharp, size: 12),
-          label: Text('Cube: ${option.cube != null ? '${option.cube!.cubeId} Lv ${option.cube!.cubeLevel}' : 'None'}'),
-        ),
-      ]);
+      );
 
       if (WeaponType.chargeWeaponTypes.contains(weapon?.weaponType)) {
         statDisplays.addAll([
           Divider(),
-          Text('Always Focus: ${option.alwaysFocus}'),
-          Text('Cancel Charge Delay: ${option.forceCancelShootDelay}'),
-          Text('Charge Mode: ${option.chargeMode.name}'),
+          Wrap(
+            spacing: 5,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [Text('Always Focus:'), Text('${option.alwaysFocus}')],
+          ),
+          Wrap(
+            spacing: 5,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [Text('Cancel Charge Delay:'), Text('${option.forceCancelShootDelay}')],
+          ),
+          Wrap(
+            spacing: 5,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [Text('Charge Mode:'), Text(option.chargeMode.name)],
+          ),
         ]);
       }
     }
@@ -433,208 +395,22 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
         children: [
           InkWell(
             onTap: () async {
-              await Navigator.push(context, MaterialPageRoute(builder: (ctx) => NikkeSelectorPage(option: option)));
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (ctx) => NikkeEditorPage(option: option, cubeLvs: widget.cubeLvs, useGlobal: useGlobal),
+                ),
+              );
               if (mounted) setState(() {});
             },
             child: NikkeIcon(
               isSelected: true,
               characterData: characterData,
-              weapon: dbLegacy.characterShotTable[characterData?.shotId],
-              defaultText: 'Tap to select',
+              weapon: weapon,
+              defaultText: 'Tap to Edit',
             ),
           ),
-          Text(name == null ? 'None' : '$name / ${weapon?.weaponType}', maxLines: 1),
           ...statDisplays,
-        ],
-      ),
-    );
-  }
-}
-
-class CubeSettingDialog extends StatefulWidget {
-  final List<HarmonyCubeOption> cubes;
-  final HarmonyCubeOption? currentSelection;
-  final bool selectMode;
-  const CubeSettingDialog({super.key, required this.cubes, this.selectMode = false, this.currentSelection});
-
-  @override
-  State<CubeSettingDialog> createState() => _CubeSettingDialogState();
-}
-
-class _CubeSettingDialogState extends State<CubeSettingDialog> {
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        spacing: 3,
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(widget.cubes.length, (index) {
-          final cube = widget.cubes[index];
-          final isSelected = cube == widget.currentSelection;
-          return Row(
-            children: [
-              if (widget.selectMode)
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(cube);
-                    setState(() {});
-                  },
-                  icon: Icon(isSelected ? Icons.remove_circle_outline : Icons.check),
-                ),
-              Flexible(
-                child: SliderWithPrefix(
-                  titled: true,
-                  label: cube.cubeId.toString(),
-                  min: 1,
-                  max: 15,
-                  valueFormatter: (v) => 'Lv $v',
-                  value: cube.cubeLevel,
-                  onChange: (newValue) {
-                    cube.cubeLevel = newValue.round();
-                    if (mounted) setState(() {});
-                  },
-                ),
-              ),
-            ],
-          );
-        }),
-      ),
-    );
-  }
-}
-
-class GlobalSettingDialog extends StatefulWidget {
-  final PlayerOptions playerOptions;
-  final int defaultGlobalSync;
-  final void Function(int) onGlobalSyncChange;
-  const GlobalSettingDialog({
-    super.key,
-    required this.playerOptions,
-    required this.defaultGlobalSync,
-    required this.onGlobalSyncChange,
-  });
-
-  @override
-  State<GlobalSettingDialog> createState() => _GlobalSettingDialogState();
-}
-
-class _GlobalSettingDialogState extends State<GlobalSettingDialog> {
-  PlayerOptions get option => widget.playerOptions;
-  int globalSync = 0;
-
-  @override
-  void initState() {
-    super.initState();
-
-    globalSync = widget.defaultGlobalSync;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        spacing: 3,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            spacing: 5,
-            children: [
-              Text('Global Sync'),
-              SizedBox(
-                width: 100,
-                child: RangedNumberTextField(
-                  minValue: 1,
-                  maxValue: dbLegacy.maxSyncLevel,
-                  defaultValue: globalSync,
-                  onChangeFunction: (newValue) {
-                    globalSync = newValue;
-                    widget.onGlobalSyncChange(newValue);
-                    if (mounted) setState(() {});
-                  },
-                ),
-              ),
-            ],
-          ),
-          Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            spacing: 5,
-            children: [
-              Text('General Research'),
-              SizedBox(
-                width: 100,
-                child: RangedNumberTextField(
-                  minValue: 1,
-                  maxValue: maxResearchLevel(dbLegacy.maxSyncLevel),
-                  defaultValue: option.personalRecycleLevel,
-                  onChangeFunction: (newValue) {
-                    option.personalRecycleLevel = newValue;
-                    if (mounted) setState(() {});
-                  },
-                ),
-              ),
-            ],
-          ),
-          Row(
-            spacing: 5,
-            children: [
-              Icon(Icons.info, size: 12),
-              Text('Max research level for current global sync is ${maxResearchLevel(globalSync)}'),
-            ],
-          ),
-          Divider(),
-          ...List.generate(3, (index) {
-            final type = [NikkeClass.attacker, NikkeClass.defender, NikkeClass.supporter][index];
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              spacing: 5,
-              children: [
-                Text(type.name.toUpperCase()),
-                SizedBox(
-                  width: 100,
-                  child: RangedNumberTextField(
-                    minValue: 1,
-                    maxValue: maxResearchLevel(dbLegacy.maxSyncLevel),
-                    defaultValue: option.classRecycleLevels[type] ?? 0,
-                    onChangeFunction: (newValue) {
-                      option.classRecycleLevels[type] = newValue;
-                      if (mounted) setState(() {});
-                    },
-                  ),
-                ),
-              ],
-            );
-          }),
-          Divider(),
-          ...List.generate(5, (index) {
-            final type =
-                [
-                  Corporation.elysion,
-                  Corporation.missilis,
-                  Corporation.tetra,
-                  Corporation.pilgrim,
-                  Corporation.abnormal,
-                ][index];
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              spacing: 5,
-              children: [
-                Text(type.name.toUpperCase()),
-                SizedBox(
-                  width: 100,
-                  child: RangedNumberTextField(
-                    maxValue: maxResearchLevel(dbLegacy.maxSyncLevel),
-                    defaultValue: option.corpRecycleLevels[type] ?? 0,
-                    onChangeFunction: (newValue) {
-                      option.corpRecycleLevels[type] = newValue;
-                      if (mounted) setState(() {});
-                    },
-                  ),
-                ),
-              ],
-            );
-          }),
         ],
       ),
     );
