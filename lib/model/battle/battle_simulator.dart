@@ -13,7 +13,7 @@ import 'package:nikke_einkk/model/user_data.dart';
 class BattleSimulation {
   static const burstMeterCap = 1000000; // 9000 = 0.9%
 
-  bool useGlobal = true;
+  final bool useGlobal;
   NikkeDatabaseV2 get db => useGlobal ? global : cn;
 
   PlayerOptions playerOptions;
@@ -47,9 +47,35 @@ class BattleSimulation {
     required this.playerOptions,
     required List<NikkeOptions?> nikkeOptions,
     required List<BattleRaptureOptions> raptureOptions,
+    this.useGlobal = true,
   }) {
-    nikkes.addAll(nikkeOptions.nonNulls.map((option) => BattleNikke(playerOptions: playerOptions, option: option)));
+    nikkes.addAll(
+      nikkeOptions.nonNulls.map(
+        (option) => BattleNikke(playerOptions: playerOptions, option: option, useGlobal: useGlobal),
+      ),
+    );
     raptures.addAll(raptureOptions.map((option) => BattleRapture(option)));
+  }
+
+  void init() {
+    timeline.clear();
+    burstMeter = 0;
+    burstStage = 0;
+    reEnterBurstCd = 0;
+    burstStageDuration = 0;
+    currentNikke = min(nikkes.length, currentNikke);
+    for (int index = 0; index < nikkes.length; index += 1) {
+      nikkes[index].init(this, index + 1);
+    }
+    for (int index = 0; index < raptures.length; index += 1) {
+      raptures[index].init(this, index + 11);
+    }
+
+    currentFrame = maxFrames + 1;
+    // BattleStart
+    for (final nikke in nikkes) {
+      nikke.broadcast(BattleStartEvent.battleStartEvent, this);
+    }
   }
 
   void simulate() {

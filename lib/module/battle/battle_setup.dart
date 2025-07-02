@@ -13,6 +13,7 @@ import 'package:nikke_einkk/model/data_path.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/user_data.dart';
+import 'package:nikke_einkk/module/battle/battle_simulation_page.dart';
 import 'package:nikke_einkk/module/battle/nikke_setup.dart';
 import 'package:nikke_einkk/module/battle/rapture_setup.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
@@ -52,11 +53,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
   void serverRadioChange(bool? v) {
     useGlobal = v ?? useGlobal;
     for (final nikkeOption in nikkeOptions) {
-      if (db.characterResourceGardeTable[nikkeOption.nikkeResourceId] == null) {
-        nikkeOption.nikkeResourceId = -1;
-      } else {
-        nikkeOption.errorCorrection(db);
-      }
+      nikkeOption.errorCorrection(db);
     }
     if (mounted) setState(() {});
   }
@@ -69,7 +66,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: 5,
           children: [
-            Text('Battle Simulation'),
+            Text('Battle Simulation Setup'),
             Radio(value: true, groupValue: useGlobal, onChanged: serverRadioChange),
             Text('Global', style: TextStyle(fontWeight: useGlobal ? FontWeight.bold : null)),
             Radio(value: false, groupValue: useGlobal, onChanged: serverRadioChange),
@@ -80,6 +77,23 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
       bottomNavigationBar: commonBottomNavigationBar(
         () => setState(() {}),
         actions: [
+          FilledButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (ctx) => BattleSimulationPage(
+                        nikkeOptions: nikkeOptions,
+                        raptureOptions: [raptureOption],
+                        playerOptions: playerOptions,
+                        useGlobal: useGlobal,
+                      ),
+                ),
+              );
+            },
+            child: Text('Simulate'),
+          ),
           FilledButton.icon(
             onPressed: () async {
               await Navigator.push(

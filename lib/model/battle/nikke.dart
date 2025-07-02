@@ -45,8 +45,7 @@ class BattleNikke extends BattleEntity {
 
   int fps = 60;
 
-  NikkeCharacterData get characterData =>
-      dbLegacy.characterResourceGardeTable[option.nikkeResourceId]![option.coreLevel]!;
+  NikkeCharacterData get characterData => db.characterResourceGardeTable[option.nikkeResourceId]![option.coreLevel]!;
   @override
   String get name => dbLegacy.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId.toString();
   WeaponData get baseWeaponData => dbLegacy.characterShotTable[characterData.shotId]!;
@@ -62,11 +61,11 @@ class BattleNikke extends BattleEntity {
   int get coreLevel => characterData.gradeCoreId;
 
   CharacterStatData get baseStat =>
-      dbLegacy.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ?? CharacterStatData.emptyData;
+      db.groupedCharacterStatTable[characterData.statEnhanceId]?[option.syncLevel] ?? CharacterStatData.emptyData;
   CharacterStatEnhanceData get statEnhanceData =>
-      dbLegacy.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
+      db.characterStatEnhanceTable[characterData.statEnhanceId] ?? CharacterStatEnhanceData.emptyData;
   ClassAttractiveStatData get attractiveStat =>
-      dbLegacy.attractiveStatTable[option.attractLevel]?.getStatData(nikkeClass) ?? ClassAttractiveStatData.emptyData;
+      db.attractiveStatTable[option.attractLevel]?.getStatData(nikkeClass) ?? ClassAttractiveStatData.emptyData;
 
   @override
   int get baseHp => getBaseStat(
@@ -77,9 +76,9 @@ class BattleNikke extends BattleEntity {
     coreEnhanceBaseRatio: statEnhanceData.coreHp,
     consoleStat: playerOptions.getRecycleHp(nikkeClass),
     bondStat: attractiveStat.hpRate,
-    equipStat: option.equips.fold(0, (sum, equip) => sum + (equip?.getStat(StatType.hp, corporation) ?? 0)),
-    cubeStat: option.cube?.getStat(StatType.hp) ?? 0,
-    dollStat: option.favoriteItem?.getStat(StatType.hp) ?? 0,
+    equipStat: option.equips.fold(0, (sum, equip) => sum + (equip?.getEquipStat(StatType.hp, db, corporation) ?? 0)),
+    cubeStat: option.cube?.getCubeStat(StatType.hp, db) ?? 0,
+    dollStat: option.favoriteItem?.getDollStat(StatType.hp, db) ?? 0,
   );
 
   @override
@@ -91,9 +90,9 @@ class BattleNikke extends BattleEntity {
     coreEnhanceBaseRatio: statEnhanceData.coreAttack,
     consoleStat: playerOptions.getRecycleAttack(corporation),
     bondStat: attractiveStat.attackRate,
-    equipStat: option.equips.fold(0, (sum, equip) => sum + (equip?.getStat(StatType.atk, corporation) ?? 0)),
-    cubeStat: option.cube?.getStat(StatType.atk) ?? 0,
-    dollStat: option.favoriteItem?.getStat(StatType.atk) ?? 0,
+    equipStat: option.equips.fold(0, (sum, equip) => sum + (equip?.getEquipStat(StatType.atk, db, corporation) ?? 0)),
+    cubeStat: option.cube?.getCubeStat(StatType.atk, db) ?? 0,
+    dollStat: option.favoriteItem?.getDollStat(StatType.atk, db) ?? 0,
   );
 
   @override
@@ -105,9 +104,12 @@ class BattleNikke extends BattleEntity {
     coreEnhanceBaseRatio: statEnhanceData.coreDefence,
     consoleStat: playerOptions.getRecycleDefence(nikkeClass, corporation),
     bondStat: attractiveStat.defenceRate,
-    equipStat: option.equips.fold(0, (sum, equip) => sum + (equip?.getStat(StatType.defence, corporation) ?? 0)),
-    cubeStat: option.cube?.getStat(StatType.defence) ?? 0,
-    dollStat: option.favoriteItem?.getStat(StatType.defence) ?? 0,
+    equipStat: option.equips.fold(
+      0,
+      (sum, equip) => sum + (equip?.getEquipStat(StatType.defence, db, corporation) ?? 0),
+    ),
+    cubeStat: option.cube?.getCubeStat(StatType.defence, db) ?? 0,
+    dollStat: option.favoriteItem?.getDollStat(StatType.defence, db) ?? 0,
   );
 
   late BattleCover cover;
@@ -117,20 +119,9 @@ class BattleNikke extends BattleEntity {
   WeaponType get currentWeaponType => currentWeaponData.weaponType;
   WeaponData get currentWeaponData => baseWeaponData;
 
-  // TODO: this encapsulates ranges so don't need to clamp on every change, but it's boiler plate ish
-  // a lot of frame counters have min value 0,
-  /// this is without buff, so internal tracking only
-  int __accuracyCircleScale = 0;
-  int get _accuracyCircleScale => __accuracyCircleScale;
-  set _accuracyCircleScale(int newScale) =>
-      __accuracyCircleScale = newScale.clamp(
-        currentWeaponData.endAccuracyCircleScale,
-        currentWeaponData.startAccuracyCircleScale,
-      );
+  int _accuracyCircleScale = 0;
 
-  int _rateOfFire = 0;
-  int get rateOfFire => _rateOfFire;
-  set rateOfFire(int value) => _rateOfFire = value.clamp(currentWeaponData.rateOfFire, currentWeaponData.endRateOfFire);
+  int rateOfFire = 0;
 
   int fullReloadFrameCount = 0;
 
@@ -155,26 +146,37 @@ class BattleNikke extends BattleEntity {
   List<BattleSkill> skills = [];
   List<BattleFunction> functions = [];
 
-  BattleNikke({required this.playerOptions, required this.option}) {
+  final bool useGlobal;
+  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeCharacterData? get data => db.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
+  WeaponData? get weaponData => db.characterShotTable[data?.shotId];
+
+  BattleNikke({required this.playerOptions, required this.option, this.useGlobal = true}) {
     cover = BattleCover(option.syncLevel);
   }
 
   void init(BattleSimulation simulation, int position) {
+    final data = this.data;
+    final weaponData = this.weaponData;
+    if (option.nikkeResourceId == -1 || data == null || weaponData == null) {
+      return;
+    }
+
     uniqueId = position;
     fps = simulation.fps;
-    _accuracyCircleScale = baseWeaponData.startAccuracyCircleScale;
-    rateOfFire = baseWeaponData.rateOfFire;
+    _accuracyCircleScale = weaponData.startAccuracyCircleScale;
+    rateOfFire = weaponData.rateOfFire;
     chargeFrames = 0;
     previousFullChargeFrameCount = 0;
     shootingFrameCount = 0;
     spotLastDelayFrameCount = 0;
-    spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(baseWeaponData.spotFirstDelay, fps);
+    spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(weaponData.spotFirstDelay, fps);
     reloadingFrameCount = 0;
     fullReloadFrameCount = 0;
     currentHp = baseHp;
-    currentAmmo = baseWeaponData.maxAmmo;
-    cover.uniqueId = position + 5;
-    cover.init(simulation);
+    currentAmmo = weaponData.maxAmmo;
+    // cover.uniqueId = position + 5;
+    // cover.init(simulation);
     barriers.clear();
 
     totalBulletsFired = 0;
@@ -185,36 +187,36 @@ class BattleNikke extends BattleEntity {
     buffs.clear();
     skills.clear();
 
-    for (final equip in option.equips) {
-      equip?.applyEquipLines(simulation, this);
-    }
-    option.cube?.applyCubeEffect(simulation, this);
-    option.favoriteItem?.applyCollectionItemEffect(simulation, this);
-
-    skills.add(BattleSkill(characterData.skill1Id, characterData.skill1Table, option.skillLevels[0], 1, uniqueId));
-    skills.add(BattleSkill(characterData.skill2Id, characterData.skill2Table, option.skillLevels[1], 2, uniqueId));
-    skills.add(BattleSkill(characterData.ultiSkillId, SkillType.characterSkill, option.skillLevels[2], 3, uniqueId));
-
-    // substitute favorite item skill
-    final favoriteItem = option.favoriteItem;
-    if (favoriteItem != null &&
-        favoriteItem.data.nameCode > 0 &&
-        favoriteItem.data.nameCode == characterData.nameCode) {
-      // grade is the number of stars, so either 1, 2, 3 in this case
-      final substituteCount = min(favoriteItem.data.favoriteItemSkills.length, favoriteItem.levelData.grade);
-      final favoriteItemSkills = favoriteItem.data.favoriteItemSkills.sublist(0, substituteCount);
-      for (final substituteSkillData in favoriteItemSkills) {
-        if (substituteSkillData.skillId == 0) continue;
-
-        final skillToChange = skills[substituteSkillData.skillChangeSlot - 1];
-        skillToChange.skillId = substituteSkillData.skillId;
-        skillToChange.skillType = substituteSkillData.skillTable;
-      }
-    }
-
-    for (final skill in skills) {
-      skill.init(simulation, this);
-    }
+    // for (final equip in option.equips) {
+    //   equip?.applyEquipLines(simulation, this);
+    // }
+    // option.cube?.applyCubeEffect(simulation, this);
+    // option.favoriteItem?.applyCollectionItemEffect(simulation, this);
+    //
+    // skills.add(BattleSkill(data.skill1Id, data.skill1Table, option.skillLevels[0], 1, uniqueId));
+    // skills.add(BattleSkill(data.skill2Id, data.skill2Table, option.skillLevels[1], 2, uniqueId));
+    // skills.add(BattleSkill(data.ultiSkillId, SkillType.characterSkill, option.skillLevels[2], 3, uniqueId));
+    //
+    // // substitute favorite item skill
+    // final favoriteItem = option.favoriteItem;
+    // if (favoriteItem != null &&
+    //     favoriteItem.data.nameCode > 0 &&
+    //     favoriteItem.data.nameCode == characterData.nameCode) {
+    //   // grade is the number of stars, so either 1, 2, 3 in this case
+    //   final substituteCount = min(favoriteItem.data.favoriteItemSkills.length, favoriteItem.levelData.grade);
+    //   final favoriteItemSkills = favoriteItem.data.favoriteItemSkills.sublist(0, substituteCount);
+    //   for (final substituteSkillData in favoriteItemSkills) {
+    //     if (substituteSkillData.skillId == 0) continue;
+    //
+    //     final skillToChange = skills[substituteSkillData.skillChangeSlot - 1];
+    //     skillToChange.skillId = substituteSkillData.skillId;
+    //     skillToChange.skillType = substituteSkillData.skillTable;
+    //   }
+    // }
+    //
+    // for (final skill in skills) {
+    //   skill.init(simulation, this);
+    // }
   }
 
   // seems not needed since statAmmoLoad & statHpHeal buffs apply instantly in addBuffs

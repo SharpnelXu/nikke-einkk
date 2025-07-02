@@ -128,53 +128,65 @@ class NikkeOptions {
 
   void errorCorrection(NikkeDatabaseV2 db) {
     if (!db.characterResourceGardeTable.containsKey(nikkeResourceId)) {
-      return;
+      nikkeResourceId = -1;
+    } else {
+      final groupedData = db.characterResourceGardeTable[nikkeResourceId]!;
+      final coreLevels = groupedData.keys.toList();
+      coreLevels.sort();
+      coreLevel = coreLevel.clamp(coreLevels.first, coreLevels.last);
+
+      final characterData = groupedData[coreLevel]!;
+      attractLevel = attractLevel.clamp(1, characterData.maxAttractLv);
+
+      for (int index = 0; index < NikkeOptions.equipTypes.length; index += 1) {
+        if (equips.length <= index) {
+          equips.add(null);
+        } else if (equips[index] != null) {
+          final equipment = equips[index]!;
+          final type = NikkeOptions.equipTypes[index];
+          equipment.type = type;
+          equipment.equipClass = characterData.characterClass;
+          if (equipment.rarity.canHaveCorp && equipment.corporation != Corporation.none) {
+            equipment.corporation = characterData.corporation;
+          } else {
+            equipment.corporation = Corporation.none;
+          }
+          if (equipment.level > equipment.rarity.maxLevel) {
+            equipment.level = equipment.rarity.maxLevel;
+          }
+
+          if (equipment.rarity == EquipRarity.t10) {
+            for (int index = 0; index < 3; index += 1) {
+              if (equipment.equipLines.length <= index) {
+                equipment.equipLines.add(EquipLine.none());
+              } else {
+                equipment.equipLines[index].level = equipment.equipLines[index].level.clamp(1, 15);
+              }
+            }
+            if (equipment.equipLines.length > 3) {
+              equipment.equipLines = equipment.equipLines.sublist(0, 3);
+            }
+          } else {
+            equipment.equipLines.clear();
+          }
+        }
+      }
+      equips = equips.sublist(0, 4);
+
+      final doll = favoriteItem;
+      final weapon = db.characterShotTable[characterData.shotId]!;
+      if (doll != null) {
+        doll.weaponType = weapon.weaponType;
+        if (doll.rarity == Rarity.ssr && !db.nameCodeFavItemTable.containsKey(characterData.nameCode)) {
+          doll.rarity = Rarity.sr;
+          doll.nameCode = 0;
+        }
+
+        doll.level = doll.level.clamp(0, maxDollLv(doll.rarity));
+      }
     }
 
     syncLevel = syncLevel.clamp(1, db.maxSyncLevel);
-
-    final groupedData = db.characterResourceGardeTable[nikkeResourceId]!;
-    final coreLevels = groupedData.keys.toList();
-    coreLevels.sort();
-    coreLevel = coreLevel.clamp(coreLevels.first, coreLevels.last);
-
-    final characterData = groupedData[coreLevel]!;
-    attractLevel = attractLevel.clamp(1, characterData.maxAttractLv);
-
-    for (int index = 0; index < NikkeOptions.equipTypes.length; index += 1) {
-      if (equips.length <= index) {
-        equips.add(null);
-      } else if (equips[index] != null) {
-        final equipment = equips[index]!;
-        final type = NikkeOptions.equipTypes[index];
-        equipment.type = type;
-        equipment.equipClass = characterData.characterClass;
-        if (equipment.rarity.canHaveCorp && equipment.corporation != Corporation.none) {
-          equipment.corporation = characterData.corporation;
-        } else {
-          equipment.corporation = Corporation.none;
-        }
-        if (equipment.level > equipment.rarity.maxLevel) {
-          equipment.level = equipment.rarity.maxLevel;
-        }
-
-        if (equipment.rarity == EquipRarity.t10) {
-          for (int index = 0; index < 3; index += 1) {
-            if (equipment.equipLines.length <= index) {
-              equipment.equipLines.add(EquipLine.none());
-            } else {
-              equipment.equipLines[index].level = equipment.equipLines[index].level.clamp(1, 15);
-            }
-          }
-          if (equipment.equipLines.length > 3) {
-            equipment.equipLines = equipment.equipLines.sublist(0, 3);
-          }
-        } else {
-          equipment.equipLines.clear();
-        }
-      }
-    }
-    equips = equips.sublist(0, 4);
 
     for (int index = 0; index < 3; index += 1) {
       if (skillLevels.length <= index) {
@@ -184,18 +196,6 @@ class NikkeOptions {
       }
     }
     skillLevels = skillLevels.sublist(0, 3);
-
-    final doll = favoriteItem;
-    final weapon = db.characterShotTable[characterData.shotId]!;
-    if (doll != null) {
-      doll.weaponType = weapon.weaponType;
-      if (doll.rarity == Rarity.ssr && !db.nameCodeFavItemTable.containsKey(characterData.nameCode)) {
-        doll.rarity = Rarity.sr;
-        doll.nameCode = 0;
-      }
-
-      doll.level = doll.level.clamp(0, maxDollLv(doll.rarity));
-    }
 
     final cube = this.cube;
     if (cube != null) {
