@@ -9,8 +9,8 @@ import 'package:nikke_einkk/model/items.dart';
 
 import '../../test_helper.dart';
 
-void main() async {
-  await TestHelper.loadData();
+void main() {
+  TestHelper.loadDataV2();
 
   group('Equipment Stat Calculation Test', () {
     final Map<EquipType, Map<NikkeClass, Map<EquipRarity, Map<StatType, Map<int, Pair<int, int>>>>>> expectedStats = {
@@ -336,28 +336,28 @@ void main() async {
             final expectedAtk = expectedValues[StatType.atk]![level]!.value1;
             final expectedDef = expectedValues[StatType.defence]![level]!.value1;
 
-            final actualHp = equip.getStat(StatType.hp);
-            final actualAtk = equip.getStat(StatType.atk);
-            final actualDef = equip.getStat(StatType.defence);
+            final actualHp = equip.getEquipStat(StatType.hp, global);
+            final actualAtk = equip.getEquipStat(StatType.atk, global);
+            final actualDef = equip.getEquipStat(StatType.defence, global);
 
             String output = '${nikkeClass.name} ${equipType.name} level $level:';
             bool print = false;
             final diffHp = actualHp - expectedHp;
             if (diffHp != 0) {
               print = true;
-              output += ' [hp: $diffHp, ${equip.getLevelStat(StatType.hp)}]';
+              output += ' [hp: $diffHp, ${equip.getLevelStat(StatType.hp, global)}]';
             }
 
             final diffAtk = actualAtk - expectedAtk;
             if (diffAtk != 0) {
               print = true;
-              output += ' [atk: $diffAtk, ${equip.getLevelStat(StatType.atk)}]';
+              output += ' [atk: $diffAtk, ${equip.getLevelStat(StatType.atk, global)}]';
             }
 
             final diffDef = actualDef - expectedDef;
             if (diffDef != 0) {
               print = true;
-              output += ' [def: $diffDef, ${equip.getLevelStat(StatType.defence)}]';
+              output += ' [def: $diffDef, ${equip.getLevelStat(StatType.defence, global)}]';
             }
 
             if (print) {
@@ -397,11 +397,11 @@ void main() async {
         level: 5,
       );
 
-      expect(equip.getStat(StatType.hp, Corporation.tetra), 39663);
-      expect(equip.getStat(StatType.defence, Corporation.tetra), 1055);
+      expect(equip.getEquipStat(StatType.hp, global, Corporation.tetra), 39663);
+      expect(equip.getEquipStat(StatType.defence, global, Corporation.tetra), 1055);
 
-      expect(equip.getStat(StatType.hp, Corporation.missilis), 33053);
-      expect(equip.getStat(StatType.defence, Corporation.missilis), 879);
+      expect(equip.getEquipStat(StatType.hp, global, Corporation.missilis), 33053);
+      expect(equip.getEquipStat(StatType.defence, global, Corporation.missilis), 879);
     });
 
     test('Support head piece t9 lv1 corp', () {
@@ -413,15 +413,15 @@ void main() async {
         level: 1,
       );
 
-      expect(equip.getStat(StatType.hp, Corporation.tetra), 41132);
-      expect(equip.getStat(StatType.atk, Corporation.tetra), 3771);
+      expect(equip.getEquipStat(StatType.hp, global, Corporation.tetra), 41132);
+      expect(equip.getEquipStat(StatType.atk, global, Corporation.tetra), 3771);
 
-      expect(equip.getStat(StatType.hp, Corporation.missilis), 32318);
-      expect(equip.getStat(StatType.atk, Corporation.missilis), 2963);
+      expect(equip.getEquipStat(StatType.hp, global, Corporation.missilis), 32318);
+      expect(equip.getEquipStat(StatType.atk, global, Corporation.missilis), 2963);
 
       equip.level = 4;
-      expect(equip.getStat(StatType.hp, Corporation.missilis), 32318 + 8814);
-      expect(equip.getStat(StatType.atk, Corporation.missilis), 2963 + 809);
+      expect(equip.getEquipStat(StatType.hp, global, Corporation.missilis), 32318 + 8814);
+      expect(equip.getEquipStat(StatType.atk, global, Corporation.missilis), 2963 + 809);
     });
 
     test('Defender body & arm piece t9 lv1 corp', () {
@@ -433,15 +433,15 @@ void main() async {
         level: 1,
       );
 
-      expect(body.getStat(StatType.hp, Corporation.tetra), 147047);
-      expect(body.getStat(StatType.atk, Corporation.tetra), 549);
+      expect(body.getEquipStat(StatType.hp, global, Corporation.tetra), 147047);
+      expect(body.getEquipStat(StatType.atk, global, Corporation.tetra), 549);
 
-      expect(body.getStat(StatType.hp, Corporation.missilis), 115537);
-      expect(body.getStat(StatType.atk, Corporation.missilis), 431);
+      expect(body.getEquipStat(StatType.hp, global, Corporation.missilis), 115537);
+      expect(body.getEquipStat(StatType.atk, global, Corporation.missilis), 431);
 
       body.level = 4;
-      expect(body.getStat(StatType.hp, Corporation.missilis), 115537 + 31511);
-      expect(body.getStat(StatType.atk, Corporation.missilis), 431 + 118);
+      expect(body.getEquipStat(StatType.hp, global, Corporation.missilis), 115537 + 31511);
+      expect(body.getEquipStat(StatType.atk, global, Corporation.missilis), 431 + 118);
 
       final arm = EquipmentOption(
         type: EquipType.arm,
@@ -451,15 +451,15 @@ void main() async {
         level: 1,
       );
 
-      expect(arm.getStat(StatType.defence, Corporation.tetra), 602);
-      expect(arm.getStat(StatType.atk, Corporation.tetra), 1921);
+      expect(arm.getEquipStat(StatType.defence, global, Corporation.tetra), 602);
+      expect(arm.getEquipStat(StatType.atk, global, Corporation.tetra), 1921);
 
-      expect(arm.getStat(StatType.defence, Corporation.missilis), 473);
-      expect(arm.getStat(StatType.atk, Corporation.missilis), 1509);
+      expect(arm.getEquipStat(StatType.defence, global, Corporation.missilis), 473);
+      expect(arm.getEquipStat(StatType.atk, global, Corporation.missilis), 1509);
 
       arm.level = 4;
-      expect(arm.getStat(StatType.defence, Corporation.missilis), 473 + 129);
-      expect(arm.getStat(StatType.atk, Corporation.missilis), 1509 + 412);
+      expect(arm.getEquipStat(StatType.defence, global, Corporation.missilis), 473 + 129);
+      expect(arm.getEquipStat(StatType.atk, global, Corporation.missilis), 1509 + 412);
     });
   });
 
@@ -474,7 +474,7 @@ void main() async {
         final stateEffectId = line.getStateEffectId();
 
         expect(stateEffectId, isNonZero);
-        expect(dbLegacy.stateEffectTable.containsKey(stateEffectId), true);
+        expect(global.stateEffectTable.containsKey(stateEffectId), true);
       }
     }
   });
@@ -484,18 +484,22 @@ void main() async {
       for (int level = 1; level <= 15; level += 1) {
         final cube = HarmonyCubeOption.fromType(cubeType, level);
 
-        final stateEffectIds = cube.getCubeStateEffectIds();
+        final List<int?> stateEffectIds =
+            cube
+                .getValidCubeSkills(global)
+                .map((tuple) => global.groupedSkillInfoTable[tuple.$1]?[tuple.$2]?.id)
+                .toList();
         expect(stateEffectIds.length, isNonZero);
         for (final stateEffectId in stateEffectIds) {
           expect(stateEffectId, isNonZero);
-          expect(dbLegacy.stateEffectTable.containsKey(stateEffectId), true);
+          expect(global.stateEffectTable.containsKey(stateEffectId), true);
         }
       }
     }
   });
 
   test('Favorite Item Effect Exists', () {
-    for (final groupedData in dbLegacy.dollTable.values) {
+    for (final groupedData in global.dollTable.values) {
       for (final favoriteItemData in groupedData.values) {
         for (int level = 0; level <= 15; level += 1) {
           final doll = FavoriteItemOption(
@@ -504,17 +508,21 @@ void main() async {
             level: level,
           );
 
-          final stateEffectIds = doll.getCollectionItemStateEffectIds();
+          final List<int?> stateEffectIds =
+              doll
+                  .getValidDollSkills(global)
+                  .map((tuple) => global.groupedSkillInfoTable[tuple.$1]?[tuple.$2]?.id)
+                  .toList();
           expect(stateEffectIds.length, isNonZero);
           for (final stateEffectId in stateEffectIds) {
             expect(stateEffectId, isNonZero);
-            expect(dbLegacy.stateEffectTable.containsKey(stateEffectId), true);
+            expect(global.stateEffectTable.containsKey(stateEffectId), true);
           }
         }
       }
     }
 
-    for (final favoriteItemData in dbLegacy.nameCodeFavItemTable.values) {
+    for (final favoriteItemData in global.nameCodeFavItemTable.values) {
       for (int level = 0; level <= 2; level += 1) {
         final doll = FavoriteItemOption(
           weaponType: favoriteItemData.weaponType,
@@ -523,11 +531,15 @@ void main() async {
           nameCode: favoriteItemData.nameCode,
         );
 
-        final stateEffectIds = doll.getCollectionItemStateEffectIds();
+        final List<int?> stateEffectIds =
+            doll
+                .getValidDollSkills(global)
+                .map((tuple) => global.groupedSkillInfoTable[tuple.$1]?[tuple.$2]?.id)
+                .toList();
         expect(stateEffectIds.length, isNonZero);
         for (final stateEffectId in stateEffectIds) {
           expect(stateEffectId, isNonZero);
-          expect(dbLegacy.stateEffectTable.containsKey(stateEffectId), true);
+          expect(global.stateEffectTable.containsKey(stateEffectId), true);
         }
       }
     }

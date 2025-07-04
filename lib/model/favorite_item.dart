@@ -22,16 +22,6 @@ class FavoriteItemOption {
 
   Map<String, dynamic> toJson() => _$FavoriteItemOptionToJson(this);
 
-  FavoriteItemData get data =>
-      rarity == Rarity.ssr ? dbLegacy.nameCodeFavItemTable[nameCode]! : dbLegacy.dollTable[weaponType]![rarity]!;
-
-  FavoriteItemLevelData get levelData => dbLegacy.favoriteItemLevelTable[data.levelEnhanceId]![level]!;
-
-  @Deprecated('use getDollStat')
-  int getStat(StatType statType) {
-    return levelData.stats.firstWhereOrNull((stat) => stat.type == statType)?.value ?? 0;
-  }
-
   int getDollStat(StatType statType, NikkeDatabaseV2 db) {
     final data = getData(db);
     final levelData = db.favoriteItemLevelTable[data?.levelEnhanceId]?[level];
@@ -62,30 +52,23 @@ class FavoriteItemOption {
     return result;
   }
 
-  List<int> getCollectionItemStateEffectIds() {
-    final List<int> result = [];
-    for (int index = 0; index < data.collectionSkills.length; index += 1) {
-      if (levelData.skillLevels.length <= index) continue;
-
-      final skillGroupId = data.collectionSkills[index].skillGroupId;
-      final skillLevel = levelData.skillLevels[index].level;
-      final skillLevelData = dbLegacy.groupedSkillInfoTable[skillGroupId]?[skillLevel];
-
-      if (skillLevelData != null) {
-        result.add(skillLevelData.id);
-      }
-    }
-    return result;
-  }
-
   void applyCollectionItemEffect(BattleSimulation simulation, BattleNikke owner) {
-    for (final stateEffectId in getCollectionItemStateEffectIds()) {
-      final stateEffectData = dbLegacy.stateEffectTable[stateEffectId]!;
-      owner.functions.addAll(
-        stateEffectData.functions
-            .where((data) => data.function != 0)
-            .map((data) => BattleFunction(dbLegacy.functionTable[data.function]!, owner.uniqueId)),
-      );
+    final db = simulation.db;
+    for (final (skillGroup, skillLv) in getValidDollSkills(db)) {
+      final skillInfo = db.groupedSkillInfoTable[skillGroup]?[skillLv];
+      final stateEffect = db.stateEffectTable[skillInfo?.id];
+      if (stateEffect == null) {
+        logger.w('Invalid Doll Skill: $skillGroup Lv$skillLv');
+      } else {
+        for (final funcId in stateEffect.allValidFuncIds) {
+          final func = simulation.db.functionTable[funcId];
+          if (func == null) {
+            logger.w('Invalid Doll Func: $funcId');
+          } else {
+            owner.functions.add(BattleFunction(func, owner.uniqueId));
+          }
+        }
+      }
     }
   }
 

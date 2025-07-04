@@ -23,17 +23,23 @@ class BattleCover extends BattleEntity {
   String get name => 'Cover';
 
   @override
-  int get baseHp => dbLegacy.coverStatTable[level]!.levelHp;
+  int get baseHp => db.coverStatTable[level]?.levelHp ?? 0;
 
   @override
   int get baseAttack => 0;
 
   @override
-  int get baseDefence => dbLegacy.coverStatTable[level]!.levelDefence;
+  int get baseDefence => db.coverStatTable[level]?.levelDefence ?? 0;
 
-  BattleCover(this.level);
+  bool useGlobal = true;
+  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+
+  BattleCover(this.level, this.useGlobal);
 
   void init(BattleSimulation simulation) {
+    if (!db.coverStatTable.containsKey(level)) {
+      logger.w('Invalid Cover level: $level');
+    }
     currentHp = baseHp;
     buffs.clear();
   }
@@ -47,8 +53,8 @@ class BattleNikke extends BattleEntity {
 
   NikkeCharacterData get characterData => db.characterResourceGardeTable[option.nikkeResourceId]![option.coreLevel]!;
   @override
-  String get name => dbLegacy.getTranslation(characterData.nameLocalkey)?.zhCN ?? characterData.resourceId.toString();
-  WeaponData get baseWeaponData => dbLegacy.characterShotTable[characterData.shotId]!;
+  String get name => locale.getTranslation(characterData.nameLocalkey) ?? characterData.resourceId.toString();
+  WeaponData get baseWeaponData => db.characterShotTable[characterData.shotId]!;
   // skill data
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
@@ -148,35 +154,27 @@ class BattleNikke extends BattleEntity {
 
   final bool useGlobal;
   NikkeDatabaseV2 get db => useGlobal ? global : cn;
-  NikkeCharacterData? get data => db.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
-  WeaponData? get weaponData => db.characterShotTable[data?.shotId];
 
   BattleNikke({required this.playerOptions, required this.option, this.useGlobal = true}) {
-    cover = BattleCover(option.syncLevel);
+    cover = BattleCover(option.syncLevel, true);
   }
 
   void init(BattleSimulation simulation, int position) {
-    final data = this.data;
-    final weaponData = this.weaponData;
-    if (option.nikkeResourceId == -1 || data == null || weaponData == null) {
-      return;
-    }
-
     uniqueId = position;
     fps = simulation.fps;
-    _accuracyCircleScale = weaponData.startAccuracyCircleScale;
-    rateOfFire = weaponData.rateOfFire;
+    _accuracyCircleScale = baseWeaponData.startAccuracyCircleScale;
+    rateOfFire = baseWeaponData.rateOfFire;
     chargeFrames = 0;
     previousFullChargeFrameCount = 0;
     shootingFrameCount = 0;
     spotLastDelayFrameCount = 0;
-    spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(weaponData.spotFirstDelay, fps);
+    spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(baseWeaponData.spotFirstDelay, fps);
     reloadingFrameCount = 0;
     fullReloadFrameCount = 0;
     currentHp = baseHp;
-    currentAmmo = weaponData.maxAmmo;
-    // cover.uniqueId = position + 5;
-    // cover.init(simulation);
+    currentAmmo = baseWeaponData.maxAmmo;
+    cover.uniqueId = position + 5;
+    cover.init(simulation);
     barriers.clear();
 
     totalBulletsFired = 0;
@@ -187,42 +185,45 @@ class BattleNikke extends BattleEntity {
     buffs.clear();
     skills.clear();
 
-    // for (final equip in option.equips) {
-    //   equip?.applyEquipLines(simulation, this);
-    // }
-    // option.cube?.applyCubeEffect(simulation, this);
-    // option.favoriteItem?.applyCollectionItemEffect(simulation, this);
-    //
-    // skills.add(BattleSkill(data.skill1Id, data.skill1Table, option.skillLevels[0], 1, uniqueId));
-    // skills.add(BattleSkill(data.skill2Id, data.skill2Table, option.skillLevels[1], 2, uniqueId));
-    // skills.add(BattleSkill(data.ultiSkillId, SkillType.characterSkill, option.skillLevels[2], 3, uniqueId));
-    //
-    // // substitute favorite item skill
-    // final favoriteItem = option.favoriteItem;
-    // if (favoriteItem != null &&
-    //     favoriteItem.data.nameCode > 0 &&
-    //     favoriteItem.data.nameCode == characterData.nameCode) {
-    //   // grade is the number of stars, so either 1, 2, 3 in this case
-    //   final substituteCount = min(favoriteItem.data.favoriteItemSkills.length, favoriteItem.levelData.grade);
-    //   final favoriteItemSkills = favoriteItem.data.favoriteItemSkills.sublist(0, substituteCount);
-    //   for (final substituteSkillData in favoriteItemSkills) {
-    //     if (substituteSkillData.skillId == 0) continue;
-    //
-    //     final skillToChange = skills[substituteSkillData.skillChangeSlot - 1];
-    //     skillToChange.skillId = substituteSkillData.skillId;
-    //     skillToChange.skillType = substituteSkillData.skillTable;
-    //   }
-    // }
-    //
-    // for (final skill in skills) {
-    //   skill.init(simulation, this);
-    // }
-  }
+    for (final equip in option.equips) {
+      equip?.applyEquipLines(simulation, this);
+    }
+    option.cube?.applyCubeEffect(simulation, this);
+    option.favoriteItem?.applyCollectionItemEffect(simulation, this);
 
-  // seems not needed since statAmmoLoad & statHpHeal buffs apply instantly in addBuffs
-  void startBattle(BattleSimulation simulation) {
-    currentHp = baseHp;
-    currentAmmo = getMaxAmmo(simulation);
+    skills.add(
+      BattleSkill(characterData.skill1Id, characterData.skill1Table, option.skillLevels[0], 1, uniqueId, useGlobal),
+    );
+    skills.add(
+      BattleSkill(characterData.skill2Id, characterData.skill2Table, option.skillLevels[1], 2, uniqueId, useGlobal),
+    );
+    skills.add(
+      BattleSkill(characterData.ultiSkillId, SkillType.characterSkill, option.skillLevels[2], 3, uniqueId, useGlobal),
+    );
+
+    // substitute favorite item skill
+    final favoriteItem = option.favoriteItem;
+    final favItemData = option.favoriteItem?.getData(db);
+    final dollLvData = db.favoriteItemLevelTable[favItemData?.levelEnhanceId]?[favoriteItem?.level];
+    if (favItemData != null &&
+        favItemData.nameCode > 0 &&
+        favItemData.nameCode == characterData.nameCode &&
+        dollLvData != null) {
+      // grade is the number of stars, so either 1, 2, 3 in this case
+      final substituteCount = min(favItemData.favoriteItemSkills.length, dollLvData.grade);
+      final favoriteItemSkills = favItemData.favoriteItemSkills.sublist(0, substituteCount);
+      for (final substituteSkillData in favoriteItemSkills) {
+        if (substituteSkillData.skillId == 0) continue;
+
+        final skillToChange = skills[substituteSkillData.skillChangeSlot - 1];
+        skillToChange.skillId = substituteSkillData.skillId;
+        skillToChange.skillType = substituteSkillData.skillTable;
+      }
+    }
+
+    for (final skill in skills) {
+      skill.init(simulation, this);
+    }
   }
 
   @override

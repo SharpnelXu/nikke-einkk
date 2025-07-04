@@ -21,35 +21,10 @@ class HarmonyCubeOption {
 
   Map<String, dynamic> toJson() => _$HarmonyCubeOptionToJson(this);
 
-  HarmonyCubeData get cubeData => dbLegacy.harmonyCubeTable[cubeId]!;
-
-  HarmonyCubeLevelData get levelData => dbLegacy.harmonyCubeLevelTable[cubeData.levelEnhanceId]![cubeLevel]!;
-
-  @Deprecated('use getCubeStat')
-  int getStat(StatType statType) {
-    return levelData.stats.firstWhereOrNull((stat) => stat.type == statType)?.rate ?? 0;
-  }
-
   int getCubeStat(StatType statType, NikkeDatabaseV2 db) {
     final cubeData = db.harmonyCubeTable[cubeId];
     final levelData = db.harmonyCubeEnhanceLvTable[cubeData?.levelEnhanceId]?[cubeLevel];
     return levelData?.stats.firstWhereOrNull((stat) => stat.type == statType)?.rate ?? 0;
-  }
-
-  List<int> getCubeStateEffectIds() {
-    final List<int> result = [];
-    for (int index = 0; index < cubeData.harmonyCubeSkillGroups.length; index += 1) {
-      if (levelData.skillLevels.length <= index) continue;
-
-      final skillGroupId = cubeData.harmonyCubeSkillGroups[index].skillGroupId;
-      final skillLevel = levelData.skillLevels[index].level;
-      final skillLevelData = dbLegacy.groupedSkillInfoTable[skillGroupId]?[skillLevel];
-
-      if (skillLevelData != null) {
-        result.add(skillLevelData.id);
-      }
-    }
-    return result;
   }
 
   List<(int, int)> getValidCubeSkills(NikkeDatabaseV2 db) {
@@ -73,13 +48,22 @@ class HarmonyCubeOption {
   }
 
   void applyCubeEffect(BattleSimulation simulation, BattleNikke wearer) {
-    for (final stateEffectId in getCubeStateEffectIds()) {
-      final stateEffectData = dbLegacy.stateEffectTable[stateEffectId]!;
-      wearer.functions.addAll(
-        stateEffectData.functions
-            .where((data) => data.function != 0)
-            .map((data) => BattleFunction(dbLegacy.functionTable[data.function]!, wearer.uniqueId)),
-      );
+    final db = simulation.db;
+    for (final (skillGroup, skillLv) in getValidCubeSkills(db)) {
+      final skillInfo = db.groupedSkillInfoTable[skillGroup]?[skillLv];
+      final stateEffect = db.stateEffectTable[skillInfo?.id];
+      if (stateEffect == null) {
+        logger.w('Invalid Cube Skill: $skillGroup Lv$skillLv');
+      } else {
+        for (final funcId in stateEffect.allValidFuncIds) {
+          final func = simulation.db.functionTable[funcId];
+          if (func == null) {
+            logger.w('Invalid Cube Func: $funcId');
+          } else {
+            wearer.functions.add(BattleFunction(func, wearer.uniqueId));
+          }
+        }
+      }
     }
   }
 

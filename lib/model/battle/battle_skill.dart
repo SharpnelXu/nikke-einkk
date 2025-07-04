@@ -15,15 +15,17 @@ import 'package:nikke_einkk/model/skills.dart';
 
 class BattleSkill {
   int skillId;
-  int get skillGroupId => dbLegacy.skillInfoTable[skillId]!.groupId;
-  int? get levelSkillId => dbLegacy.groupedSkillInfoTable[skillGroupId]?[level]?.id;
-  SkillData? get skillData => dbLegacy.characterSkillTable[levelSkillId];
+  int? get skillGroupId => db.skillInfoTable[skillId]?.groupId;
+  int? get levelSkillId => db.groupedSkillInfoTable[skillGroupId]?[level]?.id;
+  SkillData? get skillData => db.characterSkillTable[levelSkillId];
   SkillType skillType;
   final int ownerUniqueId;
   final int level;
   final int skillNum;
+  final bool useGlobal;
+  NikkeDatabaseV2 get db => useGlobal ? global : cn;
 
-  BattleSkill(this.skillId, this.skillType, this.level, this.skillNum, this.ownerUniqueId);
+  BattleSkill(this.skillId, this.skillType, this.level, this.skillNum, this.ownerUniqueId, this.useGlobal);
 
   // todo: countDown on this
   int coolDown = 0;
@@ -39,17 +41,19 @@ class BattleSkill {
     }
 
     if (skillType == SkillType.stateEffect) {
-      final stateEffectData = dbLegacy.stateEffectTable[skillId + level - 1]!;
-      nikke.functions.addAll(
-        stateEffectData.functions
-            .where((data) => data.function != 0)
-            .map((data) => BattleFunction(dbLegacy.functionTable[data.function]!, nikke.uniqueId)),
-      );
+      final stateEffectData = db.stateEffectTable[skillId + level - 1];
+      if (stateEffectData != null) {
+        nikke.functions.addAll(
+          stateEffectData.allValidFuncIds
+              .where((funcId) => db.functionTable.containsKey(funcId))
+              .map((funcId) => BattleFunction(db.functionTable[funcId]!, nikke.uniqueId)),
+        );
+      }
     }
   }
 
   bool canUseSkill(BattleSimulation simulation) {
-    if (skillType != SkillType.characterSkill || coolDown > 0) return false;
+    if (skillData == null || skillType != SkillType.characterSkill || coolDown > 0) return false;
     if (skillNum != 3) return true;
 
     final requiredStep = simulation.getNikkeOnPosition(ownerUniqueId)?.characterData.useBurstSkill;
@@ -71,7 +75,7 @@ class BattleSkill {
     }
 
     if (coolDown == 0 && canUseSkill(simulation)) {
-      activateSkill(simulation, skillData!, ownerUniqueId, skillGroupId, skillNum);
+      activateSkill(simulation, skillData!, ownerUniqueId, skillGroupId!, skillNum);
       coolDown = BattleUtils.timeDataToFrame(skillData!.skillCooltime, simulation.fps);
     }
   }
@@ -97,7 +101,7 @@ class BattleSkill {
     simulation.registerEvent(simulation.currentFrame, event);
 
     for (final beforeFuncId in [...skillData.beforeUseFunctionIdList, ...skillData.beforeHurtFunctionIdList]) {
-      final functionData = dbLegacy.functionTable[beforeFuncId];
+      final functionData = simulation.db.functionTable[beforeFuncId];
       if (functionData != null) {
         final function = BattleFunction(functionData, ownerUniqueId);
         // connected function likely doesn't check trigger target
@@ -166,7 +170,7 @@ class BattleSkill {
     }
 
     for (final afterFuncId in [...skillData.afterUseFunctionIdList, ...skillData.afterHurtFunctionIdList]) {
-      final functionData = dbLegacy.functionTable[afterFuncId];
+      final functionData = simulation.db.functionTable[afterFuncId];
       if (functionData != null) {
         final function = BattleFunction(functionData, ownerUniqueId);
         // connected function likely doesn't check trigger target
@@ -219,13 +223,13 @@ class BattleSkill {
         targetEnemy = true;
         break;
       case CharacterSkillType.instantSequentialAttack:
-        return isThisNikke ? simulation.raptures.sublist(0, 1) : simulation.nikkes.sublist(0, 1);
+        return isThisNikke ? simulation.raptures.sublist(0, 1) : simulation.nonnullNikkes.sublist(0, 1);
       case CharacterSkillType.instantAll:
       case CharacterSkillType.instantAllParts:
       case CharacterSkillType.instantArea:
       case CharacterSkillType.instantCircle:
       case CharacterSkillType.instantCircleSeparate:
-        return isThisNikke ? simulation.raptures.toList() : simulation.nikkes.toList();
+        return isThisNikke ? simulation.raptures.toList() : simulation.nonnullNikkes.toList();
       case CharacterSkillType.launchWeapon:
       case CharacterSkillType.laserBeam:
       case CharacterSkillType.explosiveCircuit:
@@ -248,7 +252,7 @@ class BattleSkill {
     // 0            1           nikkes
     // 0            0           raptures
     final targetNikkes = isThisNikke ^ targetEnemy;
-    final targetList = targetNikkes ? simulation.nikkes.toList() : simulation.raptures.toList();
+    final targetList = targetNikkes ? simulation.nonnullNikkes.toList() : simulation.raptures.toList();
 
     switch (skillData.preferTargetCondition) {
       case PreferTargetCondition.unknown:
@@ -306,9 +310,9 @@ class BattleSkill {
         break;
       case PreferTarget.back:
         // some conditions like this don't need target list
-        return simulation.nikkes.where((nikke) => [2, 4].contains(nikke.uniqueId)).toList();
+        return simulation.nonnullNikkes.where((nikke) => [2, 4].contains(nikke.uniqueId)).toList();
       case PreferTarget.front:
-        return simulation.nikkes.where((nikke) => [1, 3, 5].contains(nikke.uniqueId)).toList();
+        return simulation.nonnullNikkes.where((nikke) => [1, 3, 5].contains(nikke.uniqueId)).toList();
       case PreferTarget.haveDebuff:
         targetList.retainWhere(
           (entity) => entity.buffs.any((buff) => [BuffType.deBuff, BuffType.deBuffEtc].contains(buff.data.buff)),

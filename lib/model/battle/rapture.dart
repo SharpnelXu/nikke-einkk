@@ -628,21 +628,21 @@ class BattleRapture extends BattleEntity {
   List<BattleEntity> getActionTargets(BattleSimulation simulation, BattleRaptureAction action) {
     switch (action.targetType!) {
       case BattleRaptureActionTarget.allNikkes:
-        return simulation.nikkes.toList();
+        return simulation.nonnullNikkes.toList();
       case BattleRaptureActionTarget.allRaptures:
         return simulation.raptures.toList();
       case BattleRaptureActionTarget.allRapturesExceptSelf:
         return simulation.raptures.toList()..remove(this);
       case BattleRaptureActionTarget.allActors:
-        return [...simulation.nikkes, ...simulation.raptures];
+        return [...simulation.nonnullNikkes, ...simulation.raptures];
       case BattleRaptureActionTarget.self:
         return [this];
       case BattleRaptureActionTarget.targetedNikkes:
-        final nikkes = simulation.nikkes.toList();
+        final nikkes = simulation.nonnullNikkes.toList();
         final subtype = action.targetSubtype!;
         if (subtype == BattleRaptureActionTargetSubtype.position) {
           int position = action.position!;
-          return [if (simulation.nikkes.length >= position) simulation.nikkes[position - 1]];
+          return [if (simulation.battleNikkes[position - 1] != null) simulation.battleNikkes[position - 1]!];
         }
 
         nikkes.sort((a, b) => getSortingStat(simulation, a, subtype) - getSortingStat(simulation, b, subtype));

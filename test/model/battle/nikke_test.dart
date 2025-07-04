@@ -248,7 +248,7 @@ void main() async {
       simulation.maxSeconds = 1;
       simulation.simulate();
 
-      final scarlet = simulation.nikkes.first;
+      final scarlet = simulation.nonnullNikkes.first;
       expect(scarlet.getMaxAmmo(simulation), 66);
     });
   });

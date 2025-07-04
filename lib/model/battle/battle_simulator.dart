@@ -18,7 +18,8 @@ class BattleSimulation {
 
   PlayerOptions playerOptions;
 
-  List<BattleNikke> nikkes = [];
+  List<BattleNikke?> battleNikkes = [];
+  List<BattleNikke> get nonnullNikkes => battleNikkes.nonNulls.toList();
   List<BattleRapture> raptures = [];
   // timeline
   SplayTreeMap<int, List<BattleEvent>> timeline = SplayTreeMap((a, b) => b.compareTo(a));
@@ -49,10 +50,14 @@ class BattleSimulation {
     required List<BattleRaptureOptions> raptureOptions,
     this.useGlobal = true,
   }) {
-    nikkes.addAll(
-      nikkeOptions.nonNulls.map(
-        (option) => BattleNikke(playerOptions: playerOptions, option: option, useGlobal: useGlobal),
-      ),
+    battleNikkes.addAll(
+      nikkeOptions.map((option) {
+        final characterData = db.characterResourceGardeTable[option?.nikkeResourceId]?[option?.coreLevel];
+        final weaponData = db.characterShotTable[characterData?.shotId];
+        return option == null || characterData == null || weaponData == null
+            ? null
+            : BattleNikke(playerOptions: playerOptions, option: option, useGlobal: useGlobal);
+      }),
     );
     raptures.addAll(raptureOptions.map((option) => BattleRapture(option)));
   }
@@ -63,32 +68,36 @@ class BattleSimulation {
     burstStage = 0;
     reEnterBurstCd = 0;
     burstStageDuration = 0;
-    currentNikke = min(nikkes.length, currentNikke);
-    for (int index = 0; index < nikkes.length; index += 1) {
-      nikkes[index].init(this, index + 1);
+
+    for (int index = 0; index < battleNikkes.length; index += 1) {
+      battleNikkes[index]?.init(this, index + 1);
     }
+    if (battleNikkes[currentNikke - 1] == null) {
+      currentNikke = nonnullNikkes.first.uniqueId;
+    }
+
     for (int index = 0; index < raptures.length; index += 1) {
       raptures[index].init(this, index + 11);
     }
 
     currentFrame = maxFrames + 1;
     // BattleStart
-    for (final nikke in nikkes) {
+    for (final nikke in nonnullNikkes) {
       nikke.broadcast(BattleStartEvent.battleStartEvent, this);
     }
   }
 
   void simulate() {
-    if (nikkes.isEmpty) return;
+    if (nonnullNikkes.isEmpty) return;
 
     timeline.clear();
     burstMeter = 0;
     burstStage = 0;
     reEnterBurstCd = 0;
     burstStageDuration = 0;
-    currentNikke = min(nikkes.length, currentNikke);
-    for (int index = 0; index < nikkes.length; index += 1) {
-      nikkes[index].init(this, index + 1);
+    currentNikke = min(nonnullNikkes.length, currentNikke);
+    for (int index = 0; index < nonnullNikkes.length; index += 1) {
+      nonnullNikkes[index].init(this, index + 1);
     }
     for (int index = 0; index < raptures.length; index += 1) {
       raptures[index].init(this, index + 11);
@@ -96,12 +105,12 @@ class BattleSimulation {
 
     currentFrame = maxFrames + 1;
     // BattleStart
-    for (final nikke in nikkes) {
+    for (final nikke in nonnullNikkes) {
       nikke.broadcast(BattleStartEvent.battleStartEvent, this);
     }
 
     for (currentFrame = maxFrames; currentFrame > 0; currentFrame -= 1) {
-      for (final entity in [...nikkes, ...raptures]) {
+      for (final entity in [...nonnullNikkes, ...raptures]) {
         entity.normalAction(this);
       }
 
@@ -145,7 +154,7 @@ class BattleSimulation {
           burstStageDuration = max(0, burstStageDuration);
         }
 
-        for (final nikke in nikkes) {
+        for (final nikke in nonnullNikkes) {
           nikke.broadcast(event, this);
         }
 
@@ -154,14 +163,14 @@ class BattleSimulation {
         }
       }
 
-      for (final entity in [...nikkes, ...raptures]) {
+      for (final entity in [...nonnullNikkes, ...raptures]) {
         entity.endCurrentFrame(this);
       }
     }
   }
 
   BattleNikke? getNikkeOnPosition(int position) {
-    return nikkes.firstWhereOrNull((nikke) => nikke.uniqueId == position);
+    return nonnullNikkes.firstWhereOrNull((nikke) => nikke.uniqueId == position);
   }
 
   BattleRapture? getRaptureByUniqueId(int uniqueId) {
@@ -169,7 +178,7 @@ class BattleSimulation {
   }
 
   BattleEntity? getEntityByUniqueId(int uniqueId) {
-    for (final nikke in nikkes) {
+    for (final nikke in nonnullNikkes) {
       if (nikke.uniqueId == uniqueId) {
         return nikke;
       } else if (nikke.cover.uniqueId == uniqueId) {

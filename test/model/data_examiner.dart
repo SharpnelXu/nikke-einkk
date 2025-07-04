@@ -222,6 +222,16 @@ void main() async {
           if (data.inputType == InputType.unknown) {
             unknownInputType.add(data.rawInputType);
           }
+          expect(
+            data.useFunctionIdList.every((funcId) => funcId == 0),
+            true,
+            reason: 'Shot ${data.id} has functions: $folder',
+          );
+          expect(
+            data.hurtFunctionIdList.every((funcId) => funcId == 0),
+            true,
+            reason: 'Shot ${data.id} has functions: $folder',
+          );
 
           recordKeys.removeAll(expectedKeys);
           if (recordKeys.isNotEmpty) {

@@ -17,7 +17,6 @@ class EquipmentOption {
   EquipType type;
   NikkeClass equipClass;
   EquipRarity rarity;
-  EquipmentData get equipData => dbLegacy.groupedEquipTable[type]![equipClass]![rarity]!;
 
   Corporation corporation = Corporation.none;
   int level = 0;
@@ -49,20 +48,6 @@ class EquipmentOption {
 
   Map<String, dynamic> toJson() => _$EquipmentOptionToJson(this);
 
-  @Deprecated('use getEquipStat')
-  int getStat(StatType statType, [Corporation? ownerCorp]) {
-    final equipStat = equipData.stat.firstWhereOrNull((stat) => stat.statType == statType);
-    if (equipStat == null) return 0;
-
-    final sameCorp = rarity.canHaveCorp && corporation != Corporation.none && ownerCorp == corporation;
-    final levelStat = (level * 0.1 * equipStat.statValue).roundHalfToEven();
-    final corpStat = (sameCorp ? 0.3 * equipStat.statValue : 0).roundHalfToEven();
-
-    final result = equipStat.statValue + levelStat + corpStat;
-
-    return result;
-  }
-
   int getEquipStat(StatType statType, NikkeDatabaseV2 db, [Corporation? ownerCorp]) {
     final equipData = db.groupedEquipTable[type]?[equipClass]?[rarity];
     final equipStat = equipData?.stat.firstWhereOrNull((stat) => stat.statType == statType);
@@ -77,8 +62,9 @@ class EquipmentOption {
     return result;
   }
 
-  num getLevelStat(StatType statType) {
-    final equipStat = equipData.stat.firstWhereOrNull((stat) => stat.statType == statType);
+  num getLevelStat(StatType statType, NikkeDatabaseV2 db) {
+    final equipData = db.groupedEquipTable[type]?[equipClass]?[rarity];
+    final equipStat = equipData?.stat.firstWhereOrNull((stat) => stat.statType == statType);
     if (equipStat == null) return 0;
 
     return level * 0.1 * equipStat.statValue;
@@ -90,12 +76,19 @@ class EquipmentOption {
     for (final equipLine in equipLines) {
       if (equipLine.type == EquipLineType.none) continue;
 
-      final stateEffectData = dbLegacy.stateEffectTable[equipLine.getStateEffectId()]!;
-      wearer.functions.addAll(
-        stateEffectData.functions
-            .where((data) => data.function != 0)
-            .map((data) => BattleFunction(dbLegacy.functionTable[data.function]!, wearer.uniqueId)),
-      );
+      final stateEffectData = simulation.db.stateEffectTable[equipLine.getStateEffectId()];
+      if (stateEffectData == null) {
+        logger.w('Invalid Equip Line: ${equipLine.getStateEffectId()}');
+      } else {
+        for (final funcId in stateEffectData.allValidFuncIds) {
+          final func = simulation.db.functionTable[funcId];
+          if (func == null) {
+            logger.w('Invalid Equip Line Func: $funcId');
+          } else {
+            wearer.functions.add(BattleFunction(func, wearer.uniqueId));
+          }
+        }
+      }
     }
   }
 

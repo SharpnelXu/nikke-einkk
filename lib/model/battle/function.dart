@@ -441,14 +441,14 @@ class BattleFunction {
           final statusCheck = checkTargetStatus(event, simulation, target);
           if (!statusCheck) continue;
 
-          final skill = dbLegacy.characterSkillTable[data.functionValue];
+          final skill = simulation.db.characterSkillTable[data.functionValue];
           if (skill != null) {
             activated = true;
             BattleSkill.activateSkill(
               simulation,
               skill,
               target.uniqueId,
-              dbLegacy.skillInfoTable[skill.id]!.groupId,
+              simulation.db.skillInfoTable[skill.id]!.groupId,
               -1,
             );
           }
@@ -613,7 +613,7 @@ class BattleFunction {
         }
 
         for (final functionId in functionsToExecute) {
-          final functionData = dbLegacy.functionTable[functionId];
+          final functionData = simulation.db.functionTable[functionId];
           if (functionData != null) {
             final connectedFunction = BattleFunction(functionData, ownerUniqueId);
             // connected function likely doesn't check trigger target
@@ -628,7 +628,7 @@ class BattleFunction {
     final List<BattleEntity> result = [];
     switch (data.functionTarget) {
       case FunctionTargetType.allCharacter:
-        result.addAll(simulation.nikkes);
+        result.addAll(simulation.nonnullNikkes);
         break;
       case FunctionTargetType.self:
         final self = simulation.getNikkeOnPosition(ownerUniqueId);
