@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
-import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
@@ -81,13 +80,11 @@ String dollLvString(Rarity? dollRare, int dollLevel) {
   }
 }
 
-const avatarSize = 120.0;
-
 Widget buildRaptureIcon(BattleRaptureOptions option) {
   final textStyle = TextStyle(fontSize: 15, color: Colors.white);
   return Container(
-    width: avatarSize,
-    height: avatarSize,
+    width: 120.0,
+    height: 120.0,
     margin: const EdgeInsets.all(5.0),
     padding: const EdgeInsets.all(3.0),
     decoration: BoxDecoration(
@@ -100,11 +97,11 @@ Widget buildRaptureIcon(BattleRaptureOptions option) {
 }
 
 String frameDataToNiceTimeString(int frame, int fps) {
-  final timeData = BattleUtils.frameToTimeData(frame, fps);
-  final seconds = timeData % 6000 / 100;
-  return '${timeData ~/ 6000}:'
+  final timeData = (frame * 1000 / fps).round();
+  final seconds = timeData % 60000 / 1000;
+  return '${timeData ~/ 60000}:'
       '${seconds < 10 ? '0' : ''}'
-      '${(timeData % 6000 / 100).toStringAsFixed(3)}';
+      '${(timeData % 60000 / 1000).toStringAsFixed(3)}';
 }
 
 String? skillValueString(int value, ValueType type, [num extraRate = 1]) {

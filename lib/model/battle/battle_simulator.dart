@@ -85,6 +85,72 @@ class BattleSimulation {
     for (final nikke in nonnullNikkes) {
       nikke.broadcast(BattleStartEvent.battleStartEvent, this);
     }
+    currentFrame = maxFrames;
+  }
+
+  void proceedOneFrame() {
+    if (currentFrame <= 0) {
+      return;
+    }
+
+    for (final entity in [...nonnullNikkes, ...raptures]) {
+      entity.normalAction(this);
+    }
+
+    if (playerOptions.forceFillBurst && burstStage == 0) {
+      registerEvent(currentFrame, ChangeBurstStepEvent(this, -1, 1, -1));
+      burstStage = 1;
+    }
+
+    reEnterBurstCd = max(0, reEnterBurstCd - 1);
+    burstStageDuration = max(0, burstStageDuration - 1);
+    if (burstStage > 1 && burstStageDuration == 0) {
+      if (burstStage == 4) {
+        registerEvent(currentFrame, ExitFullBurstEvent.exitFullBurstEvent);
+      }
+      burstStage = 0;
+    }
+
+    // broadcast all events registered for this frame
+    for (int index = 0; index < (timeline[currentFrame]?.length ?? 0); index += 1) {
+      final event = timeline[currentFrame]![index];
+
+      if (event is BurstGenerationEvent) {
+        event.currentMeter = burstMeter;
+        if (burstStage == 0) {
+          burstMeter += event.burst;
+
+          if (burstMeter == burstMeterCap) {
+            registerEvent(currentFrame, ChangeBurstStepEvent(this, -1, 1, -1));
+            burstStage = 1;
+            burstMeter = 0;
+          }
+        }
+      }
+
+      if (event is ChangeBurstStepEvent) {
+        if (event.nextStage > event.currentStage) {
+          reEnterBurstCd = 0;
+        }
+        burstStage = event.nextStage;
+        burstStageDuration = BattleUtils.timeDataToFrame(event.duration, fps);
+        burstStageDuration = max(0, burstStageDuration);
+      }
+
+      for (final nikke in nonnullNikkes) {
+        nikke.broadcast(event, this);
+      }
+
+      for (final rapture in raptures) {
+        rapture.broadcast(event, this);
+      }
+    }
+
+    for (final entity in [...nonnullNikkes, ...raptures]) {
+      entity.endCurrentFrame(this);
+    }
+
+    currentFrame -= 1;
   }
 
   void simulate() {

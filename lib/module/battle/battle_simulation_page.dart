@@ -44,10 +44,26 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Battle Simulation')),
-      bottomNavigationBar: commonBottomNavigationBar(() => setState(() {})),
+      bottomNavigationBar: commonBottomNavigationBar(
+        () => setState(() {}),
+        actions: [
+          IconButton.filled(
+            onPressed:
+                simulation.currentFrame <= 0
+                    ? null
+                    : () {
+                      simulation.proceedOneFrame();
+                      setState(() {});
+                    },
+            icon: Icon(Icons.play_arrow),
+          ),
+        ],
+      ),
       body: ListView(
         children: [
           Align(child: Text('Nikkes', style: TextStyle(fontSize: 20))),
+          _buildMiscColumn(),
+          const Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,6 +71,22 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMiscColumn() {
+    return Column(
+      spacing: 3,
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Time: ${frameDataToNiceTimeString(simulation.currentFrame, simulation.fps)}s'
+          ' (Frame ${simulation.currentFrame})',
+        ),
+        Text('Burst: ${(simulation.burstMeter / 100).percentString}'),
+        SimplePercentBar(percent: simulation.burstMeter / BattleSimulation.burstMeterCap),
+      ],
     );
   }
 
@@ -68,6 +100,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       ),
     ];
 
+    final divider = const Divider(height: 2, indent: 10, endIndent: 10);
     if (nikke != null) {
       final currentCoverHp = nikke.cover.currentHp;
       final maxCoverHp = nikke.cover.getMaxHp(simulation);
@@ -76,18 +109,37 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       final maxHp = nikke.getMaxHp(simulation);
       children.addAll([
         Text('${nikke.currentAmmo} / ${nikke.getMaxAmmo(simulation)}'),
-        const Divider(height: 2),
-        Text('Cover: ${(currentCoverHp / maxCoverHp * 100).round()}%'),
+        divider,
+        SimplePercentBar(percent: currentCoverHp / maxCoverHp, color: Colors.blue[200]),
         Text(currentCoverHp.decimalPattern),
-        const Divider(height: 2),
-        Text('HP: ${(currentHp / maxHp * 100).round()}%'),
+        SimplePercentBar(percent: currentHp / maxHp, color: Colors.white),
         Text(currentHp.decimalPattern),
-        const Divider(height: 2),
+        divider,
         Text('ATK: ${(nikke.getAttackBuffValues(simulation) + nikke.baseAttack).decimalPattern}'),
         Text('DEF: ${(nikke.getDefenceBuffValues(simulation) + nikke.baseDefence).decimalPattern}'),
       ]);
     }
 
     return Expanded(child: Column(spacing: 5, children: children));
+  }
+}
+
+class SimplePercentBar extends StatelessWidget {
+  final double size;
+  final double percent;
+  final Color? color;
+
+  const SimplePercentBar({super.key, this.size = avatarSize, required this.percent, this.color = Colors.white});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 2), color: Colors.grey),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(height: 12, width: size * percent, decoration: BoxDecoration(color: color)),
+      ),
+    );
   }
 }
