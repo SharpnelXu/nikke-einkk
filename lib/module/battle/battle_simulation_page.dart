@@ -4,6 +4,7 @@ import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
+import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
@@ -128,30 +129,53 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
 
   List<Widget> buildNikkeStatus(BattleNikke nikke) {
     final status = nikke.status;
-    String statusStr =
-        status == BattleNikkeStatus.behindCover
-            ? 'Covered'
-            : status == BattleNikkeStatus.shooting
-            ? 'Firing'
-            : 'Reloading';
     int? cur, max;
+    final List<Widget> list = [Text('Status:')];
+
+    void addProgressBar(String statusText, int cur, int max) {
+      list.addAll([Text(statusText), SimplePercentBar(percent: cur / max), Text('$cur / $max')]);
+    }
+
     if (status == BattleNikkeStatus.shooting) {
       if (nikke.spotFirstDelayFrameCount >= 0) {
         max = timeDataToFrame(nikke.currentWeaponData.spotFirstDelay, nikke.fps);
         cur = max - nikke.spotFirstDelayFrameCount;
-        statusStr = 'Exiting Cover';
-      } else {
+        addProgressBar('Exiting Cover', cur, max);
+      }
+
+      if (WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponType)) {
+        if (nikke.maintainFireStanceFrameCount > 0) {
+          max = timeDataToFrame(
+            nikke.currentWeaponData.spotFirstDelay + nikke.currentWeaponData.maintainFireStance,
+            nikke.fps,
+          );
+          cur = nikke.maintainFireStanceFrameCount;
+          addProgressBar('Forced Delay', cur, max);
+        } else if (nikke.chargeFrames > 0) {
+          max = nikke.previousFullChargeFrameCount;
+          cur = nikke.chargeFrames;
+          addProgressBar('Charging', cur, max);
+        } else if (nikke.spotLastDelayFrameCount > 0) {
+          max = timeDataToFrame(nikke.currentWeaponData.spotLastDelay, nikke.fps);
+          cur = max - nikke.spotLastDelayFrameCount;
+          addProgressBar('Entering Cover', cur, max);
+        }
+      } else if (nikke.shootCountdown > 0) {
         max = nikke.shootThreshold;
         cur = max - nikke.shootCountdown;
-        statusStr = 'Next Bullet';
+        addProgressBar('Next Bullet', cur, max);
+      }
+    } else if (status == BattleNikkeStatus.behindCover) {
+      if (nikke.spotLastDelayFrameCount > 0) {
+        max = timeDataToFrame(nikke.currentWeaponData.spotLastDelay, nikke.fps);
+        cur = max - nikke.spotLastDelayFrameCount;
+        addProgressBar('Entering Cover', cur, max);
+      } else {
+        list.add(Text('Covered'));
       }
     }
-    return [
-      Text('Status:'),
-      Text(statusStr),
-      if (cur != null && max != null) SimplePercentBar(percent: cur / max),
-      if (cur != null && max != null) Text('$cur / $max'),
-    ];
+
+    return list;
   }
 }
 

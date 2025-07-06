@@ -146,6 +146,7 @@ class BattleNikke extends BattleEntity {
   int reloadingFrameCount = 0; // reason for += 1: fullReloadFrameCount is calculated as max at first reload frame
   int chargeFrames = 0;
   int previousFullChargeFrameCount = 0;
+  int maintainFireStanceFrameCount = 0;
 
   // TODO: min value 0?
   // these starts with max (-= 1 each frame)
@@ -186,6 +187,7 @@ class BattleNikke extends BattleEntity {
     shootCountdown = 0;
     spotLastDelayFrameCount = 0;
     spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(baseWeaponData.spotFirstDelay, fps);
+    maintainFireStanceFrameCount = 0;
     reloadingFrameCount = 0;
     fullReloadFrameCount = 0;
     currentHp = baseHp;
@@ -280,6 +282,7 @@ class BattleNikke extends BattleEntity {
   void processBehindCoverStatus(BattleSimulation simulation) {
     // reset this when entering a non-shooting status
     spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
+    maintainFireStanceFrameCount = 0;
     chargeFrames = 0;
     spotLastDelayFrameCount -= 1;
     if (shootCountdown > 0) {
@@ -340,6 +343,15 @@ class BattleNikke extends BattleEntity {
     // could use abs to track how long nikke stayed outside
     spotFirstDelayFrameCount -= 1;
 
+    if (maintainFireStanceFrameCount > 0) {
+      maintainFireStanceFrameCount -= 1;
+      if (maintainFireStanceFrameCount == 0 && WeaponType.chargeWeaponTypes.contains(currentWeaponType)) {
+        previousFullChargeFrameCount = getFramesToFullCharge(simulation);
+        chargeFrames = 1; // charge weapons seem to start with one frame of charge at the last frame of this animation
+      }
+      return;
+    }
+
     final target = simulation.raptures.where((rapture) => canTarget(rapture)).firstOrNull;
     if (target == null) return;
 
@@ -370,15 +382,6 @@ class BattleNikke extends BattleEntity {
           generateDamageAndBurstEvents(simulation, simulation.currentFrame, target);
         }
 
-        // these two should probably be available for all weapon types
-        if (currentWeaponData.accuracyChangePerShot > 0) {
-          _accuracyCircleScale -= currentWeaponData.accuracyChangePerShot;
-        }
-        if (currentWeaponData.rateOfFireChangePerShot > 0) {
-          rateOfFire += currentWeaponData.rateOfFireChangePerShot;
-        }
-
-        return;
       case WeaponType.rl:
       case WeaponType.sr:
         final framesToFullCharge = getFramesToFullCharge(simulation);
@@ -418,8 +421,8 @@ class BattleNikke extends BattleEntity {
           FireType.projectileCurve,
           FireType.projectileDirect,
         ].contains(currentWeaponData.fireType)) {
-          final projectileCreateFrame = BattleUtils.timeDataToFrame(
-            currentWeaponData.maintainFireStance * BattleUtils.toModifier(currentWeaponData.upTypeFireTiming),
+          final projectileCreateFrame = timeDataToFrame(
+            currentWeaponData.maintainFireStance * toModifier(currentWeaponData.upTypeFireTiming),
             fps,
           );
 
@@ -450,30 +453,29 @@ class BattleNikke extends BattleEntity {
         // this is essentially shooting frame for SR & RL
         if (currentWeaponData.maintainFireStance > 0) {
           // TODO: A2 has 9 extra frames, maybe due to animation but not sure
-          spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(
+          maintainFireStanceFrameCount = timeDataToFrame(
             currentWeaponData.spotFirstDelay + currentWeaponData.maintainFireStance,
             fps,
           );
         } else {
           spotLastDelayFrameCount =
-              option.forceCancelShootDelay ? 0 : BattleUtils.timeDataToFrame(currentWeaponData.spotLastDelay, fps);
-          spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
-          chargeFrames = 0;
+              option.forceCancelShootDelay ? 0 : timeDataToFrame(currentWeaponData.spotLastDelay, fps);
+          // necessary for quick scope
+          spotFirstDelayFrameCount = timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
         }
 
-        // these two should probably be available for all weapon types
-        if (currentWeaponData.accuracyChangePerShot > 0) {
-          _accuracyCircleScale -= currentWeaponData.accuracyChangePerShot;
-        }
-        if (currentWeaponData.rateOfFireChangePerShot > 0) {
-          rateOfFire += currentWeaponData.rateOfFireChangePerShot;
-        }
-
-        return;
+        chargeFrames = 0;
       case WeaponType.unknown:
       case WeaponType.none:
         // TODO: probably log?
         return;
+    }
+
+    if (currentWeaponData.accuracyChangePerShot > 0) {
+      _accuracyCircleScale -= currentWeaponData.accuracyChangePerShot;
+    }
+    if (currentWeaponData.rateOfFireChangePerShot > 0) {
+      rateOfFire += currentWeaponData.rateOfFireChangePerShot;
     }
   }
 
@@ -686,7 +688,7 @@ class BattleNikke extends BattleEntity {
       currentWeaponData.chargeTime,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
     );
-    return max(1, BattleUtils.timeDataToFrame(result, fps) - 1);
+    return max(1, BattleUtils.timeDataToFrame(result, fps));
   }
 
   int getTimeToReload(BattleSimulation simulation) {
