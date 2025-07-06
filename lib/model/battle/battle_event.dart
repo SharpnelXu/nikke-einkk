@@ -8,7 +8,6 @@ import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
-import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 abstract class BattleEvent {

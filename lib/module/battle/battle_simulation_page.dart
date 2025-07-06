@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
+import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
@@ -89,6 +90,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     );
   }
 
+  static final divider = const Divider(height: 2, indent: 30, endIndent: 30);
   Widget _buildNikke(int idx, BattleNikke? nikke) {
     final List<Widget> children = [
       NikkeIcon(
@@ -99,7 +101,6 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       ),
     ];
 
-    final divider = const Divider(height: 2, indent: 10, endIndent: 10);
     if (nikke != null) {
       final currentCoverHp = nikke.cover.currentHp;
       final maxCoverHp = nikke.cover.getMaxHp(simulation);
@@ -107,6 +108,9 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       final currentHp = nikke.currentHp;
       final maxHp = nikke.getMaxHp(simulation);
       children.addAll([
+        ...buildNikkeStatus(nikke),
+        divider,
+        SimplePercentBar(percent: nikke.currentAmmo / nikke.getMaxAmmo(simulation)),
         Text('${nikke.currentAmmo} / ${nikke.getMaxAmmo(simulation)}'),
         divider,
         SimplePercentBar(percent: currentCoverHp / maxCoverHp, color: Colors.blue[200]),
@@ -120,6 +124,23 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     }
 
     return Expanded(child: Column(spacing: 5, children: children));
+  }
+
+  List<Widget> buildNikkeStatus(BattleNikke nikke) {
+    final status = nikke.status;
+    String statusStr = status == BattleNikkeStatus.behindCover ? 'Covered' : status == BattleNikkeStatus.shooting ? 'Firing' : 'Reloading';
+    int? cur, max;
+    if (nikke.spotFirstDelayFrameCount > 0 && status == BattleNikkeStatus.shooting) {
+      max = timeDataToFrame(nikke.currentWeaponData.spotFirstDelay, nikke.fps);
+      cur = max - nikke.spotFirstDelayFrameCount;
+      statusStr = 'Exiting Cover';
+    }
+    return [
+      Text('Status:'),
+      Text(statusStr),
+      if (cur != null && max != null) SimplePercentBar(percent: cur / max),
+      if (cur != null && max != null) Text('$cur / $max'),
+    ];
   }
 }
 

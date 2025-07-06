@@ -125,9 +125,20 @@ class BattleNikke extends BattleEntity {
   WeaponType get currentWeaponType => currentWeaponData.weaponType;
   WeaponData get currentWeaponData => baseWeaponData;
 
-  int _accuracyCircleScale = 0;
+  // TODO: this encapsulates ranges so don't need to clamp on every change, but it's boiler plate ish
+  // a lot of frame counters have min value 0,
+  /// this is without buff, so internal tracking only
+  int __accuracyCircleScale = 0;
+  int get _accuracyCircleScale => __accuracyCircleScale;
+  set _accuracyCircleScale(int newScale) =>
+      __accuracyCircleScale = newScale.clamp(
+        currentWeaponData.endAccuracyCircleScale,
+        currentWeaponData.startAccuracyCircleScale,
+      );
 
-  int rateOfFire = 0;
+  int _rateOfFire = 0;
+  int get rateOfFire => _rateOfFire;
+  set rateOfFire(int value) => _rateOfFire = value.clamp(currentWeaponData.rateOfFire, currentWeaponData.endRateOfFire);
 
   int fullReloadFrameCount = 0;
 
@@ -162,6 +173,7 @@ class BattleNikke extends BattleEntity {
   void init(BattleSimulation simulation, int position) {
     uniqueId = position;
     fps = simulation.fps;
+    status = BattleNikkeStatus.behindCover;
     _accuracyCircleScale = baseWeaponData.startAccuracyCircleScale;
     rateOfFire = baseWeaponData.rateOfFire;
     chargeFrames = 0;
@@ -236,6 +248,7 @@ class BattleNikke extends BattleEntity {
         break;
       case BattleNikkeStatus.reloading:
       case BattleNikkeStatus.forceReloading:
+        processBehindCoverStatus(simulation);
         processReloadingStatus(simulation);
         break;
       case BattleNikkeStatus.shooting:
@@ -263,7 +276,6 @@ class BattleNikke extends BattleEntity {
     // reset this when entering a non-shooting status
     spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
     chargeFrames = 0;
-
     spotLastDelayFrameCount -= 1;
     shootingFrameCount -= 1;
     if (currentWeaponData.accuracyChangeSpeed != 0) {
@@ -278,11 +290,6 @@ class BattleNikke extends BattleEntity {
   }
 
   void processReloadingStatus(BattleSimulation simulation) {
-    // reset this when entering a non-shooting status
-    spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
-    chargeFrames = 0;
-
-    spotLastDelayFrameCount -= 1;
 
     if (reloadingFrameCount == 0) {
       // this means this is the first frame of reloading
@@ -309,19 +316,6 @@ class BattleNikke extends BattleEntity {
       currentAmmo = min(maxAmmo, currentAmmo + (reloadRatio * maxAmmo).round());
       reloadingFrameCount = 0;
     }
-
-    // these rests should probably happen in other status as well
-    if (currentWeaponData.accuracyChangeSpeed != 0) {
-      // reset accuracy
-      _accuracyCircleScale += (currentWeaponData.accuracyChangeSpeed / fps).round();
-    }
-    if (currentWeaponData.rateOfFireResetTime != 0) {
-      rateOfFire -=
-          ((currentWeaponData.endRateOfFire - currentWeaponData.rateOfFire) / currentWeaponData.rateOfFireResetTime)
-              .round();
-    }
-    // also reset shooting time well in reloading? or maybe for all possible status?
-    shootingFrameCount -= 1;
   }
 
   void processShootingStatus(BattleSimulation simulation) {

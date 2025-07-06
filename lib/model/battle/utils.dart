@@ -4,6 +4,10 @@ double toModifier(int ratio) {
   return ratio / 10000;
 }
 
+int timeDataToFrame(num timeData, int fps) {
+  return (timeData * fps / 100).round();
+}
+
 class BattleUtils {
   static const rangeCorrection = 3000;
   static const fullBurstCorrection = 5000;
