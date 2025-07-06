@@ -151,7 +151,12 @@ class BattleNikke extends BattleEntity {
   // these starts with max (-= 1 each frame)
   int spotFirstDelayFrameCount = 0;
   int spotLastDelayFrameCount = 0; // after charge attack force back to cover
-  int shootingFrameCount = 0;
+
+  // ready to fire if equals or below 0.
+  // after each bullet, add 60 * fps to this value, which then gets subtracted with rateOfFire in each frame.
+  // this makes the counter immune to rounding errors due to frame rate & fixes SMG fire rate.
+  int shootCountdown = 0;
+  int get shootThreshold => 60 * fps;
 
   int totalBulletsFired = 0;
   int totalFullChargeFired = 0;
@@ -178,7 +183,7 @@ class BattleNikke extends BattleEntity {
     rateOfFire = baseWeaponData.rateOfFire;
     chargeFrames = 0;
     previousFullChargeFrameCount = 0;
-    shootingFrameCount = 0;
+    shootCountdown = 0;
     spotLastDelayFrameCount = 0;
     spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(baseWeaponData.spotFirstDelay, fps);
     reloadingFrameCount = 0;
@@ -277,7 +282,9 @@ class BattleNikke extends BattleEntity {
     spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
     chargeFrames = 0;
     spotLastDelayFrameCount -= 1;
-    shootingFrameCount -= 1;
+    if (shootCountdown > 0) {
+      shootCountdown -= rateOfFire;
+    }
     if (currentWeaponData.accuracyChangeSpeed != 0) {
       // reset accuracy
       _accuracyCircleScale += (currentWeaponData.accuracyChangeSpeed / fps).round();
@@ -290,7 +297,6 @@ class BattleNikke extends BattleEntity {
   }
 
   void processReloadingStatus(BattleSimulation simulation) {
-
     if (reloadingFrameCount == 0) {
       // this means this is the first frame of reloading
       // need to calculate how many frames needed to do one reload
@@ -319,7 +325,9 @@ class BattleNikke extends BattleEntity {
   }
 
   void processShootingStatus(BattleSimulation simulation) {
-    shootingFrameCount -= 1;
+    if (shootCountdown > 0) {
+      shootCountdown -= rateOfFire;
+    }
     // before shooting need to go outside cover first, not sure if this should be its own status tho
     if (spotFirstDelayFrameCount > 0) {
       spotFirstDelayFrameCount -= 1;
@@ -329,6 +337,8 @@ class BattleNikke extends BattleEntity {
       }
       return;
     }
+    // could use abs to track how long nikke stayed outside
+    spotFirstDelayFrameCount -= 1;
 
     final target = simulation.raptures.where((rapture) => canTarget(rapture)).firstOrNull;
     if (target == null) return;
@@ -338,14 +348,13 @@ class BattleNikke extends BattleEntity {
       case WeaponType.smg:
       case WeaponType.mg:
       case WeaponType.sg:
-        if (shootingFrameCount > 0) {
+        if (shootCountdown > 0) {
           return;
         }
 
-        // if (totalBulletsFired % 10 == 0 && position == 2) {
-        //   currentAmmo += 3;
-        //   currentAmmo = min(maxAmmo, currentAmmo);
-        // }
+        while (shootCountdown <= 0) {
+          shootCountdown += shootThreshold;
+        }
 
         simulation.registerEvent(
           simulation.currentFrame,
@@ -360,10 +369,6 @@ class BattleNikke extends BattleEntity {
         if (currentWeaponData.fireType == FireType.instant) {
           generateDamageAndBurstEvents(simulation, simulation.currentFrame, target);
         }
-
-        // rateOfFire 90 = shoot 90 bullets per minute, so time data per bullet is 6000 / 90 = 66.66 (0.6666 second)
-        shootingFrameCount = BattleUtils.timeDataToFrame(60 * 100 / rateOfFire, fps);
-        shootingFrameCount = max(shootingFrameCount, 1); // minimum 1 frame cooldown
 
         // these two should probably be available for all weapon types
         if (currentWeaponData.accuracyChangePerShot > 0) {
@@ -545,8 +550,7 @@ class BattleNikke extends BattleEntity {
       }
 
       for (final buff in buffs) {
-        if (buff.data.durationType == DurationType.shots &&
-            db.onShotFunctionTypes.contains(buff.data.functionType)) {
+        if (buff.data.durationType == DurationType.shots && db.onShotFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }
@@ -567,8 +571,7 @@ class BattleNikke extends BattleEntity {
 
     if (event is RaptureDamageEvent && event.targetUniqueId == uniqueId) {
       for (final buff in buffs) {
-        if (buff.data.durationType == DurationType.shots &&
-            db.onHitFunctionTypes.contains(buff.data.functionType)) {
+        if (buff.data.durationType == DurationType.shots && db.onHitFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }

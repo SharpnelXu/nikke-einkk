@@ -72,7 +72,7 @@ class BattleSimulation {
     for (int index = 0; index < battleNikkes.length; index += 1) {
       battleNikkes[index]?.init(this, index + 1);
     }
-    if (battleNikkes[currentNikke - 1] == null) {
+    if (currentNikke >= battleNikkes.length || battleNikkes[currentNikke - 1] == null) {
       currentNikke = nonnullNikkes.first.uniqueId;
     }
 

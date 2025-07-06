@@ -128,12 +128,23 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
 
   List<Widget> buildNikkeStatus(BattleNikke nikke) {
     final status = nikke.status;
-    String statusStr = status == BattleNikkeStatus.behindCover ? 'Covered' : status == BattleNikkeStatus.shooting ? 'Firing' : 'Reloading';
+    String statusStr =
+        status == BattleNikkeStatus.behindCover
+            ? 'Covered'
+            : status == BattleNikkeStatus.shooting
+            ? 'Firing'
+            : 'Reloading';
     int? cur, max;
-    if (nikke.spotFirstDelayFrameCount > 0 && status == BattleNikkeStatus.shooting) {
-      max = timeDataToFrame(nikke.currentWeaponData.spotFirstDelay, nikke.fps);
-      cur = max - nikke.spotFirstDelayFrameCount;
-      statusStr = 'Exiting Cover';
+    if (status == BattleNikkeStatus.shooting) {
+      if (nikke.spotFirstDelayFrameCount >= 0) {
+        max = timeDataToFrame(nikke.currentWeaponData.spotFirstDelay, nikke.fps);
+        cur = max - nikke.spotFirstDelayFrameCount;
+        statusStr = 'Exiting Cover';
+      } else {
+        max = nikke.shootThreshold;
+        cur = max - nikke.shootCountdown;
+        statusStr = 'Next Bullet';
+      }
     }
     return [
       Text('Status:'),

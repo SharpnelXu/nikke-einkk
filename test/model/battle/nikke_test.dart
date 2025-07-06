@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/equipment.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
@@ -250,6 +251,89 @@ void main() async {
 
       final scarlet = simulation.nonnullNikkes.first;
       expect(scarlet.getMaxAmmo(simulation), 66);
+    });
+  });
+
+  group('Fire rate test', () {
+    test('Nero as SMG', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [NikkeOptions(nikkeResourceId: 380)],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 100)],
+      );
+
+      simulation.maxSeconds = 2;
+      simulation.init();
+      int shootCounter = 0;
+      final expectedShootFrames = List.generate(24, (idx) {
+        return 8 + (idx % 2 == 0 ? 5 * idx ~/ 2 : 5 * (idx - 1) ~/ 2 + 3);
+      });
+      for (int i = 0; i < 67; i += 1) {
+        // add 8 for nero's spotFirstDelay
+        final frame = simulation.currentFrame;
+        simulation.proceedOneFrame();
+        for (final event in simulation.timeline[frame] ?? []) {
+          if (event is NikkeFireEvent) {
+            shootCounter += 1;
+            expect(frame, simulation.maxFrames - expectedShootFrames.removeAt(0));
+          }
+        }
+      }
+      expect(shootCounter, 24);
+    });
+
+    test('Tove as AR', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [NikkeOptions(nikkeResourceId: 192)],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 100)],
+      );
+
+      simulation.maxSeconds = 2;
+      simulation.init();
+      int shootCounter = 0;
+      final expectedShootFrames = List.generate(12, (idx) {
+        return 20 + idx * 5;
+      });
+      for (int i = 0; i < 76; i += 1) {
+        // add 20 for tove's spotFirstDelay
+        final frame = simulation.currentFrame;
+        simulation.proceedOneFrame();
+        for (final event in simulation.timeline[frame] ?? []) {
+          if (event is NikkeFireEvent) {
+            shootCounter += 1;
+            expect(frame, simulation.maxFrames - expectedShootFrames.removeAt(0));
+          }
+        }
+      }
+      expect(shootCounter, 12);
+    });
+
+    test('Pepper as SG', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [NikkeOptions(nikkeResourceId: 131)],
+        raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 100)],
+      );
+
+      simulation.maxSeconds = 2;
+      simulation.init();
+      int shootCounter = 0;
+      final expectedShootFrames = List.generate(3, (idx) {
+        return 12 + idx * 40;
+      });
+      for (int i = 0; i < 93; i += 1) {
+        // add 20 for tove's spotFirstDelay
+        final frame = simulation.currentFrame;
+        simulation.proceedOneFrame();
+        for (final event in simulation.timeline[frame] ?? []) {
+          if (event is NikkeFireEvent) {
+            shootCounter += 1;
+            expect(frame, simulation.maxFrames - expectedShootFrames.removeAt(0));
+          }
+        }
+      }
+      expect(shootCounter, 3);
     });
   });
 }

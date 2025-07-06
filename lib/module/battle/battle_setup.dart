@@ -78,20 +78,23 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
         () => setState(() {}),
         actions: [
           FilledButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (ctx) => BattleSimulationPage(
-                        nikkeOptions: nikkeOptions,
-                        raptureOptions: [raptureOption],
-                        playerOptions: playerOptions,
-                        useGlobal: useGlobal,
-                      ),
-                ),
-              );
-            },
+            onPressed:
+                nikkeOptions.any((option) => option.nikkeResourceId != -1)
+                    ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (ctx) => BattleSimulationPage(
+                                nikkeOptions: nikkeOptions,
+                                raptureOptions: [raptureOption],
+                                playerOptions: playerOptions,
+                                useGlobal: useGlobal,
+                              ),
+                        ),
+                      );
+                    }
+                    : null,
             child: Text('Simulate'),
           ),
           FilledButton.icon(
@@ -300,7 +303,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
 
       statDisplays.addAll([
         Text('Lv ${option.syncLevel} ${coreString(option.coreLevel)}'),
-        Text('Attract Lv${option.attractLevel}'),
+        Text('Bond Lv${option.attractLevel}'),
         Text(option.skillLevels.map((lv) => lv.toString()).join('/')),
       ]);
 

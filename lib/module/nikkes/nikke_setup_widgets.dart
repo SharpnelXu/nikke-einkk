@@ -589,7 +589,7 @@ class _NikkeBasicSetupWidgetsState extends State<NikkeBasicSetupWidgets> {
         SliderWithPrefix(
           constraint: false,
           titled: false,
-          label: 'Attract',
+          label: 'Bond',
           leadingWidth: sliderWidth,
           min: 1,
           max: characterData.maxAttractLv,
