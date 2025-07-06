@@ -24,7 +24,7 @@ class NikkeCharacterPage extends StatefulWidget {
 
 class _NikkeCharacterPageState extends State<NikkeCharacterPage> {
   int tab = 0;
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
   NikkeCharacterData get data => widget.data;
   WeaponData? get weapon => db.characterShotTable[data.shotId];
   bool favoriteItemSkill = true;
@@ -289,7 +289,7 @@ class NikkeBaseStatColumn extends StatefulWidget {
 
 class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
   NikkeOptions get option => widget.option;
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   @override
   Widget build(BuildContext context) {

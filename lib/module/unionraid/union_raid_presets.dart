@@ -17,7 +17,7 @@ class _UnionRaidPresetPageState extends State<UnionRaidPresetPage> {
   int? urPreset;
 
   bool get useGlobal => userDb.useGlobal;
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +166,7 @@ class _UnionRaidDataDisplayState extends State<UnionRaidDataDisplay> {
 
 class UnionRaidBossDisplay extends StatelessWidget {
   final UnionRaidWaveData data;
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   const UnionRaidBossDisplay({super.key, required this.data});
 

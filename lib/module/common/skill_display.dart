@@ -12,7 +12,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
 
   const CharacterSkillDataDisplay({super.key, required this.data});
 
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   static final boldStyle = TextStyle(fontWeight: FontWeight.bold);
   static final headerData = TableCellData(isHeader: true, style: boldStyle);
@@ -140,7 +140,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
 class StateEffectDataDisplay extends StatelessWidget {
   final StateEffectData data;
 
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   const StateEffectDataDisplay({super.key, required this.data});
 
@@ -183,7 +183,7 @@ class SimpleFunctionDisplay extends StatelessWidget {
   final int functionId;
   final String? connectFuncPrefix;
 
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   const SimpleFunctionDisplay({super.key, required this.functionId, this.connectFuncPrefix});
 
@@ -308,7 +308,7 @@ class MonsterSkillDataDisplay extends StatelessWidget {
   final MonsterSkillData data;
   final MonsterStatEnhanceData? statEnhanceData;
 
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   static final boldStyle = TextStyle(fontWeight: FontWeight.bold);
   static final headerData = TableCellData(isHeader: true, style: boldStyle);

@@ -10,7 +10,7 @@ import 'package:nikke_einkk/model/user_data.dart';
 import '../../test_helper.dart';
 
 void main() async {
-  await TestHelper.loadData();
+  TestHelper.loadData();
 
   group('Nikke Stat Calculation Test', () {
     test('Dorothy resourceId 233', () {

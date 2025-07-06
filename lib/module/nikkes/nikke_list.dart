@@ -100,7 +100,7 @@ class _NikkeGridsState extends State<NikkeGrids> {
   ScrollController scrollController = ScrollController();
   bool extraFilters = false;
 
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   @override
   void dispose() {
@@ -381,7 +381,7 @@ class NikkeFilterData {
   bool skillOr = true;
   bool funcOr = true;
 
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   bool shouldInclude(NikkeCharacterData characterData, WeaponData? weapon) {
     return _burstCheck(characterData) &&

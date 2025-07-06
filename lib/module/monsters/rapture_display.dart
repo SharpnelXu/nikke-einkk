@@ -14,7 +14,7 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
   final int stageLv;
   final int stageLvChangeGroup;
 
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   const RaptureLeveledDataDisplay({
     super.key,
@@ -196,7 +196,7 @@ class RaptureDataDisplayPage extends StatefulWidget {
 
 class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
   int tab = 0;
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
   MonsterData get data => widget.data;
   int? get stageLv => widget.stageLv;
   MonsterStatEnhanceData? get statEnhanceData => db.monsterStatEnhanceData[data.statEnhanceId]?[stageLv];

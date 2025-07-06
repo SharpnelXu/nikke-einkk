@@ -17,7 +17,7 @@ class NikkeSelectorPage extends StatefulWidget {
 
 class _NikkeSelectorPageState extends State<NikkeSelectorPage> {
   bool get useGlobal => widget.useGlobal;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabase get db => useGlobal ? global : cn;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class NikkeEditorPage extends StatefulWidget {
 
 class _NikkeEditorPageState extends State<NikkeEditorPage> {
   bool get useGlobal => widget.useGlobal;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabase get db => useGlobal ? global : cn;
   NikkeOptions get option => widget.option;
 
   @override

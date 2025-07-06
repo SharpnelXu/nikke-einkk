@@ -3,15 +3,7 @@ import 'package:nikke_einkk/model/db.dart';
 class TestHelper {
   TestHelper._();
 
-  static Future<bool> loadData() async {
-    if (!dbLegacy.dataLoaded) {
-      await dbLegacy.loadData();
-    }
-
-    return dbLegacy.dataLoaded;
-  }
-
-  static void loadDataV2() {
+  static void loadData() {
     if (!global.initialized) {
       global.init();
     }

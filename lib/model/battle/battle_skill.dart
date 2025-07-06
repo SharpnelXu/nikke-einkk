@@ -23,7 +23,7 @@ class BattleSkill {
   final int level;
   final int skillNum;
   final bool useGlobal;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabase get db => useGlobal ? global : cn;
 
   BattleSkill(this.skillId, this.skillType, this.level, this.skillNum, this.ownerUniqueId, this.useGlobal);
 

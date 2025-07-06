@@ -18,7 +18,7 @@ class _CoopRaidPresetPageState extends State<CoopRaidPresetPage> {
   int? coopId;
 
   bool get useGlobal => userDb.useGlobal;
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,7 @@ class _CoopRaidPresetPageState extends State<CoopRaidPresetPage> {
 
 class CoopRaidBossDisplay extends StatelessWidget {
   final MultiplayerRaidData data;
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   const CoopRaidBossDisplay({super.key, required this.data});
 

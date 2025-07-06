@@ -74,7 +74,7 @@ class WeaponDataDisplay extends StatelessWidget {
   final NikkeCharacterData? character;
   final int weaponId;
 
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   const WeaponDataDisplay({super.key, this.character, required this.weaponId});
 

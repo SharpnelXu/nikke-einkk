@@ -30,7 +30,7 @@ class BattleSetupPage extends StatefulWidget {
 
 class _BattleSetupPageState extends State<BattleSetupPage> {
   bool useGlobal = true;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabase get db => useGlobal ? global : cn;
   BattleSetup setup = BattleSetup(
     playerOptions: PlayerOptions(),
     nikkeOptions: List.generate(5, (_) => NikkeOptions(nikkeResourceId: -1)),
@@ -268,7 +268,7 @@ class NikkeDisplay extends StatefulWidget {
 class _NikkeDisplayState extends State<NikkeDisplay> {
   NikkeOptions get option => widget.option;
   bool get useGlobal => widget.useGlobal;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabase get db => useGlobal ? global : cn;
 
   @override
   Widget build(BuildContext context) {

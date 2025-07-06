@@ -15,11 +15,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart';
 
 /// db object
-final dbLegacy = NikkeDatabase();
-
 final locale = Locale();
-final global = NikkeDatabaseV2(true);
-final cn = NikkeDatabaseV2(false);
+final global = NikkeDatabase(true);
+final cn = NikkeDatabase(false);
 final userDb = UserDatabase();
 late PackageInfo packageInfo;
 
@@ -77,13 +75,13 @@ class Locale {
   }
 }
 
-class NikkeDatabaseV2 {
+class NikkeDatabase {
   bool isGlobal = true;
   bool initialized = false;
 
   String get server => isGlobal ? 'Global' : 'CN';
 
-  NikkeDatabaseV2(this.isGlobal);
+  NikkeDatabase(this.isGlobal);
 
   int maxSyncLevel = 1;
   final Map<int, List<UnionRaidWaveData>> unionRaidData = {}; // key is presetId
@@ -121,6 +119,9 @@ class NikkeDatabaseV2 {
   final Map<int, Set<FunctionType>> nameCodeFuncTypes = {};
   final Map<int, Set<TimingTriggerType>> nameCodeTimingTypes = {};
   final Map<int, Set<StatusTriggerType>> nameCodeStatusTypes = {};
+
+  final Set<FunctionType> onShotFunctionTypes = {};
+  final Set<FunctionType> onHitFunctionTypes = {};
 
   void init() {
     unionRaidData.clear();
@@ -368,6 +369,13 @@ class NikkeDatabaseV2 {
   void processFunctionData(dynamic record) {
     final data = FunctionData.fromJson(record);
     functionTable[data.id] = data;
+
+    if (data.durationType == DurationType.shots) {
+      onShotFunctionTypes.add(data.functionType);
+    }
+    if (data.durationType == DurationType.hits) {
+      onHitFunctionTypes.add(data.functionType);
+    }
   }
 
   void processMonsterSkillData(dynamic record) {
@@ -483,7 +491,7 @@ class UserDatabase {
   Map<int, NikkeOptions> get nikkeOptions => useGlobal ? userData.globalNikkeOptions : userData.cnNikkeOptions;
   Map<int, int> get cubeLvs => useGlobal ? userData.globalCubeLvs : userData.cnCubeLvs;
 
-  NikkeDatabaseV2 get gameDb => useGlobal ? global : cn;
+  NikkeDatabase get gameDb => useGlobal ? global : cn;
 
   String directory(String fileName) {
     return join(userDataPath, fileName);
@@ -556,396 +564,6 @@ bool loadData(String filePath, void Function(dynamic) process) {
     }
   }
   return exists;
-}
-
-/// will be deprecated i guess
-class NikkeDatabase {
-  static const String appPath = '.';
-
-  String get userDataPath => join(appPath, 'userData');
-
-  String get userDataFilePath => join(userDataPath, 'UserData.json');
-
-  String get dataPath => join(appPath, 'data');
-  String get characterTableFilePath => join(dataPath, 'CharacterTable.json');
-  String get characterShotTableFilePath => join(dataPath, 'CharacterShotTable.json');
-  String get characterSkillTableFilePath => join(dataPath, 'CharacterSkillTable.json');
-  String get stateEffectTableFilePath => join(dataPath, 'StateEffectTable.json');
-  String get functionTableFilePath => join(dataPath, 'FunctionTable.json');
-  String get characterStatTableFilePath => join(dataPath, 'CharacterStatTable.json');
-  String get characterStatEnhanceTableFilePath => join(dataPath, 'CharacterStatEnhanceTable.json');
-  String get attractiveLevelTableFilePath => join(dataPath, 'AttractiveLevelTable.json');
-  String get itemEquipTableFilePath => join(dataPath, 'ItemEquipTable.json');
-  String get itemHarmonyCubeTableFilePath => join(dataPath, 'ItemHarmonyCubeTable.json');
-  String get itemHarmonyCubeLevelTableFilePath => join(dataPath, 'ItemHarmonyCubeLevelTable.json');
-  String get favoriteItemTableFilePath => join(dataPath, 'FavoriteItemTable.json');
-  String get favoriteItemLevelTableFilePath => join(dataPath, 'FavoriteItemLevelTable.json');
-  String get skillInfoTableFilePath => join(dataPath, 'SkillInfoTable.json');
-  String get coverStatEnhanceTableFilePath => join(dataPath, 'CoverStatEnhanceTable.json');
-  String get localeCharacterFilePath => join(dataPath, 'Locale_Character.json');
-  String get localeSkillFilePath => join(dataPath, 'Locale_Skill.json');
-
-  final Map<int, NikkeCharacterData> characterData = {}; // maybe not needed
-  final Map<int, Map<int, NikkeCharacterData>> characterResourceGardeTable = {};
-  final Map<int, WeaponData> characterShotTable = {};
-  final Map<int, SkillData> characterSkillTable = {};
-  final Map<int, StateEffectData> stateEffectTable = {};
-  final Map<int, FunctionData> functionTable = {};
-  final Map<int, SkillInfoData> skillInfoTable = {};
-  final Map<String, Translation> localeCharacterTable = {};
-  final Map<String, Translation> localeSkillTable = {};
-
-  final Map<int, HarmonyCubeData> harmonyCubeTable = {};
-  final Map<int, CoverStatData> coverStatTable = {};
-  // character stats
-  // grouped by enhanceId, level
-  final Map<int, Map<int, CharacterStatData>> groupedCharacterStatTable = {};
-  // grouped by enhanceId
-  final Map<int, CharacterStatEnhanceData> characterStatEnhanceTable = {};
-  final Map<int, AttractiveStatData> attractiveStatTable = {};
-  // grouped by skillGroupId, skillLevel
-  final Map<int, Map<int, SkillInfoData>> groupedSkillInfoTable = {};
-
-  // equips
-  final Map<EquipType, Map<NikkeClass, Map<EquipRarity, EquipmentData>>> groupedEquipTable = {};
-
-  // favoriteItems
-  final Map<WeaponType, Map<Rarity, FavoriteItemData>> dollTable = {};
-  final Map<int, FavoriteItemData> nameCodeFavItemTable = {};
-
-  // grouped by enhanceId, level
-  final Map<int, Map<int, HarmonyCubeLevelData>> harmonyCubeLevelTable = {};
-  final Map<int, Map<int, FavoriteItemLevelData>> favoriteItemLevelTable = {};
-
-  final Set<FunctionType> onShotFunctionTypes = {};
-  final Set<FunctionType> onHitFunctionTypes = {};
-
-  UserData userData = UserData();
-
-  bool dataLoaded = false;
-  int maxSyncLevel = 1;
-
-  Future<bool> loadData() async {
-    logger.i('Loading Database......');
-
-    bool result = true;
-
-    result &= await loadCharacterData();
-    result &= await loadLocaleCharacter();
-    result &= await loadLocaleSkill();
-    result &= await loadCharacterShotData();
-    result &= await loadCharacterStatData();
-    result &= await loadCharacterStatEnhanceData();
-    result &= await loadAttractiveStatData();
-    result &= await loadEquipData();
-    result &= await loadCharacterSkillData();
-    result &= await loadStateEffectData();
-    result &= await loadFunctionData();
-    result &= await loadSkillInfoData();
-    result &= await loadHarmonyCubeData();
-    result &= await loadHarmonyCubeLevelData();
-    result &= await loadFavoriteItemData();
-    result &= await loadFavoriteItemLevelData();
-    result &= await loadCoverStatData();
-
-    await loadUserData();
-
-    dataLoaded = result;
-    logger.i('Loading completed, result: $dataLoaded');
-    return result;
-  }
-
-  void writeUserData() async {
-    final file = File(userDataFilePath);
-    await file.writeAsString(jsonEncode(userData.toJson()));
-  }
-
-  Future<bool> loadUserData() async {
-    final file = File(userDataFilePath);
-    final bool exists = await file.exists();
-    if (exists) {
-      final json = jsonDecode(await file.readAsString());
-      userData = UserData.fromJson(json);
-    }
-    return exists;
-  }
-
-  Future<bool> loadCharacterData() async {
-    final characterTableFile = File(characterTableFilePath);
-    final bool exists = await characterTableFile.exists();
-    if (exists) {
-      final json = jsonDecode(await characterTableFile.readAsString());
-      for (final record in json['records']) {
-        final character = NikkeCharacterData.fromJson(record);
-        if (!character.isVisible) continue;
-
-        if (character.resourceId == 16) {
-          character.elementId.add(NikkeElement.iron.id);
-        }
-
-        characterData[character.id] = character;
-        characterResourceGardeTable.putIfAbsent(character.resourceId, () => <int, NikkeCharacterData>{});
-        characterResourceGardeTable[character.resourceId]![character.gradeCoreId] = character;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadLocaleCharacter() async {
-    final characterTranslationTableFile = File(localeCharacterFilePath);
-    final bool exists = await characterTranslationTableFile.exists();
-    if (exists) {
-      final jsonList = jsonDecode(await characterTranslationTableFile.readAsString());
-      final regex = RegExp(r'^\d+_name');
-      for (final record in jsonList) {
-        final translation = Translation.fromJson(record);
-        final match = regex.hasMatch(translation.key);
-        if (match) {
-          localeCharacterTable[translation.key] = translation;
-        }
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadLocaleSkill() async {
-    final file = File(localeSkillFilePath);
-    final bool exists = await file.exists();
-    if (exists) {
-      final jsonList = jsonDecode(await file.readAsString());
-      for (final record in jsonList) {
-        final translation = Translation.fromJson(record);
-        localeSkillTable[translation.key] = translation;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadCharacterShotData() async {
-    final table = File(characterShotTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final weapon = WeaponData.fromJson(record);
-        characterShotTable[weapon.id] = weapon;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadCharacterStatData() async {
-    final table = File(characterStatTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final stat = CharacterStatData.fromJson(record);
-        groupedCharacterStatTable.putIfAbsent(stat.group, () => <int, CharacterStatData>{});
-        groupedCharacterStatTable[stat.group]![stat.level] = stat;
-        maxSyncLevel = max(maxSyncLevel, stat.level);
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadCharacterStatEnhanceData() async {
-    final table = File(characterStatEnhanceTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final statEnhance = CharacterStatEnhanceData.fromJson(record);
-        characterStatEnhanceTable[statEnhance.id] = statEnhance;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadAttractiveStatData() async {
-    final table = File(attractiveLevelTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final attractiveStat = AttractiveStatData.fromJson(record);
-        attractiveStatTable[attractiveStat.attractiveLevel] = attractiveStat;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadEquipData() async {
-    final table = File(itemEquipTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final equip = EquipmentData.fromJson(record);
-        if (equip.characterClass == NikkeClass.unknown) continue;
-
-        groupedEquipTable.putIfAbsent(equip.itemSubType, () => <NikkeClass, Map<EquipRarity, EquipmentData>>{});
-        groupedEquipTable[equip.itemSubType]!.putIfAbsent(equip.characterClass, () => <EquipRarity, EquipmentData>{});
-        groupedEquipTable[equip.itemSubType]![equip.characterClass]![equip.itemRarity] = equip;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadCharacterSkillData() async {
-    final table = File(characterSkillTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final skill = SkillData.fromJson(record);
-
-        characterSkillTable[skill.id] = skill;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadStateEffectData() async {
-    final table = File(stateEffectTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final stateEffect = StateEffectData.fromJson(record);
-        stateEffectTable[stateEffect.id] = stateEffect;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadFunctionData() async {
-    final table = File(functionTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final function = FunctionData.fromJson(record);
-        functionTable[function.id] = function;
-
-        if (function.durationType == DurationType.shots) {
-          onShotFunctionTypes.add(function.functionType);
-        }
-        if (function.durationType == DurationType.hits) {
-          onHitFunctionTypes.add(function.functionType);
-        }
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadSkillInfoData() async {
-    final table = File(skillInfoTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final skillInfo = SkillInfoData.fromJson(record);
-        skillInfoTable[skillInfo.id] = skillInfo;
-        groupedSkillInfoTable.putIfAbsent(skillInfo.groupId, () => {});
-        groupedSkillInfoTable[skillInfo.groupId]![skillInfo.skillLevel] = skillInfo;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadHarmonyCubeData() async {
-    final table = File(itemHarmonyCubeTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final harmonyCube = HarmonyCubeData.fromJson(record);
-        harmonyCubeTable[harmonyCube.id] = harmonyCube;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadHarmonyCubeLevelData() async {
-    final table = File(itemHarmonyCubeLevelTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final harmonyLevelStat = HarmonyCubeLevelData.fromJson(record);
-        harmonyCubeLevelTable.putIfAbsent(harmonyLevelStat.levelEnhanceId, () => {});
-        harmonyCubeLevelTable[harmonyLevelStat.levelEnhanceId]![harmonyLevelStat.level] = harmonyLevelStat;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadFavoriteItemData() async {
-    final table = File(favoriteItemTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final favoriteItem = FavoriteItemData.fromJson(record);
-        if (favoriteItem.favoriteRare == Rarity.ssr) {
-          nameCodeFavItemTable[favoriteItem.nameCode] = favoriteItem;
-        } else {
-          dollTable.putIfAbsent(favoriteItem.weaponType, () => {});
-          dollTable[favoriteItem.weaponType]![favoriteItem.favoriteRare] = favoriteItem;
-        }
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadFavoriteItemLevelData() async {
-    final table = File(favoriteItemLevelTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final favoriteItemStat = FavoriteItemLevelData.fromJson(record);
-        favoriteItemLevelTable.putIfAbsent(favoriteItemStat.levelEnhanceId, () => {});
-        favoriteItemLevelTable[favoriteItemStat.levelEnhanceId]![favoriteItemStat.level] = favoriteItemStat;
-      }
-    }
-    return exists;
-  }
-
-  Future<bool> loadCoverStatData() async {
-    final table = File(coverStatEnhanceTableFilePath);
-    final bool exists = await table.exists();
-    if (exists) {
-      final json = jsonDecode(await table.readAsString());
-      for (final record in json['records']) {
-        final coverStat = CoverStatData.fromJson(record);
-        coverStatTable[coverStat.lv] = coverStat;
-      }
-    }
-    return exists;
-  }
-
-  Translation? getTranslation(String? joinedKey) {
-    if (joinedKey == null) return null;
-
-    final splits = joinedKey.split(':');
-    if (splits.length != 2) return null;
-
-    final tableType = splits[0];
-    final key = splits[1];
-    if (tableType == 'Locale_Character') {
-      return localeCharacterTable[key];
-    } else if (tableType == 'Locale_Skill') {
-      return localeSkillTable[key];
-    }
-
-    return null;
-  }
-
-  EquipmentData? getEquipData(EquipType equipType, NikkeClass nikkeClass, EquipRarity rarity) {
-    return groupedEquipTable[equipType]?[nikkeClass]?[rarity];
-  }
 }
 
 int maxResearchLevel(int syncLevel) {

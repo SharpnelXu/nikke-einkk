@@ -10,7 +10,7 @@ import 'package:nikke_einkk/model/items.dart';
 import '../../test_helper.dart';
 
 void main() {
-  TestHelper.loadDataV2();
+  TestHelper.loadData();
 
   group('Equipment Stat Calculation Test', () {
     final Map<EquipType, Map<NikkeClass, Map<EquipRarity, Map<StatType, Map<int, Pair<int, int>>>>>> expectedStats = {

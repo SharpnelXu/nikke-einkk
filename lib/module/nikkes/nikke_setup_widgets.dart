@@ -33,7 +33,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
   NikkeOptions get option => widget.option;
   bool get advanced => widget.advancedOption;
   bool get useGlobal => widget.useGlobal;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabase get db => useGlobal ? global : cn;
   Map<int, int> get cubeLvs => widget.cubeLvs;
 
   static const sliderWidth = 80.0;
@@ -539,7 +539,7 @@ class NikkeBasicSetupWidgets extends StatefulWidget {
 
 class _NikkeBasicSetupWidgetsState extends State<NikkeBasicSetupWidgets> {
   NikkeOptions get option => widget.option;
-  NikkeDatabaseV2 get db => widget.useGlobal ? global : cn;
+  NikkeDatabase get db => widget.useGlobal ? global : cn;
   void Function()? get onChange => widget.onChange;
 
   static const sliderWidth = 80.0;

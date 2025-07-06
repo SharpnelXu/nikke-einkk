@@ -656,7 +656,7 @@ class BattleRapture extends BattleEntity {
     if (event is NikkeDamageEvent && event.targetUniqueId == uniqueId) {
       for (final buff in buffs) {
         if (buff.data.durationType == DurationType.shots &&
-            dbLegacy.onHitFunctionTypes.contains(buff.data.functionType)) {
+            simulation.db.onHitFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }

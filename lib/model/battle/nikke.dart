@@ -32,7 +32,7 @@ class BattleCover extends BattleEntity {
   int get baseDefence => db.coverStatTable[level]?.levelDefence ?? 0;
 
   bool useGlobal = true;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabase get db => useGlobal ? global : cn;
 
   BattleCover(this.level, this.useGlobal);
 
@@ -153,7 +153,7 @@ class BattleNikke extends BattleEntity {
   List<BattleFunction> functions = [];
 
   final bool useGlobal;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabase get db => useGlobal ? global : cn;
 
   BattleNikke({required this.playerOptions, required this.option, this.useGlobal = true}) {
     cover = BattleCover(option.syncLevel, true);
@@ -552,7 +552,7 @@ class BattleNikke extends BattleEntity {
 
       for (final buff in buffs) {
         if (buff.data.durationType == DurationType.shots &&
-            dbLegacy.onShotFunctionTypes.contains(buff.data.functionType)) {
+            db.onShotFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }
@@ -574,7 +574,7 @@ class BattleNikke extends BattleEntity {
     if (event is RaptureDamageEvent && event.targetUniqueId == uniqueId) {
       for (final buff in buffs) {
         if (buff.data.durationType == DurationType.shots &&
-            dbLegacy.onHitFunctionTypes.contains(buff.data.functionType)) {
+            db.onHitFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }

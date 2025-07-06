@@ -126,7 +126,7 @@ class NikkeOptions {
     chargeMode = other.chargeMode;
   }
 
-  void errorCorrection(NikkeDatabaseV2 db) {
+  void errorCorrection(NikkeDatabase db) {
     if (!db.characterResourceGardeTable.containsKey(nikkeResourceId)) {
       nikkeResourceId = -1;
     } else {

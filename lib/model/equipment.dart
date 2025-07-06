@@ -48,7 +48,7 @@ class EquipmentOption {
 
   Map<String, dynamic> toJson() => _$EquipmentOptionToJson(this);
 
-  int getEquipStat(StatType statType, NikkeDatabaseV2 db, [Corporation? ownerCorp]) {
+  int getEquipStat(StatType statType, NikkeDatabase db, [Corporation? ownerCorp]) {
     final equipData = db.groupedEquipTable[type]?[equipClass]?[rarity];
     final equipStat = equipData?.stat.firstWhereOrNull((stat) => stat.statType == statType);
     if (equipStat == null) return 0;
@@ -62,7 +62,7 @@ class EquipmentOption {
     return result;
   }
 
-  num getLevelStat(StatType statType, NikkeDatabaseV2 db) {
+  num getLevelStat(StatType statType, NikkeDatabase db) {
     final equipData = db.groupedEquipTable[type]?[equipClass]?[rarity];
     final equipStat = equipData?.stat.firstWhereOrNull((stat) => stat.statType == statType);
     if (equipStat == null) return 0;

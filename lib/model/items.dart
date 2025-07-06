@@ -243,13 +243,13 @@ class EquipLine {
 
   EquipLine(this.type, int level) : _level = level;
 
-  EquipLine.onValue(this.type, int stat) : _level = 1 {
+  EquipLine.onValue(this.type, int stat, NikkeDatabase db) : _level = 1 {
     for (int level = 1; level <= 15; level += 1) {
       _level = level;
-      final stateEffectData = dbLegacy.stateEffectTable[getStateEffectId()]!;
+      final stateEffectData = db.stateEffectTable[getStateEffectId()]!;
       for (final functionId in stateEffectData.functions) {
         if (functionId.function != 0) {
-          final function = dbLegacy.functionTable[functionId.function]!;
+          final function = db.functionTable[functionId.function]!;
           if (stat == function.functionValue) {
             return;
           }

@@ -22,17 +22,17 @@ class FavoriteItemOption {
 
   Map<String, dynamic> toJson() => _$FavoriteItemOptionToJson(this);
 
-  int getDollStat(StatType statType, NikkeDatabaseV2 db) {
+  int getDollStat(StatType statType, NikkeDatabase db) {
     final data = getData(db);
     final levelData = db.favoriteItemLevelTable[data?.levelEnhanceId]?[level];
     return levelData?.stats.firstWhereOrNull((stat) => stat.type == statType)?.value ?? 0;
   }
 
-  FavoriteItemData? getData(NikkeDatabaseV2 db) {
+  FavoriteItemData? getData(NikkeDatabase db) {
     return rarity == Rarity.ssr ? db.nameCodeFavItemTable[nameCode] : db.dollTable[weaponType]?[rarity];
   }
 
-  List<(int, int)> getValidDollSkills(NikkeDatabaseV2 db) {
+  List<(int, int)> getValidDollSkills(NikkeDatabase db) {
     final data = getData(db);
     final levelData = db.favoriteItemLevelTable[data?.levelEnhanceId]?[level];
     if (data == null || levelData == null) {

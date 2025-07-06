@@ -196,7 +196,7 @@ String formatSkillInfoDescription(SkillInfoData skillInfo) {
   return result;
 }
 
-List<InlineSpan> buildDescriptionTextSpans(String curText, TextStyle style, NikkeDatabaseV2 db) {
+List<InlineSpan> buildDescriptionTextSpans(String curText, TextStyle style, NikkeDatabase db) {
   final textSpans = <InlineSpan>[];
   int currentIndex = 0;
 

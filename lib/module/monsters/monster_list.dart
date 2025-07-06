@@ -17,7 +17,7 @@ class _MonsterListPageState extends State<MonsterListPage> {
   final searchController = TextEditingController();
 
   bool get useGlobal => userDb.useGlobal;
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   @override
   void dispose() {

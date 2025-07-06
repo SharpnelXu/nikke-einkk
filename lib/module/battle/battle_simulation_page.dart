@@ -61,7 +61,6 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       ),
       body: ListView(
         children: [
-          Align(child: Text('Nikkes', style: TextStyle(fontSize: 20))),
           _buildMiscColumn(),
           const Divider(),
           Row(

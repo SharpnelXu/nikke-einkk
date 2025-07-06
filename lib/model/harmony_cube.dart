@@ -21,13 +21,13 @@ class HarmonyCubeOption {
 
   Map<String, dynamic> toJson() => _$HarmonyCubeOptionToJson(this);
 
-  int getCubeStat(StatType statType, NikkeDatabaseV2 db) {
+  int getCubeStat(StatType statType, NikkeDatabase db) {
     final cubeData = db.harmonyCubeTable[cubeId];
     final levelData = db.harmonyCubeEnhanceLvTable[cubeData?.levelEnhanceId]?[cubeLevel];
     return levelData?.stats.firstWhereOrNull((stat) => stat.type == statType)?.rate ?? 0;
   }
 
-  List<(int, int)> getValidCubeSkills(NikkeDatabaseV2 db) {
+  List<(int, int)> getValidCubeSkills(NikkeDatabase db) {
     final cubeData = db.harmonyCubeTable[cubeId];
     final levelData = db.harmonyCubeEnhanceLvTable[cubeData?.levelEnhanceId]?[cubeLevel];
     if (cubeData == null || levelData == null) {

@@ -14,7 +14,7 @@ class BattleSimulation {
   static const burstMeterCap = 1000000; // 9000 = 0.9%
 
   final bool useGlobal;
-  NikkeDatabaseV2 get db => useGlobal ? global : cn;
+  NikkeDatabase get db => useGlobal ? global : cn;
 
   PlayerOptions playerOptions;
 

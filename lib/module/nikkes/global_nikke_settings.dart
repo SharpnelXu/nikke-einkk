@@ -12,7 +12,7 @@ class GlobalSettingPage extends StatefulWidget {
   final void Function(int)? onGlobalSyncChange;
   final void Function(int, int)? onCubeLvChangeChange;
   final Map<int, int> cubeLvs;
-  final NikkeDatabaseV2 db;
+  final NikkeDatabase db;
 
   const GlobalSettingPage({
     super.key,
@@ -30,7 +30,7 @@ class GlobalSettingPage extends StatefulWidget {
 
 class _GlobalSettingPageState extends State<GlobalSettingPage> {
   PlayerOptions get option => widget.playerOptions;
-  NikkeDatabaseV2 get db => widget.db;
+  NikkeDatabase get db => widget.db;
 
   @override
   Widget build(BuildContext context) {

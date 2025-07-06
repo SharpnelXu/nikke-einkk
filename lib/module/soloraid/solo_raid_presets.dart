@@ -17,7 +17,7 @@ class _SoloRaidPresetPageState extends State<SoloRaidPresetPage> {
   int? srPreset;
 
   bool get useGlobal => userDb.useGlobal;
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +172,7 @@ class _SoloRaidDataDisplayState extends State<SoloRaidDataDisplay> {
 
 class SoloRaidBossDisplay extends StatelessWidget {
   final SoloRaidWaveData data;
-  NikkeDatabaseV2 get db => userDb.gameDb;
+  NikkeDatabase get db => userDb.gameDb;
 
   const SoloRaidBossDisplay({super.key, required this.data});
 
