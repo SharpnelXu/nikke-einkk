@@ -1,8 +1,8 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:nikke_einkk/model/battle/battle_event.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/events/battle_event.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 
 class BattleTimeline extends StatefulWidget {
@@ -107,20 +107,20 @@ class _BattleTimelineState extends State<BattleTimeline> {
   List<Widget> buildFrameEvents(List<BattleEvent> events) {
     final List<Widget> result = [];
     final allowList = [
-      ChangeBurstStepEvent,
-      BuffEvent,
-      ExitFullBurstEvent,
-      UseSkillEvent,
-      NikkeDamageEvent,
-      BurstGenerationEvent,
+      // ChangeBurstStepEvent,
+      // BuffEvent,
+      // ExitFullBurstEvent,
+      // UseSkillEvent,
+      // NikkeDamageEvent,
+      // BurstGenerationEvent,
     ];
     for (final event in events) {
       if (!allowList.contains(event.runtimeType)) continue;
 
-      if (event is NikkeDamageEvent && [2, 1].contains(event.attackerUniqueId)) continue;
-      if (event is BurstGenerationEvent && [2, 1].contains(event.attackerUniqueId)) continue;
-
-      result.add(event.buildDisplay());
+      // if (event is NikkeDamageEvent && [2, 1].contains(event.attackerUniqueId)) continue;
+      // if (event is BurstGenerationEvent && [2, 1].contains(event.attackerUniqueId)) continue;
+      //
+      // result.add(event.buildDisplay());
     }
     return result;
   }

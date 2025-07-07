@@ -3,7 +3,12 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
-import 'package:nikke_einkk/model/battle/battle_event.dart';
+import 'package:nikke_einkk/model/battle/events/battle_event.dart';
+import 'package:nikke_einkk/model/battle/events/battle_start_event.dart';
+import 'package:nikke_einkk/model/battle/events/burst_gen_event.dart';
+import 'package:nikke_einkk/model/battle/events/change_burst_step_event.dart';
+import 'package:nikke_einkk/model/battle/events/exit_full_burst_event.dart';
+import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
