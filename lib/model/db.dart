@@ -19,6 +19,7 @@ final locale = Locale();
 final global = NikkeDatabase(true);
 final cn = NikkeDatabase(false);
 final userDb = UserDatabase();
+final constData = GameConstants();
 late PackageInfo packageInfo;
 
 final Logger logger = Logger();
@@ -73,6 +74,13 @@ class Locale {
     final key = splits[1];
     return locale[tableType]?[key]?.forLanguage(language);
   }
+}
+
+class GameConstants {
+  final rangeCorrection = 3000;
+  final fullBurstCorrection = 5000;
+  final baseElementRate = 11000;
+  final burstMeterCap = 1000000; // 9000 = 0.9%
 }
 
 class NikkeDatabase {

@@ -1,37 +1,22 @@
 import 'dart:math';
 
+import 'package:nikke_einkk/model/db.dart';
+
 double toModifier(int ratio) {
   return ratio / 10000;
+}
+
+int correction(int damageRate) {
+  return damageRate - 10000;
 }
 
 int timeDataToFrame(num timeData, int fps) {
   return (timeData * fps / 100).round();
 }
 
-class BattleUtils {
-  static const rangeCorrection = 3000;
-  static const fullBurstCorrection = 5000;
-  static const baseElementRate = 11000;
-
-  BattleUtils._();
-
-  static double toModifier(int ratio) {
-    return ratio / 10000;
-  }
-
-  static int correction(int damageRate) {
-    return damageRate - 10000;
-  }
-
-  // for display
-  static int frameToTimeData(int frame, int fps) {
-    return (frame * 100 / fps).round();
-  }
-
-  // 230 = 2.3 seconds
-  static int timeDataToFrame(num timeData, int fps) {
-    return (timeData * fps / 100).round();
-  }
+// for display
+int frameToTimeData(int frame, int fps) {
+  return (frame * 100 / fps).round();
 }
 
 // CharacterStatTable[statEnhanceId = groupId][lv] to get baseStat
@@ -57,12 +42,12 @@ int getBaseStat({
 }) {
   final gradeLevel = min(4, coreLevel) - 1;
   final gradeFlat = gradeLevel * gradeEnhanceBase;
-  final gradeRatioStat = baseStat * gradeLevel * BattleUtils.toModifier(gradeRatio);
+  final gradeRatioStat = baseStat * gradeLevel * toModifier(gradeRatio);
   final gradeAddStat = gradeRatioStat + gradeFlat;
   final gradeStat = baseStat + consoleStat + bondStat + gradeAddStat.floor();
 
   final coreActualLevel = coreLevel - 4;
-  final coreStat = coreActualLevel > 0 ? gradeStat * coreActualLevel * BattleUtils.toModifier(coreEnhanceBaseRatio) : 0;
+  final coreStat = coreActualLevel > 0 ? gradeStat * coreActualLevel * toModifier(coreEnhanceBaseRatio) : 0;
 
   // here it seems to be a simple rounding without roundHalfToEven, tested via Brid's HP stat
   final result = gradeStat + coreStat.round() + equipStat + cubeStat + dollStat;
@@ -224,8 +209,8 @@ class NikkeDamageParameter {
     final coreDamage = calculateDamage(core: true);
     final critCoreDamage = calculateDamage(critical: true, core: true);
 
-    final criticalPercent = min(BattleUtils.toModifier(criticalRate), 1);
-    final corePercent = min(BattleUtils.toModifier(coreHitRate), 1);
+    final criticalPercent = min(toModifier(criticalRate), 1);
+    final corePercent = min(toModifier(coreHitRate), 1);
     final nonCriticalPercent = 1 - criticalPercent;
     final nonCorePercent = 1 - corePercent;
 
@@ -240,29 +225,25 @@ class NikkeDamageParameter {
 
   int calculateDamage({bool critical = false, bool core = false}) {
     final finalAttack = attack + attackBuff - defence - defenceBuff;
-    final finalRate = BattleUtils.toModifier(damageRate + damageRateBuff);
+    final finalRate = toModifier(damageRate + damageRateBuff);
 
-    final coreCorrection = core ? BattleUtils.correction(coreDamageRate + coreDamageBuff) : 0;
-    final critCorrection = critical ? BattleUtils.correction(criticalDamageRate + criticalDamageBuff) : 0;
-    final rangeCorrection = isBonusRange ? BattleUtils.rangeCorrection : 0;
-    final fullBurstCorrection = isFullBurst ? BattleUtils.fullBurstCorrection : 0;
-    final finalCorrection = BattleUtils.toModifier(
-      10000 + coreCorrection + critCorrection + rangeCorrection + fullBurstCorrection,
-    );
+    final coreCorrection = core ? correction(coreDamageRate + coreDamageBuff) : 0;
+    final critCorrection = critical ? correction(criticalDamageRate + criticalDamageBuff) : 0;
+    final rangeCorrection = isBonusRange ? constData.rangeCorrection : 0;
+    final fullBurstCorrection = isFullBurst ? constData.fullBurstCorrection : 0;
+    final finalCorrection = toModifier(10000 + coreCorrection + critCorrection + rangeCorrection + fullBurstCorrection);
 
-    final elementRate = BattleUtils.toModifier(
-      isStrongElement ? BattleUtils.baseElementRate + elementDamageBuff : 10000,
-    );
+    final elementRate = toModifier(isStrongElement ? constData.baseElementRate + elementDamageBuff : 10000);
 
     final fullChargeRate = chargeDamageRate + chargeDamageBuff;
-    final actualCharge = (fullChargeRate - 10000) * BattleUtils.toModifier(chargePercent);
-    final chargeRate = BattleUtils.toModifier(10000 + actualCharge.round());
+    final actualCharge = (fullChargeRate - 10000) * toModifier(chargePercent);
+    final chargeRate = toModifier(10000 + actualCharge.round());
 
-    final addDamageRate = BattleUtils.toModifier(
+    final addDamageRate = toModifier(
       10000 + addDamageBuff + partDamageBuff + interruptionPartDamageBuff + sustainedDamageBuff + pierceDamageBuff,
     );
 
-    final receiveDamage = BattleUtils.toModifier(10000 - damageReductionBuff + distributedDamageBuff);
+    final receiveDamage = toModifier(10000 - damageReductionBuff + distributedDamageBuff);
 
     final nonAttackMultipliers = finalRate * finalCorrection * elementRate * chargeRate * addDamageRate * receiveDamage;
     final totalDamage = finalAttack * nonAttackMultipliers;

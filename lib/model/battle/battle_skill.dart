@@ -36,7 +36,7 @@ class BattleSkill {
     if (skillType == SkillType.characterSkill) {
       if (skillNum != 3) {
         // normal skills start with coolDown
-        coolDown = BattleUtils.timeDataToFrame(skillData!.skillCooltime, simulation.fps);
+        coolDown = timeDataToFrame(skillData!.skillCooltime, simulation.fps);
       }
     }
 
@@ -65,7 +65,7 @@ class BattleSkill {
   void changeCd(BattleSimulation simulation, int ultCdChangeTimeData) {
     if (ultCdChangeTimeData == 0) return;
 
-    coolDown = max(coolDown + BattleUtils.timeDataToFrame(ultCdChangeTimeData, simulation.fps).round(), 0);
+    coolDown = max(coolDown + timeDataToFrame(ultCdChangeTimeData, simulation.fps).round(), 0);
   }
 
   void processFrame(BattleSimulation simulation) {
@@ -76,7 +76,7 @@ class BattleSkill {
 
     if (coolDown == 0 && canUseSkill(simulation)) {
       activateSkill(simulation, skillData!, ownerUniqueId, skillGroupId!, skillNum);
-      coolDown = BattleUtils.timeDataToFrame(skillData!.skillCooltime, simulation.fps);
+      coolDown = timeDataToFrame(skillData!.skillCooltime, simulation.fps);
     }
   }
 
@@ -140,12 +140,12 @@ class BattleSkill {
         break;
       case CharacterSkillType.installBarrier:
         for (final target in skillTargets) {
-          final barrierHp = owner.getMaxHp(simulation) * BattleUtils.toModifier(skillData.skillValueData[1].skillValue);
+          final barrierHp = owner.getMaxHp(simulation) * toModifier(skillData.skillValueData[1].skillValue);
           final barrier = Barrier(
             skillData.id,
             barrierHp.round(),
             skillData.durationType,
-            BattleUtils.timeDataToFrame(skillData.durationValue, simulation.fps),
+            timeDataToFrame(skillData.durationValue, simulation.fps),
           );
           if (target is BattleRapture) {
             target.barrier = barrier;
@@ -184,7 +184,7 @@ class BattleSkill {
 
       if (validNextStep.contains(nextStep) && simulation.reEnterBurstCd == 0) {
         final nextStageNum = nextStep == BurstStep.nextStep ? simulation.burstStage + 1 : nextStep.step;
-        simulation.reEnterBurstCd = BattleUtils.timeDataToFrame(50, simulation.fps); // 0.5s fixed cd
+        simulation.reEnterBurstCd = timeDataToFrame(50, simulation.fps); // 0.5s fixed cd
         simulation.registerEvent(
           simulation.currentFrame,
           ChangeBurstStepEvent(simulation, ownerUniqueId, nextStageNum, owner.characterData.burstDuration),

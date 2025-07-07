@@ -16,7 +16,7 @@ class BattleBuff {
   BattleBuff(this.data, this.buffGiverUniqueId, this.buffReceiverUniqueId, BattleSimulation simulation) {
     duration =
         data.durationType == DurationType.timeSec
-            ? BattleUtils.timeDataToFrame(data.durationValue, simulation.fps)
+            ? timeDataToFrame(data.durationValue, simulation.fps)
             : data.durationValue;
     count = 1;
   }

@@ -274,7 +274,7 @@ class BattleFunction {
       if (existingBuff != null) {
         existingBuff.duration =
             data.durationType == DurationType.timeSec
-                ? BattleUtils.timeDataToFrame(data.durationValue, simulation.fps)
+                ? timeDataToFrame(data.durationValue, simulation.fps)
                 : data.durationValue;
         existingBuff.count = min(existingBuff.count + 1, data.fullCount);
 
@@ -362,7 +362,7 @@ class BattleFunction {
           } else if (data.functionValueType == ValueType.percent) {
             final functionStandard = simulation.getEntityByUniqueId(getFunctionStandardUniqueId(target.uniqueId));
             if (functionStandard != null) {
-              final changeValue = BattleUtils.toModifier(data.functionValue) * functionStandard.currentHp;
+              final changeValue = toModifier(data.functionValue) * functionStandard.currentHp;
               target.changeHp(simulation, changeValue.round());
             }
           }
@@ -407,7 +407,7 @@ class BattleFunction {
             target.cover.changeHp(simulation, data.functionValue, true);
           } else if (data.functionValueType == ValueType.percent) {
             final functionStandard = simulation.getNikkeOnPosition(getFunctionStandardUniqueId(target.uniqueId))!.cover;
-            final changeValue = BattleUtils.toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
+            final changeValue = toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
             target.cover.changeHp(simulation, changeValue.round(), true);
           }
         }
@@ -428,10 +428,10 @@ class BattleFunction {
             healValue = data.functionValue;
           } else if (data.functionValueType == ValueType.percent) {
             final functionStandard = simulation.getNikkeOnPosition(getFunctionStandardUniqueId(target.uniqueId))!;
-            final changeValue = BattleUtils.toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
+            final changeValue = toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
             healValue = changeValue.round();
           }
-          final finalHeal = healValue + healValue * BattleUtils.toModifier(healVariation);
+          final finalHeal = healValue + healValue * toModifier(healVariation);
           target.changeHp(simulation, finalHeal.round(), true);
         }
         break;
@@ -461,7 +461,7 @@ class BattleFunction {
           if (!statusCheck || target is! BattleNikke) continue;
 
           activated = true;
-          final burst = BattleUtils.toModifier(data.functionValue) * BattleSimulation.burstMeterCap;
+          final burst = toModifier(data.functionValue) * constData.burstMeterCap;
           simulation.registerEvent(
             simulation.currentFrame,
             BurstGenerationEvent.fill(simulation: simulation, nikke: target, burst: burst.round()),

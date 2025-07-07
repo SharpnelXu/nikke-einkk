@@ -72,7 +72,7 @@ class _BattleTimelineState extends State<BattleTimeline> {
         SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
             final frame = frames[index];
-            final timeData = BattleUtils.frameToTimeData(frame, simulation.fps);
+            final timeData = frameToTimeData(frame, simulation.fps);
 
             final seconds = timeData % 6000 / 100;
 

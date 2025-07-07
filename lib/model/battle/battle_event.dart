@@ -8,6 +8,7 @@ import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 abstract class BattleEvent {
@@ -311,8 +312,8 @@ class NikkeDamageEvent extends BattleEvent {
 
   @override
   Widget buildDisplay() {
-    final criticalPercent = min(BattleUtils.toModifier(damageParameter.criticalRate), 1);
-    final corePercent = min(BattleUtils.toModifier(damageParameter.coreHitRate), 1);
+    final criticalPercent = min(toModifier(damageParameter.criticalRate), 1);
+    final corePercent = min(toModifier(damageParameter.coreHitRate), 1);
     final nonCritPercent = 1 - criticalPercent;
     final nonCorePercent = 1 - corePercent;
     final basePercent = nonCritPercent * nonCorePercent;
@@ -373,11 +374,11 @@ class BurstGenerationEvent extends BattleEvent {
         (nikke.option.alwaysFocus || simulation.currentNikke == nikke.uniqueId) &&
         WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponData.weaponType);
 
-    positionBurstBonus = bonusBurst ? 10000 + (15000 * BattleUtils.toModifier(chargePercent)).round() : 10000;
+    positionBurstBonus = bonusBurst ? 10000 + (15000 * toModifier(chargePercent)).round() : 10000;
 
     final baseBurst = nikke.getBurstGen(simulation, rapture.isStageTarget);
 
-    burst = (baseBurst * weaponData.shotCount * BattleUtils.toModifier(positionBurstBonus)).round();
+    burst = (baseBurst * weaponData.shotCount * toModifier(positionBurstBonus)).round();
   }
 
   BurstGenerationEvent.fill({required BattleSimulation simulation, required BattleNikke nikke, required this.burst}) {
@@ -398,7 +399,7 @@ class BurstGenerationEvent extends BattleEvent {
 
   @override
   Widget buildDisplay() {
-    final updatedBurst = min(currentMeter + burst, BattleSimulation.burstMeterCap);
+    final updatedBurst = min(currentMeter + burst, constData.burstMeterCap);
 
     return Text(
       '$name (Pos $attackerUniqueId) Burst Gen: ${(updatedBurst / 10000).toStringAsFixed(4)}%'

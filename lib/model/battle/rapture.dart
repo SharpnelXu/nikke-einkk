@@ -598,7 +598,7 @@ class BattleRapture extends BattleEntity {
                 rawFunctionStandard: StandardType.user.name.pascal,
                 fullCount: 999,
                 rawDurationType: action.durationType!.name.pascal,
-                durationValue: BattleUtils.frameToTimeData(action.frameDuration!, simulation.fps),
+                durationValue: frameToTimeData(action.frameDuration!, simulation.fps),
                 rawFunctionTarget: FunctionTargetType.self.name.pascal,
                 rawTimingTriggerType: TimingTriggerType.none.name.pascal,
                 rawStatusTriggerType: StatusTriggerType.none.name.pascal,

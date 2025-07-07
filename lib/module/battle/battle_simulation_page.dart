@@ -5,6 +5,7 @@ import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
@@ -98,7 +99,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
           ' (Frame ${simulation.currentFrame})',
         ),
         Text('Burst: ${(simulation.burstMeter / 100).percentString}'),
-        SimplePercentBar(percent: simulation.burstMeter / BattleSimulation.burstMeterCap),
+        SimplePercentBar(percent: simulation.burstMeter / constData.burstMeterCap),
       ],
     );
   }

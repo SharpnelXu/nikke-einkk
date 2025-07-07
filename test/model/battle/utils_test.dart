@@ -131,7 +131,7 @@ void main() async {
       final equip2Percent = 1393;
       final skillPercent = 2315;
       final element = 3984;
-      final equipAtkTotal = (BattleUtils.toModifier(equip1Percent + equip2Percent) * baseAtk).round();
+      final equipAtkTotal = (toModifier(equip1Percent + equip2Percent) * baseAtk).round();
       final param = NikkeDamageParameter(
         attack: baseAtk,
         attackBuff: equipAtkTotal.round(),
@@ -147,28 +147,23 @@ void main() async {
       expect(param.calculateDamage(), 596736);
       expect(param.calculateDamage(critical: true), 826250);
 
-      final paramSkill1 =
-          param.copy()..attackBuff = equipAtkTotal + (BattleUtils.toModifier(skillPercent) * baseAtk).round();
+      final paramSkill1 = param.copy()..attackBuff = equipAtkTotal + (toModifier(skillPercent) * baseAtk).round();
       expect(paramSkill1.calculateDamage(), 707230);
       expect(paramSkill1.calculateDamage(critical: true), 979242);
 
-      final paramSkill2 =
-          param.copy()..attackBuff = equipAtkTotal + (BattleUtils.toModifier(skillPercent * 2) * baseAtk).round();
+      final paramSkill2 = param.copy()..attackBuff = equipAtkTotal + (toModifier(skillPercent * 2) * baseAtk).round();
       expect(paramSkill2.calculateDamage(), 817724);
       expect(paramSkill2.calculateDamage(critical: true), 1132234);
 
-      final paramSkill3 =
-          param.copy()..attackBuff = equipAtkTotal + (BattleUtils.toModifier(skillPercent * 3) * baseAtk).round();
+      final paramSkill3 = param.copy()..attackBuff = equipAtkTotal + (toModifier(skillPercent * 3) * baseAtk).round();
       expect(paramSkill3.calculateDamage(), 928218);
       expect(paramSkill3.calculateDamage(critical: true), 1285225);
 
-      final paramSkill4 =
-          param.copy()..attackBuff = equipAtkTotal + (BattleUtils.toModifier(skillPercent * 4) * baseAtk).round();
+      final paramSkill4 = param.copy()..attackBuff = equipAtkTotal + (toModifier(skillPercent * 4) * baseAtk).round();
       expect(paramSkill4.calculateDamage(), 1038712);
       expect(paramSkill4.calculateDamage(critical: true), 1438217);
 
-      final paramSkill5 =
-          param.copy()..attackBuff = equipAtkTotal + (BattleUtils.toModifier(skillPercent * 5) * baseAtk).round();
+      final paramSkill5 = param.copy()..attackBuff = equipAtkTotal + (toModifier(skillPercent * 5) * baseAtk).round();
       expect(paramSkill5.calculateDamage(), 1149206);
       expect(paramSkill5.calculateDamage(critical: true), 1591208);
     });
@@ -182,7 +177,7 @@ void main() async {
       final literPercent = 6600;
       final dollarSkill1Percent = 1373;
       final element = 3984;
-      final equipAtkTotal = (BattleUtils.toModifier(equip1Percent + equip2Percent) * baseAtk).round();
+      final equipAtkTotal = (toModifier(equip1Percent + equip2Percent) * baseAtk).round();
       final param = NikkeDamageParameter(
         attack: baseAtk,
         attackBuff: equipAtkTotal.round(),
@@ -196,7 +191,7 @@ void main() async {
       );
 
       final totalSkillPercent = skill1Percent * 5 + literPercent + dollarSkill1Percent;
-      final totalBuffAtk = BattleUtils.toModifier(totalSkillPercent) * baseAtk;
+      final totalBuffAtk = toModifier(totalSkillPercent) * baseAtk;
 
       final paramSkill1NonBoss =
           param.copy()
@@ -240,10 +235,10 @@ void main() async {
       final redHoodPercent = 7755;
       final element = 1909;
 
-      final crownBuffAtk = BattleUtils.toModifier(crownPercent) * 614492;
-      final redHoodBuffAtk = BattleUtils.toModifier(redHoodPercent) * 906918;
-      final maxwellBuffAtk = BattleUtils.toModifier(maxwellPercent) * baseAtk;
-      final equipAtkTotal = (BattleUtils.toModifier(equipPercents) * baseAtk);
+      final crownBuffAtk = toModifier(crownPercent) * 614492;
+      final redHoodBuffAtk = toModifier(redHoodPercent) * 906918;
+      final maxwellBuffAtk = toModifier(maxwellPercent) * baseAtk;
+      final equipAtkTotal = (toModifier(equipPercents) * baseAtk);
       final param = NikkeDamageParameter(
         attack: baseAtk,
         attackBuff: equipAtkTotal.round() + maxwellBuffAtk.round() + redHoodBuffAtk.round() + crownBuffAtk.round(),

@@ -186,7 +186,7 @@ class BattleNikke extends BattleEntity {
     previousFullChargeFrameCount = 0;
     shootCountdown = 0;
     spotLastDelayFrameCount = 0;
-    spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(baseWeaponData.spotFirstDelay, fps);
+    spotFirstDelayFrameCount = timeDataToFrame(baseWeaponData.spotFirstDelay, fps);
     maintainFireStanceFrameCount = 0;
     reloadingFrameCount = 0;
     fullReloadFrameCount = 0;
@@ -281,7 +281,7 @@ class BattleNikke extends BattleEntity {
 
   void processBehindCoverStatus(BattleSimulation simulation) {
     // reset this when entering a non-shooting status
-    spotFirstDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
+    spotFirstDelayFrameCount = timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
     maintainFireStanceFrameCount = 0;
     chargeFrames = 0;
     spotLastDelayFrameCount -= 1;
@@ -320,7 +320,7 @@ class BattleNikke extends BattleEntity {
 
     reloadingFrameCount += 1;
     if (reloadingFrameCount >= fullReloadFrameCount) {
-      final reloadRatio = BattleUtils.toModifier(max(1, currentWeaponData.reloadBullet)); // ensure no empty reloads
+      final reloadRatio = toModifier(max(1, currentWeaponData.reloadBullet)); // ensure no empty reloads
       final maxAmmo = getMaxAmmo(simulation);
       currentAmmo = min(maxAmmo, currentAmmo + (reloadRatio * maxAmmo).round());
       reloadingFrameCount = 0;
@@ -560,7 +560,7 @@ class BattleNikke extends BattleEntity {
 
       // auto would still perform retreat behind cover animation
       if (currentAmmo == 0) {
-        spotLastDelayFrameCount = BattleUtils.timeDataToFrame(currentWeaponData.spotLastDelay, fps);
+        spotLastDelayFrameCount = timeDataToFrame(currentWeaponData.spotLastDelay, fps);
       }
     }
 
@@ -596,7 +596,7 @@ class BattleNikke extends BattleEntity {
     final drainHp = getDrainHpBuff(simulation);
     if (drainHp > 0) {
       final expectedDamage = event.damageParameter.calculateExpectedDamage();
-      changeHp(simulation, (BattleUtils.toModifier(drainHp) * expectedDamage).round(), true);
+      changeHp(simulation, (toModifier(drainHp) * expectedDamage).round(), true);
     }
   }
 
@@ -689,7 +689,7 @@ class BattleNikke extends BattleEntity {
       currentWeaponData.chargeTime,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
     );
-    return max(1, BattleUtils.timeDataToFrame(result, fps));
+    return max(1, timeDataToFrame(result, fps));
   }
 
   int getTimeToReload(BattleSimulation simulation) {

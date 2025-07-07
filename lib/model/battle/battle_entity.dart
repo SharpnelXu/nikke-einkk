@@ -122,7 +122,7 @@ abstract class BattleEntity {
       if (standard != null) {
         for (final buffType in percents[standardUniqueId]!.keys) {
           final percent = percents[standardUniqueId]![buffType]!;
-          result += (getStandardBaseValue(standard) * BattleUtils.toModifier(percent)).round();
+          result += (getStandardBaseValue(standard) * toModifier(percent)).round();
         }
       }
     }
@@ -165,7 +165,7 @@ abstract class BattleEntity {
         if (buff.data.functionValueType == ValueType.integer) {
           result += buff.data.functionValue;
         } else if (buff.data.functionValueType == ValueType.percent) {
-          result += (baseValue * BattleUtils.toModifier(buff.data.functionValue)).round();
+          result += (baseValue * toModifier(buff.data.functionValue)).round();
         }
       }
     }

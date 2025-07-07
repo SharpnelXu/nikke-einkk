@@ -11,8 +11,6 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 
 class BattleSimulation {
-  static const burstMeterCap = 1000000; // 9000 = 0.9%
-
   final bool useGlobal;
   NikkeDatabase get db => useGlobal ? global : cn;
 
@@ -33,7 +31,7 @@ class BattleSimulation {
 
   int _burstMeter = 0;
   int get burstMeter => _burstMeter;
-  set burstMeter(int value) => _burstMeter = value.clamp(0, burstMeterCap);
+  set burstMeter(int value) => _burstMeter = value.clamp(0, constData.burstMeterCap);
   int burstStage = 0;
   int reEnterBurstCd = 0;
   int burstStageDuration = 0;
@@ -120,7 +118,7 @@ class BattleSimulation {
         if (burstStage == 0) {
           burstMeter += event.burst;
 
-          if (burstMeter == burstMeterCap) {
+          if (burstMeter == constData.burstMeterCap) {
             registerEvent(currentFrame, ChangeBurstStepEvent(this, -1, 1, -1));
             burstStage = 1;
             burstMeter = 0;
@@ -133,7 +131,7 @@ class BattleSimulation {
           reEnterBurstCd = 0;
         }
         burstStage = event.nextStage;
-        burstStageDuration = BattleUtils.timeDataToFrame(event.duration, fps);
+        burstStageDuration = timeDataToFrame(event.duration, fps);
         burstStageDuration = max(0, burstStageDuration);
       }
 
@@ -203,7 +201,7 @@ class BattleSimulation {
           if (burstStage == 0) {
             burstMeter += event.burst;
 
-            if (burstMeter == burstMeterCap) {
+            if (burstMeter == constData.burstMeterCap) {
               registerEvent(currentFrame, ChangeBurstStepEvent(this, -1, 1, -1));
               burstStage = 1;
               burstMeter = 0;
@@ -216,7 +214,7 @@ class BattleSimulation {
             reEnterBurstCd = 0;
           }
           burstStage = event.nextStage;
-          burstStageDuration = BattleUtils.timeDataToFrame(event.duration, fps);
+          burstStageDuration = timeDataToFrame(event.duration, fps);
           burstStageDuration = max(0, burstStageDuration);
         }
 
