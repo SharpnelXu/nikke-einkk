@@ -305,7 +305,7 @@ class BattleNikke extends BattleEntity {
       // need to calculate how many frames needed to do one reload
       int baseReloadTimeData = getTimeToReload(simulation);
 
-      fullReloadFrameCount = max(BattleUtils.timeDataToFrame(baseReloadTimeData, fps), 1);
+      fullReloadFrameCount = max(timeDataToFrame(baseReloadTimeData, fps), 1);
 
       simulation.registerEvent(
         simulation.currentFrame,
@@ -448,6 +448,8 @@ class BattleNikke extends BattleEntity {
           if (damageFrame > 0) {
             generateDamageAndBurstEvents(simulation, damageFrame, target);
           }
+
+          chargeFrames = 0;
         }
 
         // this is essentially shooting frame for SR & RL
@@ -464,7 +466,6 @@ class BattleNikke extends BattleEntity {
           spotFirstDelayFrameCount = timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
         }
 
-        chargeFrames = 0;
       case WeaponType.unknown:
       case WeaponType.none:
         // TODO: probably log?

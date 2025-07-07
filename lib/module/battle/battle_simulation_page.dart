@@ -54,6 +54,18 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
                 simulation.currentFrame <= 0
                     ? null
                     : () {
+                      for (int i = 0; i < 60; i += 1) {
+                        simulation.proceedOneFrame();
+                      }
+                      setState(() {});
+                    },
+            icon: Icon(Icons.fast_forward),
+          ),
+          IconButton.filled(
+            onPressed:
+                simulation.currentFrame <= 0
+                    ? null
+                    : () {
                       simulation.proceedOneFrame();
                       setState(() {});
                     },
@@ -137,7 +149,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     }
 
     if (status == BattleNikkeStatus.shooting) {
-      if (nikke.spotFirstDelayFrameCount >= 0) {
+      if (nikke.spotFirstDelayFrameCount >= 0 && nikke.spotLastDelayFrameCount == 0) {
         max = timeDataToFrame(nikke.currentWeaponData.spotFirstDelay, nikke.fps);
         cur = max - nikke.spotFirstDelayFrameCount;
         addProgressBar('Exiting Cover', cur, max);
@@ -160,10 +172,14 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
           cur = max - nikke.spotLastDelayFrameCount;
           addProgressBar('Entering Cover', cur, max);
         }
-      } else if (nikke.shootCountdown > 0) {
+      } else if (nikke.shootCountdown > 0 && nikke.currentAmmo > 0) {
         max = nikke.shootThreshold;
         cur = max - nikke.shootCountdown;
         addProgressBar('Next Bullet', cur, max);
+      }
+
+      if (nikke.currentAmmo == 0) {
+        list.add(Text('Start Reloading'));
       }
     } else if (status == BattleNikkeStatus.behindCover) {
       if (nikke.spotLastDelayFrameCount > 0) {
@@ -173,6 +189,10 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       } else {
         list.add(Text('Covered'));
       }
+    } else {
+      max = nikke.fullReloadFrameCount;
+      cur = nikke.reloadingFrameCount == 0 ? max : nikke.reloadingFrameCount;
+      addProgressBar('Reloading', cur, max);
     }
 
     return list;
@@ -190,7 +210,7 @@ class SimplePercentBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: size,
-      decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 2), color: Colors.grey),
+      decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 1), color: Colors.grey),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(height: 12, width: size * percent, decoration: BoxDecoration(color: color)),
