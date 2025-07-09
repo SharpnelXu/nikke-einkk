@@ -55,6 +55,11 @@ int getBaseStat({
   return result;
 }
 
+double getBpStatMult({required int hp, required int atk, required int def}) {
+  final statMult = (1.075 * atk * 18 + (def * 100 + hp) * 0.7) / 100;
+  return statMult;
+}
+
 /// credit: https://ngabbs.com/read.php?tid=40380218
 int getBattlePoint({
   required int hp,

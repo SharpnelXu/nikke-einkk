@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
@@ -341,7 +342,9 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
       );
     });
 
-    int funcBpSum = 0;
+    final Map<EquipType, int> equipBpMultMap = {};
+    int cubeBpMult = 0;
+    int dollBpMult = 0;
 
     final Map<EquipLineType, List<FunctionData>> equipLineVals = {};
     for (final equip in option.equips) {
@@ -358,7 +361,8 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
             final function = db.functionTable[functionId.function]!;
             equipLineVals.putIfAbsent(equipLine.type, () => []);
             equipLineVals[equipLine.type]!.add(function);
-            funcBpSum += function.functionBattlepower ?? 0;
+            equipBpMultMap.putIfAbsent(equip.type, () => 0);
+            equipBpMultMap[equip.type] = equipBpMultMap[equip.type]! + (function.functionBattlepower ?? 0);
           }
         }
       }
@@ -370,42 +374,7 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
       db.coverStatTable[option.syncLevel]?.levelDefence,
     ];
 
-    final children = [
-      DataTable(
-        columns: [
-          DataColumn(label: Text(' ')),
-          ...statTypes.map(
-            (type) => DataColumn(label: Text(type.name.toUpperCase()), headingRowAlignment: MainAxisAlignment.center),
-          ),
-        ],
-        rows: [
-          DataRow(
-            cells: [
-              DataCell(Text('Cover', style: TextStyle(fontWeight: FontWeight.bold))),
-              ..._statArrayToDataCell(coverStat),
-            ],
-          ),
-          DataRow(
-            cells: [
-              DataCell(Text('Total', style: TextStyle(fontWeight: FontWeight.bold))),
-              ..._statArrayToDataCell(totalStat),
-            ],
-          ),
-          DataRow(cells: [DataCell(Text('Bond')), ..._statArrayToDataCell(attractiveStat)]),
-          DataRow(cells: [DataCell(Text('Console')), ..._statArrayToDataCell(consoleStat)]),
-          DataRow(cells: [DataCell(Text('Cube')), ..._statArrayToDataCell(cubeStat)]),
-          DataRow(cells: [DataCell(Text('Doll')), ..._statArrayToDataCell(dollStat)]),
-          ...NikkeOptions.equipTypes.map((type) {
-            return DataRow(
-              cells: [DataCell(Text('${type.name.pascal} Gear')), ..._statArrayToDataCell(equipStats[type]!)],
-            );
-          }),
-        ],
-      ),
-      NikkeBasicSetupWidgets(option: option, useGlobal: userDb.useGlobal, onChange: () => setState(() {})),
-      const Divider(),
-    ];
-
+    final children = [];
     if (equipLineVals.isEmpty) {
       children.add(Text('Equip Lines: None', style: TextStyle(fontSize: 18)));
     } else {
@@ -471,7 +440,7 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
                 : Text('Cube skill not found for group $skillGroupId & lv $skillLv');
         for (final funcId in stateEffect?.allValidFuncIds ?? []) {
           final func = db.functionTable[funcId];
-          funcBpSum += func?.functionBattlepower ?? 0;
+          cubeBpMult += func?.functionBattlepower ?? 0;
         }
 
         children.add(child);
@@ -516,7 +485,7 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
                 : Text('Doll skill not found for group $skillGroupId & lv $skillLv');
         for (final funcId in stateEffect?.allValidFuncIds ?? []) {
           final func = db.functionTable[funcId];
-          funcBpSum += func?.functionBattlepower ?? 0;
+          dollBpMult += func?.functionBattlepower ?? 0;
         }
 
         children.add(child);
@@ -530,13 +499,148 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
       atk: totalStat[1],
       def: totalStat[2],
       skillLvs: option.skillLevels,
-      funcBpSum: funcBpSum,
+      funcBpSum: equipBpMultMap.values.sum + cubeBpMult + dollBpMult,
     );
+    final skillBp =
+        bp -
+        getBattlePoint(
+          hp: totalStat[0],
+          atk: totalStat[1],
+          def: totalStat[2],
+          skillLvs: [0, 0, 0],
+          funcBpSum: equipBpMultMap.values.sum + cubeBpMult + dollBpMult,
+        );
+    final cubeBp =
+        bp -
+        getBattlePoint(
+          hp: totalStat[0] - (cubeStat[0] ?? 0),
+          atk: totalStat[1] - (cubeStat[1] ?? 0),
+          def: totalStat[2] - (cubeStat[2] ?? 0),
+          skillLvs: option.skillLevels,
+          funcBpSum: equipBpMultMap.values.sum + dollBpMult,
+        );
+    final dollBp =
+        bp -
+        getBattlePoint(
+          hp: totalStat[0] - (dollStat[0] ?? 0),
+          atk: totalStat[1] - (dollStat[1] ?? 0),
+          def: totalStat[2] - (dollStat[2] ?? 0),
+          skillLvs: option.skillLevels,
+          funcBpSum: equipBpMultMap.values.sum + cubeBpMult,
+        );
+    final headBp =
+        bp -
+        getBattlePoint(
+          hp: totalStat[0] - (equipStats[EquipType.head]?[0] ?? 0),
+          atk: totalStat[1] - (equipStats[EquipType.head]?[1] ?? 0),
+          def: totalStat[2] - (equipStats[EquipType.head]?[2] ?? 0),
+          skillLvs: option.skillLevels,
+          funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.head] ?? 0) + cubeBpMult + dollBpMult,
+        );
+    final bodyBp =
+        bp -
+        getBattlePoint(
+          hp: totalStat[0] - (equipStats[EquipType.body]?[0] ?? 0),
+          atk: totalStat[1] - (equipStats[EquipType.body]?[1] ?? 0),
+          def: totalStat[2] - (equipStats[EquipType.body]?[2] ?? 0),
+          skillLvs: option.skillLevels,
+          funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.body] ?? 0) + cubeBpMult + dollBpMult,
+        );
+    final armBp =
+        bp -
+        getBattlePoint(
+          hp: totalStat[0] - (equipStats[EquipType.arm]?[0] ?? 0),
+          atk: totalStat[1] - (equipStats[EquipType.arm]?[1] ?? 0),
+          def: totalStat[2] - (equipStats[EquipType.arm]?[2] ?? 0),
+          skillLvs: option.skillLevels,
+          funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.arm] ?? 0) + cubeBpMult + dollBpMult,
+        );
+    final legBp =
+        bp -
+        getBattlePoint(
+          hp: totalStat[0] - (equipStats[EquipType.leg]?[0] ?? 0),
+          atk: totalStat[1] - (equipStats[EquipType.leg]?[1] ?? 0),
+          def: totalStat[2] - (equipStats[EquipType.leg]?[2] ?? 0),
+          skillLvs: option.skillLevels,
+          funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.leg] ?? 0) + cubeBpMult + dollBpMult,
+        );
+    final statBp = bp - skillBp - cubeBp - dollBp - headBp - bodyBp - armBp - legBp;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       spacing: 5,
-      children: [Text('Battle Point: ${bp.decimalPattern}', style: TextStyle(fontSize: 18)), ...children],
+      children: [
+        Text('Battle Point: ${bp.decimalPattern}', style: TextStyle(fontSize: 18)),
+        Wrap(
+          spacing: 20,
+          children: [
+            DataTable(
+              columns: [
+                DataColumn(label: Text('')),
+                ...statTypes.map(
+                  (type) =>
+                      DataColumn(label: Text(type.name.toUpperCase()), headingRowAlignment: MainAxisAlignment.center),
+                ),
+              ],
+              rows: [
+                DataRow(
+                  cells: [
+                    DataCell(Text('Cover', style: TextStyle(fontWeight: FontWeight.bold))),
+                    ..._statArrayToDataCell(coverStat),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text('Total', style: TextStyle(fontWeight: FontWeight.bold))),
+                    ..._statArrayToDataCell(totalStat),
+                  ],
+                ),
+                DataRow(cells: [DataCell(Text('Bond')), ..._statArrayToDataCell(attractiveStat)]),
+                DataRow(cells: [DataCell(Text('Console')), ..._statArrayToDataCell(consoleStat)]),
+                DataRow(cells: [DataCell(Text('Cube')), ..._statArrayToDataCell(cubeStat)]),
+                DataRow(cells: [DataCell(Text('Doll')), ..._statArrayToDataCell(dollStat)]),
+                ...NikkeOptions.equipTypes.map((type) {
+                  return DataRow(cells: [DataCell(Text(type.name.pascal)), ..._statArrayToDataCell(equipStats[type]!)]);
+                }),
+              ],
+            ),
+            DataTable(
+              columns: [
+                DataColumn(label: Text('')),
+                DataColumn(
+                  label: Text('BP'),
+                  headingRowAlignment: MainAxisAlignment.center,
+                  tooltip: 'Cube, doll, equips includes stats bp',
+                ),
+              ],
+              rows: [
+                DataRow(
+                  cells: [
+                    DataCell(Text('Total', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataCell(Text(bp.decimalPattern)),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Tooltip(message: 'Total minus everything else', child: Text('Base'))),
+                    DataCell(Text(statBp.decimalPattern)),
+                  ],
+                ),
+                DataRow(cells: [DataCell(Text('Skills')), DataCell(Text(skillBp.decimalPattern))]),
+                DataRow(cells: [DataCell(Text('Cube')), DataCell(Text(cubeBp.decimalPattern))]),
+                DataRow(cells: [DataCell(Text('Doll')), DataCell(Text(dollBp.decimalPattern))]),
+                DataRow(cells: [DataCell(Text('Head')), DataCell(Text(headBp.decimalPattern))]),
+                DataRow(cells: [DataCell(Text('Body')), DataCell(Text(bodyBp.decimalPattern))]),
+                DataRow(cells: [DataCell(Text('Arm')), DataCell(Text(armBp.decimalPattern))]),
+                DataRow(cells: [DataCell(Text('Leg')), DataCell(Text(legBp.decimalPattern))]),
+              ],
+            ),
+          ],
+        ),
+        NikkeBasicSetupWidgets(option: option, useGlobal: userDb.useGlobal, onChange: () => setState(() {})),
+        const Divider(),
+        ...children,
+      ],
     );
   }
 
