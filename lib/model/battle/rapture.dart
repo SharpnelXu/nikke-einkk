@@ -587,8 +587,8 @@ class BattleRapture extends BattleEntity {
           break;
         case BattleRaptureActionType.setBuff:
           for (final target in getActionTargets(simulation, action)) {
-            final buff = BattleBuff(
-              FunctionData(
+            final buff = BattleBuff.create(
+              data: FunctionData(
                 id: -1,
                 groupId: -(action.setParameter! * 1000 + action.buffType!.index),
                 rawBuffType: action.isBuff! ? BuffType.buff.name.pascal : BuffType.deBuff.name.pascal,
@@ -605,9 +605,10 @@ class BattleRapture extends BattleEntity {
                 rawStatusTriggerType: StatusTriggerType.none.name.pascal,
                 rawStatusTrigger2Type: StatusTriggerType.none.name.pascal,
               ),
-              uniqueId,
-              target.uniqueId,
-              simulation,
+              buffGiverUniqueId: uniqueId,
+              buffReceiverUniqueId: target.uniqueId,
+              simulation: simulation,
+              source: Source.raptureSkill,
             );
             target.buffs.add(buff);
           }

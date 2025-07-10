@@ -7,19 +7,21 @@ import 'package:nikke_einkk/model/skills.dart';
 class BuffEvent extends BattleEvent {
   late FunctionData data;
   late String giverName;
-  late int buffGiverUniqueId;
+  late int buffGiverId;
   late String receiverName;
-  late int buffReceiverUniqueId;
+  late int buffReceiverId;
   late int buffCount;
 
   BuffEvent(BattleSimulation simulation, BattleBuff buff) {
     data = buff.data;
-    buffGiverUniqueId = buff.buffGiverUniqueId;
-    giverName = simulation.getEntityByUniqueId(buffGiverUniqueId)!.name;
-    buffReceiverUniqueId = buff.buffReceiverUniqueId;
-    receiverName = simulation.getEntityByUniqueId(buffReceiverUniqueId)!.name;
+    buffGiverId = buff.buffGiverId;
+    giverName = simulation.getEntityById(buffGiverId)!.name;
+    buffReceiverId = buff.buffReceiverId;
+    receiverName = simulation.getEntityById(buffReceiverId)!.name;
     buffCount = buff.count;
   }
+
+  BuffEvent.temp(super.activatorId, super.targetIds, this.data, this.buffCount);
 
   factory BuffEvent.create(BattleSimulation simulation, BattleBuff buff) {
     // TODO: rethink what info is needed
@@ -27,13 +29,18 @@ class BuffEvent extends BattleEvent {
   }
 
   @override
-  int getActivatorUniqueId() {
-    return buffGiverUniqueId;
+  int getActivatorId() {
+    return buffGiverId;
   }
 
   @override
-  List<int> getTargetUniqueIds() {
-    return [buffReceiverUniqueId];
+  List<int> getTargetIds() {
+    return [buffReceiverId];
+  }
+
+  @override
+  Widget buildDisplayV2(BattleSimulation simulation) {
+    return Text('$runtimeType');
   }
 
   @override

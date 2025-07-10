@@ -105,7 +105,7 @@ abstract class BattleEntity {
       if (!types.contains(buff.data.functionType)) continue;
 
       if (buff.data.functionValueType == ValueType.percent) {
-        final standardUniqueId = buff.getFunctionStandardUniqueId();
+        final standardUniqueId = buff.getFunctionStandardId();
         if (standardUniqueId != -1) {
           percents.putIfAbsent(standardUniqueId, () => {});
           final previousValue = percents[standardUniqueId]![buff.data.groupId] ?? 0;
@@ -118,7 +118,7 @@ abstract class BattleEntity {
 
     int result = baseValue + flatValue;
     for (final standardUniqueId in percents.keys) {
-      final standard = simulation.getEntityByUniqueId(standardUniqueId);
+      final standard = simulation.getEntityById(standardUniqueId);
       if (standard != null) {
         for (final buffType in percents[standardUniqueId]!.keys) {
           final percent = percents[standardUniqueId]![buffType]!;

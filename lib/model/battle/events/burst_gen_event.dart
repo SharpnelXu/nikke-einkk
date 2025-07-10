@@ -52,12 +52,12 @@ class BurstGenerationEvent extends BattleEvent {
   }
 
   @override
-  int getActivatorUniqueId() {
+  int getActivatorId() {
     return attackerUniqueId;
   }
 
   @override
-  List<int> getTargetUniqueIds() {
+  List<int> getTargetIds() {
     return [targetUniqueId];
   }
 

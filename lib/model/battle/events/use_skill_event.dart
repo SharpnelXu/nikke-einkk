@@ -18,17 +18,17 @@ class UseSkillEvent extends BattleEvent {
     this.skillNum,
     List<int> targetUniqueIds,
   ) {
-    name = simulation.getEntityByUniqueId(ownerUniqueId)!.name;
+    name = simulation.getEntityById(ownerUniqueId)!.name;
     skillTargetUniqueIds.addAll(targetUniqueIds);
   }
 
   @override
-  int getActivatorUniqueId() {
+  int getActivatorId() {
     return ownerUniqueId;
   }
 
   @override
-  List<int> getTargetUniqueIds() {
+  List<int> getTargetIds() {
     return skillTargetUniqueIds;
   }
 

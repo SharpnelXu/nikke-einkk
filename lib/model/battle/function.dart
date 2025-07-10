@@ -120,7 +120,7 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onHealedBy:
-        if (event is HpChangeEvent && event.getActivatorUniqueId() == ownerUniqueId && event.isHeal) {
+        if (event is HpChangeEvent && event.getActivatorId() == ownerUniqueId && event.isHeal) {
           executeFunction(event, simulation);
         }
         break;
@@ -236,12 +236,12 @@ class BattleFunction {
       case StandardType.user:
       case StandardType.none:
         if (event is BattleStartEvent) {
-          return simulation.getEntityByUniqueId(ownerUniqueId);
+          return simulation.getEntityById(ownerUniqueId);
         }
 
         // a lot of timingTriggerTypes have standards set to none which clearly need an countTarget, so default to
         // activator. examples include Elegg S2
-        return simulation.getEntityByUniqueId(event.getActivatorUniqueId());
+        return simulation.getEntityById(event.getActivatorId());
       case StandardType.functionTarget:
         // functionTarget: {onTeamHpRatioUnder, onPartsBrokenNum, onTeamHpRatioUp, onFullCount (not actually used)}
         // so essentially this means all nikkes? only that would makes sense for Flora S2
@@ -290,13 +290,19 @@ class BattleFunction {
         // overwrite is probably done this way
         if (existingBuff.data.level < data.level) {
           existingBuff.data = data;
-          existingBuff.buffGiverUniqueId = event.getActivatorUniqueId();
-          existingBuff.buffReceiverUniqueId = target.uniqueId;
+          existingBuff.buffGiverId = event.getActivatorId();
+          existingBuff.buffReceiverId = target.uniqueId;
         }
         simulation.registerEvent(simulation.currentFrame, BuffEvent(simulation, existingBuff));
       } else {
-        final buff = BattleBuff(data, ownerUniqueId, target.uniqueId, simulation);
-        buff.targetGroupId = parentFunctionValue ?? 0;
+        final buff = BattleBuff.create(
+          data: data,
+          buffGiverUniqueId: ownerUniqueId,
+          buffReceiverUniqueId: target.uniqueId,
+          simulation: simulation,
+          source: source,
+          targetGroupId: parentFunctionValue,
+        );
         target.buffs.add(buff);
         simulation.registerEvent(simulation.currentFrame, BuffEvent(simulation, buff));
       }
@@ -369,7 +375,7 @@ class BattleFunction {
           if (data.functionValueType == ValueType.integer) {
             target.changeHp(simulation, data.functionValue);
           } else if (data.functionValueType == ValueType.percent) {
-            final functionStandard = simulation.getEntityByUniqueId(getFunctionStandardUniqueId(target.uniqueId));
+            final functionStandard = simulation.getEntityById(getFunctionStandardUniqueId(target.uniqueId));
             if (functionStandard != null) {
               final changeValue = toModifier(data.functionValue) * functionStandard.currentHp;
               target.changeHp(simulation, changeValue.round());
@@ -429,7 +435,7 @@ class BattleFunction {
 
           activated = true;
 
-          final activator = simulation.getEntityByUniqueId(event.getActivatorUniqueId());
+          final activator = simulation.getEntityById(event.getActivatorId());
           final healVariation = activator?.getHealVariation(simulation) ?? 0;
 
           int healValue = 0;
@@ -650,16 +656,16 @@ class BattleFunction {
         break;
       case FunctionTargetType.target:
         // if used with skills, it's skill's target
-        for (final targetUniqueId in event.getTargetUniqueIds()) {
-          final target = simulation.getEntityByUniqueId(targetUniqueId);
+        for (final targetUniqueId in event.getTargetIds()) {
+          final target = simulation.getEntityById(targetUniqueId);
           if (target != null) {
             result.add(target);
           }
         }
         break;
       case FunctionTargetType.targetCover:
-        for (final targetUniqueId in event.getTargetUniqueIds()) {
-          final target = simulation.getEntityByUniqueId(targetUniqueId);
+        for (final targetUniqueId in event.getTargetIds()) {
+          final target = simulation.getEntityById(targetUniqueId);
           if (target != null && target is BattleNikke) {
             result.add(target.cover);
           }
@@ -685,13 +691,13 @@ class BattleFunction {
   ) {
     switch (standardType) {
       case StandardType.user:
-        return simulation.getEntityByUniqueId(ownerUniqueId);
+        return simulation.getEntityById(ownerUniqueId);
       case StandardType.functionTarget:
         return currentFunctionTarget;
       case StandardType.triggerTarget:
         // only used by Phantom S1 (addDamage, onShotRatio, isFunctionOn) & Flora S2 (activate barrier, onTeamHpUnder,
         // checkPosition), current interpretation is whoever triggered the event
-        return simulation.getEntityByUniqueId(event.getActivatorUniqueId());
+        return simulation.getEntityById(event.getActivatorId());
       case StandardType.none: // when statusTriggerType is not none, standardType is only none for isCheckMonster
       case StandardType.unknown:
         return null;

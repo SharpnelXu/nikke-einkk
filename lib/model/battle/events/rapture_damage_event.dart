@@ -14,12 +14,12 @@ class RaptureDamageEvent extends BattleEvent {
   late bool invalid;
 
   @override
-  int getActivatorUniqueId() {
+  int getActivatorId() {
     return attackerUniqueId;
   }
 
   @override
-  List<int> getTargetUniqueIds() {
+  List<int> getTargetIds() {
     return [targetUniqueId];
   }
 

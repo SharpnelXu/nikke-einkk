@@ -22,7 +22,7 @@ class NikkeFireEvent extends BattleEvent {
   }
 
   @override
-  int getActivatorUniqueId() {
+  int getActivatorId() {
     return ownerUniqueId;
   }
 }

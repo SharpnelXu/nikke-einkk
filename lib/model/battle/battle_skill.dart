@@ -205,7 +205,7 @@ class BattleSkill {
   ];
 
   static List<BattleEntity> getSkillTargets(BattleSimulation simulation, SkillData skillData, int ownerUniqueId) {
-    final owner = simulation.getEntityByUniqueId(ownerUniqueId);
+    final owner = simulation.getEntityById(ownerUniqueId);
     final isThisNikke = owner is BattleNikke;
     bool targetEnemy;
     int targetCountIndex;

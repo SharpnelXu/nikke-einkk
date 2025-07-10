@@ -246,7 +246,7 @@ class BattleSimulation {
     return raptures.firstWhereOrNull((rapture) => rapture.uniqueId == uniqueId);
   }
 
-  BattleEntity? getEntityByUniqueId(int uniqueId) {
+  BattleEntity? getEntityById(int uniqueId) {
     for (final nikke in nonnullNikkes) {
       if (nikke.uniqueId == uniqueId) {
         return nikke;

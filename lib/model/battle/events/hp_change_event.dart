@@ -26,7 +26,7 @@ class HpChangeEvent extends BattleEvent {
   }
 
   @override
-  int getActivatorUniqueId() {
+  int getActivatorId() {
     return ownerUniqueId;
   }
 

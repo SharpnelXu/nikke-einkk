@@ -5,20 +5,44 @@ import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
 class BattleBuff {
-  int buffGiverUniqueId;
-  int buffReceiverUniqueId;
+  int buffGiverId;
+  int buffReceiverId;
   FunctionData data;
+  Source source;
 
   int targetGroupId = 0;
   int duration = 0;
-  int count = 0;
+  int count = 1;
 
-  BattleBuff(this.data, this.buffGiverUniqueId, this.buffReceiverUniqueId, BattleSimulation simulation) {
-    duration =
+  BattleBuff._({
+    required this.data,
+    required this.buffGiverId,
+    required this.buffReceiverId,
+    required this.source,
+    this.duration = 0,
+    this.targetGroupId = 0,
+  });
+
+  factory BattleBuff.create({
+    required FunctionData data,
+    required int buffGiverUniqueId,
+    required int buffReceiverUniqueId,
+    required Source source,
+    required BattleSimulation simulation,
+    int? targetGroupId,
+  }) {
+    final duration =
         data.durationType == DurationType.timeSec
             ? timeDataToFrame(data.durationValue, simulation.fps)
             : data.durationValue;
-    count = 1;
+    return BattleBuff._(
+      data: data,
+      buffGiverId: buffGiverUniqueId,
+      buffReceiverId: buffReceiverUniqueId,
+      source: source,
+      duration: duration,
+      targetGroupId: targetGroupId ?? 0,
+    );
   }
 
   bool shouldRemove(BattleSimulation simulation) {
@@ -53,9 +77,9 @@ class BattleBuff {
   BattleEntity? getStatusTriggerStandardTarget(BattleSimulation simulation, StandardType standardType) {
     switch (standardType) {
       case StandardType.user:
-        return simulation.getEntityByUniqueId(buffGiverUniqueId);
+        return simulation.getEntityById(buffGiverId);
       case StandardType.functionTarget:
-        return simulation.getEntityByUniqueId(buffReceiverUniqueId);
+        return simulation.getEntityById(buffReceiverId);
       case StandardType.triggerTarget:
       case StandardType.none:
       case StandardType.unknown:
@@ -63,12 +87,12 @@ class BattleBuff {
     }
   }
 
-  int getFunctionStandardUniqueId() {
+  int getFunctionStandardId() {
     switch (data.functionStandard) {
       case StandardType.user:
-        return buffGiverUniqueId;
+        return buffGiverId;
       case StandardType.functionTarget:
-        return buffReceiverUniqueId;
+        return buffReceiverId;
       case StandardType.triggerTarget: // there is no triggerTarget in functionStandardType
       case StandardType.unknown:
       case StandardType.none:
