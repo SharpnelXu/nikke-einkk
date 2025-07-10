@@ -192,6 +192,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                   option: nikkeOptions[index],
                   playerOptions: playerOptions,
                   cubeLvs: cubeLvs,
+                  onChange: (option) => setState(() {}),
                 ),
               );
             }),
@@ -255,6 +256,7 @@ class NikkeDisplay extends StatefulWidget {
   final PlayerOptions playerOptions;
   final bool useGlobal;
   final Map<int, int> cubeLvs;
+  final ValueChanged<NikkeOptions> onChange;
 
   const NikkeDisplay({
     super.key,
@@ -262,6 +264,7 @@ class NikkeDisplay extends StatefulWidget {
     required this.option,
     required this.playerOptions,
     required this.cubeLvs,
+    required this.onChange,
   });
 
   @override
@@ -418,6 +421,7 @@ class _NikkeDisplayState extends State<NikkeDisplay> {
                   builder: (ctx) => NikkeEditorPage(option: option, cubeLvs: widget.cubeLvs, useGlobal: useGlobal),
                 ),
               );
+              widget.onChange(option);
               if (mounted) setState(() {});
             },
             child: NikkeIcon(

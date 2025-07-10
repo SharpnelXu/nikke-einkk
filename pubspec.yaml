@@ -54,6 +54,7 @@ dependencies:
   sqflite_common_ffi: ^2.3.6
   package_info_plus: ^8.3.0
   window_manager: ^0.5.0
+  fl_chart: ^1.0.0
 
 dev_dependencies:
   flutter_test:

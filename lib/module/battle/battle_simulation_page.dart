@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
@@ -84,8 +86,94 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
             children: simulation.battleNikkes.mapIndexed(_buildNikke).toList(),
           ),
           const Divider(),
+          _buildDpsChart(),
+          const Divider(),
           _buildLastFrameEvents(),
         ],
+      ),
+    );
+  }
+
+  static List<Color> dpsColorChart = [Colors.red, Colors.blue, Colors.green, Colors.deepPurple, Colors.orange];
+
+  Widget _buildDpsChart() {
+    final Map<int, List<int>> dpsMap = {};
+    for (final nikke in simulation.nonnullNikkes) {
+      dpsMap[nikke.uniqueId] = [];
+    }
+    final secondsToCheck = ((simulation.maxFrames - simulation.currentFrame + 1) / simulation.fps).ceil();
+    for (int sec = 0; sec < secondsToCheck; sec += 1) {
+      final framesToCheckStart = simulation.maxFrames - sec * simulation.fps;
+      final framesToCheckEnd = framesToCheckStart - simulation.fps;
+      for (final damageList in dpsMap.values) {
+        damageList.add(0);
+      }
+      for (int frame = framesToCheckStart; frame > framesToCheckEnd; frame -= 1) {
+        final events = simulation.timeline[frame];
+        if (events != null) {
+          for (final event in events) {
+            if (event is NikkeDamageEvent) {
+              final nikkeDamageList = dpsMap[event.attackerUniqueId]!;
+              final sum = nikkeDamageList[nikkeDamageList.length - 1];
+              nikkeDamageList[nikkeDamageList.length - 1] = sum + event.damageParameter.calculateExpectedDamage();
+            }
+          }
+        }
+      }
+    }
+    return Container(
+      padding: EdgeInsets.only(right: 15),
+      constraints: BoxConstraints(maxWidth: 700, maxHeight: 400),
+      child: Center(
+        child: LineChart(
+          LineChartData(
+            titlesData: FlTitlesData(
+              show: true,
+              topTitles: AxisTitles(axisNameWidget: Text('DPS', style: TextStyle(fontSize: 18)), axisNameSize: 30),
+              leftTitles: AxisTitles(axisNameSize: 0, sideTitles: SideTitles(showTitles: true, reservedSize: 70)),
+              rightTitles: AxisTitles(),
+              bottomTitles: AxisTitles(
+                axisNameSize: 50,
+                axisNameWidget: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 5,
+                  children: [
+                    Text('Seconds since battle start'),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 10,
+                      children: List.generate(simulation.nonnullNikkes.length, (idx) {
+                        final nikke = simulation.nonnullNikkes[idx];
+                        final color = dpsColorChart[idx];
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          spacing: 5,
+                          children: [
+                            Container(alignment: Alignment.center, width: 10, height: 10, color: color),
+                            Text('${locale.getTranslation(nikke.characterData.nameLocalkey)} (P${nikke.uniqueId})'),
+                          ],
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+                sideTitles: SideTitles(showTitles: true, reservedSize: 30),
+              ),
+            ),
+            lineBarsData: List.generate(simulation.nonnullNikkes.length, (idx) {
+              final nikke = simulation.nonnullNikkes[idx];
+              final dpsList = dpsMap[nikke.uniqueId]!;
+              return LineChartBarData(
+                color: dpsColorChart[idx],
+                spots: List.generate(dpsList.length, (idx) {
+                  return FlSpot(idx.toDouble(), dpsList[idx].toDouble());
+                }),
+              );
+            }),
+          ),
+        ),
       ),
     );
   }
@@ -170,7 +258,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     }
 
     if (status == BattleNikkeStatus.shooting) {
-      if (nikke.spotFirstDelayFrameCount >= 0 && nikke.spotLastDelayFrameCount == 0) {
+      if (nikke.spotFirstDelayFrameCount >= 0 && nikke.spotLastDelayFrameCount <= 0) {
         max = timeDataToFrame(nikke.currentWeaponData.spotFirstDelay, nikke.fps);
         cur = max - nikke.spotFirstDelayFrameCount;
         addProgressBar('Exiting Cover', cur, max);
