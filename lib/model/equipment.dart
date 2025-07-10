@@ -7,6 +7,7 @@ import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/skills.dart';
 
 part '../generated/model/equipment.g.dart';
 
@@ -85,7 +86,7 @@ class EquipmentOption {
           if (func == null) {
             logger.w('Invalid Equip Line Func: $funcId');
           } else {
-            wearer.functions.add(BattleFunction(func, wearer.uniqueId));
+            wearer.functions.add(BattleFunction(func, wearer.uniqueId, Source.equip));
           }
         }
       }

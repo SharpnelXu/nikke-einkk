@@ -83,9 +83,29 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: simulation.battleNikkes.mapIndexed(_buildNikke).toList(),
           ),
+          const Divider(),
+          _buildLastFrameEvents(),
         ],
       ),
     );
+  }
+
+  Widget _buildLastFrameEvents() {
+    final isBattleStartFrame = simulation.currentFrame == simulation.maxFrames;
+    final List<Widget> result = [
+      Text(
+        isBattleStartFrame ? 'Events of Battle Start' : 'Events of Last Frame (${simulation.currentFrame + 1})',
+        style: TextStyle(fontSize: 18),
+      ),
+    ];
+
+    final events = simulation.timeline[simulation.currentFrame + 1];
+    if (events == null || events.isEmpty) {
+      result.add(Text('None'));
+    } else {
+      result.addAll(events.map((event) => event.buildDisplay()));
+    }
+    return Column(mainAxisSize: MainAxisSize.min, spacing: 5, children: result);
   }
 
   Widget _buildMiscColumn() {

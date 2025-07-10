@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/skills.dart';
 
 double toModifier(int ratio) {
   return ratio / 10000;
@@ -53,6 +54,14 @@ int getBaseStat({
   final result = gradeStat + coreStat.round() + equipStat + cubeStat + dollStat;
 
   return result;
+}
+
+Source getSource(int skillNum) {
+  return skillNum == 1
+      ? Source.skill1
+      : skillNum == 2
+      ? Source.skill2
+      : Source.burst;
 }
 
 double getBpStatMult({required int hp, required int atk, required int def}) {

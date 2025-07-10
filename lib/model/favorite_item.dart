@@ -6,6 +6,7 @@ import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/skills.dart';
 
 part '../generated/model/favorite_item.g.dart';
 
@@ -65,7 +66,7 @@ class FavoriteItemOption {
           if (func == null) {
             logger.w('Invalid Doll Func: $funcId');
           } else {
-            owner.functions.add(BattleFunction(func, owner.uniqueId));
+            owner.functions.add(BattleFunction(func, owner.uniqueId, Source.doll));
           }
         }
       }

@@ -21,6 +21,11 @@ class BuffEvent extends BattleEvent {
     buffCount = buff.count;
   }
 
+  factory BuffEvent.create(BattleSimulation simulation, BattleBuff buff) {
+    // TODO: rethink what info is needed
+    return BuffEvent(simulation, buff);
+  }
+
   @override
   int getActivatorUniqueId() {
     return buffGiverUniqueId;

@@ -23,11 +23,12 @@ import 'package:nikke_einkk/model/skills.dart';
 class BattleFunction {
   final FunctionData data;
   final int ownerUniqueId;
+  final Source source;
 
   FunctionStatus status = FunctionStatus.off;
   int timesActivated = 0;
 
-  BattleFunction(this.data, this.ownerUniqueId);
+  BattleFunction(this.data, this.ownerUniqueId, this.source);
 
   void broadcast(BattleEvent event, BattleSimulation simulation) {
     if (data.limitValue > 0 && timesActivated >= data.limitValue) return;
@@ -623,7 +624,7 @@ class BattleFunction {
         for (final functionId in functionsToExecute) {
           final functionData = simulation.db.functionTable[functionId];
           if (functionData != null) {
-            final connectedFunction = BattleFunction(functionData, ownerUniqueId);
+            final connectedFunction = BattleFunction(functionData, ownerUniqueId, source);
             // connected function likely doesn't check trigger target
             connectedFunction.executeFunction(event, simulation, parentFunctionValue: data.functionValue);
           }

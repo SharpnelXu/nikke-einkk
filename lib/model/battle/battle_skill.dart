@@ -26,6 +26,7 @@ class BattleSkill {
   final int skillNum;
   final bool useGlobal;
   NikkeDatabase get db => useGlobal ? global : cn;
+  Source get source => getSource(skillNum);
 
   BattleSkill(this.skillId, this.skillType, this.level, this.skillNum, this.ownerUniqueId, this.useGlobal);
 
@@ -48,7 +49,7 @@ class BattleSkill {
         nikke.functions.addAll(
           stateEffectData.allValidFuncIds
               .where((funcId) => db.functionTable.containsKey(funcId))
-              .map((funcId) => BattleFunction(db.functionTable[funcId]!, nikke.uniqueId)),
+              .map((funcId) => BattleFunction(db.functionTable[funcId]!, nikke.uniqueId, source)),
         );
       }
     }
@@ -105,7 +106,7 @@ class BattleSkill {
     for (final beforeFuncId in [...skillData.beforeUseFunctionIdList, ...skillData.beforeHurtFunctionIdList]) {
       final functionData = simulation.db.functionTable[beforeFuncId];
       if (functionData != null) {
-        final function = BattleFunction(functionData, ownerUniqueId);
+        final function = BattleFunction(functionData, ownerUniqueId, getSource(skillNum));
         // connected function likely doesn't check trigger target
         function.executeFunction(event, simulation);
       }
@@ -174,7 +175,7 @@ class BattleSkill {
     for (final afterFuncId in [...skillData.afterUseFunctionIdList, ...skillData.afterHurtFunctionIdList]) {
       final functionData = simulation.db.functionTable[afterFuncId];
       if (functionData != null) {
-        final function = BattleFunction(functionData, ownerUniqueId);
+        final function = BattleFunction(functionData, ownerUniqueId, getSource(skillNum));
         // connected function likely doesn't check trigger target
         function.executeFunction(event, simulation);
       }

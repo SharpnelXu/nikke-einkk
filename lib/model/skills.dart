@@ -930,3 +930,5 @@ class WordGroupData {
 
   factory WordGroupData.fromJson(Map<String, dynamic> json) => _$WordGroupDataFromJson(json);
 }
+
+enum Source { skill1, skill2, burst, equip, cube, doll }
