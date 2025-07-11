@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 const Divider kHorizontalDivider = Divider(color: Color.fromRGBO(162, 169, 177, 1), thickness: 1, height: 1);
 const VerticalDivider kVerticalDivider = VerticalDivider(
@@ -59,6 +60,8 @@ class CustomTable extends StatelessWidget {
     return child;
   }
 }
+
+final battleHeaderData = TableCellData(isHeader: true, style: boldStyle);
 
 class CustomTableRow extends StatefulWidget {
   final List<TableCellData> children;

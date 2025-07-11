@@ -6,6 +6,8 @@ import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
+final boldStyle = TextStyle(fontWeight: FontWeight.bold);
+
 /// From source_helper:CaseHelper package
 extension CaseHelper on String {
   String get snake => _fixCase('_');

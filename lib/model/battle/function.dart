@@ -293,7 +293,7 @@ class BattleFunction {
           existingBuff.buffGiverId = event.getActivatorId();
           existingBuff.buffReceiverId = target.uniqueId;
         }
-        simulation.registerEvent(simulation.currentFrame, BuffEvent(simulation, existingBuff));
+        simulation.registerEvent(simulation.currentFrame, BuffEvent.create(existingBuff));
       } else {
         final buff = BattleBuff.create(
           data: data,
@@ -304,7 +304,7 @@ class BattleFunction {
           targetGroupId: parentFunctionValue,
         );
         target.buffs.add(buff);
-        simulation.registerEvent(simulation.currentFrame, BuffEvent(simulation, buff));
+        simulation.registerEvent(simulation.currentFrame, BuffEvent.create(buff));
       }
 
       if (data.functionType == FunctionType.statHpHeal) {

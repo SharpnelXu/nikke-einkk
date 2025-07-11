@@ -191,7 +191,23 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     if (events == null || events.isEmpty) {
       result.add(Text('None'));
     } else {
-      result.addAll(events.map((event) => event.buildDisplay()));
+      result.addAll(
+        List.generate(
+          events.length,
+          (idx) => Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15),
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 5,
+              children: [
+                Text('${idx + 1}.'),
+                Container(constraints: BoxConstraints(maxWidth: 700), child: events[idx].buildDisplayV2(simulation)),
+              ],
+            ),
+          ),
+        ),
+      );
     }
     return Column(mainAxisSize: MainAxisSize.min, spacing: 5, children: result);
   }

@@ -2,56 +2,53 @@ import 'package:flutter/cupertino.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
+import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/module/common/custom_table.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 class BuffEvent extends BattleEvent {
-  late FunctionData data;
-  late String giverName;
-  late int buffGiverId;
-  late String receiverName;
-  late int buffReceiverId;
-  late int buffCount;
+  final FunctionData data;
+  final Source source;
+  final int buffCount;
 
-  BuffEvent(BattleSimulation simulation, BattleBuff buff) {
-    data = buff.data;
-    buffGiverId = buff.buffGiverId;
-    giverName = simulation.getEntityById(buffGiverId)!.name;
-    buffReceiverId = buff.buffReceiverId;
-    receiverName = simulation.getEntityById(buffReceiverId)!.name;
-    buffCount = buff.count;
+  BuffEvent._(super.activatorId, super.targetIds, this.data, this.source, this.buffCount);
+
+  factory BuffEvent.create(BattleBuff buff) {
+    return BuffEvent._(buff.buffGiverId, [buff.buffReceiverId], buff.data, buff.source, buff.count);
   }
 
-  BuffEvent.temp(super.activatorId, super.targetIds, this.data, this.buffCount);
-
-  factory BuffEvent.create(BattleSimulation simulation, BattleBuff buff) {
-    // TODO: rethink what info is needed
-    return BuffEvent(simulation, buff);
-  }
-
-  @override
-  int getActivatorId() {
-    return buffGiverId;
-  }
-
-  @override
-  List<int> getTargetIds() {
-    return [buffReceiverId];
-  }
+  int get targetId => targetIds.first;
 
   @override
   Widget buildDisplayV2(BattleSimulation simulation) {
-    return Text('$runtimeType');
-  }
-
-  @override
-  Widget buildDisplay() {
-    final valueString =
-        data.functionValueType == ValueType.percent
-            ? '${(data.functionValue / 100).toStringAsFixed(2)}%'
-            : '${data.functionValue}';
-    final funcString =
-        '${data.functionType.name} $valueString (${data.functionStandard.name}) $buffCount/${data.fullCount}';
-    // final skillName = dbLegacy.getTranslation(data.nameLocalkey)?.zhCN ?? 'Buff';
-    return Text('Skill $funcString (to $receiverName by $giverName)');
+    final funcName = locale.getTranslation(data.nameLocalkey);
+    return CustomTable(
+      children: [
+        CustomTableRow.fromTexts(texts: ['Buff Applied', 'Source', 'Activator', 'Target'], defaults: battleHeaderData),
+        CustomTableRow.fromTexts(
+          texts: [
+            data.functionType.name.pascal,
+            '${source.name.pascal}${funcName != null ? ': $funcName' : ''}',
+            '${simulation.getEntityName(activatorId)}',
+            '${simulation.getEntityName(targetId)}',
+          ],
+        ),
+      ],
+    );
+    // return Row(
+    //   spacing: 5,
+    //   children: [
+    //     Text( 'Buff:', style: boldStyle),
+    //     if (funcName != null)  Text( '$funcName /'),
+    //     Text( data.functionType.name.pascal,),
+    //     Text( 'Activator:', style: boldStyle),
+    //     Text( '${simulation.getEntityName(activatorId)}',),
+    //     Text( 'Target:', style: boldStyle),
+    //     Text( '${simulation.getEntityName(targetId)}',),
+    //     Text('Source:', style: boldStyle,),
+    //     Text(source.name.pascal),
+    //   ]
+    // );
   }
 }
