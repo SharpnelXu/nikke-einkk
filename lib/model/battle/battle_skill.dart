@@ -187,7 +187,7 @@ class BattleSkill {
 
       if (validNextStep.contains(nextStep) && simulation.reEnterBurstCd == 0) {
         final nextStageNum = nextStep == BurstStep.nextStep ? simulation.burstStage + 1 : nextStep.step;
-        simulation.reEnterBurstCd = timeDataToFrame(50, simulation.fps); // 0.5s fixed cd
+        simulation.reEnterBurstCd = timeDataToFrame(constData.sameBurstStageCd, simulation.fps);
         simulation.registerEvent(
           simulation.currentFrame,
           ChangeBurstStepEvent(simulation, ownerUniqueId, nextStageNum, owner.characterData.burstDuration),

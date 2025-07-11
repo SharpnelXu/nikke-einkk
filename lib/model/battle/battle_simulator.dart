@@ -39,7 +39,8 @@ class BattleSimulation {
   set burstMeter(int value) => _burstMeter = value.clamp(0, constData.burstMeterCap);
   int burstStage = 0;
   int reEnterBurstCd = 0;
-  int burstStageDuration = 0;
+  int burstStageFramesLeft = 0;
+  int fullBurstDuration = 0;
 
   // player actions, maybe move to a dedicated object to represent current frame
   bool autoAttack = true;
@@ -70,7 +71,8 @@ class BattleSimulation {
     burstMeter = 0;
     burstStage = 0;
     reEnterBurstCd = 0;
-    burstStageDuration = 0;
+    burstStageFramesLeft = 0;
+    fullBurstDuration = 0;
 
     for (int index = 0; index < battleNikkes.length; index += 1) {
       battleNikkes[index]?.init(this, index + 1);
@@ -106,8 +108,8 @@ class BattleSimulation {
     }
 
     reEnterBurstCd = max(0, reEnterBurstCd - 1);
-    burstStageDuration = max(0, burstStageDuration - 1);
-    if (burstStage > 1 && burstStageDuration == 0) {
+    burstStageFramesLeft = max(0, burstStageFramesLeft - 1);
+    if (burstStage > 1 && burstStageFramesLeft == 0) {
       if (burstStage == 4) {
         registerEvent(currentFrame, ExitFullBurstEvent.exitFullBurstEvent);
       }
@@ -136,8 +138,11 @@ class BattleSimulation {
           reEnterBurstCd = 0;
         }
         burstStage = event.nextStage;
-        burstStageDuration = timeDataToFrame(event.duration, fps);
-        burstStageDuration = max(0, burstStageDuration);
+        burstStageFramesLeft = timeDataToFrame(event.duration, fps);
+        burstStageFramesLeft = max(0, burstStageFramesLeft);
+        if (event.nextStage == 4) {
+          fullBurstDuration = burstStageFramesLeft;
+        }
       }
 
       for (final nikke in nonnullNikkes) {
@@ -163,7 +168,7 @@ class BattleSimulation {
     burstMeter = 0;
     burstStage = 0;
     reEnterBurstCd = 0;
-    burstStageDuration = 0;
+    burstStageFramesLeft = 0;
     currentNikke = min(nonnullNikkes.length, currentNikke);
     for (int index = 0; index < nonnullNikkes.length; index += 1) {
       nonnullNikkes[index].init(this, index + 1);
@@ -189,8 +194,8 @@ class BattleSimulation {
       }
 
       reEnterBurstCd = max(0, reEnterBurstCd - 1);
-      burstStageDuration = max(0, burstStageDuration - 1);
-      if (burstStage > 1 && burstStageDuration == 0) {
+      burstStageFramesLeft = max(0, burstStageFramesLeft - 1);
+      if (burstStage > 1 && burstStageFramesLeft == 0) {
         if (burstStage == 4) {
           registerEvent(currentFrame, ExitFullBurstEvent.exitFullBurstEvent);
         }
@@ -219,8 +224,8 @@ class BattleSimulation {
             reEnterBurstCd = 0;
           }
           burstStage = event.nextStage;
-          burstStageDuration = timeDataToFrame(event.duration, fps);
-          burstStageDuration = max(0, burstStageDuration);
+          burstStageFramesLeft = timeDataToFrame(event.duration, fps);
+          burstStageFramesLeft = max(0, burstStageFramesLeft);
         }
 
         for (final nikke in nonnullNikkes) {

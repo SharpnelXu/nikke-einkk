@@ -213,18 +213,38 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
   }
 
   Widget _buildMiscColumn() {
+    final List<Widget> children = [
+      Text(
+        'Time: ${frameDataToNiceTimeString(simulation.currentFrame, simulation.fps)}s'
+        ' (Frame ${simulation.currentFrame})',
+      ),
+    ];
+    if (simulation.burstStage == 0) {
+      children.addAll([
+        Text('Burst: ${(simulation.burstMeter / 100).percentString}'),
+        SimplePercentBar(percent: simulation.burstMeter / constData.burstMeterCap),
+      ]);
+    } else if (simulation.burstStage == 4) {
+      children.addAll([
+        Text('Full Burst: ${frameDataToNiceTimeString(simulation.burstStageFramesLeft, simulation.fps)}s'),
+        SimplePercentBar(percent: simulation.burstStageFramesLeft / simulation.fullBurstDuration),
+      ]);
+    } else {
+      children.add(Text('Burst Step: ${simulation.burstStage}'));
+      if (simulation.reEnterBurstCd > 0) {
+        children.addAll([
+          Text('Re Enter CD: ${frameDataToNiceTimeString(simulation.reEnterBurstCd, simulation.fps)}s'),
+          SimplePercentBar(
+            percent: simulation.reEnterBurstCd / timeDataToFrame(constData.sameBurstStageCd, simulation.fps),
+          ),
+        ]);
+      }
+    }
     return Column(
       spacing: 3,
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          'Time: ${frameDataToNiceTimeString(simulation.currentFrame, simulation.fps)}s'
-          ' (Frame ${simulation.currentFrame})',
-        ),
-        Text('Burst: ${(simulation.burstMeter / 100).percentString}'),
-        SimplePercentBar(percent: simulation.burstMeter / constData.burstMeterCap),
-      ],
+      children: children,
     );
   }
 

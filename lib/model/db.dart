@@ -81,6 +81,7 @@ class GameConstants {
   final fullBurstCorrection = 5000;
   final baseElementRate = 11000;
   final burstMeterCap = 1000000; // 9000 = 0.9%
+  final sameBurstStageCd = 50; // 0.5 seconds
 }
 
 class NikkeDatabase {

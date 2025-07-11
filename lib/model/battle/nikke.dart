@@ -403,7 +403,7 @@ class BattleNikke extends BattleEntity {
           return;
         }
 
-        if (simulation.burstStage == 4 && simulation.burstStageDuration < framesToFullCharge) {
+        if (simulation.burstStage == 4 && simulation.burstStageFramesLeft < framesToFullCharge) {
           return;
         }
 
