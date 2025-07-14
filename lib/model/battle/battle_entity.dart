@@ -21,7 +21,16 @@ abstract class BattleEntity {
   void changeHp(BattleSimulation simulation, int changeValue, [bool isHeal = false]) {
     currentHp = (currentHp + changeValue).clamp(1, getMaxHp(simulation));
 
-    simulation.registerEvent(simulation.currentFrame, HpChangeEvent(simulation, this, changeValue, isHeal: isHeal));
+    simulation.registerEvent(
+      simulation.currentFrame,
+      HpChangeEvent(
+        uniqueId,
+        changeAmount: changeValue,
+        afterChangeHp: currentHp,
+        maxHp: getMaxHp(simulation),
+        isHeal: isHeal,
+      ),
+    );
   }
 
   int getAttackBuffValues(BattleSimulation simulation) {
@@ -153,7 +162,13 @@ abstract class BattleEntity {
     if (previousMaxHp != afterMaxHp) {
       simulation.registerEvent(
         simulation.nextFrame,
-        HpChangeEvent(simulation, this, afterMaxHp - previousMaxHp, isMaxHpOnly: true),
+        HpChangeEvent(
+          uniqueId,
+          changeAmount: afterMaxHp - previousMaxHp,
+          afterChangeHp: currentHp,
+          maxHp: getMaxHp(simulation),
+          isMaxHpOnly: true,
+        ),
       );
     }
   }

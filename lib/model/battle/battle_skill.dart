@@ -190,7 +190,12 @@ class BattleSkill {
         simulation.reEnterBurstCd = timeDataToFrame(constData.sameBurstStageCd, simulation.fps);
         simulation.registerEvent(
           simulation.currentFrame,
-          ChangeBurstStepEvent(ownerUniqueId, simulation.burstStage, nextStageNum, owner.characterData.burstDuration),
+          ChangeBurstStepEvent(
+            ownerUniqueId,
+            currentStage: simulation.burstStage,
+            nextStage: nextStageNum,
+            duration: owner.characterData.burstDuration,
+          ),
         );
       }
     }

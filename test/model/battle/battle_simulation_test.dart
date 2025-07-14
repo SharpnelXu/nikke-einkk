@@ -506,22 +506,22 @@ void main() async {
       final toStage1 =
           simulation.timeline[firstBurstFrame]!.firstWhere((event) => event is ChangeBurstStepEvent)
               as ChangeBurstStepEvent;
-      expect(toStage1.ownerUniqueId, -1);
+      expect(toStage1.activatorId, -1);
       expect(toStage1.nextStage, 1);
       final toStage2 =
           simulation.timeline[firstBurstFrame - 1]!.firstWhere((event) => event is ChangeBurstStepEvent)
               as ChangeBurstStepEvent;
-      expect(toStage2.ownerUniqueId, 1);
+      expect(toStage2.activatorId, 1);
       expect(toStage2.nextStage, 2);
       final toStage3 =
           simulation.timeline[firstBurstFrame - 2]!.firstWhere((event) => event is ChangeBurstStepEvent)
               as ChangeBurstStepEvent;
-      expect(toStage3.ownerUniqueId, 2);
+      expect(toStage3.activatorId, 2);
       expect(toStage3.nextStage, 3);
       final toStage4 =
           simulation.timeline[firstBurstFrame - 3]!.firstWhere((event) => event is ChangeBurstStepEvent)
               as ChangeBurstStepEvent;
-      expect(toStage4.ownerUniqueId, 3);
+      expect(toStage4.activatorId, 3);
       expect(toStage4.nextStage, 4);
       expect(toStage4.duration, 1000);
 
@@ -531,7 +531,7 @@ void main() async {
           simulation.timeline[nextLiterBurstFrame]!.firstWhereOrNull((event) => event is ChangeBurstStepEvent)
               as ChangeBurstStepEvent?;
       expect(nextLiterBurst, isNotNull);
-      expect(nextLiterBurst!.ownerUniqueId, 1);
+      expect(nextLiterBurst!.activatorId, 1);
       expect(nextLiterBurst.nextStage, 2);
 
       final thirdLiterBurstFrame = nextLiterBurstFrame - 1200 + ((2.34 + 2.7) * 60).round();
@@ -540,7 +540,7 @@ void main() async {
           simulation.timeline[thirdLiterBurstFrame]!.firstWhereOrNull((event) => event is ChangeBurstStepEvent)
               as ChangeBurstStepEvent?;
       expect(thirdLiterBurst, isNotNull);
-      expect(thirdLiterBurst!.ownerUniqueId, 1);
+      expect(thirdLiterBurst!.activatorId, 1);
       expect(thirdLiterBurst.nextStage, 2);
 
       final fourthLiterBurstFrame = thirdLiterBurstFrame - 1200 + ((2.34 + 2.7 + 3.17) * 60).round();
@@ -549,7 +549,7 @@ void main() async {
           simulation.timeline[fourthLiterBurstFrame]!.firstWhereOrNull((event) => event is ChangeBurstStepEvent)
               as ChangeBurstStepEvent?;
       expect(fourthLiterBurst, isNotNull);
-      expect(fourthLiterBurst!.ownerUniqueId, 1);
+      expect(fourthLiterBurst!.activatorId, 1);
       expect(fourthLiterBurst.nextStage, 2);
     });
 

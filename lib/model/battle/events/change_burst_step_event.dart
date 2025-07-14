@@ -9,7 +9,14 @@ class ChangeBurstStepEvent extends BattleEvent {
   final int nextStage;
   final int duration;
 
-  ChangeBurstStepEvent(super.activatorId, this.currentStage, this.nextStage, this.duration);
+  ChangeBurstStepEvent.byField({required this.currentStage, required this.nextStage}) : duration = -1;
+
+  ChangeBurstStepEvent(
+    super.activatorId, {
+    required this.currentStage,
+    required this.nextStage,
+    required this.duration,
+  });
 
   @override
   Widget buildDisplayV2(BattleSimulation simulation) {

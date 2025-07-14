@@ -7,7 +7,7 @@ import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/battle_skill.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
 import 'package:nikke_einkk/model/battle/events/burst_gen_event.dart';
-import 'package:nikke_einkk/model/battle/events/exit_full_burst_event.dart';
+import 'package:nikke_einkk/model/battle/events/change_burst_step_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_fire_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_reload_event.dart';
@@ -568,7 +568,7 @@ class BattleNikke extends BattleEntity {
       processDamageEvent(event, simulation);
     }
 
-    if (event is ExitFullBurstEvent) {
+    if (event is ChangeBurstStepEvent && event.currentStage == 4 && event.nextStage == 0) {
       activatedBurstSkillThisCycle = false;
     }
 

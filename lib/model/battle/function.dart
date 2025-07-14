@@ -317,7 +317,13 @@ class BattleFunction {
         final afterMaxHp = target.getMaxHp(simulation);
         simulation.registerEvent(
           simulation.currentFrame,
-          HpChangeEvent(simulation, target, afterMaxHp - previousMaxHp, isMaxHpOnly: true),
+          HpChangeEvent(
+            target.uniqueId,
+            changeAmount: afterMaxHp - previousMaxHp,
+            afterChangeHp: target.currentHp,
+            maxHp: afterMaxHp,
+            isMaxHpOnly: true,
+          ),
         );
       }
     }

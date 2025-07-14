@@ -1,41 +1,56 @@
 import 'package:flutter/cupertino.dart';
-import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
+import 'package:nikke_einkk/module/common/custom_table.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 class HpChangeEvent extends BattleEvent {
-  late String name;
-  late int ownerUniqueId; // who changed hp
+  bool isHeal;
+
   late int afterChangeHp;
   late int maxHp;
   bool isMaxHpOnly;
-  bool isHeal;
   int changeAmount;
 
   HpChangeEvent(
-    BattleSimulation simulation,
-    BattleEntity entity,
-    this.changeAmount, {
-    this.isMaxHpOnly = false,
+    super.activatorId, {
+    required this.changeAmount,
+    required this.afterChangeHp,
+    required this.maxHp,
     this.isHeal = false,
+    this.isMaxHpOnly = false,
   }) {
-    name = entity.name;
-    ownerUniqueId = entity.uniqueId;
-    afterChangeHp = entity.currentHp;
-    maxHp = entity.getMaxHp(simulation);
+    targetIds.add(activatorId);
   }
 
-  @override
-  int getActivatorId() {
-    return ownerUniqueId;
-  }
+  int get targetId => targetIds.first;
 
   @override
-  Widget buildDisplay() {
+  Widget buildDisplayV2(BattleSimulation simulation) {
     final hpPercent = (afterChangeHp / maxHp * 100).toStringAsFixed(2);
-    return Text(
-      '$name (Pos $ownerUniqueId) ${isMaxHpOnly ? 'Max' : ''}HP change:'
-      ' $changeAmount ($hpPercent% $afterChangeHp/$maxHp)',
+    return CustomTable(
+      children: [
+        CustomTableRow(
+          children: [
+            battleHeaderData.copyWith(text: '${isMaxHpOnly ? 'Max ' : ''}HP Change', flex: 2),
+            battleHeaderData.copyWith(text: 'Target', flex: 1),
+            battleHeaderData.copyWith(text: 'Is Heal', flex: 1),
+          ],
+        ),
+        CustomTableRow(
+          children: [
+            TableCellData(
+              text:
+                  '${changeAmount >= 0 ? '+' : ''}'
+                  '${changeAmount.decimalPattern}'
+                  ' (${afterChangeHp.decimalPattern} / ${maxHp.decimalPattern}, $hpPercent%)',
+              flex: 2,
+            ),
+            TableCellData(text: '${simulation.getEntityName(targetId)}', flex: 1),
+            TableCellData(text: '$isHeal', flex: 1),
+          ],
+        ),
+      ],
     );
   }
 }
