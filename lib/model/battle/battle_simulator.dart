@@ -103,7 +103,7 @@ class BattleSimulation {
     }
 
     if (playerOptions.forceFillBurst && burstStage == 0) {
-      registerEvent(currentFrame, ChangeBurstStepEvent(this, -1, 1, -1));
+      registerEvent(currentFrame, ChangeBurstStepEvent(-1, 0, 1, -1));
       burstStage = 1;
     }
 
@@ -125,7 +125,7 @@ class BattleSimulation {
           burstMeter += event.burst;
 
           if (burstMeter == constData.burstMeterCap) {
-            registerEvent(currentFrame, ChangeBurstStepEvent(this, -1, 1, -1));
+            registerEvent(currentFrame, ChangeBurstStepEvent(-1, 0, 1, -1));
             burstStage = 1;
             burstMeter = 0;
           }
@@ -163,81 +163,10 @@ class BattleSimulation {
   void simulate() {
     if (nonnullNikkes.isEmpty) return;
 
-    timeline.clear();
-    burstMeter = 0;
-    burstStage = 0;
-    reEnterBurstCd = 0;
-    burstStageFramesLeft = 0;
-    currentNikke = min(nonnullNikkes.length, currentNikke);
-    for (int index = 0; index < nonnullNikkes.length; index += 1) {
-      nonnullNikkes[index].init(this, index + 1);
-    }
-    for (int index = 0; index < raptures.length; index += 1) {
-      raptures[index].init(this, index + 11);
-    }
+    init();
 
-    currentFrame = maxFrames + 1;
-    // BattleStart
-    for (final nikke in nonnullNikkes) {
-      nikke.broadcast(BattleStartEvent.battleStartEvent, this);
-    }
-
-    for (currentFrame = maxFrames; currentFrame > 0; currentFrame -= 1) {
-      for (final entity in [...nonnullNikkes, ...raptures]) {
-        entity.normalAction(this);
-      }
-
-      if (playerOptions.forceFillBurst && burstStage == 0) {
-        registerEvent(currentFrame, ChangeBurstStepEvent(this, -1, 1, -1));
-        burstStage = 1;
-      }
-
-      reEnterBurstCd = max(0, reEnterBurstCd - 1);
-      burstStageFramesLeft = max(0, burstStageFramesLeft - 1);
-      if (burstStage > 1 && burstStageFramesLeft == 0) {
-        if (burstStage == 4) {
-          registerEvent(currentFrame, ExitFullBurstEvent.exitFullBurstEvent);
-        }
-        burstStage = 0;
-      }
-
-      // broadcast all events registered for this frame
-      for (int index = 0; index < (timeline[currentFrame]?.length ?? 0); index += 1) {
-        final event = timeline[currentFrame]![index];
-
-        if (event is BurstGenerationEvent) {
-          if (burstStage == 0) {
-            burstMeter += event.burst;
-
-            if (burstMeter == constData.burstMeterCap) {
-              registerEvent(currentFrame, ChangeBurstStepEvent(this, -1, 1, -1));
-              burstStage = 1;
-              burstMeter = 0;
-            }
-          }
-        }
-
-        if (event is ChangeBurstStepEvent) {
-          if (event.nextStage > event.currentStage) {
-            reEnterBurstCd = 0;
-          }
-          burstStage = event.nextStage;
-          burstStageFramesLeft = timeDataToFrame(event.duration, fps);
-          burstStageFramesLeft = max(0, burstStageFramesLeft);
-        }
-
-        for (final nikke in nonnullNikkes) {
-          nikke.broadcast(event, this);
-        }
-
-        for (final rapture in raptures) {
-          rapture.broadcast(event, this);
-        }
-      }
-
-      for (final entity in [...nonnullNikkes, ...raptures]) {
-        entity.endCurrentFrame(this);
-      }
+    while (currentFrame > 0) {
+      proceedOneFrame();
     }
   }
 

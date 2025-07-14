@@ -1,30 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
+import 'package:nikke_einkk/module/common/custom_table.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 class ChangeBurstStepEvent extends BattleEvent {
-  late String? name;
-  final int ownerUniqueId;
-  late int currentStage;
-  late int nextStage;
-  late int duration;
+  final int currentStage;
+  final int nextStage;
+  final int duration;
 
-  ChangeBurstStepEvent(BattleSimulation simulation, this.ownerUniqueId, this.nextStage, this.duration) {
-    final owner = simulation.getNikkeOnPosition(ownerUniqueId);
-    name = owner?.name;
-    currentStage = simulation.burstStage;
-  }
+  ChangeBurstStepEvent(super.activatorId, this.currentStage, this.nextStage, this.duration);
 
   @override
-  int getActivatorId() {
-    return ownerUniqueId;
-  }
-
-  @override
-  Widget buildDisplay() {
-    return Text(
-      'Burst stage $currentStage -> $nextStage ${name != null ? 'by $name (Pos $ownerUniqueId) '
-              'Duration ${(duration / 100).toStringAsFixed(2)}s' : ''}',
+  Widget buildDisplayV2(BattleSimulation simulation) {
+    return CustomTable(
+      children: [
+        CustomTableRow.fromTexts(
+          texts: ['Burst Step', if (activatorId > 0) 'Activator', if (duration > 0) 'Duration'],
+          defaults: battleHeaderData,
+        ),
+        CustomTableRow.fromTexts(
+          texts: [
+            'Step $currentStage → $nextStage',
+            if (activatorId > 0) '${simulation.getEntityName(activatorId)}',
+            if (duration > 0) duration.timeString,
+          ],
+        ),
+      ],
     );
   }
 }
