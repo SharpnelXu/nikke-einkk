@@ -121,7 +121,6 @@ class BattleSimulation {
       final event = timeline[currentFrame]![index];
 
       if (event is BurstGenerationEvent) {
-        event.currentMeter = burstMeter;
         if (burstStage == 0) {
           burstMeter += event.burst;
 
@@ -207,7 +206,6 @@ class BattleSimulation {
         final event = timeline[currentFrame]![index];
 
         if (event is BurstGenerationEvent) {
-          event.currentMeter = burstMeter;
           if (burstStage == 0) {
             burstMeter += event.burst;
 

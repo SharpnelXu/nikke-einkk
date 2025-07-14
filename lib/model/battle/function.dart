@@ -479,7 +479,7 @@ class BattleFunction {
           final burst = toModifier(data.functionValue) * constData.burstMeterCap;
           simulation.registerEvent(
             simulation.currentFrame,
-            BurstGenerationEvent.fill(simulation: simulation, nikke: target, burst: burst.round()),
+            BurstGenerationEvent.fill(simulation, target, burst.round(), source),
           );
         }
         break;

@@ -737,6 +737,8 @@ enum WeaponType {
 
   static const List<WeaponType> chargeWeaponTypes = [WeaponType.rl, WeaponType.sr];
 
+  bool get isCharge => chargeWeaponTypes.contains(this);
+
   @override
   String toString() {
     return name.toUpperCase();

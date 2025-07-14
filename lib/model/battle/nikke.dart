@@ -492,10 +492,7 @@ class BattleNikke extends BattleEntity {
       NikkeDamageEvent.bullet(simulation: simulation, nikke: this, rapture: target),
     );
     if (simulation.burstStage == 0) {
-      simulation.registerEvent(
-        simulation.currentFrame,
-        BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
-      );
+      simulation.registerEvent(simulation.currentFrame, BurstGenerationEvent.bullet(simulation, this, target));
     }
     if (getPierce(simulation) > 0) {
       for (final part in target.parts) {
@@ -505,10 +502,7 @@ class BattleNikke extends BattleEntity {
             NikkeDamageEvent.piercePart(simulation: simulation, nikke: this, rapture: target, part: part),
           );
           if (simulation.burstStage == 0) {
-            simulation.registerEvent(
-              simulation.currentFrame,
-              BurstGenerationEvent(simulation: simulation, nikke: this, rapture: target),
-            );
+            simulation.registerEvent(simulation.currentFrame, BurstGenerationEvent.bullet(simulation, this, target));
           }
         }
       }
