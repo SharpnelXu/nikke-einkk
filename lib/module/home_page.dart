@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nikke_einkk/main.dart';
+import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/module/about/about.dart';
 import 'package:nikke_einkk/module/api/data_downloader.dart';
 import 'package:nikke_einkk/module/api/locale_unpacker.dart';
@@ -141,6 +143,24 @@ class EinkkHomePage extends StatelessWidget {
         itemBuilder: (ctx, idx) => items[idx],
         separatorBuilder: (ctx, idx) => const Divider(),
         itemCount: items.length,
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 5,
+          children: [
+            Text('Dark Mode: '),
+            DropdownMenu(
+              initialSelection: userDb.userData.themeMode,
+              onSelected: (v) {
+                Einkk.of(context).changeTheme(v!);
+              },
+              dropdownMenuEntries:
+                  ThemeMode.values.map((mode) => DropdownMenuEntry(value: mode, label: mode.name)).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }

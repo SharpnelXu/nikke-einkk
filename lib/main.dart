@@ -46,6 +46,8 @@ class Einkk extends StatefulWidget {
 
   @override
   State<Einkk> createState() => _EinkkState();
+
+  static _EinkkState of(BuildContext context) => context.findAncestorStateOfType<_EinkkState>()!;
 }
 
 class _EinkkState extends State<Einkk> with WindowListener {
@@ -53,6 +55,12 @@ class _EinkkState extends State<Einkk> with WindowListener {
   void initState() {
     super.initState();
     windowManager.addListener(this);
+  }
+
+  void changeTheme(ThemeMode themeMode) {
+    setState(() {
+      userDb.userData.themeMode = themeMode;
+    });
   }
 
   @override
@@ -86,8 +94,14 @@ class _EinkkState extends State<Einkk> with WindowListener {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        brightness: Brightness.light,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.light),
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue, brightness: Brightness.dark),
+      ),
+      themeMode: userDb.userData.themeMode,
       home: EinkkHomePage(),
       builder: EasyLoading.init(),
     );

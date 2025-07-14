@@ -29,10 +29,10 @@ class NikkeIcon extends StatelessWidget {
     final name = locale.getTranslation(characterData?.nameLocalkey) ?? characterData?.resourceId ?? defaultText;
     final colors =
         characterData?.elementId
-            .map((eleId) => NikkeElement.fromId(eleId).color.withAlpha(isSelected ? 255 : 50))
+            .map((eleId) => NikkeElement.fromId(eleId).color.withAlpha(isSelected ? 255 : 150))
             .toList();
 
-    final textStyle = TextStyle(fontSize: 12, color: isSelected && characterData != null ? Colors.white : Colors.black);
+    final textStyle = TextStyle(fontSize: 12, color: isSelected && characterData != null ? Colors.white : null);
     return Container(
       width: avatarSize,
       height: avatarSize,
@@ -40,7 +40,12 @@ class NikkeIcon extends StatelessWidget {
       padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
         border: Border.all(
-          color: characterData?.isVisible ?? true ? characterData?.originalRare.color ?? Colors.black : Colors.red,
+          color:
+              characterData?.isVisible ?? true
+                  ? characterData?.originalRare.color ??
+                      DefaultTextStyle.of(context).style.color ??
+                      Theme.of(context).primaryColor
+                  : Colors.red,
           width: 3,
         ),
         borderRadius: BorderRadius.circular(5),

@@ -4,6 +4,7 @@
 - Format data, but seems to be at the cost of slower processing time
 - Fix monsterSkill hit ratio display
 - Detailed BP display
+- Dark Mode
 
 ## 0.1.4
 - Nikke setup & stat calculation

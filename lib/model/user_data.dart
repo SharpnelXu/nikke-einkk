@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
@@ -217,6 +218,7 @@ class UserData {
   Map<int, NikkeOptions> cnNikkeOptions = {};
   Map<int, int> globalCubeLvs = {};
   Map<int, int> cnCubeLvs = {};
+  ThemeMode themeMode = ThemeMode.system;
 
   UserData({
     this.language = Language.en,
@@ -227,6 +229,7 @@ class UserData {
     List<HarmonyCubeOption> cubes = const [],
     Map<int, int> globalCubeLvs = const {},
     Map<int, int> cnCubeLvs = const {},
+    this.themeMode = ThemeMode.system,
   }) {
     if (globalPlayerOptions != null) {
       this.globalPlayerOptions = globalPlayerOptions.copy();

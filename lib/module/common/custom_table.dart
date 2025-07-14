@@ -208,7 +208,7 @@ class TableCellData {
   Color? resolveColor(BuildContext context) {
     if (color != null) return color;
     if (isHeader) {
-      return headerColorLight;
+      return Theme.of(context).brightness == Brightness.dark ? headerColorDark : headerColorLight;
     }
     return null;
   }
