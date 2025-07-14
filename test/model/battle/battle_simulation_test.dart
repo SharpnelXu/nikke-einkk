@@ -13,6 +13,7 @@ import 'package:nikke_einkk/model/equipment.dart';
 import 'package:nikke_einkk/model/favorite_item.dart';
 import 'package:nikke_einkk/model/harmony_cube.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 
 import '../../test_helper.dart';
@@ -430,12 +431,12 @@ void main() async {
 
       expect(simulation.timeline[5093]!.length, 5); // S1
       final damageEventSkill1SnowWhite = simulation.timeline[5093]![3] as NikkeDamageEvent;
-      expect(damageEventSkill1SnowWhite.type, NikkeDamageType.skill);
+      expect(damageEventSkill1SnowWhite.source, Source.skill1);
       expect(damageEventSkill1SnowWhite.damageParameter.calculateDamage(), 1212706);
 
       expect(simulation.timeline[4501]!.length, 2); // S2
       final damageEventSkill2SnowWhite = simulation.timeline[4501]![1] as NikkeDamageEvent;
-      expect(damageEventSkill2SnowWhite.type, NikkeDamageType.skill);
+      expect(damageEventSkill2SnowWhite.source, Source.skill2);
       expect(damageEventSkill2SnowWhite.damageParameter.calculateDamage(), 2422566);
     });
 
@@ -639,8 +640,7 @@ void main() async {
       );
       final scarletBurstDamageEvent =
           simulation.timeline[burstTimeFrame]!.firstWhere(
-                (event) =>
-                    event is NikkeDamageEvent && event.type == NikkeDamageType.skill && event.attackerUniqueId == 4,
+                (event) => event is NikkeDamageEvent && event.source == Source.burst && event.activatorId == 4,
               )
               as NikkeDamageEvent;
       expect(scarletBurstDamageEvent.damageParameter.calculateDamage(), 48325502 + 3); // 3 more than actual
@@ -649,22 +649,19 @@ void main() async {
         (frame) =>
             frame < burstTimeFrame &&
             simulation.timeline[frame]!.any(
-              (event) =>
-                  event is NikkeDamageEvent && event.type == NikkeDamageType.bullet && event.attackerUniqueId == 3,
+              (event) => event is NikkeDamageEvent && event.source == Source.bullet && event.activatorId == 3,
             ),
       );
       final scarletDamageEventPos4 =
           simulation.timeline[scarletDamageFrameAfterBurst]!.firstWhere(
-                (event) =>
-                    event is NikkeDamageEvent && event.type == NikkeDamageType.bullet && event.attackerUniqueId == 4,
+                (event) => event is NikkeDamageEvent && event.source == Source.bullet && event.activatorId == 4,
               )
               as NikkeDamageEvent;
       expect(scarletDamageEventPos4.damageParameter.calculateDamage(), 3171493);
 
       final scarletDamageEventPos3 =
           simulation.timeline[scarletDamageFrameAfterBurst]!.firstWhere(
-                (event) =>
-                    event is NikkeDamageEvent && event.type == NikkeDamageType.bullet && event.attackerUniqueId == 3,
+                (event) => event is NikkeDamageEvent && event.source == Source.bullet && event.activatorId == 3,
               )
               as NikkeDamageEvent;
       expect(scarletDamageEventPos3.damageParameter.calculateDamage(), 2774043);

@@ -1,29 +1,25 @@
 import 'package:flutter/cupertino.dart';
+import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
+import 'package:nikke_einkk/module/common/custom_table.dart';
 
 class NikkeReloadStartEvent extends BattleEvent {
-  String name;
-  num reloadTimeData;
-  int reloadFrames;
-  int ownerUniqueId;
+  final int reloadFrames;
 
-  NikkeReloadStartEvent({
-    required this.name,
-    required this.reloadTimeData,
-    required this.reloadFrames,
-    required this.ownerUniqueId,
-  });
+  NikkeReloadStartEvent(super.activatorId, this.reloadFrames);
 
   @override
-  int getActivatorId() {
-    return ownerUniqueId;
-  }
-
-  @override
-  Widget buildDisplay() {
-    return Text(
-      '$name (Pos $ownerUniqueId) reloading: '
-      '${(reloadTimeData / 100).toStringAsFixed(2)}s ($reloadFrames frames)',
+  Widget buildDisplayV2(BattleSimulation simulation) {
+    return CustomTable(
+      children: [
+        CustomTableRow.fromTexts(texts: ['Reloading', 'Activator'], defaults: battleHeaderData),
+        CustomTableRow.fromTexts(
+          texts: [
+            '${(reloadFrames / simulation.fps).toStringAsFixed(2)} s ($reloadFrames Frames)',
+            '${simulation.getEntityName(activatorId)}',
+          ],
+        ),
+      ],
     );
   }
 }

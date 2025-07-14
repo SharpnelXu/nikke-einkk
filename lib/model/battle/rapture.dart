@@ -471,6 +471,17 @@ class BattleRapture extends BattleEntity {
     return parts.firstWhereOrNull((part) => !part.isBehindBoss && part.hp > 0)?.id;
   }
 
+  bool validateBulletDamage(BattleNikke attacker) {
+    return !invincible &&
+        !outsideScreen &&
+        (elementalShield.isEmpty || attacker.effectiveElements.any((ele) => elementalShield.contains(ele)));
+  }
+
+  bool validateSkillDamage(BattleNikke attacker) {
+    return !invincible &&
+        (elementalShield.isEmpty || attacker.effectiveElements.any((ele) => elementalShield.contains(ele)));
+  }
+
   @override
   void normalAction(BattleSimulation simulation) {
     super.normalAction(simulation);
@@ -581,7 +592,7 @@ class BattleRapture extends BattleEntity {
 
             simulation.registerEvent(
               simulation.currentFrame,
-              RaptureDamageEvent(simulation: simulation, rapture: this, nikke: target, damageRate: action.damageRate!),
+              RaptureDamageEvent.create(simulation, this, target, action.damageRate!),
             );
           }
           break;
@@ -655,7 +666,7 @@ class BattleRapture extends BattleEntity {
   }
 
   void broadcast(BattleEvent event, BattleSimulation simulation) {
-    if (event is NikkeDamageEvent && event.targetUniqueId == uniqueId) {
+    if (event is NikkeDamageEvent && event.targetId == uniqueId) {
       for (final buff in buffs) {
         if (buff.data.durationType == DurationType.shots &&
             simulation.db.onHitFunctionTypes.contains(buff.data.functionType)) {

@@ -313,15 +313,7 @@ class BattleNikke extends BattleEntity {
 
       fullReloadFrameCount = max(timeDataToFrame(baseReloadTimeData, fps), 1);
 
-      simulation.registerEvent(
-        simulation.currentFrame,
-        NikkeReloadStartEvent(
-          name: name,
-          reloadTimeData: baseReloadTimeData,
-          reloadFrames: fullReloadFrameCount,
-          ownerUniqueId: uniqueId,
-        ),
-      );
+      simulation.registerEvent(simulation.currentFrame, NikkeReloadStartEvent(uniqueId, fullReloadFrameCount));
     }
 
     reloadingFrameCount += 1;
@@ -376,13 +368,7 @@ class BattleNikke extends BattleEntity {
 
         simulation.registerEvent(
           simulation.currentFrame,
-          NikkeFireEvent(
-            name: name,
-            currentAmmo: currentAmmo,
-            maxAmmo: getMaxAmmo(simulation),
-            ownerUniqueId: uniqueId,
-            isFullCharge: false,
-          ),
+          NikkeFireEvent(uniqueId, currentAmmo: currentAmmo, maxAmmo: getMaxAmmo(simulation), isFullCharge: false),
         );
         if (currentWeaponData.fireType == FireType.instant) {
           generateDamageAndBurstEvents(simulation, simulation.currentFrame, target);
@@ -411,10 +397,9 @@ class BattleNikke extends BattleEntity {
           simulation.registerEvent(
             simulation.currentFrame,
             NikkeFireEvent(
-              name: name,
+              uniqueId,
               currentAmmo: currentAmmo,
               maxAmmo: getMaxAmmo(simulation),
-              ownerUniqueId: uniqueId,
               isFullCharge: chargeFrames >= framesToFullCharge,
             ),
           );
@@ -437,10 +422,9 @@ class BattleNikke extends BattleEntity {
             simulation.registerEvent(
               fireFrame,
               NikkeFireEvent(
-                name: name,
+                uniqueId,
                 currentAmmo: currentAmmo,
                 maxAmmo: getMaxAmmo(simulation),
-                ownerUniqueId: uniqueId,
                 isFullCharge: chargeFrames >= framesToFullCharge,
               ),
             );
@@ -544,7 +528,7 @@ class BattleNikke extends BattleEntity {
   }
 
   void broadcast(BattleEvent event, BattleSimulation simulation) {
-    if (event is NikkeFireEvent && event.ownerUniqueId == uniqueId) {
+    if (event is NikkeFireEvent && event.activatorId == uniqueId) {
       currentAmmo = max(0, currentAmmo - 1);
       totalBulletsFired += 1;
 
@@ -564,7 +548,7 @@ class BattleNikke extends BattleEntity {
       }
     }
 
-    if (event is NikkeDamageEvent && event.attackerUniqueId == uniqueId) {
+    if (event is NikkeDamageEvent && event.activatorId == uniqueId) {
       processDamageEvent(event, simulation);
     }
 
@@ -572,7 +556,7 @@ class BattleNikke extends BattleEntity {
       activatedBurstSkillThisCycle = false;
     }
 
-    if (event is RaptureDamageEvent && event.targetUniqueId == uniqueId) {
+    if (event is RaptureDamageEvent && event.targetId == uniqueId) {
       for (final buff in buffs) {
         if (buff.data.durationType == DurationType.shots && db.onHitFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
@@ -586,10 +570,10 @@ class BattleNikke extends BattleEntity {
   }
 
   void processDamageEvent(NikkeDamageEvent event, BattleSimulation simulation) {
-    final rapture = simulation.getRaptureByUniqueId(event.targetUniqueId);
+    final rapture = simulation.getRaptureByUniqueId(event.targetId);
     if (rapture == null) return;
 
-    if (event.type == NikkeDamageType.bullet) {
+    if (event.source == Source.bullet) {
       totalBulletsHit += 1;
     }
 

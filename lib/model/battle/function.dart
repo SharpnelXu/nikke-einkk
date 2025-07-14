@@ -42,7 +42,7 @@ class BattleFunction {
     switch (data.timingTriggerType) {
       case TimingTriggerType.onHitNum:
         // triggerStandard: {user, none}, majority is user
-        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId || event.type != NikkeDamageType.bullet) {
+        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId || event.source != Source.bullet) {
           return;
         }
 
@@ -125,14 +125,18 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onFullChargeHit:
-        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId) return;
+        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId || event.source != Source.bullet) {
+          return;
+        }
 
         if (standard is BattleNikke && event.chargePercent >= 10000) {
           executeFunction(event, simulation);
         }
         break;
       case TimingTriggerType.onFullChargeHitNum:
-        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId) return;
+        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId || event.source != Source.bullet) {
+          return;
+        }
 
         if (standard is BattleNikke &&
             event.chargePercent >= 10000 &&
@@ -171,7 +175,7 @@ class BattleFunction {
         // triggerValue is probability
         if (event is! NikkeDamageEvent || standard is! BattleNikke || standard.uniqueId != ownerUniqueId) return;
 
-        if (event.type == NikkeDamageType.bullet && standard.currentAmmo == 0) {
+        if (event.source == Source.bullet && standard.currentAmmo == 0) {
           executeFunction(event, simulation);
         }
         break;
@@ -410,6 +414,7 @@ class BattleFunction {
                 nikke: simulation.getNikkeOnPosition(ownerUniqueId)!,
                 rapture: target,
                 damageRate: data.functionValue,
+                source: source,
               ),
             );
           }

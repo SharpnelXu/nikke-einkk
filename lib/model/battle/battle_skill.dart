@@ -133,6 +133,7 @@ class BattleSkill {
                 simulation: simulation,
                 nikke: simulation.getNikkeOnPosition(ownerUniqueId)!,
                 rapture: target,
+                source: source,
                 damageRate: skillData.skillValueData[0].skillValue,
                 isShareDamage: shareDamage,
               ),

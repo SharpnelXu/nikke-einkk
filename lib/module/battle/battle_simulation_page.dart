@@ -113,7 +113,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
         if (events != null) {
           for (final event in events) {
             if (event is NikkeDamageEvent) {
-              final nikkeDamageList = dpsMap[event.attackerUniqueId]!;
+              final nikkeDamageList = dpsMap[event.activatorId]!;
               final sum = nikkeDamageList[nikkeDamageList.length - 1];
               nikkeDamageList[nikkeDamageList.length - 1] = sum + event.damageParameter.calculateExpectedDamage();
             }

@@ -204,9 +204,9 @@ class BattleSimulation {
     for (final events in timeline.values) {
       for (final event in events) {
         if (event is NikkeDamageEvent) {
-          totalDamage.putIfAbsent(event.attackerUniqueId, () => 0);
-          totalDamage[event.attackerUniqueId] =
-              totalDamage[event.attackerUniqueId]! + event.damageParameter.calculateExpectedDamage();
+          totalDamage.putIfAbsent(event.activatorId, () => 0);
+          totalDamage[event.activatorId] =
+              totalDamage[event.activatorId]! + event.damageParameter.calculateExpectedDamage();
         }
       }
     }

@@ -5,35 +5,22 @@ import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/module/common/custom_table.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 class RaptureDamageEvent extends BattleEvent {
-  late int attackerUniqueId;
-  late int targetUniqueId;
-  late String name;
   late NikkeDamageParameter damageParameter;
   late bool invalid;
 
-  @override
-  int getActivatorId() {
-    return attackerUniqueId;
-  }
+  RaptureDamageEvent._(super.activatorId, super.targetIds, this.damageParameter, this.invalid);
 
-  @override
-  List<int> getTargetIds() {
-    return [targetUniqueId];
-  }
-
-  RaptureDamageEvent({
-    required BattleSimulation simulation,
-    required BattleRapture rapture,
-    required BattleNikke nikke,
-    required int damageRate,
-  }) {
-    name = nikke.name;
-    attackerUniqueId = rapture.uniqueId;
-    targetUniqueId = nikke.uniqueId;
-
-    damageParameter = NikkeDamageParameter(
+  factory RaptureDamageEvent.create(
+    BattleSimulation simulation,
+    BattleRapture rapture,
+    BattleNikke nikke,
+    int damageRate,
+  ) {
+    final damageParameter = NikkeDamageParameter(
       attack: rapture.baseAttack,
       attackBuff: rapture.getAttackBuffValues(simulation),
       defence: nikke.baseDefence,
@@ -42,11 +29,29 @@ class RaptureDamageEvent extends BattleEvent {
       isStrongElement: rapture.element.strongAgainst(nikke.element),
       damageReductionBuff: nikke.getDamageReductionBuffValues(simulation),
     );
-    invalid = nikke.buffs.any((buff) => buff.data.functionType == FunctionType.immuneDamage);
+    final invalid = nikke.buffs.any((buff) => buff.data.functionType == FunctionType.immuneDamage);
+    return RaptureDamageEvent._(rapture.uniqueId, [nikke.uniqueId], damageParameter, invalid);
   }
 
+  int get targetId => targetIds.first;
+
   @override
-  Widget buildDisplay() {
-    return Text('$name (pos $attackerUniqueId) received ${damageParameter.calculateExpectedDamage()} damage');
+  Widget buildDisplayV2(BattleSimulation simulation) {
+    return CustomTable(
+      children: [
+        CustomTableRow.fromTexts(
+          texts: ['Rapture Damage', 'Activator', 'Target', 'Invalid'],
+          defaults: battleHeaderData,
+        ),
+        CustomTableRow.fromTexts(
+          texts: [
+            damageParameter.calculateExpectedDamage().decimalPattern,
+            '${simulation.getEntityName(activatorId)}',
+            '${simulation.getEntityName(targetId)}',
+            '$invalid',
+          ],
+        ),
+      ],
+    );
   }
 }

@@ -19,11 +19,7 @@ class HpChangeEvent extends BattleEvent {
     required this.maxHp,
     this.isHeal = false,
     this.isMaxHpOnly = false,
-  }) {
-    targetIds.add(activatorId);
-  }
-
-  int get targetId => targetIds.first;
+  });
 
   @override
   Widget buildDisplayV2(BattleSimulation simulation) {
@@ -33,7 +29,7 @@ class HpChangeEvent extends BattleEvent {
         CustomTableRow(
           children: [
             battleHeaderData.copyWith(text: '${isMaxHpOnly ? 'Max ' : ''}HP Change', flex: 2),
-            battleHeaderData.copyWith(text: 'Target', flex: 1),
+            battleHeaderData.copyWith(text: 'Activator', flex: 1),
             battleHeaderData.copyWith(text: 'Is Heal', flex: 1),
           ],
         ),
@@ -46,7 +42,7 @@ class HpChangeEvent extends BattleEvent {
                   ' (${afterChangeHp.decimalPattern} / ${maxHp.decimalPattern}, $hpPercent%)',
               flex: 2,
             ),
-            TableCellData(text: '${simulation.getEntityName(targetId)}', flex: 1),
+            TableCellData(text: '${simulation.getEntityName(activatorId)}', flex: 1),
             TableCellData(text: '$isHeal', flex: 1),
           ],
         ),

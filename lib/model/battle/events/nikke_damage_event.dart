@@ -7,42 +7,48 @@ import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/module/common/custom_table.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 class NikkeDamageEvent extends BattleEvent {
-  late NikkeDamageType type;
-  late String name;
-  late int attackerUniqueId;
-  late int targetUniqueId;
-  late int chargePercent;
-  late int shotCount;
-  bool isShareDamage = false;
-  int shareCount = 0;
-  int? partId;
+  final NikkeDamageParameter damageParameter;
+  final Source source;
+  final bool invalid;
+  final int chargePercent;
+  final int shotCount;
+  final int shareCount;
+  final int? partId;
 
-  bool invalid = true;
+  int get targetId => targetIds.first;
 
-  late NikkeDamageParameter damageParameter;
+  NikkeDamageEvent._(
+    super.activatorId,
+    super.targetIds, {
+    required this.source,
+    required this.damageParameter,
+    required this.invalid,
+    this.chargePercent = 10000,
+    this.shotCount = 1,
+    this.partId,
+    this.shareCount = 0,
+  });
 
-  NikkeDamageEvent.bullet({
+  factory NikkeDamageEvent.bullet({
     required BattleSimulation simulation,
     required BattleNikke nikke,
     required BattleRapture rapture,
   }) {
-    name = nikke.name;
-    type = NikkeDamageType.bullet;
-    attackerUniqueId = nikke.uniqueId;
-    targetUniqueId = rapture.uniqueId;
     final weaponData = nikke.currentWeaponData;
-    shotCount = weaponData.shotCount;
-    chargePercent =
-        WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponType)
+    int chargePercent =
+        nikke.currentWeaponType.isCharge
             ? (10000 * nikke.chargeFrames / nikke.getFramesToFullCharge(simulation)).round()
             : 0;
     chargePercent = chargePercent.clamp(0, 10000);
     final pierce = nikke.getPierce(simulation);
-    partId = rapture.getPartsInFront();
+    final partId = rapture.getPartsInFront();
 
-    damageParameter = NikkeDamageParameter(
+    final damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
       defence: rapture.baseDefence,
@@ -70,33 +76,32 @@ class NikkeDamageEvent extends BattleEvent {
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
 
-    invalid =
-        rapture.invincible ||
-        rapture.outsideScreen ||
-        nikke.effectiveElements.every((ele) => !rapture.elementalShield.contains(ele));
+    return NikkeDamageEvent._(
+      nikke.uniqueId,
+      [rapture.uniqueId],
+      source: Source.bullet,
+      damageParameter: damageParameter,
+      invalid: !rapture.validateBulletDamage(nikke),
+      chargePercent: chargePercent,
+      shotCount: weaponData.shotCount,
+      partId: partId,
+    );
   }
 
-  NikkeDamageEvent.piercePart({
+  factory NikkeDamageEvent.piercePart({
     required BattleSimulation simulation,
     required BattleNikke nikke,
     required BattleRapture rapture,
     required BattleRaptureParts part,
   }) {
-    name = nikke.name;
-    type = NikkeDamageType.piercePart;
-    attackerUniqueId = nikke.uniqueId;
-    targetUniqueId = rapture.uniqueId;
     final weaponData = nikke.currentWeaponData;
-    shotCount = weaponData.shotCount;
-    chargePercent =
-        WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponType)
+    int chargePercent =
+        weaponData.weaponType.isCharge
             ? (10000 * nikke.chargeFrames / nikke.getFramesToFullCharge(simulation)).round()
             : 0;
     chargePercent = chargePercent.clamp(0, 10000);
-    partId = part.id;
 
-    // TODO: fill in other buff params
-    damageParameter = NikkeDamageParameter(
+    final damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
       defence: rapture.baseDefence,
@@ -122,30 +127,27 @@ class NikkeDamageEvent extends BattleEvent {
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
 
-    invalid =
-        rapture.invincible ||
-        rapture.outsideScreen ||
-        nikke.effectiveElements.every((ele) => !rapture.elementalShield.contains(ele));
+    return NikkeDamageEvent._(
+      nikke.uniqueId,
+      [rapture.uniqueId],
+      source: Source.bullet,
+      damageParameter: damageParameter,
+      invalid: !rapture.validateBulletDamage(nikke),
+      chargePercent: chargePercent,
+      shotCount: weaponData.shotCount,
+      partId: part.id,
+    );
   }
 
-  NikkeDamageEvent.skill({
+  factory NikkeDamageEvent.skill({
     required BattleSimulation simulation,
     required BattleNikke nikke,
     required BattleRapture rapture,
     required int damageRate,
-    this.isShareDamage = false,
+    required Source source,
+    bool isShareDamage = false,
   }) {
-    name = nikke.name;
-    type = NikkeDamageType.skill;
-    attackerUniqueId = nikke.uniqueId;
-    targetUniqueId = rapture.uniqueId;
-
-    shotCount = 1;
-    shareCount = simulation.raptures.length; // just share damage to all enemies
-    chargePercent = 0;
-
-    // TODO: fill in other buff params
-    damageParameter = NikkeDamageParameter(
+    final damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
       defence: rapture.baseDefence,
@@ -163,10 +165,17 @@ class NikkeDamageEvent extends BattleEvent {
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
     );
 
-    invalid = rapture.invincible || nikke.effectiveElements.every((ele) => !rapture.elementalShield.contains(ele));
+    return NikkeDamageEvent._(
+      nikke.uniqueId,
+      [rapture.uniqueId],
+      source: source,
+      damageParameter: damageParameter,
+      invalid: !rapture.validateSkillDamage(nikke),
+      shareCount: isShareDamage ? simulation.raptures.length : 0,
+    );
   }
 
-  int calculateCoreHitRate(BattleSimulation simulation, BattleNikke nikke, BattleRapture rapture) {
+  static int calculateCoreHitRate(BattleSimulation simulation, BattleNikke nikke, BattleRapture rapture) {
     if (rapture.coreSize == 0) {
       // no core
       return 0;
@@ -177,7 +186,7 @@ class NikkeDamageEvent extends BattleEvent {
       return 0;
     }
 
-    if (WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponType)) {
+    if (nikke.currentWeaponType.isCharge) {
       return 10000;
     }
 
@@ -187,46 +196,36 @@ class NikkeDamageEvent extends BattleEvent {
   }
 
   @override
-  int getActivatorId() {
-    return attackerUniqueId;
-  }
-
-  @override
-  List<int> getTargetIds() {
-    return [targetUniqueId];
-  }
-
-  @override
-  Widget buildDisplay() {
-    final criticalPercent = min(toModifier(damageParameter.criticalRate), 1);
-    final corePercent = min(toModifier(damageParameter.coreHitRate), 1);
-    final nonCritPercent = 1 - criticalPercent;
-    final nonCorePercent = 1 - corePercent;
-    final basePercent = nonCritPercent * nonCorePercent;
-    final coreCritPercent = criticalPercent * corePercent;
-
-    final nameText = '$name (Pos $attackerUniqueId) ${type.name} damage: ${damageParameter.calculateExpectedDamage()}';
-    final shotText = shotCount > 1 ? ' ($shotCount Shots)' : '';
-    final chargeText = chargePercent > 0 ? ' Charge: ${(chargePercent / 100).toStringAsFixed(2)}%' : '';
-    final baseText =
-        basePercent > 0 ? ' Base: ${damageParameter.calculateDamage()} ${(basePercent * 100).toStringAsFixed(2)}%' : '';
-    final coreText =
-        corePercent > 0
-            ? ' Core: ${damageParameter.calculateDamage(core: true)} ${(corePercent * 100).toStringAsFixed(2)}%'
-            : '';
-    final critText =
-        criticalPercent > 0
-            ? ' Crit: ${damageParameter.calculateDamage(critical: true)} ${(criticalPercent * 100).toStringAsFixed(2)}%'
-            : '';
-    final coreCritText =
-        coreCritPercent > 0
-            ? ' Core + Crit: ${damageParameter.calculateDamage(core: true, critical: true)}'
-                ' ${(criticalPercent * 100).toStringAsFixed(2)}%'
-            : '';
-    final shareText = isShareDamage ? ' Shared by $shotCount targets' : '';
-
-    return Text('$nameText$shotText$chargeText$baseText$coreText$critText$coreCritText$shareText');
+  Widget buildDisplayV2(BattleSimulation simulation) {
+    return CustomTable(
+      children: [
+        CustomTableRow(
+          children: [
+            battleHeaderData.copyWith(text: 'Nikke Damage', flex: 4),
+            battleHeaderData.copyWith(text: 'Activator', flex: 2),
+            battleHeaderData.copyWith(text: 'Target', flex: 2),
+            battleHeaderData.copyWith(text: 'Source', flex: 1),
+            battleHeaderData.copyWith(text: 'Invalid', flex: 1),
+          ],
+        ),
+        CustomTableRow(
+          children: [
+            TableCellData(
+              text:
+                  '${damageParameter.calculateExpectedDamage().decimalPattern}'
+                  '${shotCount > 1 ? ' ($shotCount shots)' : ''}'
+                  '${damageParameter.criticalRate > 0 ? ' Crit: ${damageParameter.criticalRate.percentString}' : ''}'
+                  '${damageParameter.coreHitRate > 0 ? ' Core: ${damageParameter.coreHitRate.percentString}' : ''}'
+                  '${shareCount > 0 ? ' (Shared by $shareCount targets)' : ''}',
+              flex: 4,
+            ),
+            TableCellData(text: '${simulation.getEntityName(activatorId)}', flex: 2),
+            TableCellData(text: '${simulation.getEntityName(targetId)}', flex: 2),
+            TableCellData(text: source.name.pascal, flex: 1),
+            TableCellData(text: '$invalid', flex: 1),
+          ],
+        ),
+      ],
+    );
   }
 }
-
-enum NikkeDamageType { bullet, skill, piercePart }
