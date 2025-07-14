@@ -36,7 +36,7 @@ class BattleSkill {
   void init(BattleSimulation simulation, BattleNikke nikke) {
     coolDown = 0;
 
-    if (skillType == SkillType.characterSkill) {
+    if (skillType == SkillType.characterSkill && skillData != null) {
       if (skillNum != 3) {
         // normal skills start with coolDown
         coolDown = timeDataToFrame(skillData!.skillCooltime, simulation.fps);
@@ -78,7 +78,7 @@ class BattleSkill {
     }
 
     if (coolDown == 0 && canUseSkill(simulation)) {
-      activateSkill(simulation, skillData!, ownerUniqueId, skillGroupId!, skillNum);
+      activateSkill(simulation, skillData!, ownerUniqueId, skillGroupId!, source);
       coolDown = timeDataToFrame(skillData!.skillCooltime, simulation.fps);
     }
   }
@@ -88,25 +88,24 @@ class BattleSkill {
     SkillData skillData,
     int ownerUniqueId,
     int skillGroupId,
-    int skillNum,
+    Source source,
   ) {
     final skillTargets = getSkillTargets(simulation, skillData, ownerUniqueId);
     final owner = simulation.getNikkeOnPosition(ownerUniqueId)!;
 
     final event = UseSkillEvent(
-      simulation,
-      skillData.id,
       ownerUniqueId,
-      skillGroupId,
-      skillNum,
       skillTargets.map((entity) => entity.uniqueId).toList(),
+      skillData.id,
+      skillGroupId,
+      source,
     );
     simulation.registerEvent(simulation.currentFrame, event);
 
     for (final beforeFuncId in [...skillData.beforeUseFunctionIdList, ...skillData.beforeHurtFunctionIdList]) {
       final functionData = simulation.db.functionTable[beforeFuncId];
       if (functionData != null) {
-        final function = BattleFunction(functionData, ownerUniqueId, getSource(skillNum));
+        final function = BattleFunction(functionData, ownerUniqueId, source);
         // connected function likely doesn't check trigger target
         function.executeFunction(event, simulation);
       }
@@ -175,14 +174,14 @@ class BattleSkill {
     for (final afterFuncId in [...skillData.afterUseFunctionIdList, ...skillData.afterHurtFunctionIdList]) {
       final functionData = simulation.db.functionTable[afterFuncId];
       if (functionData != null) {
-        final function = BattleFunction(functionData, ownerUniqueId, getSource(skillNum));
+        final function = BattleFunction(functionData, ownerUniqueId, source);
         // connected function likely doesn't check trigger target
         function.executeFunction(event, simulation);
       }
     }
 
     final nextStep = owner.characterData.changeBurstStep;
-    if (skillNum == 3) {
+    if (source == Source.burst) {
       owner.activatedBurstSkillThisCycle = true;
 
       if (validNextStep.contains(nextStep) && simulation.reEnterBurstCd == 0) {

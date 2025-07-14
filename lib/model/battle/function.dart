@@ -470,7 +470,7 @@ class BattleFunction {
               skill,
               target.uniqueId,
               simulation.db.skillInfoTable[skill.id]!.groupId,
-              -1,
+              source,
             );
           }
         }

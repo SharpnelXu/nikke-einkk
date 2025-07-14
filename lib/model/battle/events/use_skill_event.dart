@@ -1,41 +1,37 @@
 import 'package:flutter/cupertino.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
+import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/skills.dart';
+import 'package:nikke_einkk/module/common/custom_table.dart';
+import 'package:nikke_einkk/module/common/format_helper.dart';
 
 class UseSkillEvent extends BattleEvent {
-  late String name;
   final int skillId;
-  final int ownerUniqueId;
   final int skillGroup;
-  final int skillNum;
-  final List<int> skillTargetUniqueIds = [];
+  final Source source;
 
-  UseSkillEvent(
-    BattleSimulation simulation,
-    this.skillId,
-    this.ownerUniqueId,
-    this.skillGroup,
-    this.skillNum,
-    List<int> targetUniqueIds,
-  ) {
-    name = simulation.getEntityById(ownerUniqueId)!.name;
-    skillTargetUniqueIds.addAll(targetUniqueIds);
-  }
+  UseSkillEvent(super.activatorId, super.targetIds, this.skillId, this.skillGroup, this.source);
 
   @override
-  int getActivatorId() {
-    return ownerUniqueId;
-  }
-
-  @override
-  List<int> getTargetIds() {
-    return skillTargetUniqueIds;
-  }
-
-  @override
-  Widget buildDisplay() {
-    // final skillName =
-    //     dbLegacy.getTranslation(dbLegacy.skillInfoTable[skillId]?.nameLocalkey)?.zhCN ?? 'Skill $skillNum';
-    return Text('$name (Pos $ownerUniqueId) activates skillName');
+  Widget buildDisplayV2(BattleSimulation simulation) {
+    final skillInfoData = simulation.db.skillInfoTable[skillId];
+    final skillName = locale.getTranslation(skillInfoData?.nameLocalkey) ?? '$skillId';
+    return CustomTable(
+      children: [
+        CustomTableRow.fromTexts(
+          texts: ['Skill Activated', 'Source', 'Activator', 'Targets'],
+          defaults: battleHeaderData,
+        ),
+        CustomTableRow.fromTexts(
+          texts: [
+            '$skillName ($skillGroup)',
+            source.name.pascal,
+            '${simulation.getEntityName(activatorId)}',
+            targetIds.map((targetId) => simulation.getEntityName(targetId)).join(', '),
+          ],
+        ),
+      ],
+    );
   }
 }
