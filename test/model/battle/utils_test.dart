@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 
-void main() async {
+void main() {
   group('Damage Calculation Test', () {
     test('Summer Helm damage test', () {
       final param = NikkeDamageParameter(

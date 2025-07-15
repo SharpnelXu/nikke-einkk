@@ -8,7 +8,7 @@ import 'package:nikke_einkk/model/skills.dart';
 
 import '../test_helper.dart';
 
-void main() async {
+void main() {
   TestHelper.loadUserDb();
 
   group('Data Examine', () {

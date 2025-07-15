@@ -10,7 +10,7 @@ import 'package:nikke_einkk/model/user_data.dart';
 
 import '../../test_helper.dart';
 
-void main() async {
+void main() {
   TestHelper.loadData();
 
   group('Nikke Stat Calculation Test', () {
