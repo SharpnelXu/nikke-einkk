@@ -6,7 +6,6 @@ import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:intl/intl.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/data_path.dart';
@@ -40,6 +39,9 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
   List<NikkeOptions> get nikkeOptions => setup.nikkeOptions;
   PlayerOptions get playerOptions => setup.playerOptions;
   final Map<int, int> cubeLvs = {};
+
+  int fps = 60;
+  int maxSeconds = 180;
 
   @override
   void initState() {
@@ -186,42 +188,18 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(5, (index) {
-              return Expanded(
-                child: NikkeDisplay(
-                  useGlobal: useGlobal,
-                  option: nikkeOptions[index],
-                  playerOptions: playerOptions,
-                  cubeLvs: cubeLvs,
-                  onChange: (option) => setState(() {}),
-                ),
-              );
+              return Expanded(child: buildNikkeDisplay(context, nikkeOptions[index]));
             }),
           ),
           Divider(),
           Align(child: Text('Rapture', style: TextStyle(fontSize: 20))),
-          Align(child: RaptureDisplay(option: raptureOption)),
+          Align(child: buildRaptureDisplay(raptureOption)),
         ],
       ),
     );
   }
-}
 
-class RaptureDisplay extends StatefulWidget {
-  final BattleRaptureOptions option;
-
-  const RaptureDisplay({super.key, required this.option});
-
-  @override
-  State<RaptureDisplay> createState() => _RaptureDisplayState();
-}
-
-class _RaptureDisplayState extends State<RaptureDisplay> {
-  BattleRaptureOptions get option => widget.option;
-
-  @override
-  Widget build(BuildContext context) {
-    final format = NumberFormat.decimalPattern();
-
+  Widget buildRaptureDisplay(BattleRaptureOptions option) {
     return Container(
       margin: EdgeInsets.all(4),
       padding: EdgeInsets.all(4),
@@ -232,19 +210,184 @@ class _RaptureDisplayState extends State<RaptureDisplay> {
         spacing: 5,
         children: [
           buildRaptureIcon(option),
-          Text(option.name, maxLines: 1),
-          Text('HP: ${format.format(option.startHp)}'),
-          Text('ATK: ${format.format(option.startAttack)}'),
-          Text('DEF: ${format.format(option.startDefence)}'),
-          Text('Distance: ${format.format(option.startDistance)}'),
+          Text(locale.getTranslation(option.name) ?? option.name),
+          Text('HP: ${option.startHp.decimalPattern}'),
+          Text('ATK: ${option.startAttack.decimalPattern}'),
+          Text('DEF: ${option.startDefence.decimalPattern}'),
+          Text('Distance: ${option.startDistance}'),
           FilledButton.icon(
             onPressed: () async {
-              await Navigator.push(context, MaterialPageRoute(builder: (ctx) => RaptureSetupPage(option: option)));
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (ctx) => RaptureSetupPage(option: option, useGlobal: useGlobal, fps: fps, maxSeconds: maxSeconds),
+                ),
+              );
               if (mounted) setState(() {});
             },
             label: Text('Configure'),
             icon: Icon(Icons.settings),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildNikkeDisplay(BuildContext context, NikkeOptions option) {
+    final characterData = db.characterResourceGardeTable[option.nikkeResourceId]?[option.coreLevel];
+    final weapon = db.characterShotTable[characterData?.shotId];
+
+    final List<Widget> statDisplays = [];
+
+    if (characterData != null) {
+      final Map<EquipLineType, int> equipLineVals = {};
+      for (final equip in option.equips) {
+        if (equip == null) continue;
+
+        for (final equipLine in equip.equipLines) {
+          final stateEffectData = db.stateEffectTable[equipLine.getStateEffectId()];
+          if (stateEffectData == null) {
+            continue;
+          }
+
+          for (final functionId in stateEffectData.functions) {
+            if (functionId.function != 0) {
+              final function = db.functionTable[functionId.function]!;
+              equipLineVals.putIfAbsent(equipLine.type, () => 0);
+              equipLineVals[equipLine.type] = equipLineVals[equipLine.type]! + function.functionValue;
+            }
+          }
+        }
+      }
+
+      statDisplays.addAll([
+        Text('Lv ${option.syncLevel} ${coreString(option.coreLevel)}'),
+        Text('Bond Lv${option.attractLevel}'),
+        Text(option.skillLevels.map((lv) => lv.toString()).join('/')),
+      ]);
+
+      final cube = option.cube;
+      if (cube != null) {
+        final cubeData = db.harmonyCubeTable[cube.cubeId];
+        final localeKey = cubeData?.nameLocalkey;
+        final colorCode = int.tryParse('0xFF${cubeData?.bgColor}');
+
+        statDisplays.add(
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: 5,
+            children: [
+              Icon(Icons.square, color: colorCode != null ? Color(colorCode) : null, size: 14),
+              AutoSizeText('${locale.getTranslation(localeKey) ?? localeKey ?? 'Not Found'} Lv${cube.cubeLevel}'),
+            ],
+          ),
+        );
+      } else {
+        statDisplays.add(Text('No Cube'));
+      }
+
+      final doll = option.favoriteItem;
+      if (doll != null) {
+        statDisplays.add(
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: 5,
+            children: [
+              Icon(Icons.person, color: doll.rarity.color, size: 14),
+              Text(dollLvString(doll.rarity, doll.level)),
+            ],
+          ),
+        );
+      } else {
+        statDisplays.add(Text('No Doll'));
+      }
+
+      statDisplays.add(
+        Wrap(
+          spacing: 5,
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            if (equipLineVals.isNotEmpty)
+              Tooltip(
+                message: equipLineVals.keys
+                    .map(
+                      (equipLineType) =>
+                          '$equipLineType:'
+                          ' ${(equipLineVals[equipLineType]! / 100).toStringAsFixed(2)}%',
+                    )
+                    .join('\n'),
+                child: Icon(Icons.info_outline, size: 14),
+              ),
+            ...NikkeOptions.equipTypes.mapIndexed((idx, type) {
+              final equip = option.equips[idx];
+              final equipText =
+                  equip == null
+                      ? '-'
+                      : '${equip.rarity.name.toUpperCase()}${equip.rarity.canHaveCorp && equip.corporation == characterData.corporation ? 'C' : ''} Lv${equip.level}';
+              return Text('${type.name}: $equipText');
+            }),
+          ],
+        ),
+      );
+
+      if (WeaponType.chargeWeaponTypes.contains(weapon?.weaponType)) {
+        statDisplays.addAll([
+          Divider(),
+          Wrap(
+            spacing: 5,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [Text('Always Focus:'), Text('${option.alwaysFocus}')],
+          ),
+          Wrap(
+            spacing: 5,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [Text('Cancel Charge Delay:'), Text('${option.forceCancelShootDelay}')],
+          ),
+          Wrap(
+            spacing: 5,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [Text('Charge Mode:'), Text(option.chargeMode.name)],
+          ),
+        ]);
+      }
+    }
+
+    return Container(
+      margin: EdgeInsets.all(4),
+      padding: EdgeInsets.all(4),
+      decoration: BoxDecoration(border: Border.all(color: Colors.black), borderRadius: BorderRadius.circular(8)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        verticalDirection: VerticalDirection.down,
+        spacing: 5,
+        children: [
+          InkWell(
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (ctx) => NikkeEditorPage(option: option, cubeLvs: cubeLvs, useGlobal: useGlobal),
+                ),
+              );
+              if (mounted) setState(() {});
+            },
+            child: NikkeIcon(
+              isSelected: true,
+              characterData: characterData,
+              weapon: weapon,
+              defaultText: 'Tap to Edit',
+            ),
+          ),
+          ...statDisplays,
         ],
       ),
     );

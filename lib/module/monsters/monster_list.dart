@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/monster.dart';
@@ -6,7 +7,10 @@ import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/monsters/rapture_display.dart';
 
 class MonsterListPage extends StatefulWidget {
-  const MonsterListPage({super.key});
+  final bool onSelect;
+  final bool? forceRegion;
+
+  const MonsterListPage({super.key, this.onSelect = false, this.forceRegion});
 
   @override
   State<MonsterListPage> createState() => _MonsterListPageState();
@@ -16,18 +20,43 @@ class _MonsterListPageState extends State<MonsterListPage> {
   final filterData = MonsterFilterData();
   final searchController = TextEditingController();
 
-  bool get useGlobal => userDb.useGlobal;
-  NikkeDatabase get db => userDb.gameDb;
+  bool get useGlobal => widget.forceRegion ?? userDb.useGlobal;
+  NikkeDatabase get db => useGlobal ? global : cn;
+
+  @override
+  void initState() {
+    super.initState();
+
+    HardwareKeyboard.instance.addHandler(onEnterPress);
+  }
+
+  bool onEnterPress(KeyEvent event) {
+    if (event is KeyUpEvent && event.logicalKey == LogicalKeyboardKey.enter) {
+      search();
+      return true;
+    }
+    return false;
+  }
 
   @override
   void dispose() {
     super.dispose();
     searchController.dispose();
+    HardwareKeyboard.instance.removeHandler(onEnterPress);
   }
 
   void serverRadioChange(bool? v) {
-    userDb.useGlobal = v ?? useGlobal;
-    if (mounted) setState(() {});
+    if (widget.forceRegion == null) {
+      userDb.useGlobal = v ?? useGlobal;
+      if (mounted) setState(() {});
+    }
+  }
+
+  void search() {
+    if (searchController.text != (filterData.search ?? '')) {
+      filterData.search = searchController.text;
+      setState(() {});
+    }
   }
 
   @override
@@ -37,15 +66,7 @@ class _MonsterListPageState extends State<MonsterListPage> {
       child: Row(
         spacing: 8,
         children: [
-          FilledButton(
-            onPressed: () {
-              if (searchController.text != (filterData.search ?? '')) {
-                filterData.search = searchController.text;
-                setState(() {});
-              }
-            },
-            child: Text('Search ID or Name'),
-          ),
+          FilledButton(onPressed: search, child: Text('Search ID or Name')),
           Expanded(child: TextFormField(controller: searchController)),
         ],
       ),
@@ -82,6 +103,7 @@ class _MonsterListPageState extends State<MonsterListPage> {
 
     final raptures = db.raptureData.values.where((data) => filterData.shouldInclude(data)).toList();
 
+    final forceRegion = widget.forceRegion != null;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -89,10 +111,12 @@ class _MonsterListPageState extends State<MonsterListPage> {
           spacing: 5,
           children: [
             Text('Raptures'),
-            Radio(value: true, groupValue: useGlobal, onChanged: serverRadioChange),
-            Text('Global', style: TextStyle(fontWeight: useGlobal ? FontWeight.bold : null)),
-            Radio(value: false, groupValue: useGlobal, onChanged: serverRadioChange),
-            Text('CN', style: TextStyle(fontWeight: !useGlobal ? FontWeight.bold : null)),
+            if (!forceRegion) ...[
+              Radio(value: true, groupValue: useGlobal, onChanged: serverRadioChange),
+              Text('Global', style: TextStyle(fontWeight: useGlobal ? FontWeight.bold : null)),
+              Radio(value: false, groupValue: useGlobal, onChanged: serverRadioChange),
+              Text('CN', style: TextStyle(fontWeight: !useGlobal ? FontWeight.bold : null)),
+            ],
           ],
         ),
       ),
@@ -113,10 +137,14 @@ class _MonsterListPageState extends State<MonsterListPage> {
                       padding: const EdgeInsets.all(2.0),
                       child: TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (ctx) => RaptureDataDisplayPage(data: raptureData)),
-                          );
+                          if (widget.onSelect) {
+                            Navigator.pop(ctx, raptureData);
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (ctx) => RaptureDataDisplayPage(data: raptureData)),
+                            );
+                          }
                         },
                         child: Text('${locale.getTranslation(raptureData.nameKey)}, ID: ${raptureData.id}'),
                       ),

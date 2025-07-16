@@ -20,27 +20,36 @@ part '../../generated/model/battle/rapture.g.dart';
 
 @JsonSerializable()
 class BattleRaptureOptions {
+  // from MonsterTable
+  int? monsterId;
   String name = 'Rapture';
+  NikkeElement element;
+  Map<int, BattleRaptureParts> parts = {};
+
+  // made up data
   bool isStageTarget;
   bool canBeTargeted;
   int coreSize;
   int startDistance;
+
+  // from level enhance
+  int? level;
   int startHp;
   int startAttack;
   int startDefence;
-  int coreRequiresPierce;
-  NikkeElement element;
+  int damageRatio;
+  int projectileHp;
+  int brokenHp;
 
   Map<int, List<BattleRaptureAction>> actions = SplayTreeMap((a, b) => b.compareTo(a));
 
-  Map<int, BattleRaptureParts> parts = {};
-
   BattleRaptureOptions copy() {
     return BattleRaptureOptions(
+      monsterId: monsterId,
+      level: level,
       name: name,
       isStageTarget: isStageTarget,
       canBeTargeted: canBeTargeted,
-      coreRequiresPierce: coreRequiresPierce,
       coreSize: coreSize,
       startDistance: startDistance,
       startHp: startHp,
@@ -49,19 +58,26 @@ class BattleRaptureOptions {
       element: element,
       actions: actions,
       parts: parts,
+      damageRatio: damageRatio,
+      projectileHp: projectileHp,
+      brokenHp: brokenHp,
     );
   }
 
   BattleRaptureOptions({
+    this.monsterId,
+    this.level,
     this.name = "Rapture",
     this.isStageTarget = true,
     this.canBeTargeted = true,
-    this.coreRequiresPierce = 0,
     this.coreSize = 10,
     this.startDistance = 25,
     this.startHp = 1,
     this.startAttack = 1,
     this.startDefence = 140,
+    this.damageRatio = 10000,
+    this.projectileHp = 1,
+    this.brokenHp = 1,
     this.element = NikkeElement.unknown,
     Map<int, List<BattleRaptureAction>> actions = const {},
     Map<int, BattleRaptureParts> parts = const {},
@@ -254,7 +270,6 @@ enum BattleRaptureActionType {
   setDef,
   setDistance,
   setCoreSize,
-  setCorePierce,
 
   // time parameter
   jump,
@@ -288,8 +303,6 @@ enum BattleRaptureActionType {
         return 'Set Distance';
       case BattleRaptureActionType.setCoreSize:
         return 'Set Core Status';
-      case BattleRaptureActionType.setCorePierce:
-        return 'Set Core Pierce Status';
       case BattleRaptureActionType.jump:
         return 'Jump';
       case BattleRaptureActionType.invincible:
@@ -396,7 +409,7 @@ class BattleRaptureParts {
 }
 
 class BattleRapture extends BattleEntity {
-  late BattleRaptureOptions options;
+  BattleRaptureOptions options;
 
   bool canBeTargeted = true;
 
@@ -408,8 +421,6 @@ class BattleRapture extends BattleEntity {
 
   // set to 0 for no core
   int coreSize = 10;
-
-  bool coreRequiresPierce = false;
 
   int distance = 25;
 
@@ -447,7 +458,6 @@ class BattleRapture extends BattleEntity {
     distance = options.startDistance;
     canBeTargeted = options.canBeTargeted;
     isStageTarget = options.isStageTarget;
-    coreRequiresPierce = options.coreRequiresPierce != 0;
 
     hasRedCircle = false;
 
@@ -523,9 +533,6 @@ class BattleRapture extends BattleEntity {
           break;
         case BattleRaptureActionType.setCoreSize:
           coreSize = action.setParameter!;
-          break;
-        case BattleRaptureActionType.setCorePierce:
-          coreRequiresPierce = action.setParameter! != 0;
           break;
         case BattleRaptureActionType.jump:
           outsideScreen = true;

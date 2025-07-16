@@ -50,7 +50,6 @@ class _RaptureActionSetupDialogState extends State<RaptureActionSetupDialog> {
     BattleRaptureActionType.setDef,
     BattleRaptureActionType.setDistance,
     BattleRaptureActionType.setCoreSize,
-    BattleRaptureActionType.setCorePierce,
     BattleRaptureActionType.jump,
     BattleRaptureActionType.invincible,
     BattleRaptureActionType.redCircle,
@@ -68,10 +67,7 @@ class _RaptureActionSetupDialogState extends State<RaptureActionSetupDialog> {
     BattleRaptureActionType.setDistance,
   ];
 
-  static List<BattleRaptureActionType> setBoolActionTypes = [
-    BattleRaptureActionType.setCoreSize,
-    BattleRaptureActionType.setCorePierce,
-  ];
+  static List<BattleRaptureActionType> setBoolActionTypes = [BattleRaptureActionType.setCoreSize];
 
   static List<BattleRaptureActionType> timedActionTypes = [
     BattleRaptureActionType.jump,
@@ -149,7 +145,6 @@ class _RaptureActionSetupDialogState extends State<RaptureActionSetupDialog> {
               action = BattleRaptureAction.set(actionType, frame, setParam);
               break;
             case BattleRaptureActionType.setCoreSize:
-            case BattleRaptureActionType.setCorePierce:
               action = BattleRaptureAction.set(actionType, frame, boolParam ? 10 : 0);
               break;
             case BattleRaptureActionType.jump:

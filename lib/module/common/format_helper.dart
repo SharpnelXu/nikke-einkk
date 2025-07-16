@@ -83,7 +83,7 @@ String dollLvString(Rarity? dollRare, int dollLevel) {
 }
 
 Widget buildRaptureIcon(BattleRaptureOptions option) {
-  final textStyle = TextStyle(fontSize: 15, color: Colors.white);
+  final textStyle = TextStyle(fontSize: 20, color: Colors.white);
   return Container(
     width: 120.0,
     height: 120.0,
@@ -94,7 +94,11 @@ Widget buildRaptureIcon(BattleRaptureOptions option) {
       borderRadius: BorderRadius.circular(5),
       color: option.element.color,
     ),
-    child: Stack(alignment: Alignment.center, fit: StackFit.loose, children: [Text(option.name, style: textStyle)]),
+    child: Stack(
+      alignment: Alignment.center,
+      fit: StackFit.loose,
+      children: [Text(locale.getTranslation(option.name) ?? option.name, style: textStyle)],
+    ),
   );
 }
 

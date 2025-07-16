@@ -7,15 +7,19 @@ part of '../../../model/battle/rapture.dart';
 // **************************************************************************
 
 BattleRaptureOptions _$BattleRaptureOptionsFromJson(Map<String, dynamic> json) => BattleRaptureOptions(
+  monsterId: (json['monsterId'] as num?)?.toInt(),
+  level: (json['level'] as num?)?.toInt(),
   name: json['name'] as String? ?? "Rapture",
   isStageTarget: json['isStageTarget'] as bool? ?? true,
   canBeTargeted: json['canBeTargeted'] as bool? ?? true,
-  coreRequiresPierce: (json['coreRequiresPierce'] as num?)?.toInt() ?? 0,
   coreSize: (json['coreSize'] as num?)?.toInt() ?? 10,
   startDistance: (json['startDistance'] as num?)?.toInt() ?? 25,
   startHp: (json['startHp'] as num?)?.toInt() ?? 1,
   startAttack: (json['startAttack'] as num?)?.toInt() ?? 1,
   startDefence: (json['startDefence'] as num?)?.toInt() ?? 140,
+  damageRatio: (json['damageRatio'] as num?)?.toInt() ?? 10000,
+  projectileHp: (json['projectileHp'] as num?)?.toInt() ?? 1,
+  brokenHp: (json['brokenHp'] as num?)?.toInt() ?? 1,
   element: $enumDecodeNullable(_$NikkeElementEnumMap, json['element']) ?? NikkeElement.unknown,
   actions:
       (json['actions'] as Map<String, dynamic>?)?.map(
@@ -33,7 +37,11 @@ BattleRaptureOptions _$BattleRaptureOptionsFromJson(Map<String, dynamic> json) =
 );
 
 Map<String, dynamic> _$BattleRaptureOptionsToJson(BattleRaptureOptions instance) => <String, dynamic>{
+  'monsterId': instance.monsterId,
+  'level': instance.level,
   'name': instance.name,
+  'element': _$NikkeElementEnumMap[instance.element]!,
+  'parts': instance.parts.map((k, e) => MapEntry(k.toString(), e.toJson())),
   'isStageTarget': instance.isStageTarget,
   'canBeTargeted': instance.canBeTargeted,
   'coreSize': instance.coreSize,
@@ -41,10 +49,10 @@ Map<String, dynamic> _$BattleRaptureOptionsToJson(BattleRaptureOptions instance)
   'startHp': instance.startHp,
   'startAttack': instance.startAttack,
   'startDefence': instance.startDefence,
-  'coreRequiresPierce': instance.coreRequiresPierce,
-  'element': _$NikkeElementEnumMap[instance.element]!,
+  'damageRatio': instance.damageRatio,
+  'projectileHp': instance.projectileHp,
+  'brokenHp': instance.brokenHp,
   'actions': instance.actions.map((k, e) => MapEntry(k.toString(), e.map((e) => e.toJson()).toList())),
-  'parts': instance.parts.map((k, e) => MapEntry(k.toString(), e.toJson())),
 };
 
 const _$NikkeElementEnumMap = {
@@ -101,7 +109,6 @@ const _$BattleRaptureActionTypeEnumMap = {
   BattleRaptureActionType.setDef: 'setDef',
   BattleRaptureActionType.setDistance: 'setDistance',
   BattleRaptureActionType.setCoreSize: 'setCoreSize',
-  BattleRaptureActionType.setCorePierce: 'setCorePierce',
   BattleRaptureActionType.jump: 'jump',
   BattleRaptureActionType.invincible: 'invincible',
   BattleRaptureActionType.redCircle: 'redCircle',

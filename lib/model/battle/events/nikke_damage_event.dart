@@ -181,11 +181,6 @@ class NikkeDamageEvent extends BattleEvent {
       return 0;
     }
 
-    if (rapture.coreRequiresPierce && nikke.getPierce(simulation) == 0) {
-      // cannot hit core
-      return 0;
-    }
-
     if (nikke.currentWeaponType.isCharge) {
       return 10000;
     }
