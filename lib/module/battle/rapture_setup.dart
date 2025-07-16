@@ -121,13 +121,13 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
           titled: false,
           leadingWidth: 80,
           label: 'Level',
-          min: 0,
-          max: levels.length - 1,
-          value: levels.indexOf(option.level ?? levels.first),
-          valueFormatter: (v) => 'Lv${levels[v]}',
+          min: levels.first,
+          max: levels.last,
+          value: option.level ?? levels.first,
+          valueFormatter: (v) => 'Lv${option.level}',
           onChange: (newValue) {
-            final idx = newValue.round();
-            option.level = levels[idx];
+            final lv = newValue.round();
+            option.level = lv;
             setOptionsByLevelData(levelDataGroup[option.level!]);
             if (mounted) setState(() {});
           },
