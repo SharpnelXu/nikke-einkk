@@ -33,8 +33,19 @@ abstract class BattleEntity {
     );
   }
 
+  int getFinalAttack(BattleSimulation simulation) {
+    return baseAttack + getAttackBuffValues(simulation);
+  }
+
   int getAttackBuffValues(BattleSimulation simulation) {
-    return getBuffValue(simulation, FunctionType.statAtk, 0, (entity) => entity.baseAttack);
+    final maxHpConversion = getBuffValue(
+      simulation,
+      FunctionType.atkChangeMaxHpRate,
+      0,
+      (entity) => entity.getMaxHp(simulation),
+    );
+    final statAttack = getBuffValue(simulation, FunctionType.statAtk, 0, (entity) => entity.baseAttack);
+    return statAttack + maxHpConversion;
   }
 
   int getDefenceBuffValues(BattleSimulation simulation) {

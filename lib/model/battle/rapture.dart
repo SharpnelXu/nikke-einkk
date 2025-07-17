@@ -356,7 +356,7 @@ enum BattleRaptureActionTargetSubtype {
 int getSortingStat(BattleSimulation simulation, BattleNikke nikke, BattleRaptureActionTargetSubtype type) {
   switch (type) {
     case BattleRaptureActionTargetSubtype.attack:
-      return nikke.getAttackBuffValues(simulation) + nikke.baseAttack;
+      return nikke.getFinalAttack(simulation);
     case BattleRaptureActionTargetSubtype.defence:
       return nikke.getDefenceBuffValues(simulation) + nikke.baseDefence;
     case BattleRaptureActionTargetSubtype.hp:

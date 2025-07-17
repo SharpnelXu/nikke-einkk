@@ -276,7 +276,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
         SimplePercentBar(percent: currentHp / maxHp, color: Colors.white),
         Text(currentHp.decimalPattern),
         divider,
-        Text('ATK: ${(nikke.getAttackBuffValues(simulation) + nikke.baseAttack).decimalPattern}'),
+        Text('ATK: ${nikke.getFinalAttack(simulation).decimalPattern}'),
         Text('DEF: ${(nikke.getDefenceBuffValues(simulation) + nikke.baseDefence).decimalPattern}'),
       ]);
     }

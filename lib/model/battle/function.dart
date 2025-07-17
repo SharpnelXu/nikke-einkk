@@ -340,6 +340,7 @@ class BattleFunction {
     bool activated = false;
     switch (data.functionType) {
       case FunctionType.addDamage:
+      case FunctionType.atkChangeMaxHpRate:
       case FunctionType.attention:
       case FunctionType.breakDamage:
       case FunctionType.changeCoolTimeUlti: // act as a buff for rounding
@@ -505,7 +506,6 @@ class BattleFunction {
       case FunctionType.allStepBurstNextStep:
       case FunctionType.atkBuffChange:
       case FunctionType.atkChangHpRate:
-      case FunctionType.atkChangeMaxHpRate:
       case FunctionType.atkReplaceMaxHpRate:
       case FunctionType.barrierDamage:
       case FunctionType.bonusRangeDamageChange:

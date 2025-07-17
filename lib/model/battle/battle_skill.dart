@@ -330,15 +330,15 @@ class BattleSkill {
         break;
       case PreferTarget.highAttack:
         targetList.sort((a, b) {
-          final totalAttackA = a.baseAttack + a.getAttackBuffValues(simulation);
-          final totalAttackB = b.baseAttack + b.getAttackBuffValues(simulation);
+          final totalAttackA = a.getFinalAttack(simulation);
+          final totalAttackB = b.getFinalAttack(simulation);
           return totalAttackB != totalAttackA ? totalAttackB - totalAttackA : a.uniqueId - b.uniqueId;
         });
         break;
       case PreferTarget.highAttackFirstSelf:
         targetList.sort((a, b) {
-          final totalAttackA = a.baseAttack + a.getAttackBuffValues(simulation);
-          final totalAttackB = b.baseAttack + b.getAttackBuffValues(simulation);
+          final totalAttackA = a.getFinalAttack(simulation);
+          final totalAttackB = b.getFinalAttack(simulation);
           return totalAttackB != totalAttackA ? totalAttackB - totalAttackA : a.uniqueId - b.uniqueId;
         });
         if (owner != null && targetList.contains(owner)) {
@@ -348,8 +348,8 @@ class BattleSkill {
         break;
       case PreferTarget.highAttackLastSelf:
         targetList.sort((a, b) {
-          final totalAttackA = a.baseAttack + a.getAttackBuffValues(simulation);
-          final totalAttackB = b.baseAttack + b.getAttackBuffValues(simulation);
+          final totalAttackA = a.getFinalAttack(simulation);
+          final totalAttackB = b.getFinalAttack(simulation);
           return totalAttackB != totalAttackA ? totalAttackB - totalAttackA : a.uniqueId - b.uniqueId;
         });
         if (owner != null && targetList.contains(owner)) {
