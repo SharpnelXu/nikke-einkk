@@ -1,12 +1,14 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
+import 'package:nikke_einkk/model/battle/events/time_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
-import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
@@ -187,7 +189,8 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       ),
     ];
 
-    final events = simulation.timeline[simulation.currentFrame + 1];
+    final events =
+        simulation.timeline[simulation.currentFrame + 1]?.whereNot((event) => event is CheckTimeEvent).toList();
     if (events == null || events.isEmpty) {
       result.add(Text('None'));
     } else {
@@ -260,24 +263,40 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     ];
 
     if (nikke != null) {
-      final currentCoverHp = nikke.cover.currentHp;
-      final maxCoverHp = nikke.cover.getMaxHp(simulation);
+      children.addAll(buildNikkeStatus(nikke));
 
-      final currentHp = nikke.currentHp;
-      final maxHp = nikke.getMaxHp(simulation);
       children.addAll([
-        ...buildNikkeStatus(nikke),
         divider,
         SimplePercentBar(percent: nikke.currentAmmo / nikke.getMaxAmmo(simulation)),
         Text('${nikke.currentAmmo} / ${nikke.getMaxAmmo(simulation)}'),
-        divider,
+      ]);
+
+      // HP Section
+      children.add(divider);
+      final decoy = nikke.decoy;
+      if (decoy != null) {
+        final decoyHp = decoy.currentHp;
+        final decoyMaxHp = decoy.getMaxHp(simulation);
+        children.addAll([
+          SimplePercentBar(percent: decoyHp / decoyMaxHp, color: Colors.yellow[200]),
+          Text(decoyHp.decimalPattern),
+        ]);
+      }
+      final currentCoverHp = nikke.cover.currentHp;
+      final maxCoverHp = nikke.cover.getMaxHp(simulation);
+      final currentHp = nikke.currentHp;
+      final maxHp = nikke.getMaxHp(simulation);
+      children.addAll([
         SimplePercentBar(percent: currentCoverHp / maxCoverHp, color: Colors.blue[200]),
         Text(currentCoverHp.decimalPattern),
         SimplePercentBar(percent: currentHp / maxHp, color: Colors.white),
         Text(currentHp.decimalPattern),
+      ]);
+
+      children.addAll([
         divider,
         Text('ATK: ${nikke.getFinalAttack(simulation).decimalPattern}'),
-        Text('DEF: ${(nikke.getDefenceBuffValues(simulation) + nikke.baseDefence).decimalPattern}'),
+        Text('DEF: ${nikke.getFinalDefence(simulation).decimalPattern}'),
       ]);
     }
 
@@ -300,7 +319,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
         addProgressBar('Exiting Cover', cur, max);
       }
 
-      if (WeaponType.chargeWeaponTypes.contains(nikke.currentWeaponType)) {
+      if (nikke.currentWeaponType.isCharge) {
         if (nikke.maintainFireStanceFrameCount > 0) {
           max = timeDataToFrame(
             nikke.currentWeaponData.spotFirstDelay + nikke.currentWeaponData.maintainFireStance,
@@ -308,6 +327,10 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
           );
           cur = nikke.maintainFireStanceFrameCount;
           addProgressBar('Forced Delay', cur, max);
+        } else if (nikke.shootCountdown > 0 && nikke.currentAmmo > 0) {
+          max = nikke.shootThreshold;
+          cur = max - nikke.shootCountdown;
+          addProgressBar('Next Bullet', cur, max);
         } else if (nikke.chargeFrames > 0) {
           max = nikke.previousFullChargeFrameCount;
           cur = nikke.chargeFrames;
@@ -358,7 +381,7 @@ class SimplePercentBar extends StatelessWidget {
       decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 1), color: Colors.grey),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Container(height: 12, width: size * percent, decoration: BoxDecoration(color: color)),
+        child: Container(height: 12, width: max(0, size * percent), decoration: BoxDecoration(color: color)),
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:nikke_einkk/model/battle/events/battle_start_event.dart';
 import 'package:nikke_einkk/model/battle/events/burst_gen_event.dart';
 import 'package:nikke_einkk/model/battle/events/change_burst_step_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
+import 'package:nikke_einkk/model/battle/events/time_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
@@ -113,6 +114,7 @@ class BattleSimulation {
       burstStage = 0;
     }
 
+    registerEvent(currentFrame, CheckTimeEvent.checkTime);
     // broadcast all events registered for this frame
     for (int index = 0; index < (timeline[currentFrame]?.length ?? 0); index += 1) {
       final event = timeline[currentFrame]![index];

@@ -51,6 +51,29 @@ class BattleCover extends BattleEntity {
   }
 }
 
+class BattleDecoy extends BattleEntity {
+  @override
+  String get name => 'Decoy';
+
+  @override
+  int baseHp;
+
+  @override
+  int get baseAttack => 0;
+
+  @override
+  int baseDefence;
+
+  BattleDecoy(this.baseHp, this.baseDefence) {
+    init();
+  }
+
+  void init() {
+    currentHp = baseHp;
+    buffs.clear();
+  }
+}
+
 class BattleNikke extends BattleEntity {
   PlayerOptions playerOptions;
   NikkeOptions option;
@@ -126,6 +149,7 @@ class BattleNikke extends BattleEntity {
 
   late BattleCover cover;
   List<Barrier> barriers = [];
+  BattleDecoy? decoy;
   int currentAmmo = 0;
 
   WeaponType get currentWeaponType => currentWeaponData.weaponType;
@@ -201,6 +225,7 @@ class BattleNikke extends BattleEntity {
     cover.uniqueId = position + 5;
     cover.init(simulation);
     barriers.clear();
+    decoy = null;
 
     totalBulletsFired = 0;
     totalFullChargeFired = 0;
@@ -322,6 +347,10 @@ class BattleNikke extends BattleEntity {
       final maxAmmo = getMaxAmmo(simulation);
       currentAmmo = min(maxAmmo, currentAmmo + (reloadRatio * maxAmmo).round());
       reloadingFrameCount = 0;
+
+      if (currentAmmo == maxAmmo) {
+        simulation.registerEvent(simulation.currentFrame, NikkeReloadEndEvent(uniqueId));
+      }
     }
   }
 
@@ -393,6 +422,10 @@ class BattleNikke extends BattleEntity {
           return;
         }
 
+        if (currentWeaponData.inputType == InputType.downCharge && shootCountdown > 0) {
+          return;
+        }
+
         if (currentWeaponData.fireType == FireType.instant) {
           simulation.registerEvent(
             simulation.currentFrame,
@@ -443,17 +476,23 @@ class BattleNikke extends BattleEntity {
         }
 
         // this is essentially shooting frame for SR & RL
-        if (currentWeaponData.maintainFireStance > 0) {
-          // TODO: A2 has 9 extra frames, maybe due to animation but not sure
-          maintainFireStanceFrameCount = timeDataToFrame(
-            currentWeaponData.spotFirstDelay + currentWeaponData.maintainFireStance,
-            fps,
-          );
-        } else {
-          spotLastDelayFrameCount =
-              option.forceCancelShootDelay ? 0 : timeDataToFrame(currentWeaponData.spotLastDelay, fps);
-          // necessary for quick scope
-          spotFirstDelayFrameCount = timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
+        if (currentWeaponData.inputType == InputType.up) {
+          if (currentWeaponData.maintainFireStance > 0) {
+            // TODO: A2 has 9 extra frames, maybe due to animation but not sure
+            maintainFireStanceFrameCount = timeDataToFrame(
+              currentWeaponData.spotFirstDelay + currentWeaponData.maintainFireStance,
+              fps,
+            );
+          } else {
+            spotLastDelayFrameCount =
+                option.forceCancelShootDelay ? 0 : timeDataToFrame(currentWeaponData.spotLastDelay, fps);
+            // necessary for quick scope
+            spotFirstDelayFrameCount = timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
+          }
+        } else if (currentWeaponData.inputType == InputType.downCharge) {
+          while (shootCountdown <= 0) {
+            shootCountdown += shootThreshold;
+          }
         }
 
       case WeaponType.unknown:

@@ -13,6 +13,8 @@ import 'package:nikke_einkk/model/battle/events/change_burst_step_event.dart';
 import 'package:nikke_einkk/model/battle/events/hp_change_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_fire_event.dart';
+import 'package:nikke_einkk/model/battle/events/nikke_reload_event.dart';
+import 'package:nikke_einkk/model/battle/events/time_event.dart';
 import 'package:nikke_einkk/model/battle/events/use_skill_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
@@ -182,11 +184,24 @@ class BattleFunction {
       case TimingTriggerType.onResurrection:
         // TODO: implement with Resurrection
         break;
+      case TimingTriggerType.onEndReload:
+        if (event is NikkeReloadEndEvent && standard is BattleNikke && standard.uniqueId == ownerUniqueId) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onCheckTime:
+        if (event is CheckTimeEvent) {
+          final elapsedFrames = simulation.maxFrames - simulation.currentFrame;
+          final requiredFrames = timeDataToFrame(data.timingTriggerValue, simulation.fps);
+          if (elapsedFrames > 0 && elapsedFrames % requiredFrames == 0) {
+            executeFunction(event, simulation);
+          }
+        }
+        break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
       case TimingTriggerType.onBurstSkillStep:
       case TimingTriggerType.onBurstSkillUseNum:
-      case TimingTriggerType.onCheckTime:
       case TimingTriggerType.onCoreHitNum:
       case TimingTriggerType.onCoreHitNumOnce:
       case TimingTriggerType.onCoreHitRatio:
@@ -194,7 +209,6 @@ class BattleFunction {
       case TimingTriggerType.onCriticalHitNum:
       case TimingTriggerType.onDead:
       case TimingTriggerType.onEndFullBurst:
-      case TimingTriggerType.onEndReload:
       case TimingTriggerType.onFunctionBuffCheck:
       case TimingTriggerType.onFunctionOff:
       case TimingTriggerType.onFunctionOn:
@@ -742,6 +756,8 @@ class BattleFunction {
         return target is BattleNikke && target.activatedBurstSkillThisCycle == true;
       case StatusTriggerType.isNotBurstMember:
         return target is BattleNikke && target.activatedBurstSkillThisCycle == false;
+      case StatusTriggerType.isHaveDecoy:
+        return target is BattleNikke && target.decoy != null && target.decoy!.currentHp > 0;
       case StatusTriggerType.unknown:
       case StatusTriggerType.isAlive:
       case StatusTriggerType.isAmmoCount:
@@ -760,7 +776,6 @@ class BattleFunction {
       case StatusTriggerType.isFunctionBuffCheck:
       case StatusTriggerType.isFunctionTypeOffCheck:
       case StatusTriggerType.isHaveBarrier:
-      case StatusTriggerType.isHaveDecoy:
       case StatusTriggerType.isNotCheckTeamBurstNextStep:
       case StatusTriggerType.isNotHaveBarrier:
       case StatusTriggerType.isPhase:

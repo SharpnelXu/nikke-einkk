@@ -13,6 +13,7 @@ import 'package:nikke_einkk/model/battle/events/rapture_damage_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
+import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 
@@ -358,7 +359,7 @@ int getSortingStat(BattleSimulation simulation, BattleNikke nikke, BattleRapture
     case BattleRaptureActionTargetSubtype.attack:
       return nikke.getFinalAttack(simulation);
     case BattleRaptureActionTargetSubtype.defence:
-      return nikke.getDefenceBuffValues(simulation) + nikke.baseDefence;
+      return nikke.getFinalDefence(simulation);
     case BattleRaptureActionTargetSubtype.hp:
       return nikke.currentHp;
     case BattleRaptureActionTargetSubtype.hpRatio:
@@ -428,6 +429,9 @@ class BattleRapture extends BattleEntity {
   int defence = 0;
 
   Barrier? barrier;
+
+  @override
+  String get name => locale.getTranslation(options.name) ?? options.name;
 
   @override
   int get baseHp => options.startHp;

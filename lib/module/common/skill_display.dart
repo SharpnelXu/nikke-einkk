@@ -101,7 +101,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
     if (preFunctions.isNotEmpty) {
       children.addAll([
         const Divider(),
-        Text('↓↓↓ Pre SKill Functions ↓↓↓', style: TextStyle(fontSize: 16)),
+        Text('↓↓↓ Pre Skill Functions ↓↓↓', style: TextStyle(fontSize: 16)),
         ...preFunctions,
       ]);
     }
@@ -214,12 +214,27 @@ class SimpleFunctionDisplay extends StatelessWidget {
         texts: [func.rawFunctionType, func.rawFunctionTarget, func.rawBuffType, func.rawBuffRemove],
       ),
       CustomTableRow.fromTexts(texts: ['Value', 'Standard', 'Duration', 'Delay'], defaults: headerData),
-      CustomTableRow.fromTexts(
-        texts: [
-          skillValueString(func.functionValue, func.functionValueType) ?? 'N/A',
-          functionStandardString(func.functionStandard) ?? 'N/A',
-          durationString(func.durationValue, func.durationType) ?? 'N/A',
-          durationString(func.delayValue, func.delayType) ?? 'N/A',
+      CustomTableRow(
+        children: [
+          TableCellData(
+            child: Tooltip(
+              message: func.rawFunctionValueType,
+              child: Text(skillValueString(func.functionValue, func.functionValueType) ?? 'N/A'),
+            ),
+          ),
+          TableCellData(text: functionStandardString(func.functionStandard) ?? 'N/A'),
+          TableCellData(
+            child: Tooltip(
+              message: func.rawDurationType,
+              child: Text(durationString(func.durationValue, func.durationType) ?? 'N/A'),
+            ),
+          ),
+          TableCellData(
+            child: Tooltip(
+              message: func.rawDelayType,
+              child: Text(durationString(func.delayValue, func.delayType) ?? 'N/A'),
+            ),
+          ),
         ],
       ),
       CustomTableRow.fromTexts(

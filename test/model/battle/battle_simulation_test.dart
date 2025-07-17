@@ -97,41 +97,41 @@ void main() {
       expect(scarlet.getMaxAmmo(simulation), 57);
       expect(scarlet.getMaxHp(simulation), 20565804);
 
-      expect(simulation.timeline[888]!.length, 3); // first bullet (fire, damage, burstGen)
+      expect(simulation.timeline[888], isNotEmpty); // first bullet (fire, damage, burstGen)
       final damageEvent1Scarlet1 = simulation.timeline[888]![1] as NikkeDamageEvent;
       expect(damageEvent1Scarlet1.damageParameter.calculateDamage(), 596736);
       expect(damageEvent1Scarlet1.damageParameter.calculateDamage(critical: true), 826250);
       final burstGenEvent1Scarlet1 = simulation.timeline[888]![2] as BurstGenerationEvent;
       expect(burstGenEvent1Scarlet1.burst, 9000);
 
-      expect(simulation.timeline[883]!.length, 3); // second bullet
+      expect(simulation.timeline[883], isNotEmpty); // second bullet
 
-      expect(simulation.timeline[838]!.length, 3); // 11 th
+      expect(simulation.timeline[838], isNotEmpty); // 11 th
       final damageEvent11Scarlet1 = simulation.timeline[838]![1] as NikkeDamageEvent;
       expect(damageEvent11Scarlet1.damageParameter.calculateDamage(), 707230);
       expect(damageEvent11Scarlet1.damageParameter.calculateDamage(critical: true), 979242);
 
-      expect(simulation.timeline[788]!.length, 3); // 21 th
+      expect(simulation.timeline[788], isNotEmpty); // 21 th
       final damageEvent21Scarlet1 = simulation.timeline[788]![1] as NikkeDamageEvent;
       expect(damageEvent21Scarlet1.damageParameter.calculateDamage(), 817724);
       expect(damageEvent21Scarlet1.damageParameter.calculateDamage(critical: true), 1132234);
 
-      expect(simulation.timeline[738]!.length, 3); // 31 th
+      expect(simulation.timeline[738], isNotEmpty); // 31 th
       final damageEvent31Scarlet1 = simulation.timeline[738]![1] as NikkeDamageEvent;
       expect(damageEvent31Scarlet1.damageParameter.calculateDamage(), 928218);
       expect(damageEvent31Scarlet1.damageParameter.calculateDamage(critical: true), 1285225);
 
-      expect(simulation.timeline[688]!.length, 3); // 41 th
+      expect(simulation.timeline[688], isNotEmpty); // 41 th
       final damageEvent41Scarlet1 = simulation.timeline[688]![1] as NikkeDamageEvent;
       expect(damageEvent41Scarlet1.damageParameter.calculateDamage(), 1038712);
       expect(damageEvent41Scarlet1.damageParameter.calculateDamage(critical: true), 1438217);
 
-      expect(simulation.timeline[638]!.length, 3); // 51 th
+      expect(simulation.timeline[638], isNotEmpty); // 51 th
       final damageEvent51Scarlet1 = simulation.timeline[638]![1] as NikkeDamageEvent;
       expect(damageEvent51Scarlet1.damageParameter.calculateDamage(), 1149206);
       expect(damageEvent51Scarlet1.damageParameter.calculateDamage(critical: true), 1591208);
 
-      expect(simulation.timeline[607]!.length, 1); // reload
+      expect(simulation.timeline[607], isNotEmpty); // reload
       final reloadEvent = simulation.timeline[607]![0] as NikkeReloadStartEvent;
       expect(reloadEvent.reloadFrames, 109);
 
@@ -175,7 +175,7 @@ void main() {
       expect(scarlet3.getMaxAmmo(simulation), 63);
       expect(scarlet3.getMaxHp(simulation), 20509704);
 
-      expect(simulation.timeline[888]!.length, 12); // first bullet (fire, damage, burstGen)
+      expect(simulation.timeline[888], isNotEmpty); // first bullet (fire, damage, burstGen)
       final damageEvent1Scarlet2 = simulation.timeline[888]![4] as NikkeDamageEvent;
       expect(damageEvent1Scarlet2.damageParameter.calculateDamage(), 596736);
       final burstGenEvent1Scarlet2 = simulation.timeline[888]![5] as BurstGenerationEvent;
@@ -186,26 +186,26 @@ void main() {
       final burstGenEvent1Scarlet4 = simulation.timeline[888]![11] as BurstGenerationEvent;
       expect(burstGenEvent1Scarlet4.burst, 9419);
 
-      expect(simulation.timeline[883]!.length, 12); // second bullet
+      expect(simulation.timeline[883], isNotEmpty); // second bullet
 
-      expect(simulation.timeline[838]!.length, 12); // 11 th
+      expect(simulation.timeline[838], isNotEmpty); // 11 th
       final damageEvent11Scarlet2 = simulation.timeline[838]![4] as NikkeDamageEvent;
       expect(damageEvent11Scarlet2.damageParameter.calculateDamage(), 707230);
 
       final damageEvent51Scarlet2 = simulation.timeline[638]![3] as NikkeDamageEvent; // 51 st, no more burst gen event
       expect(damageEvent51Scarlet2.damageParameter.calculateDamage(), 1149206);
 
-      expect(simulation.timeline[607]!.length, 2); // 1 & 4 reload
+      expect(simulation.timeline[607], isNotEmpty); // 1 & 4 reload
       final reloadEventScarlet1 = simulation.timeline[607]![0] as NikkeReloadStartEvent;
       expect(reloadEventScarlet1.reloadFrames, 109);
       final reloadEventScarlet4 = simulation.timeline[607]![1] as NikkeReloadStartEvent;
       expect(reloadEventScarlet4.reloadFrames, 150);
 
-      expect(simulation.timeline[577]!.length, 1); // 3 reload
+      expect(simulation.timeline[577], isNotEmpty); // 3 reload
       final reloadEventScarlet3 = simulation.timeline[577]![0] as NikkeReloadStartEvent;
       expect(reloadEventScarlet3.reloadFrames, 150);
 
-      expect(simulation.timeline[502]!.length, 1); // 2 reload
+      expect(simulation.timeline[502], isNotEmpty); // 2 reload
       final reloadEventScarlet2 = simulation.timeline[502]![0] as NikkeReloadStartEvent;
       expect(reloadEventScarlet2.reloadFrames, 150);
     });
@@ -275,13 +275,13 @@ void main() {
       expect(alice1.getMaxAmmo(simulation), 18);
       expect(alice1.getMaxHp(simulation), 20699696);
 
-      expect(simulation.timeline[809]!.length, 3); // first bullet (fire, damage, burstGen)
+      expect(simulation.timeline[809], isNotEmpty); // first bullet (fire, damage, burstGen)
       final damageEvent1Alice3 = simulation.timeline[809]![1] as NikkeDamageEvent;
       expect(damageEvent1Alice3.damageParameter.calculateDamage(core: true), 6756013);
       final burstGenEvent1Alice3 = simulation.timeline[809]![2] as BurstGenerationEvent;
       expect(burstGenEvent1Alice3.burst, 140000);
 
-      expect(simulation.timeline[807]!.length, 9);
+      expect(simulation.timeline[807], isNotEmpty);
       final damageEvent1Alice1 = simulation.timeline[807]![1] as NikkeDamageEvent;
       expect(damageEvent1Alice1.damageParameter.calculateDamage(core: true), 6770023);
       final burstGenEvent1Alice1 = simulation.timeline[807]![2] as BurstGenerationEvent;
@@ -421,7 +421,7 @@ void main() {
       expect(snowWhite.getMaxAmmo(simulation), 60);
       expect(snowWhite.getMaxHp(simulation), 20421354);
 
-      expect(simulation.timeline[5238]!.length, 3);
+      expect(simulation.timeline[5238], isNotEmpty);
       final damageEvent31SnowWhite = simulation.timeline[5238]![1] as NikkeDamageEvent;
       expect(damageEvent31SnowWhite.damageParameter.calculateDamage(), 320091);
       // 443203 is actual damage
@@ -429,12 +429,16 @@ void main() {
       expect(damageEvent31SnowWhite.damageParameter.calculateDamage(core: true), 580275);
       expect(damageEvent31SnowWhite.damageParameter.calculateDamage(critical: true, core: true), 703387);
 
-      expect(simulation.timeline[5093]!.length, 5); // S1
-      final damageEventSkill1SnowWhite = simulation.timeline[5093]![3] as NikkeDamageEvent;
-      expect(damageEventSkill1SnowWhite.source, Source.skill1);
-      expect(damageEventSkill1SnowWhite.damageParameter.calculateDamage(), 1212706);
+      expect(simulation.timeline[5093], isNotEmpty); // S1
+      final damageEventSkill1SnowWhite =
+          simulation.timeline[5093]!
+                  .where((event) => event is NikkeDamageEvent && event.source == Source.skill1)
+                  .firstOrNull
+              as NikkeDamageEvent?;
+      expect(damageEventSkill1SnowWhite, isNotNull);
+      expect(damageEventSkill1SnowWhite!.damageParameter.calculateDamage(), 1212706);
 
-      expect(simulation.timeline[4501]!.length, 2); // S2
+      expect(simulation.timeline[4501], isNotEmpty); // S2
       final damageEventSkill2SnowWhite = simulation.timeline[4501]![1] as NikkeDamageEvent;
       expect(damageEventSkill2SnowWhite.source, Source.skill2);
       expect(damageEventSkill2SnowWhite.damageParameter.calculateDamage(), 2422566);

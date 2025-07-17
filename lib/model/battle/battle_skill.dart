@@ -158,8 +158,20 @@ class BattleSkill {
           }
         }
         break;
-      case CharacterSkillType.instantSequentialAttack:
       case CharacterSkillType.installDecoy:
+        for (final target in skillTargets) {
+          if (target is BattleNikke) {
+            final hpPercent = toModifier(skillData.skillValueData[0].skillValue);
+            final defPercent = toModifier(skillData.skillValueData[1].skillValue); // this is a guess
+
+            final decoyHp = (target.getMaxHp(simulation) * hpPercent).round();
+            final decoyDefence = (target.getFinalDefence(simulation) * defPercent).round();
+            final decoy = BattleDecoy(decoyHp, decoyDefence);
+            target.decoy = decoy;
+          }
+        }
+        break;
+      case CharacterSkillType.instantSequentialAttack:
       case CharacterSkillType.changeWeapon:
       case CharacterSkillType.launchWeapon:
       case CharacterSkillType.laserBeam:
@@ -359,8 +371,8 @@ class BattleSkill {
         break;
       case PreferTarget.highDefence:
         targetList.sort((a, b) {
-          final totalDefenceA = a.baseDefence + a.getDefenceBuffValues(simulation);
-          final totalDefenceB = b.baseDefence + b.getDefenceBuffValues(simulation);
+          final totalDefenceA = a.getFinalDefence(simulation);
+          final totalDefenceB = b.getFinalDefence(simulation);
           return totalDefenceB != totalDefenceA ? totalDefenceB - totalDefenceA : a.uniqueId - b.uniqueId;
         });
         break;
@@ -377,8 +389,8 @@ class BattleSkill {
         break;
       case PreferTarget.lowDefence:
         targetList.sort((a, b) {
-          final totalDefenceA = a.baseDefence + a.getDefenceBuffValues(simulation);
-          final totalDefenceB = b.baseDefence + b.getDefenceBuffValues(simulation);
+          final totalDefenceA = a.getFinalDefence(simulation);
+          final totalDefenceB = b.getFinalDefence(simulation);
           return totalDefenceB != totalDefenceA ? totalDefenceA - totalDefenceB : a.uniqueId - b.uniqueId;
         });
         break;

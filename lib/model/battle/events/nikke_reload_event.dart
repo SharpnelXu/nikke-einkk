@@ -23,3 +23,17 @@ class NikkeReloadStartEvent extends BattleEvent {
     );
   }
 }
+
+class NikkeReloadEndEvent extends BattleEvent {
+  NikkeReloadEndEvent(super.activatorId);
+
+  @override
+  Widget buildDisplayV2(BattleSimulation simulation) {
+    return CustomTable(
+      children: [
+        CustomTableRow.fromTexts(texts: ['Reload Complete'], defaults: battleHeaderData),
+        CustomTableRow.fromTexts(texts: ['${simulation.getEntityName(activatorId)}']),
+      ],
+    );
+  }
+}

@@ -48,6 +48,10 @@ abstract class BattleEntity {
     return statAttack + maxHpConversion;
   }
 
+  int getFinalDefence(BattleSimulation simulation) {
+    return baseDefence + getDefenceBuffValues(simulation);
+  }
+
   int getDefenceBuffValues(BattleSimulation simulation) {
     return getBuffValue(simulation, FunctionType.statDef, 0, (entity) => entity.baseDefence);
   }
