@@ -132,6 +132,7 @@ String? durationString(int value, DurationType type) {
     case DurationType.battles:
       return '∞';
     case DurationType.hits:
+    case DurationType.hitsVer2:
       return value == 0 ? null : '$value hits';
     case DurationType.timeSecBattles:
       return 'Every ${value.timeString}';

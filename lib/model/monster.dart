@@ -79,6 +79,8 @@ class MonsterData {
   final List<MonsterSkillInfoData> skillData;
   @JsonKey(name: 'statenhance_id')
   final int statEnhanceId;
+  @JsonKey(name: 'ui_grade')
+  final String? uiGrade;
   List<MonsterSkillInfoData> get validSkillData => skillData.where((data) => data.skillId != 0).toList();
 
   MonsterData({
@@ -112,6 +114,7 @@ class MonsterData {
     this.spotRandRatioTeleport = 0,
     this.skillData = const [],
     this.statEnhanceId = 0,
+    this.uiGrade,
   });
 
   factory MonsterData.fromJson(Map<String, dynamic> json) => _$MonsterDataFromJson(json);
@@ -366,6 +369,8 @@ class MonsterSkillData {
   final String? linkedParts;
   @JsonKey(name: 'cancel_type')
   final String? cancelType;
+  @JsonKey(name: 'move_object')
+  final List<String> moveObject;
 
   MonsterSkillData({
     this.id = 0,
@@ -411,6 +416,7 @@ class MonsterSkillData {
     this.weaponObjectEnum,
     this.linkedParts,
     this.cancelType,
+    this.moveObject = const [],
   });
 
   factory MonsterSkillData.fromJson(Map<String, dynamic> json) => _$MonsterSkillDataFromJson(json);

@@ -68,6 +68,7 @@ class BattleBuff {
       case DurationType.timeSec:
       case DurationType.shots:
       case DurationType.hits:
+      case DurationType.hitsVer2:
         return duration <= 0;
       case DurationType.unknown:
         return true;

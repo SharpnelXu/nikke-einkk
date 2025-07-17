@@ -38,7 +38,6 @@ BattleRaptureOptions _$BattleRaptureOptionsFromJson(Map<String, dynamic> json) =
 
 Map<String, dynamic> _$BattleRaptureOptionsToJson(BattleRaptureOptions instance) => <String, dynamic>{
   'monsterId': instance.monsterId,
-  'level': instance.level,
   'name': instance.name,
   'element': _$NikkeElementEnumMap[instance.element]!,
   'parts': instance.parts.map((k, e) => MapEntry(k.toString(), e.toJson())),
@@ -46,6 +45,7 @@ Map<String, dynamic> _$BattleRaptureOptionsToJson(BattleRaptureOptions instance)
   'canBeTargeted': instance.canBeTargeted,
   'coreSize': instance.coreSize,
   'startDistance': instance.startDistance,
+  'level': instance.level,
   'startHp': instance.startHp,
   'startAttack': instance.startAttack,
   'startDefence': instance.startDefence,
@@ -132,6 +132,7 @@ const _$DurationTypeEnumMap = {
   DurationType.hits: 'Hits',
   DurationType.timeSecBattles: 'TimeSecBattles',
   DurationType.timeSecVer2: 'TimeSec_Ver2',
+  DurationType.hitsVer2: 'Hits_Ver2',
   DurationType.unknown: 'Unknown',
 };
 
@@ -323,6 +324,7 @@ const _$FunctionTypeEnumMap = {
   FunctionType.changeHurtFxExcludingBreakCol: 'ChangeHurtFxExcludingBreakCol',
   FunctionType.plusBuffCount: 'PlusBuffCount',
   FunctionType.durationDamage: 'DurationDamage',
+  FunctionType.useSkill1: 'UseSkill1',
 };
 
 BattleRaptureParts _$BattleRapturePartsFromJson(Map<String, dynamic> json) => BattleRaptureParts(

@@ -230,6 +230,7 @@ class BattleFunction {
       case TimingTriggerType.onEnemyDead:
       case TimingTriggerType.onUseTeamAmmo:
       case TimingTriggerType.onPelletCriticalHitNum:
+      case TimingTriggerType.onFunctionDamageCriticalHit:
         // logger.i('Unimplemented TimingTriggerType: ${data.timingTriggerType}');
         break;
     }
@@ -622,6 +623,7 @@ class BattleFunction {
       case FunctionType.changeHurtFxExcludingBreakCol:
       case FunctionType.plusBuffCount:
       case FunctionType.durationDamage:
+      case FunctionType.useSkill1:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
     }
@@ -770,6 +772,7 @@ class BattleFunction {
       case StatusTriggerType.isCheckMonsterExcludeNoneType:
       case StatusTriggerType.isBurstStepCheck:
       case StatusTriggerType.isFunctionCount:
+      case StatusTriggerType.isNotHaveCover:
         logger.i('Unimplemented StatusTriggerType: $type');
         return false;
     }

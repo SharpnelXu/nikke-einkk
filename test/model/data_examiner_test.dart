@@ -185,6 +185,7 @@ void main() {
           'ShakeType',
           'ShakeWeight',
           'homing_script',
+          'aim_prefab',
         };
 
         final Set<String?> unknownWeaponType = {};
@@ -1240,6 +1241,7 @@ void main() {
           'spot_rand_ratio_teleport',
           'skill_data',
           'statenhance_id',
+          'ui_grade',
         };
 
         final skillDataExpectedKeys = {'skill_id', 'use_function_id_skill', 'hurt_function_id_skill'};
@@ -1427,6 +1429,7 @@ void main() {
           'weapon_object_enum',
           'linked_parts',
           'cancel_type',
+          'move_object',
         };
 
         final Set<String?> unknownPreferTargets = {};

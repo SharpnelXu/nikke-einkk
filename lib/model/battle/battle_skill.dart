@@ -169,6 +169,7 @@ class BattleSkill {
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.unknown:
       case CharacterSkillType.instantAllParts:
+      case CharacterSkillType.targetHitCountGetBuff:
         break;
     }
 
@@ -245,6 +246,7 @@ class BattleSkill {
       // ^ not sure what these are
       case CharacterSkillType.hitMonsterGetBuff:
       // ^ D: Killer Wife's Ult
+      case CharacterSkillType.targetHitCountGetBuff:
       case CharacterSkillType.unknown:
         return [];
     }

@@ -25,6 +25,7 @@ enum CharacterSkillType {
   stigma,
   hitMonsterGetBuff,
   instantAllParts,
+  targetHitCountGetBuff,
   unknown;
 
   static final Map<String, CharacterSkillType> _reverseMap = Map.fromIterable(
@@ -56,6 +57,8 @@ enum DurationType {
   timeSecBattles,
   @JsonValue('TimeSec_Ver2')
   timeSecVer2,
+  @JsonValue('Hits_Ver2')
+  hitsVer2,
   unknown;
 
   static final Map<String, DurationType> _reverseMap = Map.fromIterable(
@@ -63,7 +66,16 @@ enum DurationType {
     key: (v) => (v as DurationType).jsonKey,
   );
 
-  String get jsonKey => this == DurationType.timeSecVer2 ? 'TimeSec_Ver2' : name.pascal;
+  String get jsonKey {
+    switch (this) {
+      case DurationType.timeSecVer2:
+        return 'TimeSec_Ver2';
+      case DurationType.hitsVer2:
+        return 'Hits_Ver2';
+      default:
+        return name.pascal;
+    }
+  }
 
   static DurationType fromName(String? name) {
     return _reverseMap[name] ?? DurationType.unknown;
@@ -428,7 +440,8 @@ enum FunctionType {
   immediatelyBuffCheckImmune,
   changeHurtFxExcludingBreakCol,
   plusBuffCount, // seems to be CN exclusive
-  durationDamage;
+  durationDamage,
+  useSkill1;
 
   static final Map<String, FunctionType> _reverseMap = Map.fromIterable(
     FunctionType.values,
@@ -552,7 +565,8 @@ enum TimingTriggerType {
   onSpawnEnemy,
   onEnemyDead,
   onUseTeamAmmo,
-  onPelletCriticalHitNum;
+  onPelletCriticalHitNum,
+  onFunctionDamageCriticalHit;
 
   static List<TimingTriggerType> sorted = TimingTriggerType.values.toList().sorted((a, b) => a.name.compareTo(b.name));
 
@@ -610,8 +624,8 @@ enum StatusTriggerType {
   isCheckEnemyNikke,
   isCheckMonsterExcludeNoneType,
   isBurstStepCheck,
-  isFunctionCount // cn only
-  ;
+  isFunctionCount, // cn only
+  isNotHaveCover;
 
   static final Map<String, StatusTriggerType> _reverseMap = Map.fromIterable(
     StatusTriggerType.values,

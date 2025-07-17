@@ -49,6 +49,7 @@ MonsterData _$MonsterDataFromJson(Map<String, dynamic> json) => MonsterData(
           .toList() ??
       const [],
   statEnhanceId: (json['statenhance_id'] as num?)?.toInt() ?? 0,
+  uiGrade: json['ui_grade'] as String?,
 );
 
 MonsterStatEnhanceData _$MonsterStatEnhanceDataFromJson(Map<String, dynamic> json) => MonsterStatEnhanceData(
@@ -151,4 +152,5 @@ MonsterSkillData _$MonsterSkillDataFromJson(Map<String, dynamic> json) => Monste
   weaponObjectEnum: json['weapon_object_enum'] as String?,
   linkedParts: json['linked_parts'] as String?,
   cancelType: json['cancel_type'] as String?,
+  moveObject: (json['move_object'] as List<dynamic>?)?.map((e) => e as String).toList() ?? const [],
 );
