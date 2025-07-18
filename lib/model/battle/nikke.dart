@@ -7,11 +7,9 @@ import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/battle_skill.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
 import 'package:nikke_einkk/model/battle/events/burst_gen_event.dart';
-import 'package:nikke_einkk/model/battle/events/change_burst_step_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_fire_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_reload_event.dart';
-import 'package:nikke_einkk/model/battle/events/rapture_damage_event.dart';
 import 'package:nikke_einkk/model/battle/function.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
@@ -567,41 +565,7 @@ class BattleNikke extends BattleEntity {
   }
 
   void broadcast(BattleEvent event, BattleSimulation simulation) {
-    if (event is NikkeFireEvent && event.activatorId == uniqueId) {
-      currentAmmo = max(0, currentAmmo - 1);
-      totalBulletsFired += 1;
-
-      if (event.isFullCharge) {
-        totalFullChargeFired += 1;
-      }
-
-      for (final buff in buffs) {
-        if (buff.data.durationType == DurationType.shots && db.onShotFunctionTypes.contains(buff.data.functionType)) {
-          buff.duration -= 1;
-        }
-      }
-
-      // auto would still perform retreat behind cover animation
-      if (currentAmmo == 0) {
-        spotLastDelayFrameCount = timeDataToFrame(currentWeaponData.spotLastDelay, fps);
-      }
-    }
-
-    if (event is NikkeDamageEvent && event.activatorId == uniqueId) {
-      processDamageEvent(event, simulation);
-    }
-
-    if (event is ChangeBurstStepEvent && event.currentStage == 4 && event.nextStage == 0) {
-      activatedBurstSkillThisCycle = false;
-    }
-
-    if (event is RaptureDamageEvent && event.targetId == uniqueId) {
-      for (final buff in buffs) {
-        if (buff.data.durationType == DurationType.shots && db.onHitFunctionTypes.contains(buff.data.functionType)) {
-          buff.duration -= 1;
-        }
-      }
-    }
+    event.processNikke(simulation, this);
 
     for (final function in functions) {
       function.broadcast(event, simulation);

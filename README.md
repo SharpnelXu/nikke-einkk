@@ -66,23 +66,33 @@ Receive Damage Rate = 100% + Receive Damage Buffs + Distributed Damage Buffs
   - Except for nikkes with `maintainFireStance` (A2 & SBS)
 - SRs & RLs start charging at 100% (first frame of charging), and will fire after charging complete (since `inputType` is `UP`)
   - Without charging speed buffs, charging time is constant regardless of charge rate buffs
+  - Except Cindy, whose `intputType` is `Down_Charge` which makes her behave more like an AR
+- Shotgun's burst gen data is per pellet
+- ~~Snipers & Rocket Launchers have -1 frame charge time compared to data, so chargeTime = 60 frames (from 1s) only needs
+    59 frames to fully charge, and the 60th frame is for firing the bullet / projectile. Also, when moving out of cover,
+    the last frame will actually be the first charging frame, so each full charge attack cycle is actually 2 frames faster
+    compared to calculation~~
+  - Pending more testing, could be because Charging is calculated based on actual time instead of frames
 
 ## Program Constraints
 - Drain HP (Alice S2 when below 80% HP) is based on expected damage (crit chance & core chance), else one would need to
 manually set if each bullet is crit / core hit or not
+- `InstantCircle` targets all enemies
+- `InstantSequentialAttack` targets the first rapture (boss)
 
 ## Niche Mechanisms Waiting To Be Categorized
-- Shotgun's burst gen data is per pellet
-- Snipers & Rocket Launchers have -1 frame charge time compared to data, so chargeTime = 60 frames (from 1s) only needs
-59 frames to fully charge, and the 60th frame is for firing the bullet / projectile. Also, when moving out of cover,
-the last frame will actually be the first charging frame, so each full charge attack cycle is actually 2 frames faster
-compared to calculation
 - Equipment level stat rounding method is roundHalfToEvent (stat from level & stat from same corp are rounded separately)
 - Nikke stat rounding: gradeRatioStat is truncated to int, core stat is normal rounding
 - Current damage formula is roughly 0.0001% inaccurate due to rounding, the extreme example I used is Snow White's ult
 where the difference is 0.000004% (actual: 902435165 vs calculated: 902435200)
+  - Or maybe this is capped by charging multiplier (10 vs 9.99999)?
 - HP Ratio triggers (Emergency Max HP Cube) will not trigger again if the HP stays in trigger range
 - Each burst skill takes 1 frame (fastest possible), re-enter burst skills have 0.5s cd
+- For `instantSequentialAttacks` (Cindy's Burst), beforeHurt & afterHurt functions are applied for each hit
+
+## Questions need testing
+- Do decoys have defence?
+- Will Cindy's S2 Beautiful stack be removed if decoy's HP goes to 0? 
 
 ## TODOs
 

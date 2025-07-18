@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
+import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/module/common/custom_table.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 
@@ -17,6 +18,11 @@ class ChangeBurstStepEvent extends BattleEvent {
     required this.nextStage,
     required this.duration,
   });
+
+  @override
+  void processNikke(BattleSimulation simulation, BattleNikke nikke) {
+    nikke.activatedBurstSkillThisCycle = false;
+  }
 
   @override
   Widget buildDisplayV2(BattleSimulation simulation) {

@@ -822,7 +822,7 @@ enum NikkeElement {
       case NikkeElement.wind:
         return Colors.lightGreen;
       case NikkeElement.electric:
-        return Colors.deepPurple;
+        return Colors.purple[400]!;
       case NikkeElement.iron:
         return Colors.orangeAccent;
     }

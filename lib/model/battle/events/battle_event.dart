@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/nikke.dart';
 
 class BattleEvent {
   final int activatorId;
@@ -22,4 +23,6 @@ class BattleEvent {
   List<int> getTargetIds() {
     return targetIds;
   }
+
+  void processNikke(BattleSimulation simulation, BattleNikke nikke) {}
 }

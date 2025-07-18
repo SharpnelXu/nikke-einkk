@@ -92,7 +92,10 @@ class CharacterSkillDataDisplay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
             children: [
-              Text('Pre Skill Function ${idx + 1}', style: TextStyle(fontSize: 16)),
+              Text(
+                'Pre ${data.beforeUseFunctionIdList.contains(preFunctionIds[idx]) ? 'Skill' : 'Damage'} Function ${idx + 1}',
+                style: TextStyle(fontSize: 16),
+              ),
               SimpleFunctionDisplay(functionId: preFunctionIds[idx], connectFuncPrefix: '${idx + 1}-'),
             ],
           ),
@@ -119,7 +122,10 @@ class CharacterSkillDataDisplay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
             children: [
-              Text('Post Skill Function ${idx + 1}', style: TextStyle(fontSize: 16)),
+              Text(
+                'Post ${data.afterUseFunctionIdList.contains(postFunctionIds[idx]) ? 'Skill' : 'Damage'} Function ${idx + 1}',
+                style: TextStyle(fontSize: 16),
+              ),
               SimpleFunctionDisplay(functionId: postFunctionIds[idx], connectFuncPrefix: '${idx + 1}-'),
             ],
           ),

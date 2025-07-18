@@ -36,6 +36,18 @@ class RaptureDamageEvent extends BattleEvent {
   int get targetId => targetIds.first;
 
   @override
+  void processNikke(BattleSimulation simulation, BattleNikke nikke) {
+    if (nikke.uniqueId == targetId) {
+      for (final buff in nikke.buffs) {
+        if (buff.data.durationType == DurationType.shots &&
+            simulation.db.onHitFunctionTypes.contains(buff.data.functionType)) {
+          buff.duration -= 1;
+        }
+      }
+    }
+  }
+
+  @override
   Widget buildDisplayV2(BattleSimulation simulation) {
     return CustomTable(
       children: [

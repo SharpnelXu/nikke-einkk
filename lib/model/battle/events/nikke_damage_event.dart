@@ -191,6 +191,24 @@ class NikkeDamageEvent extends BattleEvent {
   }
 
   @override
+  void processNikke(BattleSimulation simulation, BattleNikke nikke) {
+    if (activatorId == nikke.uniqueId) {
+      final rapture = simulation.getRaptureByUniqueId(targetId);
+      if (rapture == null) return;
+
+      if (source == Source.bullet) {
+        nikke.totalBulletsHit += 1;
+      }
+
+      final drainHp = nikke.getDrainHpBuff(simulation);
+      if (drainHp > 0) {
+        final expectedDamage = damageParameter.calculateExpectedDamage();
+        nikke.changeHp(simulation, (toModifier(drainHp) * expectedDamage).round(), true);
+      }
+    }
+  }
+
+  @override
   Widget buildDisplayV2(BattleSimulation simulation) {
     return CustomTable(
       children: [

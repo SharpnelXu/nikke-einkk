@@ -6,6 +6,7 @@ import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/change_burst_step_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
+import 'package:nikke_einkk/model/battle/events/sequential_attack_event.dart';
 import 'package:nikke_einkk/model/battle/events/use_skill_event.dart';
 import 'package:nikke_einkk/model/battle/function.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
@@ -83,18 +84,48 @@ class BattleSkill {
     }
   }
 
+  static void instantDamage(
+    BattleSimulation simulation,
+    SkillData skillData,
+    int ownerId,
+    Source source,
+    BattleEntity target,
+  ) {
+    if (target is BattleRapture) {
+      bool shareDamage = false;
+      final shareDamageBuff = target.buffs.firstWhereOrNull(
+        (buff) => buff.data.functionType == FunctionType.damageShareInstant,
+      );
+      if (shareDamageBuff != null) {
+        shareDamage = true;
+        target.buffs.remove(shareDamageBuff);
+      }
+      simulation.registerEvent(
+        simulation.currentFrame,
+        NikkeDamageEvent.skill(
+          simulation: simulation,
+          nikke: simulation.getNikkeOnPosition(ownerId)!,
+          rapture: target,
+          source: source,
+          damageRate: skillData.skillValueData[0].skillValue,
+          isShareDamage: shareDamage,
+        ),
+      );
+    }
+  }
+
   static void activateSkill(
     BattleSimulation simulation,
     SkillData skillData,
-    int ownerUniqueId,
+    int ownerId,
     int skillGroupId,
     Source source,
   ) {
-    final skillTargets = getSkillTargets(simulation, skillData, ownerUniqueId);
-    final owner = simulation.getNikkeOnPosition(ownerUniqueId)!;
+    final skillTargets = getSkillTargets(simulation, skillData, ownerId);
+    final owner = simulation.getNikkeOnPosition(ownerId)!;
 
     final event = UseSkillEvent(
-      ownerUniqueId,
+      ownerId,
       skillTargets.map((entity) => entity.uniqueId).toList(),
       skillData.id,
       skillGroupId,
@@ -105,7 +136,7 @@ class BattleSkill {
     for (final beforeFuncId in [...skillData.beforeUseFunctionIdList, ...skillData.beforeHurtFunctionIdList]) {
       final functionData = simulation.db.functionTable[beforeFuncId];
       if (functionData != null) {
-        final function = BattleFunction(functionData, ownerUniqueId, source);
+        final function = BattleFunction(functionData, ownerId, source);
         // connected function likely doesn't check trigger target
         function.executeFunction(event, simulation);
       }
@@ -118,26 +149,34 @@ class BattleSkill {
       case CharacterSkillType.instantCircleSeparate:
       case CharacterSkillType.instantNumber:
         for (final target in skillTargets) {
-          if (target is BattleRapture) {
-            bool shareDamage = false;
-            final shareDamageBuff = target.buffs.firstWhereOrNull(
-              (buff) => buff.data.functionType == FunctionType.damageShareInstant,
-            );
-            if (shareDamageBuff != null) {
-              shareDamage = true;
-              target.buffs.remove(shareDamageBuff);
+          instantDamage(simulation, skillData, ownerId, source, target);
+        }
+        break;
+      case CharacterSkillType.instantSequentialAttack:
+        for (final target in skillTargets) {
+          instantDamage(simulation, skillData, ownerId, source, target);
+
+          final additionalTimes = skillData.skillValueData[1].skillValue - 1;
+          final delayTime = skillData.skillValueData[2].skillValue;
+          for (int count = 1; count <= additionalTimes; count += 1) {
+            final damageFrame = simulation.currentFrame - timeDataToFrame(delayTime, simulation.fps) * count;
+            if (target is BattleRapture) {
+              simulation.registerEvent(
+                damageFrame,
+                NikkeDamageEvent.skill(
+                  simulation: simulation,
+                  nikke: simulation.getNikkeOnPosition(ownerId)!,
+                  rapture: target,
+                  source: source,
+                  damageRate: skillData.skillValueData[0].skillValue,
+                  isShareDamage: false,
+                ),
+              );
+              simulation.registerEvent(
+                damageFrame,
+                SequentialAttackEvent.create(ownerId, target.uniqueId, skillData, source),
+              );
             }
-            simulation.registerEvent(
-              simulation.currentFrame,
-              NikkeDamageEvent.skill(
-                simulation: simulation,
-                nikke: simulation.getNikkeOnPosition(ownerUniqueId)!,
-                rapture: target,
-                source: source,
-                damageRate: skillData.skillValueData[0].skillValue,
-                isShareDamage: shareDamage,
-              ),
-            );
           }
         }
         break;
@@ -171,7 +210,6 @@ class BattleSkill {
           }
         }
         break;
-      case CharacterSkillType.instantSequentialAttack:
       case CharacterSkillType.changeWeapon:
       case CharacterSkillType.launchWeapon:
       case CharacterSkillType.laserBeam:
@@ -188,7 +226,7 @@ class BattleSkill {
     for (final afterFuncId in [...skillData.afterUseFunctionIdList, ...skillData.afterHurtFunctionIdList]) {
       final functionData = simulation.db.functionTable[afterFuncId];
       if (functionData != null) {
-        final function = BattleFunction(functionData, ownerUniqueId, source);
+        final function = BattleFunction(functionData, ownerId, source);
         // connected function likely doesn't check trigger target
         function.executeFunction(event, simulation);
       }
@@ -204,7 +242,7 @@ class BattleSkill {
         simulation.registerEvent(
           simulation.currentFrame,
           ChangeBurstStepEvent(
-            ownerUniqueId,
+            ownerId,
             currentStage: simulation.burstStage,
             nextStage: nextStageNum,
             duration: owner.characterData.burstDuration,
