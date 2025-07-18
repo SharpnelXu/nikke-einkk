@@ -79,7 +79,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
       bottomNavigationBar: commonBottomNavigationBar(
         () => setState(() {}),
         actions: [
-          FilledButton(
+          FilledButton.icon(
             onPressed:
                 nikkeOptions.any((option) => option.nikkeResourceId != -1)
                     ? () {
@@ -97,41 +97,8 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                       );
                     }
                     : null,
-            child: Text('Simulate'),
-          ),
-          FilledButton.icon(
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (ctx) => GlobalSettingPage(
-                        playerOptions: playerOptions,
-                        cubeLvs: cubeLvs,
-                        db: db,
-                        maxSync: db.maxSyncLevel,
-                        onGlobalSyncChange: (v) {
-                          for (final option in nikkeOptions) {
-                            option.syncLevel = v;
-                          }
-                          setState(() {});
-                        },
-                        onCubeLvChangeChange: (id, v) {
-                          for (final option in nikkeOptions) {
-                            final cube = option.cube;
-                            if (cube != null && cube.cubeId == id) {
-                              cube.cubeLevel = v;
-                            }
-                          }
-                          setState(() {});
-                        },
-                      ),
-                ),
-              );
-              if (mounted) setState(() {});
-            },
-            icon: Icon(Icons.recycling),
-            label: Text('Global Settings'),
+            icon: Icon(Icons.play_arrow),
+            label: Text('Simulate'),
           ),
           FilledButton.icon(
             onPressed: () async {
@@ -184,6 +151,63 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
       ),
       body: ListView(
         children: [
+          Align(
+            child: Text(
+              'Time Limit: ${frameDataToNiceTimeString(maxSeconds * fps, fps)}, FPS: $fps',
+              style: TextStyle(fontSize: 20),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 15,
+            children: [
+              Text('Force Fill Burst'),
+              Switch(
+                value: playerOptions.forceFillBurst,
+                onChanged: (v) {
+                  playerOptions.forceFillBurst = v;
+                  if (mounted) setState(() {});
+                },
+              ),
+            ],
+          ),
+          const Divider(),
+          Align(
+            child: FilledButton.icon(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (ctx) => GlobalSettingPage(
+                          playerOptions: playerOptions,
+                          cubeLvs: cubeLvs,
+                          db: db,
+                          maxSync: db.maxSyncLevel,
+                          onGlobalSyncChange: (v) {
+                            for (final option in nikkeOptions) {
+                              option.syncLevel = v;
+                            }
+                            setState(() {});
+                          },
+                          onCubeLvChangeChange: (id, v) {
+                            for (final option in nikkeOptions) {
+                              final cube = option.cube;
+                              if (cube != null && cube.cubeId == id) {
+                                cube.cubeLevel = v;
+                              }
+                            }
+                            setState(() {});
+                          },
+                        ),
+                  ),
+                );
+                if (mounted) setState(() {});
+              },
+              icon: Icon(Icons.recycling),
+              label: Text('Global Nikke Settings'),
+            ),
+          ),
           Align(child: Text('Nikkes', style: TextStyle(fontSize: 20))),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,7 +215,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
               return Expanded(child: buildNikkeDisplay(context, nikkeOptions[index]));
             }),
           ),
-          Divider(),
+          const Divider(),
           Align(child: Text('Rapture', style: TextStyle(fontSize: 20))),
           Align(child: buildRaptureDisplay(raptureOption)),
         ],

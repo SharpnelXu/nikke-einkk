@@ -100,8 +100,9 @@ class BattleSkill {
         shareDamage = true;
         target.buffs.remove(shareDamageBuff);
       }
+      final delayFrame = source == Source.burst ? timeDataToFrame(constData.damageBurstApplyDelay, simulation.fps) : 0;
       simulation.registerEvent(
-        simulation.currentFrame,
+        simulation.currentFrame - delayFrame,
         NikkeDamageEvent.skill(
           simulation: simulation,
           nikke: simulation.getNikkeOnPosition(ownerId)!,
@@ -159,7 +160,10 @@ class BattleSkill {
           final additionalTimes = skillData.skillValueData[1].skillValue - 1;
           final delayTime = skillData.skillValueData[2].skillValue;
           for (int count = 1; count <= additionalTimes; count += 1) {
-            final damageFrame = simulation.currentFrame - timeDataToFrame(delayTime, simulation.fps) * count;
+            final delayFrame =
+                source == Source.burst ? timeDataToFrame(constData.damageBurstApplyDelay, simulation.fps) : 0;
+            final damageFrame =
+                simulation.currentFrame - delayFrame - timeDataToFrame(delayTime, simulation.fps) * count;
             if (target is BattleRapture) {
               simulation.registerEvent(
                 damageFrame,

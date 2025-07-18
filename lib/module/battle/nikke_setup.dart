@@ -87,6 +87,18 @@ class _NikkeEditorPageState extends State<NikkeEditorPage> {
             ),
           ),
           if (characterData != null)
+            Align(
+              child: FilledButton.icon(
+                onPressed: () {
+                  option.nikkeResourceId = -1;
+                  setState(() {});
+                },
+                label: Text('Remove'),
+                icon: Icon(Icons.remove_circle),
+                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              ),
+            ),
+          if (characterData != null)
             NikkeSetupColumn(option: option, cubeLvs: widget.cubeLvs, useGlobal: useGlobal, advancedOption: true),
         ],
       ),

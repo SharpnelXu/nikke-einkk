@@ -16,19 +16,20 @@ class UseSkillEvent extends BattleEvent {
   @override
   Widget buildDisplayV2(BattleSimulation simulation) {
     final skillInfoData = simulation.db.skillInfoTable[skillId];
+    final skillType = simulation.db.characterSkillTable[skillId]?.skillType;
     final skillName = locale.getTranslation(skillInfoData?.nameLocalkey) ?? '$skillId';
     return CustomTable(
       children: [
         CustomTableRow.fromTexts(
-          texts: ['Skill Activated', 'Source', 'Activator', 'Targets'],
+          texts: ['Skill Activated', 'Activator', 'Targets', 'Source'],
           defaults: battleHeaderData,
         ),
         CustomTableRow.fromTexts(
           texts: [
-            '$skillName ($skillGroup)',
-            source.name.pascal,
+            '$skillName (${skillType?.name}: $skillGroup)',
             '${simulation.getEntityName(activatorId)}',
             targetIds.map((targetId) => simulation.getEntityName(targetId)).join(', '),
+            source.name.pascal,
           ],
         ),
       ],

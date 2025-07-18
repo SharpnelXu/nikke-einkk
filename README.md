@@ -79,6 +79,9 @@ Receive Damage Rate = 100% + Receive Damage Buffs + Distributed Damage Buffs
 manually set if each bullet is crit / core hit or not
 - `InstantCircle` targets all enemies
 - `InstantSequentialAttack` targets the first rapture (boss)
+- Unable to find why some burst skills took one extra second to apply. Assuming all damage burst skills have this property
+(although 2B, Harran may serve as counter example.)
+  - Fixing 2B, Harran etc. will be low priority since it involves testing & verification
 
 ## Niche Mechanisms Waiting To Be Categorized
 - Equipment level stat rounding method is roundHalfToEvent (stat from level & stat from same corp are rounded separately)

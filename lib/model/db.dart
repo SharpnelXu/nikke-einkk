@@ -83,6 +83,7 @@ class GameConstants {
   final burstMeterCap = 1000000; // 9000 = 0.9%
   final sameBurstStageCd = 50; // 0.5 seconds
   final fullCountLimit = 999999; // assume all full counter greater than this is a function group
+  final damageBurstApplyDelay = 100; // 1 second
 }
 
 class NikkeDatabase {

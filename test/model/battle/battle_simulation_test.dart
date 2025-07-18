@@ -642,8 +642,9 @@ void main() {
         ),
         isNotNull,
       );
+      // -60 for common burst damage delay
       final scarletBurstDamageEvent =
-          simulation.timeline[burstTimeFrame]!.firstWhere(
+          simulation.timeline[burstTimeFrame - 60]!.firstWhere(
                 (event) => event is NikkeDamageEvent && event.source == Source.burst && event.activatorId == 4,
               )
               as NikkeDamageEvent;
