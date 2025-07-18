@@ -49,7 +49,7 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
           onPressed: () {
             if (characterData != null && weapon != null) {
               option.coreLevel = groupedData!.keys.fold(0, max);
-              option.attractLevel = characterData.maxAttractLv;
+              option.attractLevel = groupedData[option.coreLevel]!.maxAttractLv;
               option.skillLevels = [10, 10, 10];
               if (option.cube != null) {
                 final cube = db.harmonyCubeTable[option.cube?.cubeId];

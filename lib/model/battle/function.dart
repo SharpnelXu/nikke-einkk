@@ -298,6 +298,7 @@ class BattleFunction {
       final previousMaxAmmo = target is BattleNikke ? target.getMaxAmmo(simulation) : 0;
       final previousMaxHp = target.getMaxHp(simulation);
 
+      BattleBuff addedBuff;
       final existingBuff = target.buffs.firstWhereOrNull((buff) => buff.data.groupId == data.groupId);
       if (existingBuff != null) {
         existingBuff.duration =
@@ -309,10 +310,10 @@ class BattleFunction {
         // overwrite is probably done this way
         if (existingBuff.data.level < data.level) {
           existingBuff.data = data;
-          existingBuff.buffGiverId = event.getActivatorId();
+          existingBuff.buffGiverId = event.activatorId;
           existingBuff.buffReceiverId = target.uniqueId;
         }
-        simulation.registerEvent(simulation.currentFrame, BuffEvent.create(existingBuff));
+        addedBuff = existingBuff;
       } else {
         final buff = BattleBuff.create(
           data: data,
@@ -323,8 +324,17 @@ class BattleFunction {
           targetGroupId: parentFunctionValue,
         );
         target.buffs.add(buff);
-        simulation.registerEvent(simulation.currentFrame, BuffEvent.create(buff));
+        addedBuff = buff;
       }
+
+      if (data.fullCount > constData.fullCountLimit) {
+        final activator = simulation.getEntityById(event.activatorId);
+        final sourceBuff = activator?.buffs.where((buff) => buff.data.groupId == data.fullCount).firstOrNull;
+        if (sourceBuff != null) {
+          addedBuff.count = sourceBuff.count;
+        }
+      }
+      simulation.registerEvent(simulation.currentFrame, BuffEvent.create(addedBuff));
 
       if (data.functionType == FunctionType.statHpHeal) {
         final afterMaxHp = target.getMaxHp(simulation);
@@ -363,6 +373,7 @@ class BattleFunction {
       case FunctionType.damageShareInstant: // used by SBS's skills to denote the next skill damage is shared damage
       case FunctionType.drainHpBuff:
       case FunctionType.firstBurstGaugeSpeedUp:
+      case FunctionType.fullCountDamageRatio:
       case FunctionType.gainAmmo: // is actually a buff of 0 duration
       case FunctionType.givingHealVariation:
       case FunctionType.healVariation:
@@ -423,13 +434,22 @@ class BattleFunction {
             if (!statusCheck) continue;
 
             activated = true;
+            final baseRate = data.functionValue;
+            int stack = 1;
+            if (data.fullCount > constData.fullCountLimit) {
+              final activator = simulation.getEntityById(event.activatorId);
+              final sourceBuff = activator?.buffs.where((buff) => buff.data.groupId == data.fullCount).firstOrNull;
+              if (sourceBuff != null) {
+                stack = max(sourceBuff.count, stack);
+              }
+            }
             simulation.registerEvent(
               simulation.currentFrame,
               NikkeDamageEvent.skill(
                 simulation: simulation,
                 nikke: simulation.getNikkeOnPosition(ownerUniqueId)!,
                 rapture: target,
-                damageRate: data.functionValue,
+                damageRate: baseRate * stack,
                 source: source,
               ),
             );
@@ -561,7 +581,6 @@ class BattleFunction {
       case FunctionType.fixStatReloadTime:
       case FunctionType.forcedStop:
       case FunctionType.fullChargeHitDamageRepeat:
-      case FunctionType.fullCountDamageRatio:
       case FunctionType.functionOverlapChange:
       case FunctionType.gainUltiGauge:
       case FunctionType.gravityBomb:

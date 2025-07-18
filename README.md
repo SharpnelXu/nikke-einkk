@@ -89,6 +89,7 @@ where the difference is 0.000004% (actual: 902435165 vs calculated: 902435200)
 - HP Ratio triggers (Emergency Max HP Cube) will not trigger again if the HP stays in trigger range
 - Each burst skill takes 1 frame (fastest possible), re-enter burst skills have 0.5s cd
 - For `instantSequentialAttacks` (Cindy's Burst), beforeHurt & afterHurt functions are applied for each hit
+- If stack count is over 1000000, go find the buff and copy the stack count of that buff?
 
 ## Questions need testing
 - Do decoys have defence?
