@@ -28,6 +28,16 @@ enum CharacterSkillType {
   targetHitCountGetBuff,
   unknown;
 
+  bool get isDamage => [
+    instantAll,
+    instantArea,
+    instantCircle,
+    instantCircleSeparate,
+    instantNumber,
+    instantSequentialAttack,
+    instantAllParts,
+  ].contains(this);
+
   static final Map<String, CharacterSkillType> _reverseMap = Map.fromIterable(
     CharacterSkillType.values,
     key: (v) => (v as CharacterSkillType).name.pascal,

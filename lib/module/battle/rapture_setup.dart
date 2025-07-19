@@ -93,9 +93,9 @@ class _RaptureSetupPageState extends State<RaptureSetupPage> {
     if (levelData == null) return;
 
     option.level = levelData.lv;
-    option.startHp = levelData.levelHp;
-    option.startAttack = levelData.levelAttack;
-    option.startDefence = levelData.levelDefence;
+    option.startHp = (levelData.levelHp * toModifier(data?.hpRatio ?? 10000)).round();
+    option.startAttack = (levelData.levelAttack * toModifier(data?.attackRatio ?? 10000)).round();
+    option.startDefence = (levelData.levelDefence * toModifier(data?.defenceRatio ?? 10000)).round();
     option.brokenHp = levelData.levelBrokenHp;
     option.projectileHp = levelData.levelProjectileHp;
     option.damageRatio = levelData.levelStatDamageRatio;

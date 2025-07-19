@@ -101,8 +101,9 @@ class BattleSkill {
         target.buffs.remove(shareDamageBuff);
       }
       final delayFrame = source == Source.burst ? timeDataToFrame(constData.damageBurstApplyDelay, simulation.fps) : 0;
+      final damageFrame = simulation.currentFrame - delayFrame;
       simulation.registerEvent(
-        simulation.currentFrame - delayFrame,
+        damageFrame,
         NikkeDamageEvent.skill(
           simulation: simulation,
           nikke: simulation.getNikkeOnPosition(ownerId)!,
@@ -112,6 +113,7 @@ class BattleSkill {
           isShareDamage: shareDamage,
         ),
       );
+      simulation.registerEvent(damageFrame, SkillAttackEvent.create(ownerId, target.uniqueId, skillData, source));
     }
   }
 
@@ -134,7 +136,10 @@ class BattleSkill {
     );
     simulation.registerEvent(simulation.currentFrame, event);
 
-    for (final beforeFuncId in [...skillData.beforeUseFunctionIdList, ...skillData.beforeHurtFunctionIdList]) {
+    for (final beforeFuncId in [
+      ...skillData.beforeUseFunctionIdList,
+      if (!skillData.skillType.isDamage) ...skillData.beforeHurtFunctionIdList,
+    ]) {
       final functionData = simulation.db.functionTable[beforeFuncId];
       if (functionData != null) {
         final function = BattleFunction(functionData, ownerId, source);
@@ -155,11 +160,9 @@ class BattleSkill {
         break;
       case CharacterSkillType.instantSequentialAttack:
         for (final target in skillTargets) {
-          instantDamage(simulation, skillData, ownerId, source, target);
-
-          final additionalTimes = skillData.skillValueData[1].skillValue - 1;
+          final additionalTimes = skillData.skillValueData[1].skillValue;
           final delayTime = skillData.skillValueData[2].skillValue;
-          for (int count = 1; count <= additionalTimes; count += 1) {
+          for (int count = 0; count < additionalTimes; count += 1) {
             final delayFrame =
                 source == Source.burst ? timeDataToFrame(constData.damageBurstApplyDelay, simulation.fps) : 0;
             final damageFrame =
@@ -178,7 +181,7 @@ class BattleSkill {
               );
               simulation.registerEvent(
                 damageFrame,
-                SequentialAttackEvent.create(ownerId, target.uniqueId, skillData, source),
+                SkillAttackEvent.create(ownerId, target.uniqueId, skillData, source),
               );
             }
           }
@@ -227,7 +230,10 @@ class BattleSkill {
         break;
     }
 
-    for (final afterFuncId in [...skillData.afterUseFunctionIdList, ...skillData.afterHurtFunctionIdList]) {
+    for (final afterFuncId in [
+      ...skillData.afterUseFunctionIdList,
+      if (!skillData.skillType.isDamage) ...skillData.afterHurtFunctionIdList,
+    ]) {
       final functionData = simulation.db.functionTable[afterFuncId];
       if (functionData != null) {
         final function = BattleFunction(functionData, ownerId, source);

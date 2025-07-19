@@ -7,16 +7,16 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/module/common/custom_table.dart';
 
-class SequentialAttackEvent extends BattleEvent {
+class SkillAttackEvent extends BattleEvent {
   final SkillData skillData;
   final Source source;
 
-  SequentialAttackEvent._(super.activatorId, super.targetIds, this.skillData, this.source);
+  SkillAttackEvent._(super.activatorId, super.targetIds, this.skillData, this.source);
 
   int get targetId => targetIds.first;
 
-  factory SequentialAttackEvent.create(int activatorId, int targetId, SkillData skillData, Source source) {
-    return SequentialAttackEvent._(activatorId, [targetId], skillData, source);
+  factory SkillAttackEvent.create(int activatorId, int targetId, SkillData skillData, Source source) {
+    return SkillAttackEvent._(activatorId, [targetId], skillData, source);
   }
 
   @override

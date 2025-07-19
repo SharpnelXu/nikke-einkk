@@ -159,6 +159,12 @@ class BattleSimulation {
     currentFrame -= 1;
   }
 
+  void proceedNFrames(int numFrames) {
+    for (int i = 0; i < numFrames; i += 1) {
+      proceedOneFrame();
+    }
+  }
+
   void simulate() {
     if (nonnullNikkes.isEmpty) return;
 

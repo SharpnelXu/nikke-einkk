@@ -21,7 +21,9 @@ class ChangeBurstStepEvent extends BattleEvent {
 
   @override
   void processNikke(BattleSimulation simulation, BattleNikke nikke) {
-    nikke.activatedBurstSkillThisCycle = false;
+    if (currentStage == 4 && nextStage == 0) {
+      nikke.activatedBurstSkillThisCycle = false;
+    }
   }
 
   @override

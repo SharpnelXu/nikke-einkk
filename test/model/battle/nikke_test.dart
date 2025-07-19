@@ -1,11 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_fire_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/equipment.dart';
+import 'package:nikke_einkk/model/harmony_cube.dart';
 import 'package:nikke_einkk/model/items.dart';
+import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 
 import '../../test_helper.dart';
@@ -334,6 +337,148 @@ void main() {
         }
       }
       expect(shootCounter, 3);
+    });
+  });
+
+  group('Cindy', () {
+    test('Weapon Mechanism', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [NikkeOptions(nikkeResourceId: 511)],
+        raptureOptions: [Const.trainingWaterTarget],
+      );
+      simulation.init();
+      final expectedShootFrame = 12 + 59; // 12 exit 59 charging
+      simulation.proceedNFrames(expectedShootFrame);
+      final firstShot = simulation.timeline[simulation.currentFrame + 1]?.whereType<NikkeFireEvent>().toList();
+      expect(firstShot, isNotNull);
+      expect(firstShot, isNotEmpty);
+
+      final nextShotFrame = (60 * simulation.fps / 180).round(); // 180 is Cindy's fire rate
+      simulation.proceedNFrames(nextShotFrame);
+      final secondShot = simulation.timeline[simulation.currentFrame + 1]?.whereType<NikkeFireEvent>().toList();
+      expect(secondShot, isNotNull);
+      expect(secondShot, isNotEmpty);
+
+      final finalShotFrame = nextShotFrame * 22; // cindy default ammo is 24
+      simulation.proceedNFrames(finalShotFrame);
+      final finalShot = simulation.timeline[simulation.currentFrame + 1]?.whereType<NikkeFireEvent>().toList();
+      expect(finalShot, isNotNull);
+      expect(finalShot, isNotEmpty);
+      expect(simulation.nonnullNikkes.first.totalBulletsFired, 24);
+
+      final secondClipFirstShotFrame = 12 + 120 + 12 + 59; // enter cover + reload + exit cover + charging
+      simulation.proceedNFrames(secondClipFirstShotFrame);
+      final secondClipFirstShot =
+          simulation.timeline[simulation.currentFrame + 1]?.whereType<NikkeFireEvent>().toList();
+      expect(secondClipFirstShot, isNotNull);
+      expect(secondClipFirstShot, isNotEmpty);
+      expect(simulation.nonnullNikkes.first.totalBulletsFired, 25);
+    });
+
+    // test damage & burst
+    test('Damage Test', () {
+      final syncLv = 920;
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(
+          personalRecycleLevel: 440,
+          corpRecycleLevels: {
+            Corporation.pilgrim: 440,
+            Corporation.missilis: 216,
+            Corporation.abnormal: 185,
+            Corporation.tetra: 248,
+            Corporation.elysion: 227,
+          },
+          classRecycleLevels: {NikkeClass.attacker: 243, NikkeClass.supporter: 216, NikkeClass.defender: 216},
+        ),
+        nikkeOptions: [
+          Const.liter..syncLevel = syncLv,
+          Const.cindy
+            ..syncLevel = syncLv
+            ..cube = HarmonyCubeOption.fromType(HarmonyCubeType.gainAmmo, 15),
+          Const.helm
+            ..syncLevel = syncLv
+            ..cube = HarmonyCubeOption.fromType(HarmonyCubeType.reload, 15),
+          Const.crown
+            ..syncLevel = syncLv
+            ..cube = HarmonyCubeOption.fromType(HarmonyCubeType.reload, 15),
+        ],
+        raptureOptions: [Const.shootingRangeWaterBoss],
+      );
+
+      simulation.init();
+      final cindyId = 2;
+      final cindy = simulation.getEntityById(cindyId)!;
+      expect(cindy.getMaxHp(simulation), 27172647);
+      expect(cindy.currentHp, 27172647);
+      expect(cindy.baseAttack, 664275);
+      expect(cindy.baseDefence, 178253);
+      final expectedShootFrame = 12 + 59 - 4; // 12 exit 59 charging - 4 due to equip line
+      simulation.proceedNFrames(expectedShootFrame);
+      final firstShotDamageEvents =
+          simulation.timeline[simulation.currentFrame + 1]
+              ?.whereType<NikkeDamageEvent>()
+              .where((event) => event.activatorId == cindyId)
+              .toList();
+      expect(firstShotDamageEvents, isNotNull);
+      expect(firstShotDamageEvents!.length, 2);
+      final firstShot = firstShotDamageEvents.first;
+      final firstS1 = firstShotDamageEvents.last;
+      expect(firstShot.source, Source.bullet);
+      expect(firstShot.damageParameter.calculateDamage(core: true), moreOrLessEquals(1690317, epsilon: 5));
+      expect(firstS1.source, Source.skill1);
+      expect(firstS1.damageParameter.calculateDamage(), moreOrLessEquals(1642191, epsilon: 3));
+
+      List<NikkeDamageEvent>? cindyBurstDmg;
+      while ((cindyBurstDmg?.isEmpty ?? true) && simulation.currentFrame > 0) {
+        simulation.proceedOneFrame();
+        final events = simulation.timeline[simulation.currentFrame + 1];
+        cindyBurstDmg =
+            events
+                ?.whereType<NikkeDamageEvent>()
+                .where((event) => event.activatorId == cindyId && event.source == Source.burst)
+                .toList();
+      }
+      expect(cindy.getMaxHp(simulation), 27607409);
+      expect(cindyBurstDmg, isNotNull);
+      expect(cindyBurstDmg!.length, 2);
+      expect(cindyBurstDmg.first.damageParameter.calculateDamage(), moreOrLessEquals(58715278, epsilon: 3));
+      expect(cindyBurstDmg.last.damageParameter.calculateDamage(), moreOrLessEquals(2637622, epsilon: 3));
+
+      for (int count = 2; count <= 10; count += 1) {
+        simulation.proceedNFrames(12); // each cindy burst is 12 frames apart
+        final events = simulation.timeline[simulation.currentFrame + 1];
+        cindyBurstDmg =
+            events
+                ?.whereType<NikkeDamageEvent>()
+                .where((event) => event.activatorId == cindyId && event.source == Source.burst)
+                .toList();
+        expect(cindyBurstDmg, isNotNull);
+        expect(cindyBurstDmg!.length, 2);
+        expect(cindyBurstDmg.first.damageParameter.calculateDamage(), moreOrLessEquals(58715278, epsilon: 3));
+        final cindyMaxHp = cindy.getMaxHp(simulation);
+        final expectedStackDamage = cindyMaxHp == 27607409 ? 2637622 : 2649826;
+        expect(
+          cindyBurstDmg.last.damageParameter.calculateDamage(),
+          moreOrLessEquals(expectedStackDamage.toDouble(), epsilon: 3),
+        );
+      }
+
+      cindyBurstDmg = null;
+      while ((cindyBurstDmg?.isEmpty ?? true) && simulation.currentFrame > 0) {
+        simulation.proceedOneFrame();
+        final events = simulation.timeline[simulation.currentFrame + 1];
+        cindyBurstDmg =
+            events
+                ?.whereType<NikkeDamageEvent>()
+                .where((event) => event.activatorId == cindyId && event.source == Source.burst)
+                .toList();
+      }
+      expect(cindy.getMaxHp(simulation), 32389795); // max stack
+      expect(cindyBurstDmg, isNotNull);
+      expect(cindyBurstDmg!.length, 2);
+      expect(cindyBurstDmg.first.damageParameter.calculateDamage(), moreOrLessEquals(64963951, epsilon: 5));
+      expect(cindyBurstDmg.last.damageParameter.calculateDamage(), moreOrLessEquals(34453045, epsilon: 3));
     });
   });
 }

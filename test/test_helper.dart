@@ -40,6 +40,24 @@ class Const {
   );
   static BattleRaptureOptions get trainingWaterTarget => _trainingWaterTarget.copy();
 
+  static final _shootingRangeWaterBoss = BattleRaptureOptions(
+    name: 'Locale_Monster:2420040422_name',
+    monsterId: 2420040422,
+    level: 300,
+    startDistance: 30, // tbd
+    coreSize: 10,
+    isStageTarget: true,
+    canBeTargeted: true,
+    element: NikkeElement.water,
+    startHp: (48575982 * 9999.9999).round(),
+    startAttack: (71350 * 0.0001).round(),
+    startDefence: (14272 * 0.0070).round(),
+    damageRatio: 238571,
+    projectileHp: 140600,
+    brokenHp: 48575982,
+  );
+  static BattleRaptureOptions get shootingRangeWaterBoss => _shootingRangeWaterBoss.copy();
+
   static final _liter = NikkeOptions(
     nikkeResourceId: 82,
     coreLevel: 11,
@@ -129,6 +147,105 @@ class Const {
     cube: null,
   );
   static NikkeOptions get helm => _helm.copy();
+
+  static final _cindy = NikkeOptions(
+    nikkeResourceId: 511,
+    coreLevel: 11,
+    syncLevel: 884,
+    attractLevel: 40,
+    skillLevels: [10, 10, 10],
+    equips: [
+      EquipmentOption(
+        type: EquipType.head,
+        equipClass: NikkeClass.defender,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [
+          EquipLine(EquipLineType.statAmmo, 11),
+          EquipLine.onValue(EquipLineType.statAtk, 829, global),
+          EquipLine.onValue(EquipLineType.startAccuracyCircle, 1040, global),
+        ],
+      ),
+      EquipmentOption(
+        type: EquipType.body,
+        equipClass: NikkeClass.defender,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [EquipLine.onValue(EquipLineType.statAtk, 900, global), EquipLine(EquipLineType.statAmmo, 11)],
+      ),
+      EquipmentOption(
+        type: EquipType.arm,
+        equipClass: NikkeClass.defender,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [EquipLine(EquipLineType.statAtk, 11)],
+      ),
+      EquipmentOption(
+        type: EquipType.leg,
+        equipClass: NikkeClass.defender,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [
+          EquipLine.onValue(EquipLineType.statCritical, 469, global),
+          EquipLine.onValue(EquipLineType.statAtk, 1111, global),
+          EquipLine.onValue(EquipLineType.statChargeTime, 257, global),
+        ],
+      ),
+    ],
+    favoriteItem: FavoriteItemOption(weaponType: WeaponType.rl, rarity: Rarity.sr, level: 15),
+    cube: null,
+  );
+  static NikkeOptions get cindy => _cindy.copy();
+
+  static final _crown = NikkeOptions(
+    nikkeResourceId: 330,
+    coreLevel: 11,
+    syncLevel: 884,
+    attractLevel: 40,
+    skillLevels: [10, 10, 10],
+    equips: [
+      EquipmentOption(
+        type: EquipType.head,
+        equipClass: NikkeClass.defender,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [
+          EquipLine.onValue(EquipLineType.statAtk, 1040, global),
+          EquipLine.onValue(EquipLineType.statChargeDamage, 477, global),
+        ],
+      ),
+      EquipmentOption(
+        type: EquipType.body,
+        equipClass: NikkeClass.defender,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [EquipLine.onValue(EquipLineType.statAtk, 1181, global), EquipLine(EquipLineType.statAmmo, 11)],
+      ),
+      EquipmentOption(
+        type: EquipType.arm,
+        equipClass: NikkeClass.defender,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [
+          EquipLine.onValue(EquipLineType.statChargeDamage, 492, global),
+          EquipLine(EquipLineType.statAtk, 11),
+        ],
+      ),
+      EquipmentOption(
+        type: EquipType.leg,
+        equipClass: NikkeClass.defender,
+        rarity: EquipRarity.t10,
+        level: 3,
+        equipLines: [
+          EquipLine.onValue(EquipLineType.statCritical, 366, global),
+          EquipLine.onValue(EquipLineType.statAmmo, 4017, global),
+        ],
+      ),
+    ],
+    favoriteItem: FavoriteItemOption(weaponType: WeaponType.mg, rarity: Rarity.sr, level: 15),
+    cube: null,
+  );
+  static NikkeOptions get crown => _crown.copy();
 
   Const._();
 }
