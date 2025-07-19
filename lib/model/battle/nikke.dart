@@ -639,12 +639,14 @@ class BattleNikke extends BattleEntity {
   }
 
   int getMaxAmmo(BattleSimulation simulation) {
-    return getBuffValueOfTypes(
+    final result = getBuffValueOfTypes(
       simulation,
       [FunctionType.statAmmoLoad, FunctionType.statAmmo],
       currentWeaponData.maxAmmo,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.maxAmmo : 0,
     );
+
+    return max(1, result);
   }
 
   int getChargeDamageBuffValues(BattleSimulation simulation) {

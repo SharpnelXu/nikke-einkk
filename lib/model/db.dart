@@ -397,10 +397,6 @@ class NikkeDatabase {
   void processCharacterData(dynamic record) {
     final data = NikkeCharacterData.fromJson(record);
 
-    if (data.resourceId == 16) {
-      data.elementId.add(NikkeElement.iron.id);
-    }
-
     characterResourceGardeTable.putIfAbsent(data.resourceId, () => {});
     characterResourceGardeTable[data.resourceId]![data.gradeCoreId] = data;
   }

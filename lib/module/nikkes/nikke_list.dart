@@ -386,7 +386,7 @@ class NikkeFilterData {
   bool shouldInclude(NikkeCharacterData characterData, WeaponData? weapon) {
     return _burstCheck(characterData) &&
         (corps.isEmpty || corps.contains(characterData.corporation)) &&
-        (elements.isEmpty || characterData.elementId.any((eleId) => elements.contains(NikkeElement.fromId(eleId)))) &&
+        _elementCheck(characterData) &&
         (classes.isEmpty || classes.contains(characterData.characterClass)) &&
         (weaponTypes.isEmpty || weaponTypes.contains(weapon?.weaponType)) &&
         (rarity.isEmpty || rarity.contains(characterData.originalRare)) &&
@@ -394,6 +394,14 @@ class NikkeFilterData {
         _funcTypeCheck(characterData) &&
         _timingTypeCheck(characterData) &&
         _statusTypeCheck(characterData);
+  }
+
+  bool _elementCheck(NikkeCharacterData characterData) {
+    if (elements.isEmpty || characterData.elementId.any((eleId) => elements.contains(NikkeElement.fromId(eleId)))) {
+      return true;
+    }
+    final rapiRedHoodCheck = characterData.resourceId == 16 && elements.contains(NikkeElement.iron);
+    return rapiRedHoodCheck;
   }
 
   bool _burstCheck(NikkeCharacterData characterData) {

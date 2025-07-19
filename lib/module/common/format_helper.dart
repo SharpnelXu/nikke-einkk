@@ -142,6 +142,31 @@ String? durationString(int value, DurationType type) {
   }
 }
 
+String timingValueDisplay(TimingTriggerType type, int value) {
+  switch (type) {
+    case TimingTriggerType.onHurtRatio:
+    case TimingTriggerType.onHpRatioUnder:
+    case TimingTriggerType.onHpRatioUp:
+      return value.percentString;
+    case TimingTriggerType.onCheckTime:
+      return value.timeString;
+    default:
+      return '$value';
+  }
+}
+
+String statusValueDisplay(StatusTriggerType type, int value) {
+  switch (type) {
+    case StatusTriggerType.isHpRatioUnder:
+    case StatusTriggerType.isHpRatioUp:
+      return value.percentString;
+    case StatusTriggerType.isSearchElementId:
+      return NikkeElement.fromId(value).name.toUpperCase();
+    default:
+      return '$value';
+  }
+}
+
 Color buffTypeColor(BuffType? type) {
   if (type == null) {
     return Colors.grey;

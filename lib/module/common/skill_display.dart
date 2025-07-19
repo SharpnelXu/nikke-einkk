@@ -260,19 +260,31 @@ class SimpleFunctionDisplay extends StatelessWidget {
         CustomTableRow.fromTexts(texts: ['Timing Trigger', 'Value', 'Standard'], defaults: headerData),
       if (func.timingTriggerType != TimingTriggerType.none)
         CustomTableRow.fromTexts(
-          texts: [func.rawTimingTriggerType, '${func.timingTriggerValue}', func.rawTimingTriggerStandard],
+          texts: [
+            func.rawTimingTriggerType,
+            timingValueDisplay(func.timingTriggerType, func.timingTriggerValue),
+            func.rawTimingTriggerStandard,
+          ],
         ),
       if (func.statusTriggerType != StatusTriggerType.none)
         CustomTableRow.fromTexts(texts: ['Status Trigger 1', 'Value', 'Standard'], defaults: headerData),
       if (func.statusTriggerType != StatusTriggerType.none)
         CustomTableRow.fromTexts(
-          texts: [func.rawStatusTriggerType, '${func.statusTriggerValue}', func.rawStatusTriggerStandard],
+          texts: [
+            func.rawStatusTriggerType,
+            statusValueDisplay(func.statusTriggerType, func.statusTriggerValue),
+            func.rawStatusTriggerStandard,
+          ],
         ),
       if (func.statusTrigger2Type != StatusTriggerType.none)
         CustomTableRow.fromTexts(texts: ['Status Trigger 2', 'Value', 'Standard'], defaults: headerData),
       if (func.statusTrigger2Type != StatusTriggerType.none)
         CustomTableRow.fromTexts(
-          texts: [func.rawStatusTrigger2Type, '${func.statusTrigger2Value}', func.rawStatusTrigger2Standard],
+          texts: [
+            func.rawStatusTrigger2Type,
+            statusValueDisplay(func.statusTrigger2Type, func.statusTrigger2Value),
+            func.rawStatusTrigger2Standard,
+          ],
         ),
       CustomTableRow.fromTexts(texts: ['Is Cancel', 'Keeping Type'], defaults: headerData),
       CustomTableRow.fromTexts(texts: ['${func.isCancel}', func.rawKeepingType]),
