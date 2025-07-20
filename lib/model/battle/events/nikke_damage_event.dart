@@ -218,14 +218,13 @@ class NikkeDamageEvent extends BattleEvent {
             battleHeaderData.copyWith(text: 'Activator', flex: 2),
             battleHeaderData.copyWith(text: 'Target', flex: 2),
             battleHeaderData.copyWith(text: 'Source', flex: 1),
-            battleHeaderData.copyWith(text: 'Invalid', flex: 1),
           ],
         ),
         CustomTableRow(
           children: [
             TableCellData(
               text:
-                  '${damageParameter.calculateExpectedDamage().decimalPattern}'
+                  '${damageParameter.calculateExpectedDamage().decimalPattern}${invalid ? ' (Invalid)' : ''}'
                   '${shotCount > 1 ? ' ($shotCount shots)' : ''}'
                   '${damageParameter.criticalRate > 0 ? ' Crit: ${damageParameter.criticalRate.percentString}' : ''}'
                   '${damageParameter.coreHitRate > 0 ? ' Core: ${damageParameter.coreHitRate.percentString}' : ''}'
@@ -235,7 +234,6 @@ class NikkeDamageEvent extends BattleEvent {
             TableCellData(text: '${simulation.getEntityName(activatorId)}', flex: 2),
             TableCellData(text: '${simulation.getEntityName(targetId)}', flex: 2),
             TableCellData(text: source.name.pascal, flex: 1),
-            TableCellData(text: '$invalid', flex: 1),
           ],
         ),
       ],

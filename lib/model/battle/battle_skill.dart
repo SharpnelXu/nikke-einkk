@@ -6,7 +6,7 @@ import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/change_burst_step_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
-import 'package:nikke_einkk/model/battle/events/sequential_attack_event.dart';
+import 'package:nikke_einkk/model/battle/events/skill_attack_event.dart';
 import 'package:nikke_einkk/model/battle/events/use_skill_event.dart';
 import 'package:nikke_einkk/model/battle/function.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';

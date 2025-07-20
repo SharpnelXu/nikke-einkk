@@ -39,7 +39,7 @@ class SkillAttackEvent extends BattleEvent {
     final skillName = locale.getTranslation(skillInfoData?.nameLocalkey) ?? '${skillData.id}';
     return CustomTable(
       children: [
-        CustomTableRow.fromTexts(texts: ['Sequential Attack', 'Activator', 'Targets'], defaults: battleHeaderData),
+        CustomTableRow.fromTexts(texts: ['Skill Attack', 'Activator', 'Targets'], defaults: battleHeaderData),
         CustomTableRow.fromTexts(
           texts: [skillName, '${simulation.getEntityName(activatorId)}', '${simulation.getEntityName(targetId)}'],
         ),

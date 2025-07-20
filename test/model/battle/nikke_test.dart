@@ -481,4 +481,53 @@ void main() {
       expect(cindyBurstDmg.last.damageParameter.calculateDamage(), moreOrLessEquals(34453045, epsilon: 3));
     });
   });
+
+  group('Summer Anis', () {
+    test('LastAmmoUse', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [
+          NikkeOptions(nikkeResourceId: 15)..cube = HarmonyCubeOption.fromType(HarmonyCubeType.gainAmmo, 1),
+        ],
+        raptureOptions: [Const.trainingWaterTarget],
+      );
+
+      final anisId = 1;
+      simulation.init();
+      simulation.proceedNFrames(12 + 40 * 4 + 1); // exit cover, five shots, to reload event
+      final anisSkillDmg =
+          simulation.timeline[simulation.currentFrame + 1]
+              ?.whereType<NikkeDamageEvent>()
+              .where((event) => event.activatorId == anisId && event.source == Source.skill2)
+              .toList();
+      expect(anisSkillDmg, isNotNull);
+
+      simulation.proceedNFrames(
+        12 + 120 + 12 + 40 * 5 + 1,
+      ); // enter cover, reload, exit cover, six shots due to cube, to reload event
+      final anisSkill2Dmg =
+          simulation.timeline[simulation.currentFrame + 1]
+              ?.whereType<NikkeDamageEvent>()
+              .where((event) => event.activatorId == anisId && event.source == Source.skill2)
+              .toList();
+      expect(anisSkill2Dmg, isNotNull);
+    });
+
+    test('IsSearchElement', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [NikkeOptions(nikkeResourceId: 15), Const.liter, Const.crown, Const.helm],
+        raptureOptions: [Const.trainingWaterTarget],
+      );
+
+      simulation.init();
+      while (simulation.burstStage != 4 && simulation.currentFrame > 0) {
+        simulation.proceedOneFrame();
+      }
+      final anis = simulation.getEntityById(1)!;
+      expect(anis.buffs.where((buff) => buff.data.groupId == 2015101), isNotEmpty);
+      final helm = simulation.getEntityById(4)!;
+      expect(helm.buffs.where((buff) => buff.data.groupId == 2015101), isEmpty);
+    });
+  });
 }

@@ -589,6 +589,7 @@ class BattleNikke extends BattleEntity {
 
   @override
   void endCurrentFrame(BattleSimulation simulation) {
+    // gainAmmo is put here because max ammo can change in this frame
     final gainAmmo = getBuffValue(
       simulation,
       FunctionType.gainAmmo,

@@ -167,17 +167,10 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onLastAmmoUse:
-        if (event is! NikkeFireEvent || standard is! BattleNikke || standard.uniqueId != ownerUniqueId) return;
+      case TimingTriggerType.onLastShotHit:
+        if (event is! NikkeReloadStartEvent || standard is! BattleNikke || standard.uniqueId != ownerUniqueId) return;
 
         if (standard.currentAmmo == 0) {
-          executeFunction(event, simulation);
-        }
-        break;
-      case TimingTriggerType.onLastShotHit:
-        // triggerValue is probability
-        if (event is! NikkeDamageEvent || standard is! BattleNikke || standard.uniqueId != ownerUniqueId) return;
-
-        if (event.source == Source.bullet && standard.currentAmmo == 0) {
           executeFunction(event, simulation);
         }
         break;
@@ -777,6 +770,8 @@ class BattleFunction {
         return target is BattleNikke && target.activatedBurstSkillThisCycle == false;
       case StatusTriggerType.isHaveDecoy:
         return target is BattleNikke && target.decoy != null && target.decoy!.currentHp > 0;
+      case StatusTriggerType.isSearchElementId:
+        return target != null && target.element.id == value;
       case StatusTriggerType.unknown:
       case StatusTriggerType.isAlive:
       case StatusTriggerType.isAmmoCount:
@@ -800,7 +795,6 @@ class BattleFunction {
       case StatusTriggerType.isPhase:
       case StatusTriggerType.isSameSquadCount:
       case StatusTriggerType.isSameSquadUp:
-      case StatusTriggerType.isSearchElementId:
       case StatusTriggerType.isStun:
       case StatusTriggerType.isCheckEnemyNikke:
       case StatusTriggerType.isCheckMonsterExcludeNoneType:
