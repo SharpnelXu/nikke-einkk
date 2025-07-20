@@ -199,6 +199,11 @@ class BattleFunction {
           executeFunction(event, simulation);
         }
         break;
+      case TimingTriggerType.onFunctionOn:
+        if (event is BuffEvent && standard?.uniqueId == event.activatorId && event.data.groupId == timingTriggerValue) {
+          executeFunction(event, simulation);
+        }
+        break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
       case TimingTriggerType.onBurstSkillStep:
@@ -211,7 +216,6 @@ class BattleFunction {
       case TimingTriggerType.onEndFullBurst:
       case TimingTriggerType.onFunctionBuffCheck:
       case TimingTriggerType.onFunctionOff:
-      case TimingTriggerType.onFunctionOn:
       case TimingTriggerType.onHealCover:
       case TimingTriggerType.onHitNumExceptCore:
       case TimingTriggerType.onHitNumberOver:

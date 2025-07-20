@@ -10,7 +10,9 @@ import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/db.dart';
+import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/model/user_data.dart';
+import 'package:nikke_einkk/module/battle/battle_entity_status_page.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
@@ -70,21 +72,25 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
                     ? null
                     : () async {
                       int? numFrames;
-                      await showDialog(context: context, useRootNavigator: false, builder: (ctx) {
-                        final max = simulation.currentFrame;
-                        return InputCancelOkDialog.number(
-                          title: 'Proceed X Frames',
-                          initValue: 60,
-                          helperText: '1~$max',
-                          keyboardType: const TextInputType.numberWithOptions(signed: true),
-                          validate: (v) => v >= 1 && v <= max,
-                          onSubmit: (v) {
-                            if (v >= 1 && v <= max) {
-                              numFrames = v;
-                            }
-                          },
-                        );
-                      });
+                      await showDialog(
+                        context: context,
+                        useRootNavigator: false,
+                        builder: (ctx) {
+                          final max = simulation.currentFrame;
+                          return InputCancelOkDialog.number(
+                            title: 'Proceed X Frames',
+                            initValue: 60,
+                            helperText: '1~$max',
+                            keyboardType: const TextInputType.numberWithOptions(signed: true),
+                            validate: (v) => v >= 1 && v <= max,
+                            onSubmit: (v) {
+                              if (v >= 1 && v <= max) {
+                                numFrames = v;
+                              }
+                            },
+                          );
+                        },
+                      );
 
                       if (numFrames != null) {
                         simulation.proceedNFrames(numFrames!);
@@ -103,32 +109,35 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
                       setState(() {});
                     },
             onLongPress:
-            simulation.currentFrame <= 0
-                ? null
-                : () async {
-                    int? burstStage;
-                    await showDialog(context: context, useRootNavigator: false, builder: (ctx) {
-                      return InputCancelOkDialog.number(
-                        title: 'Proceed to next Burst X',
-                        initValue: 1,
-                        helperText: '0~4',
-                        keyboardType: const TextInputType.numberWithOptions(signed: true),
-                        validate: (v) => v >= 0 && v <= 4,
-                        onSubmit: (v) {
-                          if (v >= 0 && v <= 4) {
-                            burstStage = v;
-                          }
+                simulation.currentFrame <= 0
+                    ? null
+                    : () async {
+                      int? burstStage;
+                      await showDialog(
+                        context: context,
+                        useRootNavigator: false,
+                        builder: (ctx) {
+                          return InputCancelOkDialog.number(
+                            title: 'Proceed to next Burst X',
+                            initValue: 1,
+                            helperText: '0~4',
+                            keyboardType: const TextInputType.numberWithOptions(signed: true),
+                            validate: (v) => v >= 0 && v <= 4,
+                            onSubmit: (v) {
+                              if (v >= 0 && v <= 4) {
+                                burstStage = v;
+                              }
+                            },
+                          );
                         },
                       );
-                    });
-      
-                    if (burstStage != null) {
-                      do {
-                        simulation.proceedOneFrame();
-                      } while (simulation.burstStage != burstStage && simulation.currentFrame > 0);
-                      setState(() {});
-                    }
-                  },
+                      if (burstStage != null) {
+                        do {
+                          simulation.proceedOneFrame();
+                        } while (simulation.burstStage != burstStage && simulation.currentFrame > 0);
+                        setState(() {});
+                      }
+                    },
             icon: Icon(Icons.play_arrow),
           ),
         ],
@@ -309,11 +318,22 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
   static final divider = const Divider(height: 2, indent: 30, endIndent: 30);
   Widget _buildNikke(int idx, BattleNikke? nikke) {
     final List<Widget> children = [
-      NikkeIcon(
-        characterData: nikke?.characterData,
-        weapon: nikke?.currentWeaponData,
-        defaultText: 'None',
-        isSelected: simulation.currentNikke == idx + 1,
+      InkWell(
+        onTap:
+            nikke == null
+                ? null
+                : () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (ctx) => BattleNikkeStatusPage(simulation: simulation, nikke: nikke)),
+                  );
+                },
+        child: NikkeIcon(
+          characterData: nikke?.characterData,
+          weapon: nikke?.currentWeaponData,
+          defaultText: 'None',
+          isSelected: simulation.currentNikke == idx + 1,
+        ),
       ),
     ];
 
@@ -353,6 +373,56 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
         Text('ATK: ${nikke.getFinalAttack(simulation).decimalPattern}'),
         Text('DEF: ${nikke.getFinalDefence(simulation).decimalPattern}'),
       ]);
+
+      final displayBuffs = nikke.buffs.where((buff) => buff.source != Source.equip && buff.source != Source.doll);
+      if (displayBuffs.isNotEmpty) {
+        children.addAll([
+          divider,
+          Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 3,
+            runSpacing: 3,
+            children:
+                displayBuffs.map((buff) {
+                  final borderColor =
+                      buff.data.buff.isBuff
+                          ? Colors.green
+                          : buff.data.buff.isDeBuff
+                          ? Colors.red
+                          : Colors.grey;
+                  final funcTypeAbbr = buff.data.functionType.name.pascal.replaceAll(RegExp(r'[a-z\d]+'), '');
+                  final name =
+                      funcTypeAbbr.length > 1
+                          ? '${funcTypeAbbr[0]}${funcTypeAbbr[funcTypeAbbr.length - 1]}'
+                          : funcTypeAbbr;
+                  return Container(
+                    padding: EdgeInsets.all(2),
+                    constraints: BoxConstraints(minWidth: 30, maxWidth: 40),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: borderColor),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    child: Center(
+                      child: Tooltip(
+                        message:
+                            '${buff.data.functionType.name.pascal}'
+                            ' ${simulation.getEntityName(buff.buffGiverId)}'
+                            ': ${buff.source.name.pascal}',
+                        child: Wrap(
+                          children: [
+                            Text(name),
+                            if (buff.count > 1)
+                              Text('${buff.count}', style: TextStyle(fontFeatures: [FontFeature.superscripts()])),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+          ),
+        ]);
+      }
     }
 
     return Expanded(child: Column(spacing: 5, children: children));

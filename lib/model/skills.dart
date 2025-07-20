@@ -261,6 +261,9 @@ enum BuffType {
   static BuffType fromName(String? name) {
     return _reverseMap[name] ?? BuffType.unknown;
   }
+
+  bool get isBuff => this == buff || this == buffEtc;
+  bool get isDeBuff => this == deBuffEtc || this == deBuff;
 }
 
 // "buffRemove": "{Etc, Clear, Resist}"
