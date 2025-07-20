@@ -185,16 +185,23 @@ class BattleFunction {
       case TimingTriggerType.onCheckTime:
         if (event is CheckTimeEvent) {
           final elapsedFrames = simulation.maxFrames - simulation.currentFrame;
-          final requiredFrames = timeDataToFrame(data.timingTriggerValue, simulation.fps);
+          final requiredFrames = timeDataToFrame(timingTriggerValue, simulation.fps);
           if (elapsedFrames > 0 && elapsedFrames % requiredFrames == 0) {
             executeFunction(event, simulation);
           }
         }
         break;
+      case TimingTriggerType.onBurstSkillUseNum:
+        if (event is ChangeBurstStepEvent &&
+            standard is BattleNikke &&
+            standard.uniqueId == event.activatorId &&
+            standard.totalBurstSkillUsed == timingTriggerValue) {
+          executeFunction(event, simulation);
+        }
+        break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
       case TimingTriggerType.onBurstSkillStep:
-      case TimingTriggerType.onBurstSkillUseNum:
       case TimingTriggerType.onCoreHitNum:
       case TimingTriggerType.onCoreHitNumOnce:
       case TimingTriggerType.onCoreHitRatio:
@@ -359,6 +366,7 @@ class BattleFunction {
       case FunctionType.addDamage:
       case FunctionType.atkChangeMaxHpRate:
       case FunctionType.attention:
+      case FunctionType.barrierDamage: // TODO: actually implement after boss can install barriers
       case FunctionType.breakDamage:
       case FunctionType.changeCoolTimeUlti: // act as a buff for rounding
       case FunctionType.coreShotDamageChange:
@@ -388,7 +396,7 @@ class BattleFunction {
       case FunctionType.statDef:
       case FunctionType.statHp:
       case FunctionType.statHpHeal:
-      case FunctionType.statPenetration:
+      case FunctionType.statPenetration: // TODO: revisit when boss can have parts
       case FunctionType.statReloadTime:
       case FunctionType.none: // misc counters etc.
         // add buff
@@ -534,7 +542,6 @@ class BattleFunction {
       case FunctionType.atkBuffChange:
       case FunctionType.atkChangHpRate:
       case FunctionType.atkReplaceMaxHpRate:
-      case FunctionType.barrierDamage:
       case FunctionType.bonusRangeDamageChange:
       case FunctionType.buffRemove:
       case FunctionType.callingMonster:
@@ -772,6 +779,8 @@ class BattleFunction {
         return target is BattleNikke && target.decoy != null && target.decoy!.currentHp > 0;
       case StatusTriggerType.isSearchElementId:
         return target != null && target.element.id == value;
+      case StatusTriggerType.isCheckPosition:
+        return target is BattleNikke && target.uniqueId == value;
       case StatusTriggerType.unknown:
       case StatusTriggerType.isAlive:
       case StatusTriggerType.isAmmoCount:
@@ -779,7 +788,6 @@ class BattleFunction {
       case StatusTriggerType.isCheckFunctionOverlapUp:
       case StatusTriggerType.isCheckMonsterType:
       case StatusTriggerType.isCheckPartsId:
-      case StatusTriggerType.isCheckPosition:
       case StatusTriggerType.isCheckTarget:
       case StatusTriggerType.isCheckTeamBurstNextStep:
       case StatusTriggerType.isClassType:

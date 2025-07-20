@@ -55,6 +55,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
         () => setState(() {}),
         actions: [
           IconButton.filled(
+            tooltip: 'Proceed 60 frames\nLong press to specify frames to proceed',
             onPressed:
                 simulation.currentFrame <= 0
                     ? null
@@ -64,9 +65,36 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
                       }
                       setState(() {});
                     },
+            onLongPress:
+                simulation.currentFrame <= 0
+                    ? null
+                    : () async {
+                      int? numFrames;
+                      await showDialog(context: context, useRootNavigator: false, builder: (ctx) {
+                        final max = simulation.currentFrame;
+                        return InputCancelOkDialog.number(
+                          title: 'Proceed X Frames',
+                          initValue: 60,
+                          helperText: '1~$max',
+                          keyboardType: const TextInputType.numberWithOptions(signed: true),
+                          validate: (v) => v >= 1 && v <= max,
+                          onSubmit: (v) {
+                            if (v >= 1 && v <= max) {
+                              numFrames = v;
+                            }
+                          },
+                        );
+                      });
+
+                      if (numFrames != null) {
+                        simulation.proceedNFrames(numFrames!);
+                        setState(() {});
+                      }
+                    },
             icon: Icon(Icons.fast_forward),
           ),
           IconButton.filled(
+            tooltip: 'Proceed 1 frame\nLong press to proceed to next burst',
             onPressed:
                 simulation.currentFrame <= 0
                     ? null
@@ -74,6 +102,33 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
                       simulation.proceedOneFrame();
                       setState(() {});
                     },
+            onLongPress:
+            simulation.currentFrame <= 0
+                ? null
+                : () async {
+                    int? burstStage;
+                    await showDialog(context: context, useRootNavigator: false, builder: (ctx) {
+                      return InputCancelOkDialog.number(
+                        title: 'Proceed to next Burst X',
+                        initValue: 1,
+                        helperText: '0~4',
+                        keyboardType: const TextInputType.numberWithOptions(signed: true),
+                        validate: (v) => v >= 0 && v <= 4,
+                        onSubmit: (v) {
+                          if (v >= 0 && v <= 4) {
+                            burstStage = v;
+                          }
+                        },
+                      );
+                    });
+      
+                    if (burstStage != null) {
+                      do {
+                        simulation.proceedOneFrame();
+                      } while (simulation.burstStage != burstStage && simulation.currentFrame > 0);
+                      setState(() {});
+                    }
+                  },
             icon: Icon(Icons.play_arrow),
           ),
         ],

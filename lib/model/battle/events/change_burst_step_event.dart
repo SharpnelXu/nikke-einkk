@@ -24,6 +24,10 @@ class ChangeBurstStepEvent extends BattleEvent {
     if (currentStage == 4 && nextStage == 0) {
       nikke.activatedBurstSkillThisCycle = false;
     }
+
+    if (activatorId == nikke.uniqueId) {
+      nikke.totalBurstSkillUsed += 1;
+    }
   }
 
   @override
