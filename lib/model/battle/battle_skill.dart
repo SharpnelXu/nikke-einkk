@@ -160,7 +160,12 @@ class BattleSkill {
         break;
       case CharacterSkillType.instantSequentialAttack:
         for (final target in skillTargets) {
-          final additionalTimes = skillData.skillValueData[1].skillValue;
+          int additionalTimes = skillData.skillValueData[1].skillValue;
+          if (skillData.skillValueData[4].skillValueType != ValueType.none) {
+            final targetBuffGroup = skillData.skillValueData[4].skillValue;
+            final buffStack = owner.buffs.where((buff) => buff.data.groupId == targetBuffGroup).firstOrNull;
+            additionalTimes = buffStack?.count ?? additionalTimes;
+          }
           final delayTime = skillData.skillValueData[2].skillValue;
           for (int count = 0; count < additionalTimes; count += 1) {
             final delayFrame =
@@ -172,7 +177,7 @@ class BattleSkill {
                 damageFrame,
                 NikkeDamageEvent.skill(
                   simulation: simulation,
-                  nikke: simulation.getNikkeOnPosition(ownerId)!,
+                  nikke: owner,
                   rapture: target,
                   source: source,
                   damageRate: skillData.skillValueData[0].skillValue,

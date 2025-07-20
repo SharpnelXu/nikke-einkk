@@ -13,6 +13,7 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 import 'package:nikke_einkk/module/battle/battle_entity_status_page.dart';
+import 'package:nikke_einkk/module/battle/battle_widgets.dart';
 import 'package:nikke_einkk/module/common/custom_widgets.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_widgets.dart';
@@ -383,43 +384,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
             crossAxisAlignment: WrapCrossAlignment.center,
             spacing: 3,
             runSpacing: 3,
-            children:
-                displayBuffs.map((buff) {
-                  final borderColor =
-                      buff.data.buff.isBuff
-                          ? Colors.green
-                          : buff.data.buff.isDeBuff
-                          ? Colors.red
-                          : Colors.grey;
-                  final funcTypeAbbr = buff.data.functionType.name.pascal.replaceAll(RegExp(r'[a-z\d]+'), '');
-                  final name =
-                      funcTypeAbbr.length > 1
-                          ? '${funcTypeAbbr[0]}${funcTypeAbbr[funcTypeAbbr.length - 1]}'
-                          : funcTypeAbbr;
-                  return Container(
-                    padding: EdgeInsets.all(2),
-                    constraints: BoxConstraints(minWidth: 30, maxWidth: 40),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: borderColor),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Center(
-                      child: Tooltip(
-                        message:
-                            '${buff.data.functionType.name.pascal}'
-                            ' ${simulation.getEntityName(buff.buffGiverId)}'
-                            ': ${buff.source.name.pascal}',
-                        child: Wrap(
-                          children: [
-                            Text(name),
-                            if (buff.count > 1)
-                              Text('${buff.count}', style: TextStyle(fontFeatures: [FontFeature.superscripts()])),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+            children: displayBuffs.map((buff) => simpleBuffIcon(simulation, buff)).toList(),
           ),
         ]);
       }
