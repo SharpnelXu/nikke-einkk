@@ -126,14 +126,14 @@ String? durationString(int value, DurationType type) {
   switch (type) {
     case DurationType.timeSec:
     case DurationType.timeSecVer2:
-      return value == 0 ? null : value.timeString;
+      return value.timeString;
     case DurationType.shots:
-      return value == 0 ? null : '$value shots';
+      return '$value shots';
     case DurationType.battles:
       return '∞';
     case DurationType.hits:
     case DurationType.hitsVer2:
-      return value == 0 ? null : '$value hits';
+      return '$value hits';
     case DurationType.timeSecBattles:
       return 'Every ${value.timeString}';
     case DurationType.none:

@@ -116,7 +116,7 @@ class _BattleNikkeStatusPageState extends State<BattleNikkeStatusPage> {
             Text(
               '${skillValueString(func.functionValue, func.functionValueType) ?? 'N/A'}'
               '${buff.count > 1 ? ' (${buff.count} stacks)' : ''}'
-              '${func.functionStandard == StandardType.functionTarget ? ' of Receiver' : ''}',
+              '${func.functionStandard == StandardType.user && buff.buffReceiverId != buff.buffGiverId ? ' of Activator' : ''}',
             ),
             if ([DurationType.timeSec, DurationType.timeSecVer2].contains(func.durationType))
               Text(
