@@ -192,9 +192,13 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
         }
       }
     }
+
+    final totalDamageMap = dpsMap.map((a, b) => MapEntry(a, b.fold(0, (s, v) => s + v)));
+    final totalDamage = totalDamageMap.values.fold(0, (s, v) => s + v);
+
     return Container(
       padding: EdgeInsets.only(right: 15),
-      constraints: BoxConstraints(maxWidth: 700, maxHeight: 400),
+      constraints: BoxConstraints(maxWidth: 700, maxHeight: 700),
       child: Center(
         child: LineChart(
           LineChartData(
@@ -204,7 +208,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
               leftTitles: AxisTitles(axisNameSize: 0, sideTitles: SideTitles(showTitles: true, reservedSize: 70)),
               rightTitles: AxisTitles(),
               bottomTitles: AxisTitles(
-                axisNameSize: 50,
+                axisNameSize: 75,
                 axisNameWidget: Column(
                   mainAxisSize: MainAxisSize.min,
                   spacing: 5,
@@ -224,6 +228,26 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
                           children: [
                             Container(alignment: Alignment.center, width: 10, height: 10, color: color),
                             Text('${locale.getTranslation(nikke.characterData.nameLocalkey)} (P${nikke.uniqueId})'),
+                          ],
+                        );
+                      }),
+                    ),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 10,
+                      children: List.generate(simulation.nonnullNikkes.length, (idx) {
+                        final nikke = simulation.nonnullNikkes[idx];
+                        final color = dpsColorChart[idx];
+                        final nikkeDamage = totalDamageMap[nikke.uniqueId]!;
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          spacing: 5,
+                          children: [
+                            Container(alignment: Alignment.center, width: 10, height: 10, color: color),
+                            Text(nikkeDamage.decimalPattern),
+                            Text('(${(nikkeDamage / totalDamage * 10000).percentString})'),
                           ],
                         );
                       }),
