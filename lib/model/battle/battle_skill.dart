@@ -64,16 +64,20 @@ class BattleSkill {
     final allStepCheck = requiredStep == BurstStep.allStep && [1, 2, 3].contains(simulation.burstStage);
     final stepCheck = allStepCheck || requiredStep?.step == simulation.burstStage;
     final basicBurstCheck = simulation.reEnterBurstCd == 0 && stepCheck;
+    if (!basicBurstCheck) {
+      return false;
+    }
+
     final burstSpecification = simulation.advancedOption?.burstOrders[simulation.burstCycle];
     if (burstSpecification == null) {
-      return basicBurstCheck;
+      return true;
     } else {
       final positionCheck =
           burstSpecification.order.length > simulation.burstOrder
               ? burstSpecification.order[simulation.burstOrder] == ownerId
               : false;
       final timeCheck = burstSpecification.frame == null || burstSpecification.frame! >= simulation.currentFrame;
-      return basicBurstCheck && positionCheck && timeCheck;
+      return positionCheck && timeCheck;
     }
   }
 

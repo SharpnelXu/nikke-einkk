@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
+import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
@@ -33,6 +34,7 @@ class _BattleNikkeStatusPageState extends State<BattleNikkeStatusPage> {
 
   List<(String, Widget Function())> get tabs => [
     ('Buffs', () => buildBuffs()),
+    ('Damage', () => buildDamageStat()),
     ('Weapon', () => WeaponDataDisplay(character: data, weaponId: data.shotId)),
     ('Skill 1', () => buildSkillTab(0)),
     ('Skill 2', () => buildSkillTab(1)),
@@ -69,6 +71,59 @@ class _BattleNikkeStatusPageState extends State<BattleNikkeStatusPage> {
         children.addAll(buffs.map(buildBuff));
       }
     }
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 10,
+        children: children,
+      ),
+    );
+  }
+
+  Widget buildDamageStat() {
+    final Map<Source, int> damageSourceMap = {};
+    for (final events in simulation.timeline.values) {
+      for (final event in events) {
+        if (event is NikkeDamageEvent && event.activatorId == nikke.uniqueId) {
+          damageSourceMap.putIfAbsent(event.source, () => 0);
+          damageSourceMap[event.source] =
+              damageSourceMap[event.source]! + event.damageParameter.calculateExpectedDamage();
+        }
+      }
+    }
+    final totalDamage = damageSourceMap.values.fold(0, (prev, next) => prev + next);
+    final sources = damageSourceMap.keys.sorted((a, b) => damageSourceMap[b]!.compareTo(damageSourceMap[a]!));
+
+    final List<Widget> children = [
+      DataTable(
+        columns: [
+          DataColumn(label: Text('Source'), headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(label: Text('Total Damage'), headingRowAlignment: MainAxisAlignment.center),
+          DataColumn(label: Text('Percentage'), headingRowAlignment: MainAxisAlignment.center),
+        ],
+        rows: [
+          ...sources.map(
+            (source) => DataRow(
+              cells: [
+                DataCell(Text(source.name.pascal, style: boldStyle)),
+                DataCell(Text(damageSourceMap[source]!.decimalPattern)),
+                DataCell(Text((damageSourceMap[source]! / totalDamage * 10000).percentString)),
+              ],
+            ),
+          ),
+          DataRow(
+            cells: [
+              DataCell(Text('Total', style: boldStyle)),
+              DataCell(Text(totalDamage.decimalPattern)),
+              DataCell(Text(10000.percentString)),
+            ],
+          ),
+        ],
+      ),
+    ];
 
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),

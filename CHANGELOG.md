@@ -5,6 +5,7 @@
 - Fix monsterSkill hit ratio display
 - Detailed BP display
 - Dark Mode
+- Enable simulation
 
 ## 0.1.4
 - Nikke setup & stat calculation

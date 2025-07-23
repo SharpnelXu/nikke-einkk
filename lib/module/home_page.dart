@@ -18,20 +18,19 @@ class EinkkHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Widget> items = [
-      if (kDebugMode)
-        TextButton.icon(
-          style: TextButton.styleFrom(
-            alignment: Alignment.centerLeft,
-            iconAlignment: IconAlignment.start,
-            textStyle: TextStyle(fontSize: 30),
-            iconSize: 30,
-          ),
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (ctx) => BattleSetupPage()));
-          },
-          icon: Icon(Icons.calculate),
-          label: Text('Battle Simulation'),
+      TextButton.icon(
+        style: TextButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          iconAlignment: IconAlignment.start,
+          textStyle: TextStyle(fontSize: 30),
+          iconSize: 30,
         ),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => BattleSetupPage()));
+        },
+        icon: Icon(Icons.calculate),
+        label: Text('Battle Simulation'),
+      ),
       TextButton.icon(
         style: TextButton.styleFrom(
           alignment: Alignment.centerLeft,

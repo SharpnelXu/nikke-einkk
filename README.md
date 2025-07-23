@@ -82,6 +82,7 @@ manually set if each bullet is crit / core hit or not
 - Unable to find why some burst skills took one extra second to apply. Assuming all damage burst skills have this property
 (although 2B, Harran may serve as counter example.)
   - Fixing 2B, Harran etc. will be low priority since it involves testing & verification
+- Currently all SG pellets will hit
 
 ## Niche Mechanisms Waiting To Be Categorized
 - Equipment level stat rounding method is roundHalfToEvent (stat from level & stat from same corp are rounded separately)

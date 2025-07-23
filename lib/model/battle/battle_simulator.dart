@@ -149,9 +149,7 @@ class BattleSimulation {
           fullBurstDuration = burstStageFramesLeft;
           burstCycle += 1;
           burstOrder = 0;
-        }
-
-        if (event.activatorId > 0) {
+        } else if (event.activatorId > 0) {
           burstOrder += 1;
         }
       }
