@@ -17,14 +17,12 @@ class PlayerOptions {
   int personalRecycleLevel;
   Map<Corporation, int> corpRecycleLevels = {};
   Map<NikkeClass, int> classRecycleLevels = {};
-  bool forceFillBurst = false;
 
   PlayerOptions({
     this.globalSync = 1,
     this.personalRecycleLevel = 0,
     Map<Corporation, int> corpRecycleLevels = const {},
     Map<NikkeClass, int> classRecycleLevels = const {},
-    this.forceFillBurst = false,
   }) {
     this.corpRecycleLevels.addAll(corpRecycleLevels);
     this.classRecycleLevels.addAll(classRecycleLevels);
@@ -36,7 +34,6 @@ class PlayerOptions {
       personalRecycleLevel: personalRecycleLevel,
       corpRecycleLevels: corpRecycleLevels,
       classRecycleLevels: classRecycleLevels,
-      forceFillBurst: forceFillBurst,
     );
   }
 
@@ -254,21 +251,66 @@ class UserData {
 
 @JsonSerializable()
 class BattleSetup {
-  late PlayerOptions playerOptions;
-  List<NikkeOptions> nikkeOptions = [];
-  late BattleRaptureOptions raptureOptions;
+  PlayerOptions playerOptions;
+  List<NikkeOptions> nikkeOptions;
+  BattleRaptureOptions raptureOptions;
+  BattleAdvancedOption advancedOptions;
 
   BattleSetup({
     required PlayerOptions playerOptions,
     List<NikkeOptions> nikkeOptions = const [],
     required BattleRaptureOptions raptureOptions,
-  }) {
-    this.playerOptions = playerOptions.copy();
-    this.nikkeOptions.addAll(nikkeOptions.map((option) => option.copy()));
-    this.raptureOptions = raptureOptions.copy();
-  }
+    required BattleAdvancedOption advancedOptions,
+  }) : playerOptions = playerOptions.copy(),
+       nikkeOptions = nikkeOptions.map((option) => option.copy()).toList(),
+       raptureOptions = raptureOptions.copy(),
+       advancedOptions = advancedOptions.copy();
 
   factory BattleSetup.fromJson(Map<String, dynamic> json) => _$BattleSetupFromJson(json);
 
   Map<String, dynamic> toJson() => _$BattleSetupToJson(this);
+}
+
+@JsonSerializable()
+class BattleAdvancedOption {
+  bool forceFillBurst = false;
+  int fps;
+  int maxSeconds;
+  Map<int, BattleBurstSpecification> burstOrders;
+
+  BattleAdvancedOption({
+    this.forceFillBurst = false,
+    this.fps = 60,
+    this.maxSeconds = 180,
+    Map<int, BattleBurstSpecification> burstOrder = const {},
+  }) : burstOrders = burstOrder.map((a, b) => MapEntry(a, b));
+
+  BattleAdvancedOption copy() {
+    return BattleAdvancedOption(
+      forceFillBurst: forceFillBurst,
+      fps: fps,
+      maxSeconds: maxSeconds,
+      burstOrder: burstOrders,
+    );
+  }
+
+  factory BattleAdvancedOption.fromJson(Map<String, dynamic> json) => _$BattleAdvancedOptionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BattleAdvancedOptionToJson(this);
+}
+
+@JsonSerializable()
+class BattleBurstSpecification {
+  List<int> order = [];
+  int? frame;
+
+  BattleBurstSpecification({List<int> order = const [], this.frame}) : order = order.toList();
+
+  BattleBurstSpecification copy() {
+    return BattleBurstSpecification(order: order, frame: frame);
+  }
+
+  factory BattleBurstSpecification.fromJson(Map<String, dynamic> json) => _$BattleBurstSpecificationFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BattleBurstSpecificationToJson(this);
 }

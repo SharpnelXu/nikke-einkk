@@ -143,6 +143,7 @@ class InputCancelOkDialog extends StatefulWidget {
   final TextInputType? keyboardType;
   final bool autofocus;
   final bool showNumButton;
+  final String Function(String s)? valueFormatter;
 
   const InputCancelOkDialog({
     super.key,
@@ -156,6 +157,7 @@ class InputCancelOkDialog extends StatefulWidget {
     this.onSubmit,
     this.keyboardType,
     this.autofocus = true,
+    this.valueFormatter,
   }) : showNumButton = false;
 
   InputCancelOkDialog.number({
@@ -171,6 +173,7 @@ class InputCancelOkDialog extends StatefulWidget {
     this.keyboardType = TextInputType.number,
     this.autofocus = true,
     this.showNumButton = true,
+    this.valueFormatter,
   }) : initValue = initValue?.toString(),
        validate = ((String s) {
          final v = int.parse(s);
@@ -292,6 +295,11 @@ class _InputCancelOkDialogState extends State<InputCancelOkDialog> {
       title: widget.title == null ? null : Text(widget.title!),
       content: field,
       actions: <Widget>[
+        if (widget.valueFormatter != null)
+          Text(
+            widget.valueFormatter!(_controller.text),
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+          ),
         TextButton(child: Text('Cancel'), onPressed: () => Navigator.pop(context)),
         TextButton(
           onPressed:

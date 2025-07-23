@@ -19,7 +19,6 @@ PlayerOptions _$PlayerOptionsFromJson(Map<String, dynamic> json) => PlayerOption
         (k, e) => MapEntry($enumDecode(_$NikkeClassEnumMap, k), (e as num).toInt()),
       ) ??
       const {},
-  forceFillBurst: json['forceFillBurst'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$PlayerOptionsToJson(PlayerOptions instance) => <String, dynamic>{
@@ -27,7 +26,6 @@ Map<String, dynamic> _$PlayerOptionsToJson(PlayerOptions instance) => <String, d
   'personalRecycleLevel': instance.personalRecycleLevel,
   'corpRecycleLevels': instance.corpRecycleLevels.map((k, e) => MapEntry(_$CorporationEnumMap[k]!, e)),
   'classRecycleLevels': instance.classRecycleLevels.map((k, e) => MapEntry(_$NikkeClassEnumMap[k]!, e)),
-  'forceFillBurst': instance.forceFillBurst,
 };
 
 const _$CorporationEnumMap = {
@@ -146,10 +144,38 @@ BattleSetup _$BattleSetupFromJson(Map<String, dynamic> json) => BattleSetup(
       (json['nikkeOptions'] as List<dynamic>?)?.map((e) => NikkeOptions.fromJson(e as Map<String, dynamic>)).toList() ??
       const [],
   raptureOptions: BattleRaptureOptions.fromJson(json['raptureOptions'] as Map<String, dynamic>),
+  advancedOptions: BattleAdvancedOption.fromJson(json['advancedOptions'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$BattleSetupToJson(BattleSetup instance) => <String, dynamic>{
   'playerOptions': instance.playerOptions.toJson(),
   'nikkeOptions': instance.nikkeOptions.map((e) => e.toJson()).toList(),
   'raptureOptions': instance.raptureOptions.toJson(),
+  'advancedOptions': instance.advancedOptions.toJson(),
+};
+
+BattleAdvancedOption _$BattleAdvancedOptionFromJson(Map<String, dynamic> json) => BattleAdvancedOption(
+    forceFillBurst: json['forceFillBurst'] as bool? ?? false,
+    fps: (json['fps'] as num?)?.toInt() ?? 60,
+    maxSeconds: (json['maxSeconds'] as num?)?.toInt() ?? 180,
+  )
+  ..burstOrders = (json['burstOrders'] as Map<String, dynamic>).map(
+    (k, e) => MapEntry(int.parse(k), BattleBurstSpecification.fromJson(e as Map<String, dynamic>)),
+  );
+
+Map<String, dynamic> _$BattleAdvancedOptionToJson(BattleAdvancedOption instance) => <String, dynamic>{
+  'forceFillBurst': instance.forceFillBurst,
+  'fps': instance.fps,
+  'maxSeconds': instance.maxSeconds,
+  'burstOrders': instance.burstOrders.map((k, e) => MapEntry(k.toString(), e.toJson())),
+};
+
+BattleBurstSpecification _$BattleBurstSpecificationFromJson(Map<String, dynamic> json) => BattleBurstSpecification(
+  order: (json['order'] as List<dynamic>?)?.map((e) => (e as num).toInt()).toList() ?? const [],
+  frame: (json['frame'] as num?)?.toInt(),
+);
+
+Map<String, dynamic> _$BattleBurstSpecificationToJson(BattleBurstSpecification instance) => <String, dynamic>{
+  'order': instance.order,
+  'frame': instance.frame,
 };

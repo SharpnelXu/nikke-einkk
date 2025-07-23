@@ -22,6 +22,7 @@ class BattleSimulationPage extends StatefulWidget {
   final List<NikkeOptions> nikkeOptions;
   final List<BattleRaptureOptions> raptureOptions;
   final PlayerOptions playerOptions;
+  final BattleAdvancedOption advancedOptions;
   final bool useGlobal;
 
   const BattleSimulationPage({
@@ -29,6 +30,7 @@ class BattleSimulationPage extends StatefulWidget {
     required this.nikkeOptions,
     required this.raptureOptions,
     required this.playerOptions,
+    required this.advancedOptions,
     required this.useGlobal,
   });
 
@@ -46,6 +48,8 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       playerOptions: widget.playerOptions,
       nikkeOptions: widget.nikkeOptions,
       raptureOptions: widget.raptureOptions,
+      advancedOption: widget.advancedOptions,
+      useGlobal: widget.useGlobal,
     );
     simulation.init();
   }

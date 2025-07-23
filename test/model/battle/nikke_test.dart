@@ -247,9 +247,9 @@ void main() {
         playerOptions: PlayerOptions(),
         nikkeOptions: [scarletOption],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 100)],
+        advancedOption: BattleAdvancedOption(maxSeconds: 1),
       );
 
-      simulation.maxSeconds = 1;
       simulation.simulate();
 
       final scarlet = simulation.nonnullNikkes.first;
@@ -263,9 +263,9 @@ void main() {
         playerOptions: PlayerOptions(),
         nikkeOptions: [NikkeOptions(nikkeResourceId: 380)],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 100)],
+        advancedOption: BattleAdvancedOption(maxSeconds: 2),
       );
 
-      simulation.maxSeconds = 2;
       simulation.init();
       int shootCounter = 0;
       final expectedShootFrames = List.generate(24, (idx) {
@@ -290,9 +290,9 @@ void main() {
         playerOptions: PlayerOptions(),
         nikkeOptions: [NikkeOptions(nikkeResourceId: 192)],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 100)],
+        advancedOption: BattleAdvancedOption(maxSeconds: 2),
       );
 
-      simulation.maxSeconds = 2;
       simulation.init();
       int shootCounter = 0;
       final expectedShootFrames = List.generate(12, (idx) {
@@ -317,9 +317,9 @@ void main() {
         playerOptions: PlayerOptions(),
         nikkeOptions: [NikkeOptions(nikkeResourceId: 131)],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 100)],
+        advancedOption: BattleAdvancedOption(maxSeconds: 2),
       );
 
-      simulation.maxSeconds = 2;
       simulation.init();
       int shootCounter = 0;
       final expectedShootFrames = List.generate(3, (idx) {

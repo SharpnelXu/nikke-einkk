@@ -20,6 +20,7 @@ class BattleSimulation {
   NikkeDatabase get db => useGlobal ? global : cn;
 
   PlayerOptions playerOptions;
+  BattleAdvancedOption? advancedOption;
 
   List<BattleNikke?> battleNikkes = [];
   List<BattleNikke> get nonnullNikkes => battleNikkes.nonNulls.toList();
@@ -27,11 +28,12 @@ class BattleSimulation {
   // timeline
   SplayTreeMap<int, List<BattleEvent>> timeline = SplayTreeMap((a, b) => b.compareTo(a));
   late int currentFrame;
+  int get previousFrame => currentFrame + 1;
   int get nextFrame => currentFrame - 1;
 
   // maybe configurable in the future or put into a global option class
-  int fps = 60;
-  int maxSeconds = 180;
+  int get fps => advancedOption?.fps ?? 60;
+  int get maxSeconds => advancedOption?.maxSeconds ?? 180;
   int get maxFrames => fps * maxSeconds;
 
   int _burstMeter = 0;
@@ -52,6 +54,7 @@ class BattleSimulation {
     required this.playerOptions,
     required List<NikkeOptions?> nikkeOptions,
     required List<BattleRaptureOptions> raptureOptions,
+    this.advancedOption,
     this.useGlobal = true,
   }) {
     battleNikkes.addAll(
@@ -102,7 +105,7 @@ class BattleSimulation {
       entity.normalAction(this);
     }
 
-    if (playerOptions.forceFillBurst && burstStage == 0) {
+    if ((advancedOption?.forceFillBurst ?? false) && burstStage == 0) {
       registerEvent(currentFrame, ChangeBurstStepEvent.byField(currentStage: 0, nextStage: 1));
       burstStage = 1;
     }

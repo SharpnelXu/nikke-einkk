@@ -86,9 +86,9 @@ void main() {
         playerOptions: playerOptions,
         nikkeOptions: [scarletOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.reload, 15)],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
+        advancedOption: BattleAdvancedOption(maxSeconds: 15),
       );
 
-      simulation.maxSeconds = 15;
       simulation.simulate();
 
       final scarlet = simulation.nonnullNikkes.first;
@@ -158,9 +158,9 @@ void main() {
           scarletOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
         ],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
+        advancedOption: BattleAdvancedOption(maxSeconds: 15),
       );
 
-      simulation.maxSeconds = 15;
       simulation.simulate();
 
       final scarlet1 = simulation.nonnullNikkes.first;
@@ -264,9 +264,9 @@ void main() {
           aliceOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
         ],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
+        advancedOption: BattleAdvancedOption(maxSeconds: 15),
       );
 
-      simulation.maxSeconds = 15;
       simulation.simulate();
 
       final alice1 = simulation.nonnullNikkes.first;
@@ -306,9 +306,9 @@ void main() {
           ),
         ],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
+        advancedOption: BattleAdvancedOption(maxSeconds: 15),
       );
 
-      simulation.maxSeconds = 15;
       simulation.simulate();
 
       expect(simulation.timeline[830]!.isNotEmpty, true); // first bullet (fire, damage, burstGen)
@@ -323,7 +323,6 @@ void main() {
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
       );
 
-      simulation.maxSeconds = 180;
       simulation.simulate();
 
       final scarlet = simulation.nonnullNikkes.first;
@@ -410,9 +409,9 @@ void main() {
         ),
         nikkeOptions: [snowWhiteOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.reload, 15)],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.electric, startDefence: 140)],
+        advancedOption: BattleAdvancedOption(maxSeconds: 90),
       );
 
-      simulation.maxSeconds = 90;
       simulation.simulate();
 
       final snowWhite = simulation.nonnullNikkes.first;
@@ -489,7 +488,7 @@ void main() {
 
     test('Liter skill test on minus CD', () {
       final simulation = BattleSimulation(
-        playerOptions: PlayerOptions(forceFillBurst: true),
+        playerOptions: PlayerOptions(),
         nikkeOptions: [
           literOption.copy()..cube = HarmonyCubeOption.fromType(HarmonyCubeType.gainAmmo, 15),
           NikkeOptions(nikkeResourceId: 80, coreLevel: 11, syncLevel: 884, attractLevel: 30, skillLevels: [4, 4, 4])
@@ -500,9 +499,9 @@ void main() {
             ..cube = HarmonyCubeOption.fromType(HarmonyCubeType.burst, 7),
         ],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
+        advancedOption: BattleAdvancedOption(forceFillBurst: true),
       );
 
-      simulation.maxSeconds = 180;
       simulation.simulate();
 
       final firstBurstFrame = simulation.timeline.keys.firstWhere(
@@ -619,9 +618,9 @@ void main() {
           scarletOption.copy(),
         ],
         raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 140)],
+        advancedOption: BattleAdvancedOption(maxSeconds: 90),
       );
 
-      simulation.maxSeconds = 90;
       simulation.simulate();
 
       final crown = simulation.nonnullNikkes[1];

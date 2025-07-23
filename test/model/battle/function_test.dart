@@ -15,8 +15,8 @@ void main() {
         playerOptions: PlayerOptions(),
         nikkeOptions: [Const.helm],
         raptureOptions: [Const.trainingWaterTarget],
+        advancedOption: BattleAdvancedOption(maxSeconds: 3),
       );
-      simulation.maxSeconds = 3;
       simulation.init();
 
       // 12 frames leave cover + 59 frames to charge

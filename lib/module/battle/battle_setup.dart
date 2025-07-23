@@ -12,6 +12,7 @@ import 'package:nikke_einkk/model/data_path.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/items.dart';
 import 'package:nikke_einkk/model/user_data.dart';
+import 'package:nikke_einkk/module/battle/advanced_option_setup.dart';
 import 'package:nikke_einkk/module/battle/battle_simulation_page.dart';
 import 'package:nikke_einkk/module/battle/nikke_setup.dart';
 import 'package:nikke_einkk/module/battle/rapture_setup.dart';
@@ -34,10 +35,12 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
     playerOptions: PlayerOptions(),
     nikkeOptions: List.generate(5, (_) => NikkeOptions(nikkeResourceId: -1)),
     raptureOptions: BattleRaptureOptions(),
+    advancedOptions: BattleAdvancedOption(),
   );
   BattleRaptureOptions get raptureOption => setup.raptureOptions;
   List<NikkeOptions> get nikkeOptions => setup.nikkeOptions;
   PlayerOptions get playerOptions => setup.playerOptions;
+  BattleAdvancedOption get advancedOption => setup.advancedOptions;
   final Map<int, int> cubeLvs = {};
 
   int fps = 60;
@@ -91,6 +94,7 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                                 nikkeOptions: nikkeOptions,
                                 raptureOptions: [raptureOption],
                                 playerOptions: playerOptions,
+                                advancedOptions: advancedOption,
                                 useGlobal: useGlobal,
                               ),
                         ),
@@ -157,21 +161,28 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
               style: TextStyle(fontSize: 20),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 15,
-            children: [
-              Text('Force Fill Burst'),
-              Switch(
-                value: playerOptions.forceFillBurst,
-                onChanged: (v) {
-                  playerOptions.forceFillBurst = v;
-                  if (mounted) setState(() {});
-                },
-              ),
-            ],
+          Align(
+            child: FilledButton.icon(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (ctx) => AdvancedOptionPage(
+                          option: advancedOption,
+                          useGlobal: useGlobal,
+                          nikkes: nikkeOptions.map((v) => v.copy()).toList(),
+                        ),
+                  ),
+                );
+                setState(() {});
+              },
+              label: Text('Advanced Options'),
+              icon: Icon(Icons.science),
+            ),
           ),
           const Divider(),
+          Align(child: Text('Nikkes', style: TextStyle(fontSize: 20))),
           Align(
             child: FilledButton.icon(
               onPressed: () async {
@@ -208,7 +219,6 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
               label: Text('Global Nikke Settings'),
             ),
           ),
-          Align(child: Text('Nikkes', style: TextStyle(fontSize: 20))),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(5, (index) {
