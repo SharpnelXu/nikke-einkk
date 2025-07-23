@@ -350,27 +350,26 @@ void main() {
       simulation.init();
       final expectedShootFrame = 12 + 59; // 12 exit 59 charging
       simulation.proceedNFrames(expectedShootFrame);
-      final firstShot = simulation.timeline[simulation.currentFrame + 1]?.whereType<NikkeFireEvent>().toList();
+      final firstShot = simulation.timeline[simulation.previousFrame]?.whereType<NikkeFireEvent>().toList();
       expect(firstShot, isNotNull);
       expect(firstShot, isNotEmpty);
 
       final nextShotFrame = (60 * simulation.fps / 180).round(); // 180 is Cindy's fire rate
       simulation.proceedNFrames(nextShotFrame);
-      final secondShot = simulation.timeline[simulation.currentFrame + 1]?.whereType<NikkeFireEvent>().toList();
+      final secondShot = simulation.timeline[simulation.previousFrame]?.whereType<NikkeFireEvent>().toList();
       expect(secondShot, isNotNull);
       expect(secondShot, isNotEmpty);
 
       final finalShotFrame = nextShotFrame * 22; // cindy default ammo is 24
       simulation.proceedNFrames(finalShotFrame);
-      final finalShot = simulation.timeline[simulation.currentFrame + 1]?.whereType<NikkeFireEvent>().toList();
+      final finalShot = simulation.timeline[simulation.previousFrame]?.whereType<NikkeFireEvent>().toList();
       expect(finalShot, isNotNull);
       expect(finalShot, isNotEmpty);
       expect(simulation.nonnullNikkes.first.totalBulletsFired, 24);
 
       final secondClipFirstShotFrame = 12 + 120 + 12 + 59; // enter cover + reload + exit cover + charging
       simulation.proceedNFrames(secondClipFirstShotFrame);
-      final secondClipFirstShot =
-          simulation.timeline[simulation.currentFrame + 1]?.whereType<NikkeFireEvent>().toList();
+      final secondClipFirstShot = simulation.timeline[simulation.previousFrame]?.whereType<NikkeFireEvent>().toList();
       expect(secondClipFirstShot, isNotNull);
       expect(secondClipFirstShot, isNotEmpty);
       expect(simulation.nonnullNikkes.first.totalBulletsFired, 25);
@@ -416,7 +415,7 @@ void main() {
       final expectedShootFrame = 12 + 59 - 4; // 12 exit 59 charging - 4 due to equip line
       simulation.proceedNFrames(expectedShootFrame);
       final firstShotDamageEvents =
-          simulation.timeline[simulation.currentFrame + 1]
+          simulation.timeline[simulation.previousFrame]
               ?.whereType<NikkeDamageEvent>()
               .where((event) => event.activatorId == cindyId)
               .toList();
@@ -432,7 +431,7 @@ void main() {
       List<NikkeDamageEvent>? cindyBurstDmg;
       while ((cindyBurstDmg?.isEmpty ?? true) && simulation.currentFrame > 0) {
         simulation.proceedOneFrame();
-        final events = simulation.timeline[simulation.currentFrame + 1];
+        final events = simulation.timeline[simulation.previousFrame];
         cindyBurstDmg =
             events
                 ?.whereType<NikkeDamageEvent>()
@@ -447,7 +446,7 @@ void main() {
 
       for (int count = 2; count <= 10; count += 1) {
         simulation.proceedNFrames(12); // each cindy burst is 12 frames apart
-        final events = simulation.timeline[simulation.currentFrame + 1];
+        final events = simulation.timeline[simulation.previousFrame];
         cindyBurstDmg =
             events
                 ?.whereType<NikkeDamageEvent>()
@@ -467,7 +466,7 @@ void main() {
       cindyBurstDmg = null;
       while ((cindyBurstDmg?.isEmpty ?? true) && simulation.currentFrame > 0) {
         simulation.proceedOneFrame();
-        final events = simulation.timeline[simulation.currentFrame + 1];
+        final events = simulation.timeline[simulation.previousFrame];
         cindyBurstDmg =
             events
                 ?.whereType<NikkeDamageEvent>()
@@ -496,7 +495,7 @@ void main() {
       simulation.init();
       simulation.proceedNFrames(12 + 40 * 4 + 1); // exit cover, five shots, to reload event
       final anisSkillDmg =
-          simulation.timeline[simulation.currentFrame + 1]
+          simulation.timeline[simulation.previousFrame]
               ?.whereType<NikkeDamageEvent>()
               .where((event) => event.activatorId == anisId && event.source == Source.skill2)
               .toList();
@@ -506,7 +505,7 @@ void main() {
         12 + 120 + 12 + 40 * 5 + 1,
       ); // enter cover, reload, exit cover, six shots due to cube, to reload event
       final anisSkill2Dmg =
-          simulation.timeline[simulation.currentFrame + 1]
+          simulation.timeline[simulation.previousFrame]
               ?.whereType<NikkeDamageEvent>()
               .where((event) => event.activatorId == anisId && event.source == Source.skill2)
               .toList();

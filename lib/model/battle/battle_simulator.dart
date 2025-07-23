@@ -43,6 +43,8 @@ class BattleSimulation {
   int reEnterBurstCd = 0;
   int burstStageFramesLeft = 0;
   int fullBurstDuration = 0;
+  int burstCycle = 1;
+  int burstOrder = 0;
 
   // player actions, maybe move to a dedicated object to represent current frame
   bool autoAttack = true;
@@ -76,6 +78,8 @@ class BattleSimulation {
     reEnterBurstCd = 0;
     burstStageFramesLeft = 0;
     fullBurstDuration = 0;
+    burstCycle = 1;
+    burstOrder = 0;
 
     for (int index = 0; index < battleNikkes.length; index += 1) {
       battleNikkes[index]?.init(this, index + 1);
@@ -143,6 +147,12 @@ class BattleSimulation {
         burstStageFramesLeft = max(0, burstStageFramesLeft);
         if (event.nextStage == 4) {
           fullBurstDuration = burstStageFramesLeft;
+          burstCycle += 1;
+          burstOrder = 0;
+        }
+
+        if (event.activatorId > 0) {
+          burstOrder += 1;
         }
       }
 

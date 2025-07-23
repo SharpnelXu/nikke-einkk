@@ -24,7 +24,7 @@ void main() {
         simulation.proceedOneFrame();
       }
 
-      final events = simulation.timeline[simulation.currentFrame + 1];
+      final events = simulation.timeline[simulation.previousFrame];
       expect(events, isNotNull);
       final damageEvents = events!.whereType<NikkeDamageEvent>().toList();
       expect(damageEvents.length, 2);

@@ -22,14 +22,14 @@ class BattleSkill {
   int? get levelSkillId => db.groupedSkillInfoTable[skillGroupId]?[level]?.id;
   SkillData? get skillData => db.characterSkillTable[levelSkillId];
   SkillType skillType;
-  final int ownerUniqueId;
+  final int ownerId;
   final int level;
   final int skillNum;
   final bool useGlobal;
   NikkeDatabase get db => useGlobal ? global : cn;
   Source get source => getSource(skillNum);
 
-  BattleSkill(this.skillId, this.skillType, this.level, this.skillNum, this.ownerUniqueId, this.useGlobal);
+  BattleSkill(this.skillId, this.skillType, this.level, this.skillNum, this.ownerId, this.useGlobal);
 
   // todo: countDown on this
   int coolDown = 0;
@@ -60,10 +60,21 @@ class BattleSkill {
     if (skillData == null || skillType != SkillType.characterSkill || coolDown > 0) return false;
     if (skillNum != 3) return true;
 
-    final requiredStep = simulation.getNikkeOnPosition(ownerUniqueId)?.characterData.useBurstSkill;
+    final requiredStep = simulation.getNikkeOnPosition(ownerId)?.characterData.useBurstSkill;
     final allStepCheck = requiredStep == BurstStep.allStep && [1, 2, 3].contains(simulation.burstStage);
     final stepCheck = allStepCheck || requiredStep?.step == simulation.burstStage;
-    return simulation.reEnterBurstCd == 0 && stepCheck;
+    final basicBurstCheck = simulation.reEnterBurstCd == 0 && stepCheck;
+    final burstSpecification = simulation.advancedOption?.burstOrders[simulation.burstCycle];
+    if (burstSpecification == null) {
+      return basicBurstCheck;
+    } else {
+      final positionCheck =
+          burstSpecification.order.length > simulation.burstOrder
+              ? burstSpecification.order[simulation.burstOrder] == ownerId
+              : false;
+      final timeCheck = burstSpecification.frame == null || burstSpecification.frame! >= simulation.currentFrame;
+      return basicBurstCheck && positionCheck && timeCheck;
+    }
   }
 
   void changeCd(BattleSimulation simulation, int ultCdChangeTimeData) {
@@ -79,7 +90,7 @@ class BattleSkill {
     }
 
     if (coolDown == 0 && canUseSkill(simulation)) {
-      activateSkill(simulation, skillData!, ownerUniqueId, skillGroupId!, source);
+      activateSkill(simulation, skillData!, ownerId, skillGroupId!, source);
       coolDown = timeDataToFrame(skillData!.skillCooltime, simulation.fps);
     }
   }

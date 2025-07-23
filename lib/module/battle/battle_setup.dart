@@ -114,7 +114,8 @@ class _BattleSetupPageState extends State<BattleSetupPage> {
                 allowedExtensions: ['json'],
               );
               if (outputFile != null) {
-                final file = File(outputFile);
+                final appendedFileName = outputFile.endsWith('.json') ? outputFile : '$outputFile.json';
+                final file = File(appendedFileName);
                 await file.writeAsString(jsonEncode(setup.toJson()), encoding: utf8);
                 EasyLoading.showSuccess('Saved setup!');
               }

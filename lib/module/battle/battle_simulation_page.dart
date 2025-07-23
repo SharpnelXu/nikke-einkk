@@ -172,7 +172,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     for (final nikke in simulation.nonnullNikkes) {
       dpsMap[nikke.uniqueId] = [];
     }
-    final secondsToCheck = ((simulation.maxFrames - simulation.currentFrame + 1) / simulation.fps).ceil();
+    final secondsToCheck = ((simulation.maxFrames - simulation.previousFrame) / simulation.fps).ceil();
     for (int sec = 0; sec < secondsToCheck; sec += 1) {
       final framesToCheckStart = simulation.maxFrames - sec * simulation.fps;
       final framesToCheckEnd = framesToCheckStart - simulation.fps;
@@ -253,13 +253,12 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     final isBattleStartFrame = simulation.currentFrame == simulation.maxFrames;
     final List<Widget> result = [
       Text(
-        isBattleStartFrame ? 'Events of Battle Start' : 'Events of Last Frame (${simulation.currentFrame + 1})',
+        isBattleStartFrame ? 'Events of Battle Start' : 'Events of Last Frame (${simulation.previousFrame})',
         style: TextStyle(fontSize: 18),
       ),
     ];
 
-    final events =
-        simulation.timeline[simulation.currentFrame + 1]?.whereNot((event) => event is CheckTimeEvent).toList();
+    final events = simulation.timeline[simulation.previousFrame]?.whereNot((event) => event is CheckTimeEvent).toList();
     if (events == null || events.isEmpty) {
       result.add(Text('None'));
     } else {
