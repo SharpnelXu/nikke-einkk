@@ -113,8 +113,49 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
         ...List.generate(NikkeOptions.equipTypes.length, (index) => _buildEquipmentOption(characterData, index)),
       ]);
 
-      if (widget.advancedOption && WeaponType.chargeWeaponTypes.contains(weapon.weaponType)) {
-        children.addAll([const Divider(), _chargeWeaponAdvancedOptionColumn()]);
+      if (advanced) {
+        children.addAll([
+          const Divider(),
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 5,
+            children: [
+              Text('Set Core Hit Rate'),
+              Checkbox(
+                value: option.coreHitRate != null,
+                onChanged: (v) {
+                  setState(() {
+                    if (v == true) {
+                      option.coreHitRate = 100;
+                    } else if (v == false) {
+                      option.coreHitRate = null;
+                    }
+                  });
+                },
+              ),
+              SliderWithPrefix(
+                constraint: false,
+                titled: false,
+                leadingWidth: sliderWidth,
+                label: 'Core %',
+                min: 0,
+                max: 100,
+                value: option.coreHitRate?.round() ?? 100,
+                valueFormatter: (v) => '$v%',
+                onChange:
+                    option.coreHitRate == null
+                        ? null
+                        : (newValue) {
+                          option.coreHitRate = newValue;
+                          if (mounted) setState(() {});
+                        },
+              ),
+            ],
+          ),
+        ]);
+        if (weapon.weaponType.isCharge) {
+          children.addAll([const Divider(), _chargeWeaponAdvancedOptionColumn()]);
+        }
       }
     }
     return Container(

@@ -63,6 +63,7 @@ NikkeOptions _$NikkeOptionsFromJson(Map<String, dynamic> json) => NikkeOptions(
   alwaysFocus: json['alwaysFocus'] as bool? ?? false,
   forceCancelShootDelay: json['forceCancelShootDelay'] as bool? ?? false,
   chargeMode: $enumDecodeNullable(_$NikkeFullChargeModeEnumMap, json['chargeMode']) ?? NikkeFullChargeMode.always,
+  coreHitRate: (json['coreHitRate'] as num?)?.toDouble(),
 );
 
 Map<String, dynamic> _$NikkeOptionsToJson(NikkeOptions instance) => <String, dynamic>{
@@ -77,6 +78,7 @@ Map<String, dynamic> _$NikkeOptionsToJson(NikkeOptions instance) => <String, dyn
   'alwaysFocus': instance.alwaysFocus,
   'forceCancelShootDelay': instance.forceCancelShootDelay,
   'chargeMode': _$NikkeFullChargeModeEnumMap[instance.chargeMode]!,
+  'coreHitRate': instance.coreHitRate,
 };
 
 const _$NikkeFullChargeModeEnumMap = {

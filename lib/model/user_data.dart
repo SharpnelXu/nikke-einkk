@@ -70,6 +70,7 @@ class NikkeOptions {
   bool alwaysFocus;
   bool forceCancelShootDelay;
   NikkeFullChargeMode chargeMode;
+  double? coreHitRate;
 
   static List<EquipType> equipTypes = [EquipType.head, EquipType.body, EquipType.arm, EquipType.leg];
 
@@ -85,6 +86,7 @@ class NikkeOptions {
     this.alwaysFocus = false,
     this.forceCancelShootDelay = false,
     this.chargeMode = NikkeFullChargeMode.always,
+    this.coreHitRate,
   }) : equips = equips.map((equip) => equip?.copy()).toList(),
        skillLevels = skillLevels.toList();
 
@@ -105,6 +107,7 @@ class NikkeOptions {
       alwaysFocus: alwaysFocus,
       forceCancelShootDelay: forceCancelShootDelay,
       chargeMode: chargeMode,
+      coreHitRate: coreHitRate,
     );
   }
 
@@ -122,6 +125,7 @@ class NikkeOptions {
     alwaysFocus = other.alwaysFocus;
     forceCancelShootDelay = other.forceCancelShootDelay;
     chargeMode = other.chargeMode;
+    coreHitRate = other.coreHitRate;
   }
 
   void errorCorrection(NikkeDatabase db) {

@@ -181,6 +181,10 @@ class NikkeDamageEvent extends BattleEvent {
       return 0;
     }
 
+    if (nikke.option.coreHitRate != null) {
+      return (nikke.option.coreHitRate! * 100).round();
+    }
+
     if (nikke.currentWeaponType.isCharge) {
       return 10000;
     }

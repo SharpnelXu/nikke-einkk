@@ -10,7 +10,7 @@ class SliderWithPrefix extends StatelessWidget {
   final int min;
   final int max;
   final int value;
-  final ValueChanged<double> onChange;
+  final ValueChanged<double>? onChange;
   final ValueChanged<double>? onEdit;
   final int? division;
   final double leadingWidth;
@@ -96,9 +96,7 @@ class SliderWithPrefix extends StatelessWidget {
         divisions: max > min ? (division ?? max - min) : null,
         value: value.toDouble(),
         label: valueText,
-        onChanged: (v) {
-          onChange(v);
-        },
+        onChanged: onChange,
       ),
     );
     if (constraint != false) {
@@ -133,8 +131,8 @@ class SliderWithPrefix extends StatelessWidget {
         if (v >= min && v <= max) {
           if (onEdit != null) {
             onEdit!(v.toDouble());
-          } else {
-            onChange(v.toDouble());
+          } else if (onChange != null) {
+            onChange!(v.toDouble());
           }
         }
       },
