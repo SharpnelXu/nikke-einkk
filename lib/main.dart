@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -7,6 +8,9 @@ import 'package:nikke_einkk/module/home_page.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:window_manager/window_manager.dart';
+
+double minWidth = 800;
+double minHeight = 600;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,8 +32,8 @@ Future<void> main() async {
   cn.init();
 
   WindowOptions windowOptions = WindowOptions(
-    size: Size(1800, 1200),
-    minimumSize: Size(800, 600),
+    size: Size(max(minWidth, userDb.userData.defaultWindowWidth), max(minHeight, userDb.userData.defaultWindowHeight)),
+    minimumSize: Size(minWidth, minHeight),
     center: true,
     backgroundColor: Colors.transparent,
   );
@@ -70,7 +74,14 @@ class _EinkkState extends State<Einkk> with WindowListener {
   }
 
   @override
-  void onWindowClose() {
+  void onWindowResized() async {
+    final size = await windowManager.getSize();
+    userDb.userData.defaultWindowWidth = max(size.width, minWidth);
+    userDb.userData.defaultWindowHeight = max(size.height, minHeight);
+  }
+
+  @override
+  void onWindowClose() async {
     userDb.save();
   }
 

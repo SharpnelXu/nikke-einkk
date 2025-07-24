@@ -216,6 +216,8 @@ class UserData {
   Map<int, int> globalCubeLvs = {};
   Map<int, int> cnCubeLvs = {};
   ThemeMode themeMode = ThemeMode.system;
+  double defaultWindowHeight = 1200;
+  double defaultWindowWidth = 1800;
 
   UserData({
     this.language = Language.en,
@@ -227,6 +229,8 @@ class UserData {
     Map<int, int> globalCubeLvs = const {},
     Map<int, int> cnCubeLvs = const {},
     this.themeMode = ThemeMode.system,
+    this.defaultWindowHeight = 1200,
+    this.defaultWindowWidth = 1800,
   }) {
     if (globalPlayerOptions != null) {
       this.globalPlayerOptions = globalPlayerOptions.copy();

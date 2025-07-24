@@ -110,6 +110,8 @@ UserData _$UserDataFromJson(Map<String, dynamic> json) => UserData(
       (json['cnCubeLvs'] as Map<String, dynamic>?)?.map((k, e) => MapEntry(int.parse(k), (e as num).toInt())) ??
       const {},
   themeMode: $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ?? ThemeMode.system,
+  defaultWindowHeight: (json['defaultWindowHeight'] as num?)?.toDouble() ?? 1200,
+  defaultWindowWidth: (json['defaultWindowWidth'] as num?)?.toDouble() ?? 1800,
 );
 
 Map<String, dynamic> _$UserDataToJson(UserData instance) => <String, dynamic>{
@@ -121,6 +123,8 @@ Map<String, dynamic> _$UserDataToJson(UserData instance) => <String, dynamic>{
   'globalCubeLvs': instance.globalCubeLvs.map((k, e) => MapEntry(k.toString(), e)),
   'cnCubeLvs': instance.cnCubeLvs.map((k, e) => MapEntry(k.toString(), e)),
   'themeMode': _$ThemeModeEnumMap[instance.themeMode]!,
+  'defaultWindowHeight': instance.defaultWindowHeight,
+  'defaultWindowWidth': instance.defaultWindowWidth,
 };
 
 const _$LanguageEnumMap = {

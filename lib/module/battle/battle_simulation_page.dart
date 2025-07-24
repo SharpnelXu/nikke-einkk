@@ -208,7 +208,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
               leftTitles: AxisTitles(axisNameSize: 0, sideTitles: SideTitles(showTitles: true, reservedSize: 70)),
               rightTitles: AxisTitles(),
               bottomTitles: AxisTitles(
-                axisNameSize: 75,
+                axisNameSize: 100,
                 axisNameWidget: Column(
                   mainAxisSize: MainAxisSize.min,
                   spacing: 5,
@@ -252,6 +252,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
                         );
                       }),
                     ),
+                    Text('Total: ${totalDamage.decimalPattern}'),
                   ],
                 ),
                 sideTitles: SideTitles(showTitles: true, reservedSize: 30),

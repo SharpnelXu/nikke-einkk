@@ -5,6 +5,7 @@
 - Fix monsterSkill hit ratio display
 - Detailed BP display
 - Dark Mode
+- Default window size
 - Enable simulation
 
 ## 0.1.4
