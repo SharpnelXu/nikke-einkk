@@ -47,6 +47,14 @@ class NikkeDamageEvent extends BattleEvent {
     chargePercent = chargePercent.clamp(0, 10000);
     final pierce = nikke.getPierce(simulation);
     final partId = rapture.getPartsInFront();
+    final customHitRateThreshold = nikke.option.customHitRateThreshold;
+    final customHitRate = nikke.option.customHitRate;
+    int pelletHitRate = 10000;
+    if (customHitRateThreshold != null &&
+        customHitRate != null &&
+        customHitRateThreshold <= nikke.getAccuracyCircleScale(simulation)) {
+      pelletHitRate = (customHitRate * 100).round();
+    }
 
     final damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
@@ -55,6 +63,7 @@ class NikkeDamageEvent extends BattleEvent {
       defenceBuff: rapture.getDefenceBuffValues(simulation),
       damageRate: weaponData.damage * weaponData.muzzleCount,
       damageRateBuff: nikke.getNormalDamageRatioChangeBuffValues(simulation),
+      hitRate: pelletHitRate,
       coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
       coreDamageRate: weaponData.coreDamageRate,
       coreDamageBuff: nikke.getCoreDamageBuffValues(simulation),

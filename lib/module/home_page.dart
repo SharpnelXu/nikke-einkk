@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nikke_einkk/main.dart';
 import 'package:nikke_einkk/model/db.dart';

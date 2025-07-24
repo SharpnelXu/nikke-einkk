@@ -62,6 +62,17 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
         () => setState(() {}),
         actions: [
           IconButton.filled(
+            tooltip: 'Proceed til the end',
+            onPressed:
+                simulation.currentFrame <= 0
+                    ? null
+                    : () {
+                      simulation.proceedNFrames(simulation.currentFrame);
+                      setState(() {});
+                    },
+            icon: Icon(Icons.skip_next),
+          ),
+          IconButton.filled(
             tooltip: 'Proceed 60 frames\nLong press to specify frames to proceed',
             onPressed:
                 simulation.currentFrame <= 0

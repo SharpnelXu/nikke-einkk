@@ -71,6 +71,8 @@ class NikkeOptions {
   bool forceCancelShootDelay;
   NikkeFullChargeMode chargeMode;
   double? coreHitRate;
+  int? customHitRateThreshold;
+  double? customHitRate;
 
   static List<EquipType> equipTypes = [EquipType.head, EquipType.body, EquipType.arm, EquipType.leg];
 
@@ -87,6 +89,8 @@ class NikkeOptions {
     this.forceCancelShootDelay = false,
     this.chargeMode = NikkeFullChargeMode.always,
     this.coreHitRate,
+    this.customHitRateThreshold,
+    this.customHitRate,
   }) : equips = equips.map((equip) => equip?.copy()).toList(),
        skillLevels = skillLevels.toList();
 
@@ -108,6 +112,8 @@ class NikkeOptions {
       forceCancelShootDelay: forceCancelShootDelay,
       chargeMode: chargeMode,
       coreHitRate: coreHitRate,
+      customHitRateThreshold: customHitRateThreshold,
+      customHitRate: customHitRate,
     );
   }
 
@@ -126,6 +132,8 @@ class NikkeOptions {
     forceCancelShootDelay = other.forceCancelShootDelay;
     chargeMode = other.chargeMode;
     coreHitRate = other.coreHitRate;
+    customHitRateThreshold = other.customHitRateThreshold;
+    customHitRate = other.customHitRate;
   }
 
   void errorCorrection(NikkeDatabase db) {

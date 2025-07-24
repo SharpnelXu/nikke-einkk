@@ -90,6 +90,7 @@ class NikkeDamageParameter {
   int defenceBuff = 0;
   int damageRate = 10000; // 100%
   int damageRateBuff = 0;
+  int hitRate = 10000;
 
   // correction
   int coreHitRate = 0;
@@ -129,6 +130,7 @@ class NikkeDamageParameter {
     this.defenceBuff = 0,
     this.damageRate = 10000,
     this.damageRateBuff = 0,
+    this.hitRate = 10000,
     this.coreHitRate = 0,
     this.coreDamageRate = 10000,
     this.coreDamageBuff = 0,
@@ -161,6 +163,7 @@ class NikkeDamageParameter {
         'defenceBuff: $defenceBuff, '
         'damageRate: $damageRate, '
         'damageRateBuff: $damageRateBuff, '
+        'hitRate: $hitRate, '
         'coreHitRate: $coreHitRate, '
         'coreDamageRate: $coreDamageRate, '
         'coreDamageBuff: $coreDamageBuff, '
@@ -193,6 +196,7 @@ class NikkeDamageParameter {
       defenceBuff: defenceBuff,
       damageRate: damageRate,
       damageRateBuff: damageRateBuff,
+      hitRate: hitRate,
       coreHitRate: coreHitRate,
       coreDamageRate: coreDamageRate,
       coreDamageBuff: coreDamageBuff,
@@ -239,7 +243,7 @@ class NikkeDamageParameter {
 
   int calculateDamage({bool critical = false, bool core = false}) {
     final finalAttack = attack + attackBuff - defence - defenceBuff;
-    final finalRate = toModifier(damageRate + damageRateBuff);
+    final finalRate = toModifier(damageRate + damageRateBuff) * toModifier(hitRate);
 
     final coreCorrection = core ? correction(coreDamageRate + coreDamageBuff) : 0;
     final critCorrection = critical ? correction(criticalDamageRate + criticalDamageBuff) : 0;

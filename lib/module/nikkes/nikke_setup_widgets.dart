@@ -152,6 +152,75 @@ class _NikkeSetupColumnState extends State<NikkeSetupColumn> {
               ),
             ],
           ),
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 5,
+            children: [
+              Text('Set Hit Rate Threshold'),
+              Checkbox(
+                value: option.customHitRateThreshold != null,
+                onChanged: (v) {
+                  setState(() {
+                    if (v == true) {
+                      option.customHitRateThreshold = weapon.startAccuracyCircleScale;
+                    } else if (v == false) {
+                      option.customHitRateThreshold = null;
+                    }
+                  });
+                },
+              ),
+              Text(
+                'If accuracy is above this threshold, make some pellets miss',
+                style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 14),
+              ),
+              Tooltip(
+                richMessage: WidgetSpan(
+                  child: Container(
+                    height: max(1, (option.customHitRateThreshold ?? weapon.startAccuracyCircleScale) * 0.75),
+                    width: max(1, (option.customHitRateThreshold ?? weapon.startAccuracyCircleScale) * 0.75),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 3),
+                      color: null,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                child: Icon(Icons.info_outline, size: 16),
+              ),
+              SliderWithPrefix(
+                constraint: false,
+                titled: false,
+                leadingWidth: sliderWidth,
+                label: 'Accuracy',
+                min: 1,
+                max: weapon.startAccuracyCircleScale,
+                value: option.customHitRateThreshold ?? weapon.startAccuracyCircleScale,
+                valueFormatter: (v) => '$v',
+                onChange:
+                    option.customHitRateThreshold == null
+                        ? null
+                        : (newValue) {
+                          option.customHitRateThreshold = newValue.round();
+                          if (mounted) setState(() {});
+                        },
+              ),
+            ],
+          ),
+          if (option.customHitRateThreshold != null)
+            SliderWithPrefix(
+              constraint: false,
+              titled: false,
+              leadingWidth: sliderWidth,
+              label: 'Hit %',
+              min: 0,
+              max: 100,
+              value: option.customHitRate?.round() ?? 100,
+              valueFormatter: (v) => '$v%',
+              onChange: (newValue) {
+                option.customHitRate = newValue;
+                if (mounted) setState(() {});
+              },
+            ),
         ]);
         if (weapon.weaponType.isCharge) {
           children.addAll([const Divider(), _chargeWeaponAdvancedOptionColumn()]);

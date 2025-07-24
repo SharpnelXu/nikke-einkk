@@ -64,6 +64,8 @@ NikkeOptions _$NikkeOptionsFromJson(Map<String, dynamic> json) => NikkeOptions(
   forceCancelShootDelay: json['forceCancelShootDelay'] as bool? ?? false,
   chargeMode: $enumDecodeNullable(_$NikkeFullChargeModeEnumMap, json['chargeMode']) ?? NikkeFullChargeMode.always,
   coreHitRate: (json['coreHitRate'] as num?)?.toDouble(),
+  customHitRateThreshold: (json['customHitRateThreshold'] as num?)?.toInt(),
+  customHitRate: (json['customHitRate'] as num?)?.toDouble(),
 );
 
 Map<String, dynamic> _$NikkeOptionsToJson(NikkeOptions instance) => <String, dynamic>{
@@ -79,6 +81,8 @@ Map<String, dynamic> _$NikkeOptionsToJson(NikkeOptions instance) => <String, dyn
   'forceCancelShootDelay': instance.forceCancelShootDelay,
   'chargeMode': _$NikkeFullChargeModeEnumMap[instance.chargeMode]!,
   'coreHitRate': instance.coreHitRate,
+  'customHitRateThreshold': instance.customHitRateThreshold,
+  'customHitRate': instance.customHitRate,
 };
 
 const _$NikkeFullChargeModeEnumMap = {
