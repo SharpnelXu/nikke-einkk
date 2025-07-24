@@ -529,4 +529,40 @@ void main() {
       expect(helm.buffs.where((buff) => buff.data.groupId == 2015101), isEmpty);
     });
   });
+
+  group('Rouge', () {
+    test('checkPosition fail on pos1', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [NikkeOptions(nikkeResourceId: 272), Const.liter, Const.crown],
+        raptureOptions: [Const.trainingWaterTarget],
+      );
+      simulation.init();
+
+      final rouge = simulation.battleNikkes.first!;
+      final liter = simulation.battleNikkes[1]!;
+      expect(rouge.buffs.where((buff) => buff.buffGiverId == rouge.uniqueId && buff.source == Source.skill2), isEmpty);
+      expect(liter.buffs.where((buff) => buff.buffGiverId == rouge.uniqueId && buff.source == Source.skill2), isEmpty);
+    });
+
+    test('checkPosition success on pos4', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [Const.liter, Const.crown, Const.helm, NikkeOptions(nikkeResourceId: 272)],
+        raptureOptions: [Const.trainingWaterTarget],
+      );
+      simulation.init();
+
+      final rouge = simulation.battleNikkes[3]!;
+      final helm = simulation.battleNikkes[2]!;
+      expect(
+        rouge.buffs.where((buff) => buff.buffGiverId == rouge.uniqueId && buff.source == Source.skill2),
+        isNotEmpty,
+      );
+      expect(
+        helm.buffs.where((buff) => buff.buffGiverId == rouge.uniqueId && buff.source == Source.skill2),
+        isNotEmpty,
+      );
+    });
+  });
 }

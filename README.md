@@ -94,6 +94,8 @@ where the difference is 0.000004% (actual: 902435165 vs calculated: 902435200)
 - Each burst skill takes 1 frame (fastest possible), re-enter burst skills have 0.5s cd
 - For `instantSequentialAttacks` (Cindy's Burst), beforeHurt & afterHurt functions are applied for each hit
 - If stack count is over 1000000, go find the buff and copy the stack count of that buff?
+- OnFunctionOn & OnFunctionOff assumes to only check buffs
+  - May be a problem later since not all functions are considered buff in Einkk
 
 ## Questions need testing
 - Do decoys have defence?
