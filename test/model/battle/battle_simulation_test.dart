@@ -678,5 +678,117 @@ void main() {
         isNotNull,
       );
     });
+
+    test('Burst Order Tests', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [Const.crown, Const.liter, Const.helm, Const.cindy, Const.helm],
+        raptureOptions: [Const.shootingRangeWaterBoss],
+        advancedOption: BattleAdvancedOption(
+          maxSeconds: 60,
+          burstOrder: {
+            1: BattleBurstSpecification(order: [2, 1, 4], frame: 3200),
+            2: BattleBurstSpecification(order: [2, 1, 5]),
+            3: BattleBurstSpecification(order: [2, 1, 3], frame: 1200),
+          },
+        ),
+      );
+
+      simulation.init();
+      ChangeBurstStepEvent? getChangeBurstStepEvent() {
+        return simulation.timeline[simulation.previousFrame]?.firstWhereOrNull((event) => event is ChangeBurstStepEvent)
+            as ChangeBurstStepEvent?;
+      }
+
+      // cycle 1
+      while (simulation.burstStage != 1 && simulation.currentFrame > 0) {
+        simulation.proceedOneFrame();
+      }
+      ChangeBurstStepEvent? burstEvent = getChangeBurstStepEvent();
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 0);
+      expect(burstEvent.nextStage, 1);
+
+      while (simulation.burstStage != 2 && simulation.currentFrame > 0) {
+        simulation.proceedOneFrame();
+      }
+      burstEvent = getChangeBurstStepEvent();
+      expect(simulation.previousFrame, 3200);
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 1);
+      expect(burstEvent.nextStage, 2);
+      expect(burstEvent.activatorId, 2);
+
+      simulation.proceedOneFrame();
+      burstEvent = getChangeBurstStepEvent();
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 2);
+      expect(burstEvent.nextStage, 3);
+      expect(burstEvent.activatorId, 1);
+
+      simulation.proceedOneFrame();
+      burstEvent = getChangeBurstStepEvent();
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 3);
+      expect(burstEvent.nextStage, 4);
+      expect(burstEvent.activatorId, 4);
+
+      // cycle 2
+      while (simulation.burstStage != 1 && simulation.currentFrame > 0) {
+        simulation.proceedOneFrame();
+      }
+      burstEvent = getChangeBurstStepEvent();
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 0);
+      expect(burstEvent.nextStage, 1);
+
+      while (simulation.burstStage != 2 && simulation.currentFrame > 0) {
+        simulation.proceedOneFrame();
+      }
+      burstEvent = getChangeBurstStepEvent();
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 1);
+      expect(burstEvent.nextStage, 2);
+      expect(burstEvent.activatorId, 2);
+
+      simulation.proceedOneFrame();
+      burstEvent = getChangeBurstStepEvent();
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 2);
+      expect(burstEvent.nextStage, 3);
+      expect(burstEvent.activatorId, 1);
+
+      simulation.proceedOneFrame();
+      burstEvent = getChangeBurstStepEvent();
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 3);
+      expect(burstEvent.nextStage, 4);
+      expect(burstEvent.activatorId, 5);
+
+      // cycle 3
+      while (simulation.burstStage != 2 && simulation.currentFrame > 0) {
+        simulation.proceedOneFrame();
+      }
+      burstEvent = getChangeBurstStepEvent();
+      expect(simulation.previousFrame, 1200);
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 1);
+      expect(burstEvent.nextStage, 2);
+      expect(burstEvent.activatorId, 2);
+
+      simulation.proceedOneFrame();
+      burstEvent = getChangeBurstStepEvent();
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 2);
+      expect(burstEvent.nextStage, 3);
+      expect(burstEvent.activatorId, 1);
+
+      simulation.proceedOneFrame();
+      burstEvent = getChangeBurstStepEvent();
+      expect(burstEvent, isNotNull);
+      expect(burstEvent!.currentStage, 3);
+      expect(burstEvent.nextStage, 4);
+      expect(burstEvent.activatorId, 3);
+    });
   });
 }
