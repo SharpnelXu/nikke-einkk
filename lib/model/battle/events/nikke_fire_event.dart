@@ -29,10 +29,13 @@ class NikkeFireEvent extends BattleEvent {
       }
 
       for (final buff in nikke.buffs) {
-        if (buff.data.durationType == DurationType.shots &&
-            simulation.db.onShotFunctionTypes.contains(buff.data.functionType)) {
+        if (buff.data.durationType.isShots && simulation.db.onShotFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
+      }
+
+      if (nikke.changeWeaponSkill != null && nikke.changeWeaponSkill?.durationType == DurationType.shots) {
+        nikke.changeWeaponDuration -= 1;
       }
 
       // auto would still perform retreat behind cover animation

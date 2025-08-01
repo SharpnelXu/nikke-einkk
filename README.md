@@ -84,22 +84,28 @@ manually set if each bullet is crit / core hit or not
   - Fixing 2B, Harran etc. will be low priority since it involves testing & verification
 - Currently all SG pellets will hit
 
+## Skills & Functions
+- For `instantSequentialAttacks` (Cindy's Burst), beforeHurt & afterHurt functions are applied for each hit
+- If stack count is over 1000000, go find the buff and copy the stack count of that buff?
+- OnFunctionOn & OnFunctionOff assumes to only check buffs
+  - May be a problem later since not all functions are considered buff in Einkk
+- HP Ratio triggers (Emergency Max HP Cube) will not trigger again if the HP stays in trigger range
+- ChangeWeapon values: damage rate, fire rate, weaponId, ?, ?. The fourth & fifth parameter's functions are unknown
+
+
 ## Niche Mechanisms Waiting To Be Categorized
 - Equipment level stat rounding method is roundHalfToEvent (stat from level & stat from same corp are rounded separately)
 - Nikke stat rounding: gradeRatioStat is truncated to int, core stat is normal rounding
 - Current damage formula is roughly 0.0001% inaccurate due to rounding, the extreme example I used is Snow White's ult
 where the difference is 0.000004% (actual: 902435165 vs calculated: 902435200)
   - Or maybe this is capped by charging multiplier (10 vs 9.99999)?
-- HP Ratio triggers (Emergency Max HP Cube) will not trigger again if the HP stays in trigger range
 - Each burst skill takes 1 frame (fastest possible), re-enter burst skills have 0.5s cd
-- For `instantSequentialAttacks` (Cindy's Burst), beforeHurt & afterHurt functions are applied for each hit
-- If stack count is over 1000000, go find the buff and copy the stack count of that buff?
-- OnFunctionOn & OnFunctionOff assumes to only check buffs
-  - May be a problem later since not all functions are considered buff in Einkk
 
 ## Questions need testing
 - Do decoys have defence?
 - Will Cindy's S2 Beautiful stack be removed if decoy's HP goes to 0? 
+- IsWeaponType checks current or base?
+  - A: base
 
 ## TODOs
 

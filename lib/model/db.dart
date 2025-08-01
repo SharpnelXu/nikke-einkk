@@ -381,10 +381,10 @@ class NikkeDatabase {
     final data = FunctionData.fromJson(record);
     functionTable[data.id] = data;
 
-    if (data.durationType == DurationType.shots) {
+    if (data.durationType.isShots) {
       onShotFunctionTypes.add(data.functionType);
     }
-    if (data.durationType == DurationType.hits) {
+    if (data.durationType.isHits) {
       onHitFunctionTypes.add(data.functionType);
     }
   }

@@ -156,7 +156,7 @@ abstract class BattleEntity {
 
   void normalAction(BattleSimulation simulation) {
     for (final buff in buffs) {
-      if (buff.data.durationType == DurationType.timeSec) {
+      if (buff.data.durationType.isTimed) {
         buff.duration -= 1;
       }
     }

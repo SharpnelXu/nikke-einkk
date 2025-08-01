@@ -177,11 +177,11 @@ class BattleSkill {
         for (final target in skillTargets) {
           int additionalTimes = skillData.skillValueData[1].skillValue;
           if (skillData.skillValueData[4].skillValueType != ValueType.none) {
-            final targetBuffGroup = skillData.skillValueData[4].skillValue;
+            final targetBuffGroup = skillData.getSkillValue(4);
             final buffStack = owner.buffs.where((buff) => buff.data.groupId == targetBuffGroup).firstOrNull;
             additionalTimes = buffStack?.count ?? additionalTimes;
           }
-          final delayTime = skillData.skillValueData[2].skillValue;
+          final delayTime = skillData.getSkillValue(2);
           for (int count = 0; count < additionalTimes; count += 1) {
             final delayFrame =
                 source == Source.burst ? timeDataToFrame(constData.damageBurstApplyDelay, simulation.fps) : 0;
@@ -195,7 +195,7 @@ class BattleSkill {
                   nikke: owner,
                   rapture: target,
                   source: source,
-                  damageRate: skillData.skillValueData[0].skillValue,
+                  damageRate: skillData.getSkillValue(0),
                   isShareDamage: false,
                 ),
               );
@@ -209,7 +209,7 @@ class BattleSkill {
         break;
       case CharacterSkillType.installBarrier:
         for (final target in skillTargets) {
-          final barrierHp = owner.getMaxHp(simulation) * toModifier(skillData.skillValueData[1].skillValue);
+          final barrierHp = owner.getMaxHp(simulation) * toModifier(skillData.getSkillValue(1));
           final barrier = Barrier(
             skillData.id,
             barrierHp.round(),
@@ -227,8 +227,8 @@ class BattleSkill {
       case CharacterSkillType.installDecoy:
         for (final target in skillTargets) {
           if (target is BattleNikke) {
-            final hpPercent = toModifier(skillData.skillValueData[0].skillValue);
-            final defPercent = toModifier(skillData.skillValueData[1].skillValue); // this is a guess
+            final hpPercent = toModifier(skillData.getSkillValue(0));
+            final defPercent = toModifier(skillData.getSkillValue(1)); // this is a guess
 
             final decoyHp = (target.getMaxHp(simulation) * hpPercent).round();
             final decoyDefence = (target.getFinalDefence(simulation) * defPercent).round();
@@ -238,6 +238,23 @@ class BattleSkill {
         }
         break;
       case CharacterSkillType.changeWeapon:
+        for (final target in skillTargets) {
+          final damageRate = skillData.getSkillValue(0);
+          final fireRate = skillData.getSkillValue(1);
+          final duration =
+              skillData.durationType.isTimed
+                  ? timeDataToFrame(skillData.durationValue, simulation.fps)
+                  : skillData.durationValue;
+          final weaponId = skillData.getSkillValue(2);
+          final weaponData = simulation.db.characterShotTable[weaponId];
+          if (target is BattleNikke && weaponData != null) {
+            target.changeWeaponSkill = skillData;
+            target.changeWeaponData = WeaponData.changeWeapon(damageRate, fireRate, weaponData);
+            target.changeWeaponDuration = duration;
+            target.currentAmmo = target.getMaxAmmo(simulation);
+          }
+        }
+        break;
       case CharacterSkillType.launchWeapon:
       case CharacterSkillType.laserBeam:
       case CharacterSkillType.explosiveCircuit:

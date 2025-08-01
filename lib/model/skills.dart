@@ -76,6 +76,10 @@ enum DurationType {
     key: (v) => (v as DurationType).jsonKey,
   );
 
+  bool get isTimed => this == DurationType.timeSec || this == DurationType.timeSecVer2;
+  bool get isHits => this == DurationType.hits || this == DurationType.hitsVer2;
+  bool get isShots => this == DurationType.shots;
+
   String get jsonKey {
     switch (this) {
       case DurationType.timeSecVer2:
@@ -200,6 +204,10 @@ class SkillData {
   });
 
   factory SkillData.fromJson(Map<String, dynamic> json) => _$SkillDataFromJson(json);
+
+  int getSkillValue(int index) {
+    return skillValueData[index].skillValue;
+  }
 }
 
 @JsonSerializable(createToJson: false)

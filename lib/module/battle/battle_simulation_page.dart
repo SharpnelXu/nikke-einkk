@@ -208,7 +208,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     final totalDamage = totalDamageMap.values.fold(0, (s, v) => s + v);
 
     return Container(
-      padding: EdgeInsets.only(right: 15),
+      padding: EdgeInsets.only(right: 55),
       constraints: BoxConstraints(maxWidth: 700, maxHeight: 700),
       child: Center(
         child: LineChart(

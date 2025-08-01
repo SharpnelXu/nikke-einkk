@@ -82,6 +82,7 @@ class BattleNikke extends BattleEntity {
   @override
   String get name => locale.getTranslation(characterData.nameLocalkey) ?? characterData.resourceId.toString();
   WeaponData get baseWeaponData => db.characterShotTable[characterData.shotId]!;
+  WeaponType get baseWeaponType => baseWeaponData.weaponType;
   // skill data
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
@@ -151,7 +152,10 @@ class BattleNikke extends BattleEntity {
   int currentAmmo = 0;
 
   WeaponType get currentWeaponType => currentWeaponData.weaponType;
-  WeaponData get currentWeaponData => baseWeaponData;
+  WeaponData get currentWeaponData => changeWeaponData ?? baseWeaponData;
+  int changeWeaponDuration = 0;
+  WeaponData? changeWeaponData;
+  SkillData? changeWeaponSkill;
 
   // TODO: this encapsulates ranges so don't need to clamp on every change, but it's boiler plate ish
   // a lot of frame counters have min value 0,
@@ -235,6 +239,10 @@ class BattleNikke extends BattleEntity {
     buffs.clear();
     skills.clear();
 
+    changeWeaponDuration = 0;
+    changeWeaponData = null;
+    changeWeaponSkill = null;
+
     for (final equip in option.equips) {
       equip?.applyEquipLines(simulation, this);
     }
@@ -300,14 +308,15 @@ class BattleNikke extends BattleEntity {
       skill.processFrame(simulation);
     }
 
+    if (changeWeaponSkill != null && changeWeaponSkill!.durationType.isTimed) {
+      changeWeaponDuration -= 1;
+    }
+
     for (final barrier in barriers) {
-      if (barrier.durationType == DurationType.timeSec) {
+      if (barrier.durationType.isTimed) {
         barrier.duration -= 1;
       }
     }
-    barriers.removeWhere(
-      (barrier) => barrier.hp <= 0 || (barrier.duration == 0 && barrier.durationType == DurationType.timeSec),
-    );
   }
 
   void processBehindCoverStatus(BattleSimulation simulation) {
@@ -406,6 +415,9 @@ class BattleNikke extends BattleEntity {
       case WeaponType.rl:
       case WeaponType.sr:
         final framesToFullCharge = getFramesToFullCharge(simulation);
+        if (previousFullChargeFrameCount <= 0) {
+          previousFullChargeFrameCount = framesToFullCharge;
+        }
         if (framesToFullCharge != previousFullChargeFrameCount) {
           // update chargeFrames to based on percentage, this is for change in charge speed
           final chargePercent = chargeFrames / previousFullChargeFrameCount;
@@ -591,6 +603,14 @@ class BattleNikke extends BattleEntity {
 
   @override
   void endCurrentFrame(BattleSimulation simulation) {
+    barriers.removeWhere((barrier) => barrier.hp <= 0 || barrier.duration == 0);
+
+    if (changeWeaponDuration <= 0) {
+      changeWeaponSkill = null;
+      changeWeaponData = null;
+      currentAmmo = min(currentAmmo, getMaxAmmo(simulation));
+    }
+
     // gainAmmo is put here because max ammo can change in this frame
     final gainAmmo = getBuffValue(
       simulation,

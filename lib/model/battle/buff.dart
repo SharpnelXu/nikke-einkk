@@ -32,9 +32,7 @@ class BattleBuff {
     int? targetGroupId,
   }) {
     final duration =
-        data.durationType == DurationType.timeSec
-            ? timeDataToFrame(data.durationValue, simulation.fps)
-            : data.durationValue;
+        data.durationType.isTimed ? timeDataToFrame(data.durationValue, simulation.fps) : data.durationValue;
     return BattleBuff._(
       data: data,
       buffGiverId: buffGiverUniqueId,

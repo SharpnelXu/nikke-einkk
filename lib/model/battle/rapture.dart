@@ -502,7 +502,7 @@ class BattleRapture extends BattleEntity {
 
     final barrier = this.barrier;
     if (barrier != null) {
-      if (barrier.durationType == DurationType.timeSec) {
+      if (barrier.durationType.isTimed) {
         barrier.duration -= 1;
         if (barrier.duration == 0) {
           this.barrier = null;
@@ -679,8 +679,7 @@ class BattleRapture extends BattleEntity {
   void broadcast(BattleEvent event, BattleSimulation simulation) {
     if (event is NikkeDamageEvent && event.targetId == uniqueId) {
       for (final buff in buffs) {
-        if (buff.data.durationType == DurationType.shots &&
-            simulation.db.onHitFunctionTypes.contains(buff.data.functionType)) {
+        if (buff.data.durationType.isShots && simulation.db.onHitFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }

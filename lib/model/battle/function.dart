@@ -306,9 +306,7 @@ class BattleFunction {
       final existingBuff = target.buffs.firstWhereOrNull((buff) => buff.data.groupId == data.groupId);
       if (existingBuff != null) {
         existingBuff.duration =
-            data.durationType == DurationType.timeSec
-                ? timeDataToFrame(data.durationValue, simulation.fps)
-                : data.durationValue;
+            data.durationType.isTimed ? timeDataToFrame(data.durationValue, simulation.fps) : data.durationValue;
         existingBuff.count = min(existingBuff.count + 1, data.fullCount);
 
         // overwrite is probably done this way
@@ -769,7 +767,7 @@ class BattleFunction {
         // all user
         return target != null && (target.currentHp / target.getMaxHp(simulation) * 10000).round() >= value;
       case StatusTriggerType.isWeaponType:
-        return target is BattleNikke && target.baseWeaponData.id == value;
+        return target is BattleNikke && target.baseWeaponType.id == value;
       case StatusTriggerType.isFunctionOff:
         return target != null && target.buffs.every((buff) => buff.data.groupId != value);
       case StatusTriggerType.isFunctionOn:

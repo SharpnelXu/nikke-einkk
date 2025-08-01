@@ -173,13 +173,12 @@ class _BattleNikkeStatusPageState extends State<BattleNikkeStatusPage> {
               '${buff.count > 1 ? ' (${buff.count} stacks)' : ''}'
               '${func.functionStandard == StandardType.user && buff.buffReceiverId != buff.buffGiverId ? ' of Activator' : ''}',
             ),
-            if ([DurationType.timeSec, DurationType.timeSecVer2].contains(func.durationType))
+            if (func.durationType.isTimed)
               Text(
                 '${(buff.duration / simulation.fps).toStringAsFixed(3)} s (${buff.duration} frames)',
                 style: secondaryStyle,
               ),
-            if ([DurationType.hits, DurationType.hitsVer2].contains(func.durationType))
-              Text('${buff.duration} shots', style: secondaryStyle),
+            if (func.durationType.isHits) Text('${buff.duration} shots', style: secondaryStyle),
           ],
         ),
       ],

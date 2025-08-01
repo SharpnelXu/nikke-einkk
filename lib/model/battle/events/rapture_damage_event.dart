@@ -39,8 +39,7 @@ class RaptureDamageEvent extends BattleEvent {
   void processNikke(BattleSimulation simulation, BattleNikke nikke) {
     if (nikke.uniqueId == targetId) {
       for (final buff in nikke.buffs) {
-        if (buff.data.durationType == DurationType.shots &&
-            simulation.db.onHitFunctionTypes.contains(buff.data.functionType)) {
+        if (buff.data.durationType.isShots && simulation.db.onHitFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
       }
