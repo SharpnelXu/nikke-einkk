@@ -601,14 +601,26 @@ class BattleNikke extends BattleEntity {
     }
   }
 
+  void resetWeaponParams(BattleSimulation simulation) {
+    currentAmmo = getMaxAmmo(simulation);
+    chargeFrames = 0;
+    previousFullChargeFrameCount = 0;
+    rateOfFire = currentWeaponData.rateOfFire;
+    _accuracyCircleScale = currentWeaponData.startAccuracyCircleScale;
+    shootCountdown = 0;
+    reloadingFrameCount = 0;
+    fullReloadFrameCount = 0;
+  }
+
   @override
   void endCurrentFrame(BattleSimulation simulation) {
     barriers.removeWhere((barrier) => barrier.hp <= 0 || barrier.duration == 0);
 
-    if (changeWeaponDuration <= 0) {
+    if (changeWeaponDuration <= 0 && changeWeaponData != null) {
       changeWeaponSkill = null;
       changeWeaponData = null;
-      currentAmmo = min(currentAmmo, getMaxAmmo(simulation));
+
+      resetWeaponParams(simulation);
     }
 
     // gainAmmo is put here because max ammo can change in this frame

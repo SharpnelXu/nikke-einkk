@@ -251,7 +251,7 @@ class BattleSkill {
             target.changeWeaponSkill = skillData;
             target.changeWeaponData = WeaponData.changeWeapon(damageRate, fireRate, weaponData);
             target.changeWeaponDuration = duration;
-            target.currentAmmo = target.getMaxAmmo(simulation);
+            target.resetWeaponParams(simulation);
           }
         }
         break;

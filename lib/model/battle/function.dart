@@ -204,6 +204,11 @@ class BattleFunction {
           executeFunction(event, simulation);
         }
         break;
+      case TimingTriggerType.onSpawnMonster:
+        if (event is BattleStartEvent && simulation.raptures.length >= timingTriggerValue) {
+          executeFunction(event, simulation);
+        }
+        break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
       case TimingTriggerType.onBurstSkillStep:
@@ -235,7 +240,6 @@ class BattleFunction {
       case TimingTriggerType.onPelletHitPerShot:
       case TimingTriggerType.onShotNotFullCharge:
       case TimingTriggerType.onShotRatio:
-      case TimingTriggerType.onSpawnMonster:
       case TimingTriggerType.onSpawnTarget:
       case TimingTriggerType.onSquadHurtRatio:
       case TimingTriggerType.onSummonMonster:
