@@ -237,6 +237,7 @@ class BattleNikke extends BattleEntity {
     totalBurstSkillUsed = 0;
     functions.clear();
     buffs.clear();
+    funcRatioTracker.clear();
     skills.clear();
 
     changeWeaponDuration = 0;

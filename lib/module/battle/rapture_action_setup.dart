@@ -42,6 +42,7 @@ class _RaptureActionSetupDialogState extends State<RaptureActionSetupDialog> {
   FunctionType buffType = FunctionType.statDef;
   TextEditingController buffValueController = TextEditingController();
   bool isBuff = false;
+  bool hitCover = false;
   BattleRaptureActionType actionType = BattleRaptureActionType.setAtk;
   String? errorText;
 
@@ -170,6 +171,7 @@ class _RaptureActionSetupDialogState extends State<RaptureActionSetupDialog> {
                 targetCount: targetCount,
                 sortHighToLow: highToLow,
                 position: position,
+                hitCover: hitCover,
               );
               break;
             case BattleRaptureActionType.setBuff:

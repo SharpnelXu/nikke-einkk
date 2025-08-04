@@ -108,6 +108,7 @@ class BattleRaptureAction {
   int? barrierHp;
 
   int? damageRate;
+  bool? hitCover;
   BattleRaptureActionTarget? targetType;
   BattleRaptureActionTargetSubtype? targetSubtype;
   int? position;
@@ -139,6 +140,7 @@ class BattleRaptureAction {
       partId: partId,
       damageRate: damageRate,
       barrierHp: barrierHp,
+      hitCover: hitCover,
     );
   }
 
@@ -160,6 +162,7 @@ class BattleRaptureAction {
     this.partId,
     this.damageRate,
     this.barrierHp,
+    this.hitCover,
   }) : eleShields = eleShields?.toList();
 
   factory BattleRaptureAction.fromJson(Map<String, dynamic> json) => _$BattleRaptureActionFromJson(json);
@@ -193,6 +196,7 @@ class BattleRaptureAction {
     required int frame,
     required BattleRaptureActionTarget targetType,
     required int damageRate,
+    required bool hitCover,
     BattleRaptureActionTargetSubtype? targetSubtype,
     int? targetCount,
     bool? sortHighToLow,
@@ -207,6 +211,7 @@ class BattleRaptureAction {
       targetCount: targetCount,
       sortHighToLow: sortHighToLow,
       position: position,
+      hitCover: hitCover,
     );
   }
 
@@ -473,6 +478,7 @@ class BattleRapture extends BattleEntity {
     parts.clear();
     hasRedCircle = false;
     buffs.clear();
+    funcRatioTracker.clear();
 
     endActions.clear();
   }
@@ -603,7 +609,7 @@ class BattleRapture extends BattleEntity {
 
             simulation.registerEvent(
               simulation.currentFrame,
-              RaptureDamageEvent.create(simulation, this, target, action.damageRate!),
+              RaptureDamageEvent.create(simulation, this, target, action.damageRate!, action.hitCover!),
             );
           }
           break;

@@ -10,6 +10,7 @@ abstract class BattleEntity {
   int currentHp = 0;
 
   final List<BattleBuff> buffs = [];
+  final Map<int, int> funcRatioTracker = {};
 
   String get name => 'Entity $uniqueId';
   int get baseAttack;
@@ -17,6 +18,20 @@ abstract class BattleEntity {
   int get baseHp;
 
   NikkeElement get element => NikkeElement.unknown;
+
+  bool checkRatio(int groupId, int triggerValue) {
+    int ratioTracker = funcRatioTracker[groupId] ?? 0;
+    final ratioCheck = triggerValue >= 10000 || ratioTracker == 0 || ratioTracker >= 10000;
+    if (ratioCheck) {
+      ratioTracker %= 10000;
+    }
+
+    if (triggerValue < 10000 && triggerValue > 0) {
+      funcRatioTracker[groupId] = ratioTracker + triggerValue;
+    }
+
+    return ratioCheck;
+  }
 
   void changeHp(BattleSimulation simulation, int changeValue, [bool isHeal = false]) {
     currentHp = (currentHp + changeValue).clamp(1, getMaxHp(simulation));

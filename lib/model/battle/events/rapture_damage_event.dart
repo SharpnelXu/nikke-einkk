@@ -9,16 +9,18 @@ import 'package:nikke_einkk/module/common/custom_table.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 
 class RaptureDamageEvent extends BattleEvent {
-  late NikkeDamageParameter damageParameter;
-  late bool invalid;
+  NikkeDamageParameter damageParameter;
+  bool hitCover;
+  bool invalid;
 
-  RaptureDamageEvent._(super.activatorId, super.targetIds, this.damageParameter, this.invalid);
+  RaptureDamageEvent._(super.activatorId, super.targetIds, this.damageParameter, this.invalid, this.hitCover);
 
   factory RaptureDamageEvent.create(
     BattleSimulation simulation,
     BattleRapture rapture,
     BattleNikke nikke,
     int damageRate,
+    bool hitCover,
   ) {
     final damageParameter = NikkeDamageParameter(
       attack: rapture.baseAttack,
@@ -30,7 +32,7 @@ class RaptureDamageEvent extends BattleEvent {
       damageReductionBuff: nikke.getDamageReductionBuffValues(simulation),
     );
     final invalid = nikke.buffs.any((buff) => buff.data.functionType == FunctionType.immuneDamage);
-    return RaptureDamageEvent._(rapture.uniqueId, [nikke.uniqueId], damageParameter, invalid);
+    return RaptureDamageEvent._(rapture.uniqueId, [nikke.uniqueId], damageParameter, invalid, hitCover);
   }
 
   int get targetId => targetIds.first;

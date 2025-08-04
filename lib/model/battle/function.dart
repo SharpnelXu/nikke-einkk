@@ -14,6 +14,7 @@ import 'package:nikke_einkk/model/battle/events/hp_change_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_fire_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_reload_event.dart';
+import 'package:nikke_einkk/model/battle/events/rapture_damage_event.dart';
 import 'package:nikke_einkk/model/battle/events/time_event.dart';
 import 'package:nikke_einkk/model/battle/events/use_skill_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
@@ -209,13 +210,28 @@ class BattleFunction {
           executeFunction(event, simulation);
         }
         break;
+      case TimingTriggerType.onCoverHurtRatio:
+        if (event is RaptureDamageEvent && event.hitCover && event.targetId == standard?.uniqueId && standard != null) {
+          final ratioCheck = standard.checkRatio(data.groupId, timingTriggerValue);
+          if (ratioCheck) {
+            executeFunction(event, simulation);
+          }
+        }
+        break;
+      case TimingTriggerType.onShotRatio:
+        if (event is NikkeFireEvent && event.activatorId == standard?.uniqueId && standard != null) {
+          final ratioCheck = standard.checkRatio(data.groupId, timingTriggerValue);
+          if (ratioCheck) {
+            executeFunction(event, simulation);
+          }
+        }
+        break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
       case TimingTriggerType.onBurstSkillStep:
       case TimingTriggerType.onCoreHitNum:
       case TimingTriggerType.onCoreHitNumOnce:
       case TimingTriggerType.onCoreHitRatio:
-      case TimingTriggerType.onCoverHurtRatio:
       case TimingTriggerType.onCriticalHitNum:
       case TimingTriggerType.onDead:
       case TimingTriggerType.onEndFullBurst:
@@ -239,7 +255,6 @@ class BattleFunction {
       case TimingTriggerType.onPelletHitNum:
       case TimingTriggerType.onPelletHitPerShot:
       case TimingTriggerType.onShotNotFullCharge:
-      case TimingTriggerType.onShotRatio:
       case TimingTriggerType.onSpawnTarget:
       case TimingTriggerType.onSquadHurtRatio:
       case TimingTriggerType.onSummonMonster:

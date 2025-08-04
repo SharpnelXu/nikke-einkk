@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
@@ -269,10 +270,10 @@ void main() {
       simulation.init();
       int shootCounter = 0;
       final expectedShootFrames = List.generate(24, (idx) {
+        // add 8 for nero's spotFirstDelay
         return 8 + (idx % 2 == 0 ? 5 * idx ~/ 2 : 5 * (idx - 1) ~/ 2 + 3);
       });
       for (int i = 0; i < 67; i += 1) {
-        // add 8 for nero's spotFirstDelay
         final frame = simulation.currentFrame;
         simulation.proceedOneFrame();
         for (final event in simulation.timeline[frame] ?? []) {
@@ -296,10 +297,10 @@ void main() {
       simulation.init();
       int shootCounter = 0;
       final expectedShootFrames = List.generate(12, (idx) {
+        // add 20 for tove's spotFirstDelay
         return 20 + idx * 5;
       });
       for (int i = 0; i < 76; i += 1) {
-        // add 20 for tove's spotFirstDelay
         final frame = simulation.currentFrame;
         simulation.proceedOneFrame();
         for (final event in simulation.timeline[frame] ?? []) {
@@ -323,10 +324,10 @@ void main() {
       simulation.init();
       int shootCounter = 0;
       final expectedShootFrames = List.generate(3, (idx) {
+        // add 12 for Pepper's spotFirstDelay
         return 12 + idx * 40;
       });
       for (int i = 0; i < 93; i += 1) {
-        // add 20 for tove's spotFirstDelay
         final frame = simulation.currentFrame;
         simulation.proceedOneFrame();
         for (final event in simulation.timeline[frame] ?? []) {
@@ -564,5 +565,39 @@ void main() {
         isNotEmpty,
       );
     });
+  });
+
+  test('Ratio mechanism tests with Tove', () {
+    final simulation = BattleSimulation(
+      playerOptions: PlayerOptions(),
+      nikkeOptions: [NikkeOptions(nikkeResourceId: 192)],
+      raptureOptions: [BattleRaptureOptions(startDistance: 30, element: NikkeElement.water, startDefence: 100)],
+      advancedOption: BattleAdvancedOption(maxSeconds: 15),
+    );
+
+    simulation.init();
+    final tove = simulation.nonnullNikkes[0];
+    int shootCounter = 0;
+    int triggerCount = 0;
+    final expectedShootFrames = List.generate(61, (idx) {
+      // add 20 for tove's spotFirstDelay
+      return 20 + idx * 5;
+    });
+    for (int i = 0; i < (20 + 60 * 5 + 3); i += 1) {
+      final frame = simulation.currentFrame;
+      simulation.proceedOneFrame();
+      for (final event in simulation.timeline[frame] ?? []) {
+        if (event is NikkeFireEvent) {
+          shootCounter += 1;
+          expect(frame, simulation.maxFrames - expectedShootFrames.removeAt(0));
+          if (shootCounter == 1 || (shootCounter > 0 && shootCounter % 20 == 0)) {
+            triggerCount += 1;
+            final stackBuff = tove.buffs.firstWhereOrNull((buff) => buff.data.groupId == 2192102);
+            expect(stackBuff, isNotNull);
+          }
+        }
+      }
+    }
+    expect(triggerCount, 4);
   });
 }
