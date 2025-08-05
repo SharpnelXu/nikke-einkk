@@ -366,14 +366,18 @@ class BattleSkill {
       case PreferTargetCondition.none:
         break;
       case PreferTargetCondition.includeNoneTargetLast:
-        targetList.sort((a, b) {
-          final canTargetA = (a as BattleRapture).canBeTargeted ? -1 : 1;
-          final canTargetB = (b as BattleRapture).canBeTargeted ? -1 : 1;
-          return canTargetA - canTargetB;
-        });
+        if (!targetNikkes) {
+          targetList.sort((a, b) {
+            final canTargetA = (a as BattleRapture).canBeTargeted ? -1 : 1;
+            final canTargetB = (b as BattleRapture).canBeTargeted ? -1 : 1;
+            return canTargetA - canTargetB;
+          });
+        }
         break;
       case PreferTargetCondition.includeNoneTargetNone:
-        targetList.retainWhere((rapture) => rapture is BattleRapture && rapture.canBeTargeted);
+        if (!targetNikkes) {
+          targetList.retainWhere((rapture) => rapture is BattleRapture && rapture.canBeTargeted);
+        }
         break;
       case PreferTargetCondition.excludeSelf:
         targetList.remove(owner);

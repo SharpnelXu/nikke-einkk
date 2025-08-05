@@ -419,6 +419,9 @@ class BattleFunction {
       case FunctionType.statHpHeal:
       case FunctionType.statPenetration: // TODO: revisit when boss can have parts
       case FunctionType.statReloadTime:
+      case FunctionType.statEndRateOfFire:
+      case FunctionType.statRateOfFire:
+      case FunctionType.statRateOfFirePerShot:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -649,13 +652,10 @@ class BattleFunction {
       case FunctionType.statBonusRangeMax:
       case FunctionType.statBurstSkillCoolTime:
       case FunctionType.statChargeTimeImmune:
-      case FunctionType.statEndRateOfFire:
       case FunctionType.statEnergyResist:
       case FunctionType.statExplosion:
       case FunctionType.statInstantSkillRange:
       case FunctionType.statMaintainFireStance:
-      case FunctionType.statRateOfFire:
-      case FunctionType.statRateOfFirePerShot:
       case FunctionType.statReloadBulletRatio:
       case FunctionType.statShotCount:
       case FunctionType.statSpotRadius:

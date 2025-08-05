@@ -160,17 +160,15 @@ class BattleNikke extends BattleEntity {
   // TODO: this encapsulates ranges so don't need to clamp on every change, but it's boiler plate ish
   // a lot of frame counters have min value 0,
   /// this is without buff, so internal tracking only
-  int __accuracyCircleScale = 0;
-  int get _accuracyCircleScale => __accuracyCircleScale;
-  set _accuracyCircleScale(int newScale) =>
-      __accuracyCircleScale = newScale.clamp(
+  int _baseAccCircleScale = 0;
+  int get baseAccCircleScale => _baseAccCircleScale;
+  set baseAccCircleScale(int newScale) =>
+      _baseAccCircleScale = newScale.clamp(
         currentWeaponData.endAccuracyCircleScale,
         currentWeaponData.startAccuracyCircleScale,
       );
 
-  int _rateOfFire = 0;
-  int get rateOfFire => _rateOfFire;
-  set rateOfFire(int value) => _rateOfFire = value.clamp(currentWeaponData.rateOfFire, currentWeaponData.endRateOfFire);
+  int rateOfFire = 0;
 
   int fullReloadFrameCount = 0;
 
@@ -213,7 +211,7 @@ class BattleNikke extends BattleEntity {
     uniqueId = position;
     fps = simulation.fps;
     status = BattleNikkeStatus.behindCover;
-    _accuracyCircleScale = baseWeaponData.startAccuracyCircleScale;
+    baseAccCircleScale = baseWeaponData.startAccuracyCircleScale;
     rateOfFire = baseWeaponData.rateOfFire;
     chargeFrames = 0;
     previousFullChargeFrameCount = 0;
@@ -327,16 +325,17 @@ class BattleNikke extends BattleEntity {
     chargeFrames = 0;
     spotLastDelayFrameCount -= 1;
     if (shootCountdown > 0) {
-      shootCountdown -= rateOfFire;
+      shootCountdown -= getRateOfFire(simulation);
     }
     if (currentWeaponData.accuracyChangeSpeed != 0) {
       // reset accuracy
-      _accuracyCircleScale += (currentWeaponData.accuracyChangeSpeed / fps).round();
+      baseAccCircleScale += (currentWeaponData.accuracyChangeSpeed / fps).round();
     }
     if (currentWeaponData.rateOfFireResetTime != 0) {
-      rateOfFire -=
-          ((currentWeaponData.endRateOfFire - currentWeaponData.rateOfFire) / currentWeaponData.rateOfFireResetTime)
-              .round();
+      final endRateOfFire = getEndRateOfFire(simulation);
+      final startRateOfFire = getStartRateOfFire(simulation);
+      final resetChangePerFrame = (endRateOfFire - startRateOfFire) / currentWeaponData.rateOfFireResetTime;
+      rateOfFire -= resetChangePerFrame.round();
     }
   }
 
@@ -366,7 +365,7 @@ class BattleNikke extends BattleEntity {
 
   void processShootingStatus(BattleSimulation simulation) {
     if (shootCountdown > 0) {
-      shootCountdown -= rateOfFire;
+      shootCountdown -= getRateOfFire(simulation);
     }
     // before shooting need to go outside cover first, not sure if this should be its own status tho
     if (spotFirstDelayFrameCount > 0) {
@@ -515,10 +514,14 @@ class BattleNikke extends BattleEntity {
     }
 
     if (currentWeaponData.accuracyChangePerShot > 0) {
-      _accuracyCircleScale -= currentWeaponData.accuracyChangePerShot;
+      baseAccCircleScale -= currentWeaponData.accuracyChangePerShot;
     }
-    if (currentWeaponData.rateOfFireChangePerShot > 0) {
-      rateOfFire += currentWeaponData.rateOfFireChangePerShot;
+
+    final changePerShot = getRateOfFireChangePerShot(simulation);
+    if (changePerShot > 0) {
+      final endRateOfFire = getEndRateOfFire(simulation);
+      final startRateOfFire = getStartRateOfFire(simulation);
+      rateOfFire = (rateOfFire + changePerShot).clamp(startRateOfFire, endRateOfFire);
     }
   }
 
@@ -606,8 +609,7 @@ class BattleNikke extends BattleEntity {
     currentAmmo = getMaxAmmo(simulation);
     chargeFrames = 0;
     previousFullChargeFrameCount = 0;
-    rateOfFire = currentWeaponData.rateOfFire;
-    _accuracyCircleScale = currentWeaponData.startAccuracyCircleScale;
+    baseAccCircleScale = currentWeaponData.startAccuracyCircleScale;
     shootCountdown = 0;
     reloadingFrameCount = 0;
     fullReloadFrameCount = 0;
@@ -669,8 +671,42 @@ class BattleNikke extends BattleEntity {
     return getBuffValue(
       simulation,
       FunctionType.statAccuracyCircle,
-      _accuracyCircleScale,
+      baseAccCircleScale,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.startAccuracyCircleScale : 0,
+    );
+  }
+
+  int getRateOfFire(BattleSimulation simulation) {
+    final endRateOfFire = getEndRateOfFire(simulation);
+    final startRateOfFire = getStartRateOfFire(simulation);
+    rateOfFire = rateOfFire.clamp(startRateOfFire, endRateOfFire);
+    return rateOfFire;
+  }
+
+  int getRateOfFireChangePerShot(BattleSimulation simulation) {
+    return getBuffValue(
+      simulation,
+      FunctionType.statRateOfFirePerShot,
+      currentWeaponData.rateOfFireChangePerShot,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.rateOfFireChangePerShot : 0,
+    );
+  }
+
+  int getStartRateOfFire(BattleSimulation simulation) {
+    return getBuffValue(
+      simulation,
+      FunctionType.statRateOfFire,
+      currentWeaponData.rateOfFire,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.rateOfFire : 0,
+    );
+  }
+
+  int getEndRateOfFire(BattleSimulation simulation) {
+    return getBuffValue(
+      simulation,
+      FunctionType.statEndRateOfFire,
+      currentWeaponData.endRateOfFire,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.endRateOfFire : 0,
     );
   }
 
@@ -759,5 +795,20 @@ class BattleNikke extends BattleEntity {
 
   int getBreakDamageBuff(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.breakDamage);
+  }
+
+  void takeDamage(BattleSimulation simulation, int damage, bool hitCover) {
+    final selfBarrier = barriers.firstWhereOrNull((barrier) => barrier.hp > 0);
+    if (selfBarrier != null) {
+      selfBarrier.hp -= damage;
+    } else {
+      final entity =
+          (decoy?.currentHp ?? 0) > 0
+              ? decoy!
+              : hitCover && cover.currentHp > 0
+              ? cover
+              : this;
+      entity.changeHp(simulation, -damage);
+    }
   }
 }

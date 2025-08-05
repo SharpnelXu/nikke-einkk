@@ -45,6 +45,9 @@ class RaptureDamageEvent extends BattleEvent {
           buff.duration -= 1;
         }
       }
+
+      final damage = damageParameter.calculateDamage(critical: false, core: false);
+      nikke.takeDamage(simulation, damage, hitCover);
     }
   }
 
