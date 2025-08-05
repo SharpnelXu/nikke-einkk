@@ -25,13 +25,13 @@ import 'package:nikke_einkk/model/skills.dart';
 
 class BattleFunction {
   final FunctionData data;
-  final int ownerUniqueId;
+  final int ownerId;
   final Source source;
 
   FunctionStatus status = FunctionStatus.off;
   int timesActivated = 0;
 
-  BattleFunction(this.data, this.ownerUniqueId, this.source);
+  BattleFunction(this.data, this.ownerId, this.source);
 
   void broadcast(BattleEvent event, BattleSimulation simulation) {
     if (data.limitValue > 0 && timesActivated >= data.limitValue) return;
@@ -45,7 +45,7 @@ class BattleFunction {
     switch (data.timingTriggerType) {
       case TimingTriggerType.onHitNum:
         // triggerStandard: {user, none}, majority is user
-        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId || event.source != Source.bullet) {
+        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerId || event.source != Source.bullet) {
           return;
         }
 
@@ -62,7 +62,7 @@ class BattleFunction {
         break;
       case TimingTriggerType.onUseAmmo:
         // triggerStandard: {user, none}, majority is user
-        if (event is! NikkeFireEvent || standard?.uniqueId != ownerUniqueId) return;
+        if (event is! NikkeFireEvent || standard?.uniqueId != ownerId) return;
 
         if (standard is BattleNikke &&
             standard.totalBulletsFired > 0 &&
@@ -73,7 +73,7 @@ class BattleFunction {
       case TimingTriggerType.onHpRatioUnder:
         // all standard is User
         final checkEventType = event is HpChangeEvent || event is BattleStartEvent;
-        if (!checkEventType || standard == null || standard.uniqueId != ownerUniqueId) return;
+        if (!checkEventType || standard == null || standard.uniqueId != ownerId) return;
 
         final hpPercent = standard.currentHp / standard.getMaxHp(simulation);
         if ((hpPercent * 10000).round() <= timingTriggerValue) {
@@ -90,7 +90,7 @@ class BattleFunction {
       case TimingTriggerType.onHpRatioUp:
         // all standard is User
         final checkEventType = event is HpChangeEvent || event is BattleStartEvent;
-        if (!checkEventType || standard == null || standard.uniqueId != ownerUniqueId) return;
+        if (!checkEventType || standard == null || standard.uniqueId != ownerId) return;
 
         final hpPercent = standard.currentHp / standard.getMaxHp(simulation);
         if ((hpPercent * 10000).round() >= timingTriggerValue) {
@@ -105,7 +105,7 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onSkillUse:
-        if (event is UseSkillEvent && event.skillGroup == timingTriggerValue && standard?.uniqueId == ownerUniqueId) {
+        if (event is UseSkillEvent && event.skillGroup == timingTriggerValue && standard?.uniqueId == ownerId) {
           executeFunction(event, simulation);
         }
         break;
@@ -116,19 +116,19 @@ class BattleFunction {
         break;
       case TimingTriggerType.onFullCount:
         if (event is BuffEvent &&
-            standard?.uniqueId == ownerUniqueId &&
+            standard?.uniqueId == ownerId &&
             event.buffCount == event.data.fullCount &&
             event.data.groupId == timingTriggerValue) {
           executeFunction(event, simulation);
         }
         break;
       case TimingTriggerType.onHealedBy:
-        if (event is HpChangeEvent && event.getActivatorId() == ownerUniqueId && event.isHeal) {
+        if (event is HpChangeEvent && standard?.uniqueId == ownerId && event.isHeal) {
           executeFunction(event, simulation);
         }
         break;
       case TimingTriggerType.onFullChargeHit:
-        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId || event.source != Source.bullet) {
+        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerId || event.source != Source.bullet) {
           return;
         }
 
@@ -137,7 +137,7 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onFullChargeHitNum:
-        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerUniqueId || event.source != Source.bullet) {
+        if (event is! NikkeDamageEvent || standard?.uniqueId != ownerId || event.source != Source.bullet) {
           return;
         }
 
@@ -150,7 +150,7 @@ class BattleFunction {
         break;
       case TimingTriggerType.onFullCharge:
       case TimingTriggerType.onFullChargeShot:
-        if (event is! NikkeFireEvent || standard?.uniqueId != ownerUniqueId) return;
+        if (event is! NikkeFireEvent || standard?.uniqueId != ownerId) return;
 
         if (standard is BattleNikke && event.isFullCharge) {
           executeFunction(event, simulation);
@@ -158,7 +158,7 @@ class BattleFunction {
         break;
       case TimingTriggerType.onFullChargeNum:
       case TimingTriggerType.onFullChargeShotNum:
-        if (event is! NikkeFireEvent || standard?.uniqueId != ownerUniqueId) return;
+        if (event is! NikkeFireEvent || standard?.uniqueId != ownerId) return;
 
         if (standard is BattleNikke &&
             event.isFullCharge &&
@@ -169,7 +169,7 @@ class BattleFunction {
         break;
       case TimingTriggerType.onLastAmmoUse:
       case TimingTriggerType.onLastShotHit:
-        if (event is! NikkeReloadStartEvent || standard is! BattleNikke || standard.uniqueId != ownerUniqueId) return;
+        if (event is! NikkeReloadStartEvent || standard is! BattleNikke || standard.uniqueId != ownerId) return;
 
         if (standard.currentAmmo == 0) {
           executeFunction(event, simulation);
@@ -179,7 +179,7 @@ class BattleFunction {
         // TODO: implement with Resurrection
         break;
       case TimingTriggerType.onEndReload:
-        if (event is NikkeReloadEndEvent && standard is BattleNikke && standard.uniqueId == ownerUniqueId) {
+        if (event is NikkeReloadEndEvent && standard is BattleNikke && standard.uniqueId == ownerId) {
           executeFunction(event, simulation);
         }
         break;
@@ -195,13 +195,13 @@ class BattleFunction {
       case TimingTriggerType.onBurstSkillUseNum:
         if (event is ChangeBurstStepEvent &&
             standard is BattleNikke &&
-            standard.uniqueId == event.activatorId &&
+            standard.uniqueId == ownerId &&
             standard.totalBurstSkillUsed == timingTriggerValue) {
           executeFunction(event, simulation);
         }
         break;
       case TimingTriggerType.onFunctionOn:
-        if (event is BuffEvent && standard?.uniqueId == event.activatorId && event.data.groupId == timingTriggerValue) {
+        if (event is BuffEvent && standard?.uniqueId == ownerId && event.data.groupId == timingTriggerValue) {
           executeFunction(event, simulation);
         }
         break;
@@ -211,7 +211,7 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onCoverHurtRatio:
-        if (event is RaptureDamageEvent && event.hitCover && event.targetId == standard?.uniqueId && standard != null) {
+        if (event is RaptureDamageEvent && event.hitCover && ownerId == standard?.uniqueId && standard != null) {
           final ratioCheck = standard.checkRatio(data.groupId, timingTriggerValue);
           if (ratioCheck) {
             executeFunction(event, simulation);
@@ -219,7 +219,7 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onShotRatio:
-        if (event is NikkeFireEvent && event.activatorId == standard?.uniqueId && standard != null) {
+        if (event is NikkeFireEvent && ownerId == standard?.uniqueId && standard != null) {
           final ratioCheck = standard.checkRatio(data.groupId, timingTriggerValue);
           if (ratioCheck) {
             executeFunction(event, simulation);
@@ -278,7 +278,7 @@ class BattleFunction {
       case StandardType.user:
       case StandardType.none:
         if (event is BattleStartEvent) {
-          return simulation.getEntityById(ownerUniqueId);
+          return simulation.getEntityById(ownerId);
         }
 
         // a lot of timingTriggerTypes have standards set to none which clearly need an countTarget, so default to
@@ -338,7 +338,7 @@ class BattleFunction {
       } else {
         final buff = BattleBuff.create(
           data: data,
-          buffGiverUniqueId: ownerUniqueId,
+          buffGiverUniqueId: ownerId,
           buffReceiverUniqueId: target.uniqueId,
           simulation: simulation,
           source: source,
@@ -472,7 +472,7 @@ class BattleFunction {
               simulation.currentFrame,
               NikkeDamageEvent.skill(
                 simulation: simulation,
-                nikke: simulation.getNikkeOnPosition(ownerUniqueId)!,
+                nikke: simulation.getNikkeOnPosition(ownerId)!,
                 rapture: target,
                 damageRate: baseRate * stack,
                 source: source,
@@ -697,7 +697,7 @@ class BattleFunction {
         for (final functionId in functionsToExecute) {
           final functionData = simulation.db.functionTable[functionId];
           if (functionData != null) {
-            final connectedFunction = BattleFunction(functionData, ownerUniqueId, source);
+            final connectedFunction = BattleFunction(functionData, ownerId, source);
             // connected function likely doesn't check trigger target
             connectedFunction.executeFunction(event, simulation, parentFunctionValue: data.functionValue);
           }
@@ -713,7 +713,7 @@ class BattleFunction {
         result.addAll(simulation.nonnullNikkes);
         break;
       case FunctionTargetType.self:
-        final self = simulation.getNikkeOnPosition(ownerUniqueId);
+        final self = simulation.getNikkeOnPosition(ownerId);
         if (self != null) {
           result.add(self);
         }
@@ -738,7 +738,7 @@ class BattleFunction {
           }
         }
       case FunctionTargetType.userCover:
-        final self = simulation.getNikkeOnPosition(ownerUniqueId);
+        final self = simulation.getNikkeOnPosition(ownerId);
         if (self != null) {
           result.add(self.cover);
         }
@@ -758,7 +758,7 @@ class BattleFunction {
   ) {
     switch (standardType) {
       case StandardType.user:
-        return simulation.getEntityById(ownerUniqueId);
+        return simulation.getEntityById(ownerId);
       case StandardType.functionTarget:
         return currentFunctionTarget;
       case StandardType.triggerTarget:
@@ -802,6 +802,9 @@ class BattleFunction {
         return target != null && target.element.id == value;
       case StatusTriggerType.isCheckPosition:
         return target is BattleNikke && target.uniqueId == value;
+      case StatusTriggerType.isFullCount:
+        final checkBuff = target?.buffs.firstWhereOrNull((buff) => buff.data.groupId == value);
+        return checkBuff != null && checkBuff.count == checkBuff.data.fullCount;
       case StatusTriggerType.unknown:
       case StatusTriggerType.isAlive:
       case StatusTriggerType.isAmmoCount:
@@ -815,7 +818,6 @@ class BattleFunction {
       case StatusTriggerType.isCover:
       case StatusTriggerType.isExplosiveCircuitOff:
       case StatusTriggerType.isFullCharge:
-      case StatusTriggerType.isFullCount:
       case StatusTriggerType.isFunctionBuffCheck:
       case StatusTriggerType.isFunctionTypeOffCheck:
       case StatusTriggerType.isHaveBarrier:
@@ -838,7 +840,7 @@ class BattleFunction {
   int getFunctionStandardUniqueId(int targetUniqueId) {
     switch (data.functionStandard) {
       case StandardType.user:
-        return ownerUniqueId;
+        return ownerId;
       case StandardType.functionTarget:
         return targetUniqueId;
       case StandardType.triggerTarget: // there is no triggerTarget in functionStandardType
