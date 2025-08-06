@@ -352,12 +352,13 @@ class BattleNikke extends BattleEntity {
 
     reloadingFrameCount += 1;
     if (reloadingFrameCount >= fullReloadFrameCount) {
-      final reloadRatio = toModifier(max(1, currentWeaponData.reloadBullet)); // ensure no empty reloads
+      final reloadRatio = toModifier(max(1, getReloadBulletRatio(simulation))); // ensure no empty reloads
       final maxAmmo = getMaxAmmo(simulation);
       currentAmmo = min(maxAmmo, currentAmmo + (reloadRatio * maxAmmo).round());
       reloadingFrameCount = 0;
 
       if (currentAmmo == maxAmmo) {
+        fullReloadFrameCount = 0;
         simulation.registerEvent(simulation.currentFrame, NikkeReloadEndEvent(uniqueId));
       }
     }
@@ -590,21 +591,6 @@ class BattleNikke extends BattleEntity {
     }
   }
 
-  void processDamageEvent(NikkeDamageEvent event, BattleSimulation simulation) {
-    final rapture = simulation.getRaptureByUniqueId(event.targetId);
-    if (rapture == null) return;
-
-    if (event.source == Source.bullet) {
-      totalBulletsHit += 1;
-    }
-
-    final drainHp = getDrainHpBuff(simulation);
-    if (drainHp > 0) {
-      final expectedDamage = event.damageParameter.calculateExpectedDamage();
-      changeHp(simulation, (toModifier(drainHp) * expectedDamage).round(), true);
-    }
-  }
-
   void resetWeaponParams(BattleSimulation simulation) {
     currentAmmo = getMaxAmmo(simulation);
     chargeFrames = 0;
@@ -625,6 +611,9 @@ class BattleNikke extends BattleEntity {
 
       resetWeaponParams(simulation);
     }
+    if (hasBuff(simulation, FunctionType.allAmmo)) {
+      currentAmmo = currentWeaponData.maxAmmo;
+    }
 
     // gainAmmo is put here because max ammo can change in this frame
     final gainAmmo = getBuffValue(
@@ -644,6 +633,8 @@ class BattleNikke extends BattleEntity {
     skills[2].changeCd(simulation, ultCdReduceTimeData);
 
     super.endCurrentFrame(simulation);
+
+    currentAmmo = currentAmmo.clamp(0, getMaxAmmo(simulation));
   }
 
   int getFramesCharged(BattleSimulation simulation) {
@@ -710,6 +701,16 @@ class BattleNikke extends BattleEntity {
     );
   }
 
+  int getReloadBulletRatio(BattleSimulation simulation) {
+    final result = getBuffValue(
+      simulation,
+      FunctionType.statReloadBulletRatio,
+      currentWeaponData.reloadBullet,
+      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.reloadBullet : 0,
+    );
+    return result.clamp(0, 10000);
+  }
+
   int getMaxAmmo(BattleSimulation simulation) {
     final result = getBuffValueOfTypes(
       simulation,
@@ -760,7 +761,7 @@ class BattleNikke extends BattleEntity {
       currentWeaponData.reloadTime,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.reloadTime : 0,
     );
-    return max(1, result + currentWeaponData.spotLastDelay);
+    return max(1, result + (fullReloadFrameCount == 0 ? currentWeaponData.spotLastDelay : 0));
   }
 
   int getBurstGen(BattleSimulation simulation, bool isTarget) {

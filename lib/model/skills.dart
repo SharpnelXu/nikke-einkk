@@ -77,6 +77,7 @@ enum DurationType {
   );
 
   bool get isTimed => this == DurationType.timeSec || this == DurationType.timeSecVer2;
+  bool get isDurationBuff => isTimed || this == DurationType.timeSecBattles;
   bool get isHits => this == DurationType.hits || this == DurationType.hitsVer2;
   bool get isShots => this == DurationType.shots;
 

@@ -5,6 +5,8 @@ import 'package:nikke_einkk/model/battle/utils.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
+import 'events/buff_event.dart';
+
 abstract class BattleEntity {
   int uniqueId = 0;
   int currentHp = 0;
@@ -169,10 +171,30 @@ abstract class BattleEntity {
     return result;
   }
 
+  bool hasBuff(BattleSimulation simulation, FunctionType type) {
+    return buffs.any((buff) => buff.data.functionType == type);
+  }
+
   void normalAction(BattleSimulation simulation) {
     for (final buff in buffs) {
-      if (buff.data.durationType.isTimed) {
+      final data = buff.data;
+      if (data.durationType.isTimed) {
         buff.duration -= 1;
+      }
+
+      if (data.functionType == FunctionType.changeCurrentHpValue && data.durationType.isDurationBuff) {
+        final activeFrame = data.durationValue > 0 && (buff.fullDuration - buff.duration) % simulation.fps == 0;
+        if (activeFrame) {
+          if (data.functionValueType == ValueType.integer) {
+            changeHp(simulation, data.functionValue);
+          } else if (data.functionValueType == ValueType.percent) {
+            final functionStandard = simulation.getEntityById(buff.getFunctionStandardId());
+            if (functionStandard != null) {
+              final changeValue = toModifier(data.functionValue) * functionStandard.currentHp;
+              changeHp(simulation, changeValue.round());
+            }
+          }
+        }
       }
     }
   }
@@ -186,7 +208,12 @@ abstract class BattleEntity {
             .map((buff) => buff.data.functionValue)
             .toList();
 
-    buffs.removeWhere((buff) => buff.shouldRemove(simulation) || removeBuffGroupIds.contains(buff.data.groupId));
+    final removedBuffs =
+        buffs.where((buff) => buff.shouldRemove(simulation) || removeBuffGroupIds.contains(buff.data.groupId)).toList();
+    for (final buff in removedBuffs) {
+      buffs.remove(buff);
+      simulation.registerEvent(simulation.nextFrame, BuffEvent.remove(buff));
+    }
 
     final afterMaxHp = getMaxHp(simulation);
     if (previousMaxHp != afterMaxHp) {

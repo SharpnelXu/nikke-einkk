@@ -116,6 +116,7 @@ class BattleFunction {
         break;
       case TimingTriggerType.onFullCount:
         if (event is BuffEvent &&
+            event.isAdd &&
             standard?.uniqueId == ownerId &&
             event.buffCount == event.data.fullCount &&
             event.data.groupId == timingTriggerValue) {
@@ -201,7 +202,18 @@ class BattleFunction {
         }
         break;
       case TimingTriggerType.onFunctionOn:
-        if (event is BuffEvent && standard?.uniqueId == ownerId && event.data.groupId == timingTriggerValue) {
+        if (event is BuffEvent &&
+            event.isAdd &&
+            standard?.uniqueId == ownerId &&
+            event.data.groupId == timingTriggerValue) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onFunctionOff:
+        if (event is BuffEvent &&
+            !event.isAdd &&
+            standard?.uniqueId == ownerId &&
+            event.data.groupId == timingTriggerValue) {
           executeFunction(event, simulation);
         }
         break;
@@ -236,7 +248,6 @@ class BattleFunction {
       case TimingTriggerType.onDead:
       case TimingTriggerType.onEndFullBurst:
       case TimingTriggerType.onFunctionBuffCheck:
-      case TimingTriggerType.onFunctionOff:
       case TimingTriggerType.onHealCover:
       case TimingTriggerType.onHitNumExceptCore:
       case TimingTriggerType.onHitNumberOver:
@@ -362,7 +373,7 @@ class BattleFunction {
         target.changeHp(simulation, afterMaxHp - previousMaxHp);
       } else if (target is BattleNikke && data.functionType == FunctionType.statAmmoLoad) {
         final afterMaxAmmo = target.getMaxAmmo(simulation);
-        target.currentAmmo = (target.currentAmmo + afterMaxAmmo - previousMaxAmmo).clamp(1, afterMaxAmmo);
+        target.currentAmmo = (target.currentAmmo + afterMaxAmmo - previousMaxAmmo).clamp(0, afterMaxAmmo);
       } else if (data.functionType == FunctionType.statHp) {
         final afterMaxHp = target.getMaxHp(simulation);
         simulation.registerEvent(
@@ -385,6 +396,7 @@ class BattleFunction {
     bool activated = false;
     switch (data.functionType) {
       case FunctionType.addDamage:
+      case FunctionType.allAmmo: // infinite ammo
       case FunctionType.atkChangeMaxHpRate:
       case FunctionType.attention:
       case FunctionType.barrierDamage: // TODO: actually implement after boss can install barriers
@@ -422,6 +434,7 @@ class BattleFunction {
       case FunctionType.statEndRateOfFire:
       case FunctionType.statRateOfFire:
       case FunctionType.statRateOfFirePerShot:
+      case FunctionType.statReloadBulletRatio:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -444,6 +457,8 @@ class BattleFunction {
             }
           }
         }
+
+        addBuff(event, simulation);
         break;
       case FunctionType.timingTriggerValueChange:
         if (parentFunctionValue != null) {
@@ -561,7 +576,6 @@ class BattleFunction {
         activated = true;
         break;
       case FunctionType.addIncElementDmgType:
-      case FunctionType.allAmmo:
       case FunctionType.allStepBurstNextStep:
       case FunctionType.atkBuffChange:
       case FunctionType.atkChangHpRate:
@@ -656,7 +670,6 @@ class BattleFunction {
       case FunctionType.statExplosion:
       case FunctionType.statInstantSkillRange:
       case FunctionType.statMaintainFireStance:
-      case FunctionType.statReloadBulletRatio:
       case FunctionType.statShotCount:
       case FunctionType.statSpotRadius:
       case FunctionType.stickyProjectileCollisionDamage:

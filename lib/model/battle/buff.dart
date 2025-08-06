@@ -11,6 +11,7 @@ class BattleBuff {
   Source source;
 
   int targetGroupId = 0;
+  int fullDuration = 0;
   int duration = 0;
   int count = 1;
 
@@ -21,7 +22,7 @@ class BattleBuff {
     required this.source,
     this.duration = 0,
     this.targetGroupId = 0,
-  });
+  }) : fullDuration = duration;
 
   factory BattleBuff.create({
     required FunctionData data,
@@ -47,7 +48,6 @@ class BattleBuff {
     switch (data.durationType) {
       case DurationType.none:
       case DurationType.timeSecBattles:
-      case DurationType.timeSecVer2:
         return false;
       case DurationType.battles:
         // added for Alice S2 (continuous penetration if hp above threshold)
@@ -64,6 +64,7 @@ class BattleBuff {
               data.statusTrigger2Value,
             );
       case DurationType.timeSec:
+      case DurationType.timeSecVer2:
       case DurationType.shots:
       case DurationType.hits:
       case DurationType.hitsVer2:

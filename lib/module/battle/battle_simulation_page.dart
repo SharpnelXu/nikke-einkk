@@ -380,10 +380,11 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     if (nikke != null) {
       children.addAll(buildNikkeStatus(nikke));
 
+      final infiniteAmmo = nikke.hasBuff(simulation, FunctionType.allAmmo);
       children.addAll([
         divider,
         SimplePercentBar(percent: nikke.currentAmmo / nikke.getMaxAmmo(simulation)),
-        Text('${nikke.currentAmmo} / ${nikke.getMaxAmmo(simulation)}'),
+        Text(infiniteAmmo ? '∞' : '${nikke.currentAmmo} / ${nikke.getMaxAmmo(simulation)}'),
       ]);
 
       // HP Section
