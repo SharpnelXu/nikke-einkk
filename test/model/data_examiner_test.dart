@@ -1655,5 +1655,61 @@ void main() {
         expect(unknownCategory, isEmpty, reason: 'Unknown shop category: $folder');
       }
     });
+
+    test('Check PackageProductData unexpected fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {'id', 'package_group_id', 'product_type', 'product_id', 'product_value'};
+
+        final Set<String> extraKeys = {};
+        final Set<String?> unknownCategory = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'PackageGroupTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          recordKeys.removeAll(expectedKeys);
+
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+
+          final data = PackageProductData.fromJson(record);
+          if (data.productType == ProductType.unknown) {
+            unknownCategory.add(data.rawProductType);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected keys in PackageProductData: $folder');
+        expect(unknownCategory, isEmpty, reason: 'Unknown product type: $folder');
+      }
+    });
+
+    test('Check CurrencyData unexpected fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'name_localkey',
+          'description_localkey',
+          'resource_id',
+          'is_visible_to_inventory',
+          'max_value',
+        };
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'CurrencyTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          recordKeys.removeAll(expectedKeys);
+
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+
+          CurrencyData.fromJson(record);
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected keys in CurrencyData: $folder');
+      }
+    });
   });
 }

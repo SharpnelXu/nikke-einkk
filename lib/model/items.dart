@@ -751,3 +751,96 @@ enum ShopCategory {
     return _reverseMap[name] ?? ShopCategory.unknown;
   }
 }
+
+enum ProductType {
+  item,
+  currency,
+  characterCostume,
+  unknown;
+
+  static final Map<String, ProductType> _reverseMap = Map.fromIterable(
+    ProductType.values,
+    key: (v) => (v as ProductType).name.pascal,
+  );
+
+  static ProductType fromName(String? name) {
+    return _reverseMap[name] ?? ProductType.unknown;
+  }
+}
+
+@JsonSerializable(createToJson: false)
+class PackageProductData {
+  final int id;
+  @JsonKey(name: 'package_group_id')
+  final int packageGroupId;
+  @JsonKey(name: 'product_type')
+  final String rawProductType;
+  ProductType get productType => ProductType.fromName(rawProductType);
+  @JsonKey(name: 'product_id')
+  final int productId;
+  @JsonKey(name: 'product_value')
+  final int productValue;
+
+  PackageProductData({
+    this.id = 0,
+    this.packageGroupId = 0,
+    this.rawProductType = '',
+    this.productId = 0,
+    this.productValue = 0,
+  });
+
+  factory PackageProductData.fromJson(Map<String, dynamic> json) => _$PackageProductDataFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class CurrencyData {
+  final int id;
+  @JsonKey(name: 'name_localkey')
+  final String nameKey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionKey;
+  @JsonKey(name: 'resource_id')
+  final int resourceId;
+  @JsonKey(name: 'is_visible_to_inventory')
+  final bool isVisibleInInventory;
+  @JsonKey(name: 'max_value')
+  final int maxValue;
+
+  CurrencyData({
+    this.id = 0,
+    this.nameKey = '',
+    this.descriptionKey = '',
+    this.resourceId = 0,
+    this.isVisibleInInventory = false,
+    this.maxValue = 0,
+  });
+
+  factory CurrencyData.fromJson(Map<String, dynamic> json) => _$CurrencyDataFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class SimplifiedItemData {
+  final int id;
+  @JsonKey(name: 'name_localkey')
+  final String nameKey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionKey;
+  @JsonKey(name: 'item_type')
+  final String rawItemType;
+  @JsonKey(name: 'item_sub_type')
+  final String rawItemSubType;
+  @JsonKey(name: 'item_rare')
+  final String rawItemRare;
+  Rarity get itemRare => Rarity.fromName(rawItemRare);
+
+  SimplifiedItemData({
+    this.id = 0,
+    this.nameKey = '',
+    this.descriptionKey = '',
+    this.rawItemType = '',
+    this.rawItemSubType = '',
+    this.rawItemRare = '',
+  });
+
+  factory SimplifiedItemData.fromJson(Map<String, dynamic> json) => _$SimplifiedItemDataFromJson(json);
+}

@@ -203,3 +203,29 @@ InAppShopData _$InAppShopDataFromJson(Map<String, dynamic> json) => InAppShopDat
   rawShopCategory: json['shop_category'] as String? ?? '',
   shopPrefabName: json['shop_prefab_name'] as String? ?? '',
 );
+
+PackageProductData _$PackageProductDataFromJson(Map<String, dynamic> json) => PackageProductData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  packageGroupId: (json['package_group_id'] as num?)?.toInt() ?? 0,
+  rawProductType: json['product_type'] as String? ?? '',
+  productId: (json['product_id'] as num?)?.toInt() ?? 0,
+  productValue: (json['product_value'] as num?)?.toInt() ?? 0,
+);
+
+CurrencyData _$CurrencyDataFromJson(Map<String, dynamic> json) => CurrencyData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  nameKey: json['name_localkey'] as String? ?? '',
+  descriptionKey: json['description_localkey'] as String? ?? '',
+  resourceId: (json['resource_id'] as num?)?.toInt() ?? 0,
+  isVisibleInInventory: json['is_visible_to_inventory'] as bool? ?? false,
+  maxValue: (json['max_value'] as num?)?.toInt() ?? 0,
+);
+
+SimplifiedItemData _$SimplifiedItemDataFromJson(Map<String, dynamic> json) => SimplifiedItemData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  nameKey: json['name_localkey'] as String? ?? '',
+  descriptionKey: json['description_localkey'] as String? ?? '',
+  rawItemType: json['item_type'] as String? ?? '',
+  rawItemSubType: json['item_sub_type'] as String? ?? '',
+  rawItemRare: json['item_rare'] as String? ?? '',
+);

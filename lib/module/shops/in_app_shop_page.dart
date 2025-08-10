@@ -165,12 +165,13 @@ class _ShopDisplayState extends State<ShopDisplay> {
               if (shopData.endDate != null) Text('End Date: ${shopData.endDate}'),
             ],
           ),
-        Wrap(spacing: 5, children: children),
+        Wrap(spacing: 5, runSpacing: 5, children: children),
       ],
     );
   }
 
   Widget buildPackage(PackageListData package) {
+    final packageGroups = db.packageGroupData[package.productId] ?? [];
     return Container(
       padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
@@ -183,8 +184,28 @@ class _ShopDisplayState extends State<ShopDisplay> {
         children: [
           Text(locale.getTranslation(package.nameKey) ?? package.nameKey, style: TextStyle(fontSize: 18)),
           DescriptionTextWidget(locale.getTranslation(package.descriptionKey) ?? package.descriptionKey),
+          Text('Group: ${package.productId}'),
+          ...packageGroups.map(buildProduct),
         ],
       ),
     );
+  }
+
+  Widget buildProduct(PackageProductData data) {
+    if (data.productType == ProductType.currency) {
+      final currency = db.currencyTable[data.productId];
+      return Tooltip(
+        message: locale.getTranslation(currency?.descriptionKey) ?? 'Unknown Product',
+        child: Text('${locale.getTranslation(currency?.nameKey) ?? currency?.nameKey} × ${data.productValue}'),
+      );
+    } else if (data.productType == ProductType.item) {
+      final item = db.simplifiedItemTable[data.productId];
+      return Tooltip(
+        message: locale.getTranslation(item?.descriptionKey) ?? 'Unknown Product',
+        child: Text('${locale.getTranslation(item?.nameKey) ?? item?.nameKey} × ${data.productValue}'),
+      );
+    } else {
+      return Text('${data.productId} (${data.rawProductType}): ${data.productValue}');
+    }
   }
 }

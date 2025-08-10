@@ -138,6 +138,9 @@ class NikkeDatabase {
   // shops & items
   final Map<int, List<InAppShopData>> inAppShopManager = {}; // orderGroupId as key
   final Map<int, List<PackageListData>> packageListData = {}; // packageShopId as key
+  final Map<int, List<PackageProductData>> packageGroupData = {}; // package_group_id as key
+  final Map<int, CurrencyData> currencyTable = {};
+  final Map<int, SimplifiedItemData> simplifiedItemTable = {};
 
   void init() {
     unionRaidData.clear();
@@ -174,6 +177,9 @@ class NikkeDatabase {
     coopRaidData.clear();
     packageListData.clear();
     inAppShopManager.clear();
+    packageGroupData.clear();
+    currencyTable.clear();
+    simplifiedItemTable.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     String directory(String fileName) {
@@ -207,6 +213,13 @@ class NikkeDatabase {
     initialized &= loadData(directory('MultiRaidTable.json'), processCoopRaidData);
     initialized &= loadData(directory('PackageListTable.json'), processPackageListData);
     initialized &= loadData(directory('InAppShopManagerTable.json'), processInAppShopData);
+    initialized &= loadData(directory('PackageGroupTable.json'), processPackageGroupData);
+    initialized &= loadData(directory('CurrencyTable.json'), processCurrencyData);
+    initialized &= loadData(directory('ItemConsumeTable.json'), processSimplifiedItemData);
+    initialized &= loadData(directory('ItemEquipTable.json'), processSimplifiedItemData);
+    initialized &= loadData(directory('ItemHarmonyCubeTable.json'), processSimplifiedItemData);
+    initialized &= loadData(directory('ItemMaterialTable.json'), processSimplifiedItemData);
+    initialized &= loadData(directory('ItemPieceTable.json'), processSimplifiedItemData);
 
     initialized &= loadCsv(directory('WaveData.GroupDict.csv'), processWaveDict);
 
@@ -506,6 +519,22 @@ class NikkeDatabase {
     final data = InAppShopData.fromJson(record);
     inAppShopManager.putIfAbsent(data.orderGroupId, () => []);
     inAppShopManager[data.orderGroupId]!.add(data);
+  }
+
+  void processPackageGroupData(dynamic record) {
+    final data = PackageProductData.fromJson(record);
+    packageGroupData.putIfAbsent(data.packageGroupId, () => []);
+    packageGroupData[data.packageGroupId]!.add(data);
+  }
+
+  void processCurrencyData(dynamic record) {
+    final data = CurrencyData.fromJson(record);
+    currencyTable[data.id] = data;
+  }
+
+  void processSimplifiedItemData(dynamic record) {
+    final data = SimplifiedItemData.fromJson(record);
+    simplifiedItemTable[data.id] = data;
   }
 }
 
