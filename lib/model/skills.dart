@@ -463,7 +463,8 @@ enum FunctionType {
   changeHurtFxExcludingBreakCol,
   plusBuffCount, // seems to be CN exclusive
   durationDamage,
-  useSkill1;
+  useSkill1,
+  defIgnoreSkillDamageInstant;
 
   static final Map<String, FunctionType> _reverseMap = Map.fromIterable(
     FunctionType.values,
@@ -647,7 +648,9 @@ enum StatusTriggerType {
   isCheckMonsterExcludeNoneType,
   isBurstStepCheck,
   isFunctionCount, // cn only
-  isNotHaveCover;
+  isNotHaveCover,
+  @JsonValue('IsSameSqaud')
+  isSameSquad;
 
   static final Map<String, StatusTriggerType> _reverseMap = Map.fromIterable(
     StatusTriggerType.values,
@@ -659,6 +662,8 @@ enum StatusTriggerType {
           return 'IsSameSqaudCount';
         case isSameSquadUp:
           return 'IsSameSqaudUp';
+        case isSameSquad:
+          return 'IsSameSqaud';
         default:
           return v.name.pascal;
       }

@@ -691,6 +691,7 @@ class BattleFunction {
       case FunctionType.plusBuffCount:
       case FunctionType.durationDamage:
       case FunctionType.useSkill1:
+      case FunctionType.defIgnoreSkillDamageInstant:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
     }
@@ -845,6 +846,7 @@ class BattleFunction {
       case StatusTriggerType.isBurstStepCheck:
       case StatusTriggerType.isFunctionCount:
       case StatusTriggerType.isNotHaveCover:
+      case StatusTriggerType.isSameSquad:
         logger.i('Unimplemented StatusTriggerType: $type');
         return false;
     }
