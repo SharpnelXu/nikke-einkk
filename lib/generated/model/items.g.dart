@@ -229,3 +229,47 @@ SimplifiedItemData _$SimplifiedItemDataFromJson(Map<String, dynamic> json) => Si
   rawItemSubType: json['item_sub_type'] as String? ?? '',
   rawItemRare: json['item_rare'] as String? ?? '',
 );
+
+StepUpPackageData _$StepUpPackageDataFromJson(Map<String, dynamic> json) => StepUpPackageData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  stepUpGroupId: (json['stepup_group_id'] as num?)?.toInt() ?? 0,
+  packageGroupId: (json['package_group_id'] as num?)?.toInt() ?? 0,
+  step: (json['step'] as num?)?.toInt() ?? 0,
+  previousPackageId: (json['previous_package_id'] as num?)?.toInt() ?? 0,
+  isLastStep: json['is_last_step'] as bool? ?? false,
+  productEfficiency: (json['product_effieciency'] as num?)?.toDouble() ?? 0.0,
+  buyLimitType: json['buy_limit_type'] as String? ?? 'Account',
+  isLimited: json['is_limit'] as bool? ?? false,
+  buyLimitCount: (json['buy_limit_count'] as num?)?.toInt() ?? 0,
+  isFree: json['is_free'] as bool? ?? false,
+  midasProductId: (json['midas_product_id'] as num?)?.toInt() ?? 0,
+  nameKey: json['name_localkey'] as String? ?? '',
+  descriptionKey: json['description_localkey'] as String? ?? '',
+  productResourceId: json['product_resource_id'] as String? ?? '',
+);
+
+CustomPackageShopData _$CustomPackageShopDataFromJson(Map<String, dynamic> json) => CustomPackageShopData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  customShopId: (json['custom_shop_id'] as num?)?.toInt() ?? 0,
+  customOrder: (json['custom_order'] as num?)?.toInt() ?? 0,
+  packageGroupId: (json['package_group_id'] as num?)?.toInt() ?? 0,
+  customGroupId: (json['custom_group_id'] as num?)?.toInt() ?? 0,
+  customGroupCount: (json['custom_group_count'] as num?)?.toInt() ?? 0,
+  nameKey: json['name_localkey'] as String? ?? '',
+  descriptionKey: json['description_localkey'] as String? ?? '',
+  productResourceId: json['product_resource_id'] as String? ?? '',
+  buyLimitType: json['buy_limit_type'] as String? ?? 'Account',
+  isLimited: json['is_limit'] as bool? ?? false,
+  buyLimitCount: (json['buy_limit_count'] as num?)?.toInt() ?? 0,
+  isFree: json['is_free'] as bool? ?? false,
+  midasProductId: (json['midas_product_id'] as num?)?.toInt() ?? 0,
+);
+
+CustomPackageSlotData _$CustomPackageSlotDataFromJson(Map<String, dynamic> json) => CustomPackageSlotData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  customGroupId: (json['custom_group_id'] as num?)?.toInt() ?? 0,
+  slotNumber: (json['slot_number'] as num?)?.toInt() ?? 0,
+  rawProductType: json['product_type'] as String? ?? '',
+  productId: (json['product_id'] as num?)?.toInt() ?? 0,
+  productValue: (json['product_value'] as num?)?.toInt() ?? 0,
+);

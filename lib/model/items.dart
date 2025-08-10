@@ -844,3 +844,132 @@ class SimplifiedItemData {
 
   factory SimplifiedItemData.fromJson(Map<String, dynamic> json) => _$SimplifiedItemDataFromJson(json);
 }
+
+@JsonSerializable(createToJson: false)
+class StepUpPackageData {
+  final int id;
+  @JsonKey(name: 'stepup_group_id')
+  final int stepUpGroupId;
+  @JsonKey(name: 'package_group_id')
+  final int packageGroupId;
+  final int step;
+  @JsonKey(name: 'previous_package_id')
+  final int previousPackageId;
+  @JsonKey(name: 'is_last_step')
+  final bool isLastStep;
+  @JsonKey(name: 'product_effieciency')
+  final double productEfficiency;
+  @JsonKey(name: 'buy_limit_type')
+  final String buyLimitType;
+  @JsonKey(name: 'is_limit')
+  final bool isLimited;
+  @JsonKey(name: 'buy_limit_count')
+  final int buyLimitCount;
+  @JsonKey(name: 'is_free')
+  final bool isFree;
+  @JsonKey(name: 'midas_product_id')
+  final int midasProductId;
+  @JsonKey(name: 'name_localkey')
+  final String nameKey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionKey;
+  @JsonKey(name: 'product_resource_id')
+  final String productResourceId;
+
+  StepUpPackageData({
+    this.id = 0,
+    this.stepUpGroupId = 0,
+    this.packageGroupId = 0,
+    this.step = 0,
+    this.previousPackageId = 0,
+    this.isLastStep = false,
+    this.productEfficiency = 0.0,
+    this.buyLimitType = 'Account',
+    this.isLimited = false,
+    this.buyLimitCount = 0,
+    this.isFree = false,
+    this.midasProductId = 0,
+    this.nameKey = '',
+    this.descriptionKey = '',
+    this.productResourceId = '',
+  });
+
+  factory StepUpPackageData.fromJson(Map<String, dynamic> json) => _$StepUpPackageDataFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class CustomPackageShopData {
+  final int id;
+  @JsonKey(name: 'custom_shop_id')
+  final int customShopId;
+  @JsonKey(name: 'custom_order')
+  final int customOrder;
+  @JsonKey(name: 'package_group_id')
+  final int packageGroupId;
+  @JsonKey(name: 'custom_group_id')
+  final int customGroupId;
+  @JsonKey(name: 'custom_group_count')
+  final int customGroupCount;
+  @JsonKey(name: 'name_localkey')
+  final String nameKey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionKey;
+  @JsonKey(name: 'product_resource_id')
+  final String productResourceId;
+  @JsonKey(name: 'buy_limit_type')
+  final String buyLimitType;
+  @JsonKey(name: 'is_limit')
+  final bool isLimited;
+  @JsonKey(name: 'buy_limit_count')
+  final int buyLimitCount;
+  @JsonKey(name: 'is_free')
+  final bool isFree;
+  @JsonKey(name: 'midas_product_id')
+  final int midasProductId;
+
+  CustomPackageShopData({
+    this.id = 0,
+    this.customShopId = 0,
+    this.customOrder = 0,
+    this.packageGroupId = 0,
+    this.customGroupId = 0,
+    this.customGroupCount = 0,
+    this.nameKey = '',
+    this.descriptionKey = '',
+    this.productResourceId = '',
+    this.buyLimitType = 'Account',
+    this.isLimited = false,
+    this.buyLimitCount = 0,
+    this.isFree = false,
+    this.midasProductId = 0,
+  });
+
+  factory CustomPackageShopData.fromJson(Map<String, dynamic> json) => _$CustomPackageShopDataFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class CustomPackageSlotData {
+  final int id;
+  @JsonKey(name: 'custom_group_id')
+  final int customGroupId;
+  @JsonKey(name: 'slot_number')
+  final int slotNumber;
+  @JsonKey(name: 'product_type')
+  final String rawProductType;
+  ProductType get productType => ProductType.fromName(rawProductType);
+  @JsonKey(name: 'product_id')
+  final int productId;
+  @JsonKey(name: 'product_value')
+  final int productValue;
+
+  CustomPackageSlotData({
+    this.id = 0,
+    this.customGroupId = 0,
+    this.slotNumber = 0,
+    this.rawProductType = '',
+    this.productId = 0,
+    this.productValue = 0,
+  });
+
+  factory CustomPackageSlotData.fromJson(Map<String, dynamic> json) => _$CustomPackageSlotDataFromJson(json);
+}

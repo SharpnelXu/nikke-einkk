@@ -126,6 +126,17 @@ class _ShopDisplayState extends State<ShopDisplay> {
               .toList() ??
           [];
       children.addAll(packages.map(buildPackage));
+    } else if (shopData.shopCategory == ShopCategory.stepUpPackageShop) {
+      final stepUps =
+          db.stepUpPackageGroupData[shopData.packageShopId]?.sorted((a, b) => a.step.compareTo(b.step)).toList() ?? [];
+      children.addAll(stepUps.map(buildStepUp));
+    } else if (shopData.shopCategory == ShopCategory.customPackageShop) {
+      final customShopData =
+          db.customPackageShopData[shopData.packageShopId]
+              ?.sorted((a, b) => a.customOrder.compareTo(b.customOrder))
+              .toList() ??
+          [];
+      children.addAll(customShopData.map(buildCustomPackage));
     } else {
       children.add(Text('Package Shop ID: ${shopData.packageShopId}'));
     }
@@ -170,6 +181,75 @@ class _ShopDisplayState extends State<ShopDisplay> {
     );
   }
 
+  Widget buildCustomPackage(CustomPackageShopData customPackage) {
+    final packageGroups = db.packageGroupData[customPackage.packageGroupId] ?? [];
+    final customPackageSlotsData = db.customPackageSlotData[customPackage.customGroupId] ?? [];
+    final Map<int, List<CustomPackageSlotData>> slots = {};
+    for (final customPackageSlot in customPackageSlotsData) {
+      slots.putIfAbsent(customPackageSlot.slotNumber, () => []);
+      slots[customPackageSlot.slotNumber]!.add(customPackageSlot);
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(3.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey, width: 3),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 5,
+        children: [
+          Text(locale.getTranslation(customPackage.nameKey) ?? customPackage.nameKey, style: TextStyle(fontSize: 18)),
+          DescriptionTextWidget(locale.getTranslation(customPackage.descriptionKey) ?? customPackage.descriptionKey),
+          ...packageGroups.map((data) => buildProduct(data.productType, data.productId, data.productValue)),
+          ...slots.keys.map((slot) => buildCustomPackageSlot(slot, slots[slot]!)),
+        ],
+      ),
+    );
+  }
+
+  Widget buildCustomPackageSlot(int slotNum, List<CustomPackageSlotData> customPackageSlots) {
+    return Container(
+      padding: const EdgeInsets.all(3.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey, width: 3),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 5,
+        children: [
+          Text('Slot $slotNum'),
+          ...customPackageSlots.map((slotData) {
+            return buildProduct(slotData.productType, slotData.productId, slotData.productValue);
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget buildStepUp(StepUpPackageData stepUp) {
+    final packageGroups = db.packageGroupData[stepUp.packageGroupId] ?? [];
+    return Container(
+      padding: const EdgeInsets.all(3.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey, width: 3),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 5,
+        children: [
+          Text(locale.getTranslation(stepUp.nameKey) ?? stepUp.nameKey, style: TextStyle(fontSize: 18)),
+          DescriptionTextWidget(locale.getTranslation(stepUp.descriptionKey) ?? stepUp.descriptionKey),
+          Text('Step ${stepUp.step}'),
+          ...packageGroups.map((data) => buildProduct(data.productType, data.productId, data.productValue)),
+        ],
+      ),
+    );
+  }
+
   Widget buildPackage(PackageListData package) {
     final packageGroups = db.packageGroupData[package.productId] ?? [];
     return Container(
@@ -184,28 +264,27 @@ class _ShopDisplayState extends State<ShopDisplay> {
         children: [
           Text(locale.getTranslation(package.nameKey) ?? package.nameKey, style: TextStyle(fontSize: 18)),
           DescriptionTextWidget(locale.getTranslation(package.descriptionKey) ?? package.descriptionKey),
-          Text('Group: ${package.productId}'),
-          ...packageGroups.map(buildProduct),
+          ...packageGroups.map((data) => buildProduct(data.productType, data.productId, data.productValue)),
         ],
       ),
     );
   }
 
-  Widget buildProduct(PackageProductData data) {
-    if (data.productType == ProductType.currency) {
-      final currency = db.currencyTable[data.productId];
+  Widget buildProduct(ProductType productType, int productId, int productValue) {
+    if (productType == ProductType.currency) {
+      final currency = db.currencyTable[productId];
       return Tooltip(
         message: locale.getTranslation(currency?.descriptionKey) ?? 'Unknown Product',
-        child: Text('${locale.getTranslation(currency?.nameKey) ?? currency?.nameKey} × ${data.productValue}'),
+        child: Text('${locale.getTranslation(currency?.nameKey) ?? currency?.nameKey} × $productValue'),
       );
-    } else if (data.productType == ProductType.item) {
-      final item = db.simplifiedItemTable[data.productId];
+    } else if (productType == ProductType.item) {
+      final item = db.simplifiedItemTable[productId];
       return Tooltip(
         message: locale.getTranslation(item?.descriptionKey) ?? 'Unknown Product',
-        child: Text('${locale.getTranslation(item?.nameKey) ?? item?.nameKey} × ${data.productValue}'),
+        child: Text('${locale.getTranslation(item?.nameKey) ?? item?.nameKey} × $productValue'),
       );
     } else {
-      return Text('${data.productId} (${data.rawProductType}): ${data.productValue}');
+      return Text('$productId (${productType.name}): $productValue');
     }
   }
 }

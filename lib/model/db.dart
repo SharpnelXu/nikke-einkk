@@ -141,6 +141,9 @@ class NikkeDatabase {
   final Map<int, List<PackageProductData>> packageGroupData = {}; // package_group_id as key
   final Map<int, CurrencyData> currencyTable = {};
   final Map<int, SimplifiedItemData> simplifiedItemTable = {};
+  final Map<int, List<StepUpPackageData>> stepUpPackageGroupData = {}; // stepup_group_id
+  final Map<int, List<CustomPackageShopData>> customPackageShopData = {}; // custom_shop_id
+  final Map<int, List<CustomPackageSlotData>> customPackageSlotData = {}; // custom_group_id
 
   void init() {
     unionRaidData.clear();
@@ -180,6 +183,9 @@ class NikkeDatabase {
     packageGroupData.clear();
     currencyTable.clear();
     simplifiedItemTable.clear();
+    stepUpPackageGroupData.clear();
+    customPackageShopData.clear();
+    customPackageSlotData.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     String directory(String fileName) {
@@ -220,6 +226,9 @@ class NikkeDatabase {
     initialized &= loadData(directory('ItemHarmonyCubeTable.json'), processSimplifiedItemData);
     initialized &= loadData(directory('ItemMaterialTable.json'), processSimplifiedItemData);
     initialized &= loadData(directory('ItemPieceTable.json'), processSimplifiedItemData);
+    initialized &= loadData(directory('StepUpPackageListTable.json'), processStepUpPackageData);
+    initialized &= loadData(directory('CustomPackageShopTable.json'), processCustomPackageData);
+    initialized &= loadData(directory('CustomPackageGroupTable.json'), processCustomPackageSlotData);
 
     initialized &= loadCsv(directory('WaveData.GroupDict.csv'), processWaveDict);
 
@@ -535,6 +544,24 @@ class NikkeDatabase {
   void processSimplifiedItemData(dynamic record) {
     final data = SimplifiedItemData.fromJson(record);
     simplifiedItemTable[data.id] = data;
+  }
+
+  void processStepUpPackageData(dynamic record) {
+    final data = StepUpPackageData.fromJson(record);
+    stepUpPackageGroupData.putIfAbsent(data.stepUpGroupId, () => []);
+    stepUpPackageGroupData[data.stepUpGroupId]!.add(data);
+  }
+
+  void processCustomPackageData(dynamic record) {
+    final data = CustomPackageShopData.fromJson(record);
+    customPackageShopData.putIfAbsent(data.customShopId, () => []);
+    customPackageShopData[data.customShopId]!.add(data);
+  }
+
+  void processCustomPackageSlotData(dynamic record) {
+    final data = CustomPackageSlotData.fromJson(record);
+    customPackageSlotData.putIfAbsent(data.customGroupId, () => []);
+    customPackageSlotData[data.customGroupId]!.add(data);
   }
 }
 
