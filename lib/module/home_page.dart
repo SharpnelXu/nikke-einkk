@@ -8,6 +8,7 @@ import 'package:nikke_einkk/module/battle/battle_setup.dart';
 import 'package:nikke_einkk/module/coop/coop_raid_presets.dart';
 import 'package:nikke_einkk/module/monsters/monster_list.dart';
 import 'package:nikke_einkk/module/nikkes/nikke_list.dart';
+import 'package:nikke_einkk/module/shops/in_app_shop_page.dart';
 import 'package:nikke_einkk/module/soloraid/solo_raid_presets.dart';
 import 'package:nikke_einkk/module/unionraid/union_raid_presets.dart';
 
@@ -120,6 +121,19 @@ class EinkkHomePage extends StatelessWidget {
         },
         icon: Icon(Icons.catching_pokemon),
         label: Text('Rapture Data'),
+      ),
+      TextButton.icon(
+        style: TextButton.styleFrom(
+          alignment: Alignment.centerLeft,
+          iconAlignment: IconAlignment.start,
+          textStyle: TextStyle(fontSize: 30),
+          iconSize: 30,
+        ),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => InAppShopPage()));
+        },
+        icon: Icon(Icons.shop_2),
+        label: Text('In App Shop'),
       ),
       TextButton.icon(
         style: TextButton.styleFrom(

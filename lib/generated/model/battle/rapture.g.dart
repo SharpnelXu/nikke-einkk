@@ -82,6 +82,7 @@ BattleRaptureAction _$BattleRaptureActionFromJson(Map<String, dynamic> json) => 
   partId: (json['partId'] as num?)?.toInt(),
   damageRate: (json['damageRate'] as num?)?.toInt(),
   barrierHp: (json['barrierHp'] as num?)?.toInt(),
+  hitCover: json['hitCover'] as bool?,
 );
 
 Map<String, dynamic> _$BattleRaptureActionToJson(BattleRaptureAction instance) => <String, dynamic>{
@@ -93,6 +94,7 @@ Map<String, dynamic> _$BattleRaptureActionToJson(BattleRaptureAction instance) =
   'eleShields': instance.eleShields?.map((e) => _$NikkeElementEnumMap[e]!).toList(),
   'barrierHp': instance.barrierHp,
   'damageRate': instance.damageRate,
+  'hitCover': instance.hitCover,
   'targetType': _$BattleRaptureActionTargetEnumMap[instance.targetType],
   'targetSubtype': _$BattleRaptureActionTargetSubtypeEnumMap[instance.targetSubtype],
   'position': instance.position,
@@ -325,6 +327,7 @@ const _$FunctionTypeEnumMap = {
   FunctionType.plusBuffCount: 'PlusBuffCount',
   FunctionType.durationDamage: 'DurationDamage',
   FunctionType.useSkill1: 'UseSkill1',
+  FunctionType.defIgnoreSkillDamageInstant: 'DefIgnoreSkillDamageInstant',
 };
 
 BattleRaptureParts _$BattleRapturePartsFromJson(Map<String, dynamic> json) => BattleRaptureParts(

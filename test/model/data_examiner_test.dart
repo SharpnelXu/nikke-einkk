@@ -1576,5 +1576,84 @@ void main() {
         expect(extraKeys, emptySet, reason: 'Unexpected keys in MultiplayerRaidData: $folder');
       }
     });
+
+    test('Check PackageListData unexpected fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'package_shop_id',
+          'package_order',
+          'product_id',
+          'name_localkey',
+          'description_localkey',
+          'product_resource_id',
+          'buy_limit_type',
+          'is_limit',
+          'buy_limit_count',
+          'is_active',
+        };
+
+        final Set<String> extraKeys = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'PackageListTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          recordKeys.removeAll(expectedKeys);
+
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+
+          PackageListData.fromJson(record);
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected keys in PackageListData: $folder');
+      }
+    });
+
+    test('Check InAppShopData unexpected fields', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        final expectedKeys = {
+          'id',
+          'main_category_type',
+          'order_group_id',
+          'name_localkey',
+          'description_localkey',
+          'main_category_icon_name',
+          'sub_category_id',
+          'sub_category_name_localkey',
+          'package_shop_id',
+          'is_hide_if_not_valid',
+          'renew_type',
+          'start_date',
+          'end_date',
+          'date_ui_control',
+          'shop_type',
+          'shop_category',
+          'shop_prefab_name',
+        };
+
+        final Set<String> extraKeys = {};
+        final Set<String?> unknownCategory = {};
+
+        final loaded = loadData(getDesignatedDirectory(folder, 'InAppShopManagerTable.json'), (record) {
+          final recordKeys = (record as Map<String, dynamic>).keys.toSet();
+          recordKeys.removeAll(expectedKeys);
+
+          if (recordKeys.isNotEmpty) {
+            extraKeys.addAll(recordKeys);
+          }
+
+          final data = InAppShopData.fromJson(record);
+          if (data.shopCategory == ShopCategory.unknown) {
+            unknownCategory.add(data.rawShopCategory);
+          }
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+        expect(extraKeys, emptySet, reason: 'Unexpected keys in InAppShopData: $folder');
+        expect(unknownCategory, isEmpty, reason: 'Unknown shop category: $folder');
+      }
+    });
   });
 }

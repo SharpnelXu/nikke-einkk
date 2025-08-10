@@ -169,3 +169,37 @@ FavoriteItemLevelData _$FavoriteItemLevelDataFromJson(Map<String, dynamic> json)
           .toList() ??
       const [],
 );
+
+PackageListData _$PackageListDataFromJson(Map<String, dynamic> json) => PackageListData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  packageShopId: (json['package_shop_id'] as num?)?.toInt() ?? 0,
+  packageOrder: (json['package_order'] as num?)?.toInt() ?? 0,
+  productId: (json['product_id'] as num?)?.toInt() ?? 0,
+  nameKey: json['name_localkey'] as String? ?? '',
+  descriptionKey: json['description_localkey'] as String? ?? '',
+  productResourceId: json['product_resource_id'] as String? ?? '',
+  buyLimitType: json['buy_limit_type'] as String? ?? 'Account',
+  isLimited: json['is_limit'] as bool? ?? false,
+  buyLimitCount: (json['buy_limit_count'] as num?)?.toInt() ?? 0,
+  isActive: json['is_active'] as bool? ?? false,
+);
+
+InAppShopData _$InAppShopDataFromJson(Map<String, dynamic> json) => InAppShopData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  mainCategoryType: json['main_category_type'] as String? ?? '',
+  orderGroupId: (json['order_group_id'] as num?)?.toInt() ?? 0,
+  nameKey: json['name_localkey'] as String? ?? '',
+  descriptionKey: json['description_localkey'] as String? ?? '',
+  iconName: json['main_category_icon_name'] as String? ?? '',
+  subCategoryId: (json['sub_category_id'] as num?)?.toInt() ?? 0,
+  subCategoryNameKey: json['sub_category_name_localkey'] as String? ?? '',
+  packageShopId: (json['package_shop_id'] as num?)?.toInt() ?? 0,
+  hideIfNotValid: json['is_hide_if_not_valid'] as bool? ?? false,
+  renewType: json['renew_type'] as String? ?? 'NoRenew',
+  startDate: json['start_date'] as String?,
+  endDate: json['end_date'] as String?,
+  dateUiControl: json['date_ui_control'] as bool? ?? false,
+  shopType: json['shop_type'] as String? ?? '',
+  rawShopCategory: json['shop_category'] as String? ?? '',
+  shopPrefabName: json['shop_prefab_name'] as String? ?? '',
+);

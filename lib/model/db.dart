@@ -40,6 +40,7 @@ class Locale {
     result &= loadGeneral('Locale_System');
     result &= loadGeneral('Locale_Monster');
     result &= loadGeneral('Locale_Item');
+    result &= loadGeneral('Locale_InAppShopProduct');
 
     logger.i('Locale init result: $result');
 
@@ -134,6 +135,10 @@ class NikkeDatabase {
   final Set<FunctionType> onShotFunctionTypes = {};
   final Set<FunctionType> onHitFunctionTypes = {};
 
+  // shops & items
+  final Map<int, List<InAppShopData>> inAppShopManager = {}; // orderGroupId as key
+  final Map<int, List<PackageListData>> packageListData = {}; // packageShopId as key
+
   void init() {
     unionRaidData.clear();
     waveGroupDict.clear();
@@ -167,6 +172,8 @@ class NikkeDatabase {
     dollTable.clear();
     favoriteItemLevelTable.clear();
     coopRaidData.clear();
+    packageListData.clear();
+    inAppShopManager.clear();
 
     final extractFolderPath = getExtractDataFolderPath(isGlobal);
     String directory(String fileName) {
@@ -198,6 +205,8 @@ class NikkeDatabase {
     initialized &= loadData(directory('AttractiveLevelTable.json'), processAttractiveLevelTable);
     initialized &= loadData(directory('FavoriteItemLevelTable.json'), processFavoriteItemLevelData);
     initialized &= loadData(directory('MultiRaidTable.json'), processCoopRaidData);
+    initialized &= loadData(directory('PackageListTable.json'), processPackageListData);
+    initialized &= loadData(directory('InAppShopManagerTable.json'), processInAppShopData);
 
     initialized &= loadCsv(directory('WaveData.GroupDict.csv'), processWaveDict);
 
@@ -485,6 +494,18 @@ class NikkeDatabase {
   void processCoopRaidData(dynamic record) {
     final data = MultiplayerRaidData.fromJson(record);
     coopRaidData[data.id] = data;
+  }
+
+  void processPackageListData(dynamic record) {
+    final data = PackageListData.fromJson(record);
+    packageListData.putIfAbsent(data.packageShopId, () => []);
+    packageListData[data.packageShopId]!.add(data);
+  }
+
+  void processInAppShopData(dynamic record) {
+    final data = InAppShopData.fromJson(record);
+    inAppShopManager.putIfAbsent(data.orderGroupId, () => []);
+    inAppShopManager[data.orderGroupId]!.add(data);
   }
 }
 

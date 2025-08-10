@@ -627,3 +627,127 @@ enum HarmonyCubeType {
     }
   }
 }
+
+@JsonSerializable(createToJson: false)
+class PackageListData {
+  final int id;
+  @JsonKey(name: 'package_shop_id')
+  final int packageShopId;
+  @JsonKey(name: 'package_order')
+  final int packageOrder;
+  @JsonKey(name: 'product_id')
+  final int productId;
+  @JsonKey(name: 'name_localkey')
+  final String nameKey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionKey;
+  @JsonKey(name: 'product_resource_id')
+  final String productResourceId;
+  @JsonKey(name: 'buy_limit_type')
+  final String buyLimitType;
+  @JsonKey(name: 'is_limit')
+  final bool isLimited;
+  @JsonKey(name: 'buy_limit_count')
+  final int buyLimitCount;
+  @JsonKey(name: 'is_active')
+  final bool isActive;
+
+  PackageListData({
+    this.id = 0,
+    this.packageShopId = 0,
+    this.packageOrder = 0,
+    this.productId = 0,
+    this.nameKey = '',
+    this.descriptionKey = '',
+    this.productResourceId = '',
+    this.buyLimitType = 'Account',
+    this.isLimited = false,
+    this.buyLimitCount = 0,
+    this.isActive = false,
+  });
+
+  factory PackageListData.fromJson(Map<String, dynamic> json) => _$PackageListDataFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class InAppShopData {
+  final int id;
+  @JsonKey(name: 'main_category_type')
+  final String mainCategoryType;
+  @JsonKey(name: 'order_group_id')
+  final int orderGroupId;
+  @JsonKey(name: 'name_localkey')
+  final String nameKey;
+  @JsonKey(name: 'description_localkey')
+  final String descriptionKey;
+  @JsonKey(name: 'main_category_icon_name')
+  final String iconName;
+  @JsonKey(name: 'sub_category_id')
+  final int subCategoryId;
+  @JsonKey(name: 'sub_category_name_localkey')
+  final String subCategoryNameKey;
+  @JsonKey(name: 'package_shop_id')
+  final int packageShopId;
+  @JsonKey(name: 'is_hide_if_not_valid')
+  final bool hideIfNotValid;
+  @JsonKey(name: 'renew_type')
+  final String renewType;
+  @JsonKey(name: 'start_date')
+  final String? startDate;
+  @JsonKey(name: 'end_date')
+  final String? endDate;
+  @JsonKey(name: 'date_ui_control')
+  final bool dateUiControl;
+  @JsonKey(name: 'shop_type')
+  final String shopType;
+  ShopCategory get shopCategory => ShopCategory.fromName(rawShopCategory);
+  @JsonKey(name: 'shop_category')
+  final String rawShopCategory;
+  @JsonKey(name: 'shop_prefab_name')
+  final String shopPrefabName;
+
+  InAppShopData({
+    this.id = 0,
+    this.mainCategoryType = '',
+    this.orderGroupId = 0,
+    this.nameKey = '',
+    this.descriptionKey = '',
+    this.iconName = '',
+    this.subCategoryId = 0,
+    this.subCategoryNameKey = '',
+    this.packageShopId = 0,
+    this.hideIfNotValid = false,
+    this.renewType = 'NoRenew',
+    this.startDate,
+    this.endDate,
+    this.dateUiControl = false,
+    this.shopType = '',
+    this.rawShopCategory = '',
+    this.shopPrefabName = '',
+  });
+
+  factory InAppShopData.fromJson(Map<String, dynamic> json) => _$InAppShopDataFromJson(json);
+}
+
+enum ShopCategory {
+  timeLimitPackageShop,
+  customPackageShop,
+  stepUpPackageShop,
+  renewPackageShop,
+  passCostumeShop,
+  popupPackageShop,
+  costumeShop,
+  campaignPackageShop,
+  monthlyAmountShop,
+  jewelShop,
+  unknown;
+
+  static final Map<String, ShopCategory> _reverseMap = Map.fromIterable(
+    ShopCategory.values,
+    key: (v) => (v as ShopCategory).name.pascal,
+  );
+
+  static ShopCategory fromName(String? name) {
+    return _reverseMap[name] ?? ShopCategory.unknown;
+  }
+}
