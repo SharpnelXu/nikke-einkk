@@ -1711,5 +1711,20 @@ void main() {
         expect(extraKeys, emptySet, reason: 'Unexpected keys in CurrencyData: $folder');
       }
     });
+
+    test('Shop Redirect Tests', () {
+      for (final folder in [globalFolder, cnFolder]) {
+        bool loaded = loadData(getDesignatedDirectory(folder, 'CustomPackageShopTable.json'), (record) {
+          final data = CustomPackageShopData.fromJson(record);
+          expect(data.customGroupId, data.packageGroupId, reason: '$folder: custom package shop data mismatch');
+        });
+
+        loaded &= loadData(getDesignatedDirectory(folder, 'StepUpPackageShopTable.json'), (record) {
+          expect(record['package_shop_id'], record['stepup_group_id'], reason: '$folder: step up shop data mismatch');
+        });
+
+        expect(loaded, true, reason: 'loaded: $folder');
+      }
+    });
   });
 }

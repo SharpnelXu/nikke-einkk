@@ -973,3 +973,34 @@ class CustomPackageSlotData {
 
   factory CustomPackageSlotData.fromJson(Map<String, dynamic> json) => _$CustomPackageSlotDataFromJson(json);
 }
+
+@JsonSerializable(createToJson: false)
+class MidasProductData {
+  final int id;
+  @JsonKey(name: 'product_type')
+  final String productType;
+  @JsonKey(name: 'product_id')
+  final int productId;
+  @JsonKey(name: 'item_type')
+  final String itemType;
+  @JsonKey(name: 'midas_product_id_proximabeta')
+  final String proximaBetaProductId;
+  @JsonKey(name: 'midas_product_id_gamamobi')
+  final String gamamobiProductId;
+  @JsonKey(name: 'is_free')
+  final bool isFree;
+  final String cost;
+
+  MidasProductData({
+    this.id = 0,
+    this.productType = '',
+    this.productId = 0,
+    this.itemType = '',
+    this.proximaBetaProductId = '',
+    this.gamamobiProductId = '',
+    this.isFree = false,
+    this.cost = '0',
+  });
+
+  factory MidasProductData.fromJson(Map<String, dynamic> json) => _$MidasProductDataFromJson(json);
+}

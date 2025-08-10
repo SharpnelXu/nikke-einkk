@@ -183,6 +183,7 @@ class _ShopDisplayState extends State<ShopDisplay> {
 
   Widget buildCustomPackage(CustomPackageShopData customPackage) {
     final packageGroups = db.packageGroupData[customPackage.packageGroupId] ?? [];
+    final price = db.midasProductTable[customPackage.packageGroupId]?.cost ?? '?';
     final customPackageSlotsData = db.customPackageSlotData[customPackage.customGroupId] ?? [];
     final Map<int, List<CustomPackageSlotData>> slots = {};
     for (final customPackageSlot in customPackageSlotsData) {
@@ -200,7 +201,10 @@ class _ShopDisplayState extends State<ShopDisplay> {
         mainAxisSize: MainAxisSize.min,
         spacing: 5,
         children: [
-          Text(locale.getTranslation(customPackage.nameKey) ?? customPackage.nameKey, style: TextStyle(fontSize: 18)),
+          Text(
+            '${locale.getTranslation(customPackage.nameKey) ?? customPackage.nameKey} ($price)',
+            style: TextStyle(fontSize: 18),
+          ),
           DescriptionTextWidget(locale.getTranslation(customPackage.descriptionKey) ?? customPackage.descriptionKey),
           ...packageGroups.map((data) => buildProduct(data.productType, data.productId, data.productValue)),
           ...slots.keys.map((slot) => buildCustomPackageSlot(slot, slots[slot]!)),
@@ -231,6 +235,7 @@ class _ShopDisplayState extends State<ShopDisplay> {
 
   Widget buildStepUp(StepUpPackageData stepUp) {
     final packageGroups = db.packageGroupData[stepUp.packageGroupId] ?? [];
+    final price = db.midasProductTable[stepUp.id]?.cost ?? '?';
     return Container(
       padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
@@ -241,7 +246,7 @@ class _ShopDisplayState extends State<ShopDisplay> {
         mainAxisSize: MainAxisSize.min,
         spacing: 5,
         children: [
-          Text(locale.getTranslation(stepUp.nameKey) ?? stepUp.nameKey, style: TextStyle(fontSize: 18)),
+          Text('${locale.getTranslation(stepUp.nameKey) ?? stepUp.nameKey} ($price)', style: TextStyle(fontSize: 18)),
           DescriptionTextWidget(locale.getTranslation(stepUp.descriptionKey) ?? stepUp.descriptionKey),
           Text('Step ${stepUp.step}'),
           ...packageGroups.map((data) => buildProduct(data.productType, data.productId, data.productValue)),
@@ -252,6 +257,7 @@ class _ShopDisplayState extends State<ShopDisplay> {
 
   Widget buildPackage(PackageListData package) {
     final packageGroups = db.packageGroupData[package.productId] ?? [];
+    final price = db.midasProductTable[package.productId]?.cost ?? '?';
     return Container(
       padding: const EdgeInsets.all(3.0),
       decoration: BoxDecoration(
@@ -262,7 +268,7 @@ class _ShopDisplayState extends State<ShopDisplay> {
         mainAxisSize: MainAxisSize.min,
         spacing: 5,
         children: [
-          Text(locale.getTranslation(package.nameKey) ?? package.nameKey, style: TextStyle(fontSize: 18)),
+          Text('${locale.getTranslation(package.nameKey) ?? package.nameKey} ($price)', style: TextStyle(fontSize: 18)),
           DescriptionTextWidget(locale.getTranslation(package.descriptionKey) ?? package.descriptionKey),
           ...packageGroups.map((data) => buildProduct(data.productType, data.productId, data.productValue)),
         ],

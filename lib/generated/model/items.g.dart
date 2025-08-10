@@ -273,3 +273,14 @@ CustomPackageSlotData _$CustomPackageSlotDataFromJson(Map<String, dynamic> json)
   productId: (json['product_id'] as num?)?.toInt() ?? 0,
   productValue: (json['product_value'] as num?)?.toInt() ?? 0,
 );
+
+MidasProductData _$MidasProductDataFromJson(Map<String, dynamic> json) => MidasProductData(
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  productType: json['product_type'] as String? ?? '',
+  productId: (json['product_id'] as num?)?.toInt() ?? 0,
+  itemType: json['item_type'] as String? ?? '',
+  proximaBetaProductId: json['midas_product_id_proximabeta'] as String? ?? '',
+  gamamobiProductId: json['midas_product_id_gamamobi'] as String? ?? '',
+  isFree: json['is_free'] as bool? ?? false,
+  cost: json['cost'] as String? ?? '0',
+);
