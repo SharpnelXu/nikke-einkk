@@ -822,11 +822,15 @@ enum WeaponType {
 
 @JsonEnum(fieldRename: FieldRename.pascal)
 enum NikkeClass {
-  unknown,
-  attacker,
-  defender,
-  supporter,
-  all;
+  unknown(-1),
+  attacker(1),
+  defender(2),
+  supporter(3),
+  all(-1);
+
+  final int classId;
+
+  const NikkeClass(this.classId);
 
   static final Map<String, NikkeClass> _reverseMap = Map.fromIterable(
     NikkeClass.values,
@@ -928,6 +932,20 @@ enum BurstStep {
         return 'FB';
       case BurstStep.allStep:
         return 'ANY';
+    }
+  }
+
+  static BurstStep? fromStep(int? step) {
+    if (step == 1) {
+      return BurstStep.step1;
+    } else if (step == 2) {
+      return BurstStep.step2;
+    } else if (step == 3) {
+      return BurstStep.step3;
+    } else if (step == 4) {
+      return BurstStep.stepFull;
+    } else {
+      return null;
     }
   }
 

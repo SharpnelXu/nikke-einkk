@@ -40,6 +40,7 @@ class BattleSimulation {
   int get burstMeter => _burstMeter;
   set burstMeter(int value) => _burstMeter = value.clamp(0, constData.burstMeterCap);
   int burstStage = 0;
+  int get nextBurstStage => burstStage == 4 ? 0 : burstStage + 1;
   int reEnterBurstCd = 0;
   int burstStageFramesLeft = 0;
   int fullBurstDuration = 0;
@@ -237,5 +238,9 @@ class BattleSimulation {
 
     timeline.putIfAbsent(frame, () => <BattleEvent>[]);
     timeline[frame]!.add(event);
+  }
+
+  int countSquad(BattleNikke targetSquad) {
+    return nonnullNikkes.where((nikke) => nikke.characterData.squad == targetSquad.characterData.squad).length;
   }
 }

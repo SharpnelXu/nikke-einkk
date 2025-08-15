@@ -122,6 +122,15 @@ abstract class BattleEntity {
     return result;
   }
 
+  int? getFirstPlainBuffValues(BattleSimulation simulation, FunctionType type) {
+    for (final buff in buffs) {
+      if (buff.data.functionType == type) {
+        return buff.data.functionValue * buff.count;
+      }
+    }
+    return null;
+  }
+
   int getBuffValue(
     BattleSimulation simulation,
     FunctionType type,

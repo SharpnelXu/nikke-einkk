@@ -812,4 +812,14 @@ class BattleNikke extends BattleEntity {
       entity.changeHp(simulation, -damage);
     }
   }
+
+  BurstStep getUseBurstSkill(BattleSimulation simulation) {
+    final changeBuffVal = getFirstPlainBuffValues(simulation, FunctionType.changeUseBurstSkill);
+    return BurstStep.fromStep(changeBuffVal) ?? characterData.useBurstSkill;
+  }
+
+  BurstStep getChangeBurstStep(BattleSimulation simulation) {
+    final changeBuffVal = getFirstPlainBuffValues(simulation, FunctionType.changeChangeBurstStep);
+    return BurstStep.fromStep(changeBuffVal) ?? characterData.changeBurstStep;
+  }
 }

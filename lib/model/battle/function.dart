@@ -20,6 +20,7 @@ import 'package:nikke_einkk/model/battle/events/use_skill_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/battle/utils.dart';
+import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 
@@ -312,12 +313,16 @@ class BattleFunction {
           getStatusTriggerStandardTarget(event, simulation, data.statusTriggerStandard, target),
           data.statusTriggerType,
           data.statusTriggerValue,
+          getStatusTriggerStandardTarget(event, simulation, data.statusTrigger2Standard, target),
+          data.statusTrigger2Value,
         ) &&
         checkStatusTrigger(
           simulation,
           getStatusTriggerStandardTarget(event, simulation, data.statusTrigger2Standard, target),
           data.statusTrigger2Type,
           data.statusTrigger2Value,
+          getStatusTriggerStandardTarget(event, simulation, data.statusTriggerStandard, target),
+          data.statusTriggerValue,
         );
   }
 
@@ -435,6 +440,8 @@ class BattleFunction {
       case FunctionType.statRateOfFire:
       case FunctionType.statRateOfFirePerShot:
       case FunctionType.statReloadBulletRatio:
+      case FunctionType.changeChangeBurstStep:
+      case FunctionType.changeUseBurstSkill:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -583,7 +590,6 @@ class BattleFunction {
       case FunctionType.bonusRangeDamageChange:
       case FunctionType.buffRemove:
       case FunctionType.callingMonster:
-      case FunctionType.changeChangeBurstStep:
       case FunctionType.changeCoolTimeAll:
       case FunctionType.changeCoolTimeSkill1:
       case FunctionType.changeCoolTimeSkill2:
@@ -592,7 +598,6 @@ class BattleFunction {
       case FunctionType.changeNormalDefIgnoreDamage:
       case FunctionType.chargeDamageChangeMaxStatAmmo:
       case FunctionType.chargeTimeChangetoDamage:
-      case FunctionType.changeUseBurstSkill:
       case FunctionType.copyAtk:
       case FunctionType.copyHp:
       case FunctionType.coverResurrection:
@@ -785,7 +790,14 @@ class BattleFunction {
     }
   }
 
-  static bool checkStatusTrigger(BattleSimulation simulation, BattleEntity? target, StatusTriggerType type, int value) {
+  static bool checkStatusTrigger(
+    BattleSimulation simulation,
+    BattleEntity? target,
+    StatusTriggerType type,
+    int value,
+    BattleEntity? otherTarget,
+    int otherValue,
+  ) {
     switch (type) {
       case StatusTriggerType.none:
         return true;
@@ -819,35 +831,87 @@ class BattleFunction {
       case StatusTriggerType.isFullCount:
         final checkBuff = target?.buffs.firstWhereOrNull((buff) => buff.data.groupId == value);
         return checkBuff != null && checkBuff.count == checkBuff.data.fullCount;
-      case StatusTriggerType.unknown:
-      case StatusTriggerType.isAlive:
-      case StatusTriggerType.isAmmoCount:
-      case StatusTriggerType.isCharacter:
-      case StatusTriggerType.isCheckFunctionOverlapUp:
-      case StatusTriggerType.isCheckMonsterType:
-      case StatusTriggerType.isCheckPartsId:
-      case StatusTriggerType.isCheckTarget:
-      case StatusTriggerType.isCheckTeamBurstNextStep:
-      case StatusTriggerType.isClassType:
-      case StatusTriggerType.isCover:
-      case StatusTriggerType.isExplosiveCircuitOff:
-      case StatusTriggerType.isFullCharge:
-      case StatusTriggerType.isFunctionBuffCheck:
-      case StatusTriggerType.isFunctionTypeOffCheck:
       case StatusTriggerType.isHaveBarrier:
-      case StatusTriggerType.isNotCheckTeamBurstNextStep:
+        return (target is BattleNikke && target.barriers.isNotEmpty) ||
+            (target is BattleRapture && target.barrier != null);
       case StatusTriggerType.isNotHaveBarrier:
-      case StatusTriggerType.isPhase:
-      case StatusTriggerType.isSameSquadCount:
-      case StatusTriggerType.isSameSquadUp:
-      case StatusTriggerType.isStun:
+        return (target is BattleNikke && target.barriers.isEmpty) ||
+            (target is BattleRapture && target.barrier == null);
+      case StatusTriggerType.isAlive:
+        return target != null && target.currentHp > 0;
+      case StatusTriggerType.isAmmoCount:
+        return target is BattleNikke && target.currentAmmo == value;
+      case StatusTriggerType.isCharacter:
+        return target is BattleNikke;
       case StatusTriggerType.isCheckEnemyNikke:
+        // TODO: implement arena
+        return target is BattleNikke;
+      case StatusTriggerType.isCheckFunctionOverlapUp:
+        final buff = target?.buffs.firstWhereOrNull((buff) => buff.data.groupId == otherValue);
+        return buff != null && buff.count >= value;
+      case StatusTriggerType.isCheckMonsterType:
+        return target is BattleRapture;
       case StatusTriggerType.isCheckMonsterExcludeNoneType:
-      case StatusTriggerType.isBurstStepCheck:
-      case StatusTriggerType.isFunctionCount:
+        return target is BattleRapture && target.canBeTargeted;
+      case StatusTriggerType.isCheckPartsId:
+        return target is BattleRaptureParts && target?.uniqueId == value;
+      case StatusTriggerType.isCheckTarget:
+        return target is BattleRapture && target.isStageTarget;
+      case StatusTriggerType.isCheckTeamBurstNextStep:
+        return target is BattleNikke &&
+            simulation.nonnullNikkes.any((nikke) {
+              if (nikke.uniqueId == target.uniqueId) {
+                return false;
+              }
+              final requiredStep = nikke.getUseBurstSkill(simulation);
+              return requiredStep.step == simulation.nextBurstStage || requiredStep == BurstStep.allStep;
+            });
+      case StatusTriggerType.isNotCheckTeamBurstNextStep:
+        return target is BattleNikke &&
+            simulation.nonnullNikkes.every((nikke) {
+              if (nikke.uniqueId == target.uniqueId) {
+                return true;
+              }
+              final requiredStep = nikke.getUseBurstSkill(simulation);
+              return requiredStep.step != simulation.nextBurstStage && requiredStep != BurstStep.allStep;
+            });
+      case StatusTriggerType.isClassType:
+        return target is BattleNikke && target.characterData.characterClass.classId == value;
+      case StatusTriggerType.isFullCharge:
+        return target is BattleNikke && target.chargeFrames >= target.previousFullChargeFrameCount;
       case StatusTriggerType.isNotHaveCover:
+        return target is BattleNikke && target.cover.currentHp <= 0;
+      case StatusTriggerType.isBurstStepCheck:
+        return target is BattleNikke &&
+            target.activatedBurstSkillThisCycle &&
+            target.getUseBurstSkill(simulation).step == value;
+      case StatusTriggerType.isStun:
+        return target != null && target.buffs.any((buff) => buff.data.functionType == FunctionType.stun);
+      case StatusTriggerType.isExplosiveCircuitOff:
+        return target != null &&
+            target.buffs.every((buff) => buff.data.functionType != FunctionType.explosiveCircuitAccrueDamageRatio);
       case StatusTriggerType.isSameSquad:
+        return target is BattleNikke &&
+            otherTarget is BattleNikke &&
+            target.characterData.squad == otherTarget.characterData.squad;
+      case StatusTriggerType.isSameSquadCount:
+        return target is BattleNikke && simulation.countSquad(target) == value;
+      case StatusTriggerType.isSameSquadUp:
+        return target is BattleNikke && simulation.countSquad(target) >= value;
+      case StatusTriggerType.isFunctionBuffCheck:
+        return target != null &&
+            target.buffs.any((buff) => buff.data.functionType == NikkeDatabase.functionTypeId[value]);
+      case StatusTriggerType.isFunctionTypeOffCheck:
+        return target != null &&
+            target.buffs.every((buff) => buff.data.functionType != NikkeDatabase.functionTypeId[value]);
+      // likely used by raptures
+      case StatusTriggerType.isCover:
+        return target is BattleCover;
+      case StatusTriggerType.isPhase:
+      case StatusTriggerType.isFunctionCount:
         logger.i('Unimplemented StatusTriggerType: $type');
+        return false;
+      case StatusTriggerType.unknown:
         return false;
     }
   }

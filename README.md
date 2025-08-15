@@ -91,6 +91,9 @@ manually set if each bullet is crit / core hit or not
   - May be a problem later since not all functions are considered buff in Einkk
 - HP Ratio triggers (Emergency Max HP Cube) will not trigger again if the HP stays in trigger range
 - ChangeWeapon values: damage rate, fire rate, weaponId, ?, ?. The fourth & fifth parameter's functions are unknown
+- `isCharacter`, used by Siren only, probably for arena trigger
+- `isCheckEnemyNikke`, likely arena only
+- `isCheckTeamBurstNextStep`, check next step or check trigger value?
 
 
 ## Niche Mechanisms Waiting To Be Categorized
@@ -106,6 +109,7 @@ where the difference is 0.000004% (actual: 902435165 vs calculated: 902435200)
 - Will Cindy's S2 Beautiful stack be removed if decoy's HP goes to 0? 
 - IsWeaponType checks current or base?
   - A: base
+- Can a nikke have multiple barriers or do they override one another based on hp?
 
 ## TODOs
 

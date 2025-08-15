@@ -135,6 +135,16 @@ class NikkeDatabase {
   final Set<FunctionType> onShotFunctionTypes = {};
   final Set<FunctionType> onHitFunctionTypes = {};
 
+  static final Map<int, FunctionType> functionTypeId = {
+    4: FunctionType.attention,
+    8: FunctionType.statAccuracyCircle,
+    18: FunctionType.immuneStun,
+    40: FunctionType.immortal,
+    107: FunctionType.hide,
+    145: FunctionType.shareDamageIncrease,
+    169: FunctionType.durationDamageRatio,
+  };
+
   // shops & items
   final Map<int, List<InAppShopData>> inAppShopManager = {}; // orderGroupId as key
   final Map<int, List<PackageListData>> packageListData = {}; // packageShopId as key

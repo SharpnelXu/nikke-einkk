@@ -948,6 +948,9 @@ void main() {
 
         final Set<String> extraKeys = {};
 
+        final functionTypeCheck = {StatusTriggerType.isFunctionBuffCheck, StatusTriggerType.isFunctionTypeOffCheck};
+        final Set<int> unknownFuncTypeIds = {};
+
         final loaded = loadData(getDesignatedDirectory(folder, 'FunctionTable.json'), (record) {
           final recordKeys = (record as Map<String, dynamic>).keys.toSet();
           final data = FunctionData.fromJson(record);
@@ -977,6 +980,21 @@ void main() {
           }
           if (data.keepingType == FunctionStatus.unknown) unknownKeepingTypes.add(data.rawKeepingType);
 
+          if (functionTypeCheck.contains(data.statusTriggerType) &&
+              !NikkeDatabase.functionTypeId.containsKey(data.statusTriggerValue)) {
+            unknownFuncTypeIds.add(data.statusTriggerValue);
+          }
+
+          if (functionTypeCheck.contains(data.statusTrigger2Type) &&
+              !NikkeDatabase.functionTypeId.containsKey(data.statusTrigger2Value)) {
+            unknownFuncTypeIds.add(data.statusTrigger2Value);
+          }
+
+          if (data.timingTriggerType == TimingTriggerType.onFunctionBuffCheck &&
+              !NikkeDatabase.functionTypeId.containsKey(data.timingTriggerValue)) {
+            unknownFuncTypeIds.add(data.timingTriggerValue);
+          }
+
           // Check for extra fields
           recordKeys.removeAll(expectedKeys);
           if (recordKeys.isNotEmpty) {
@@ -998,6 +1016,7 @@ void main() {
         expect(unknownTimingTriggers, emptySet, reason: 'Unknown timing triggers: $folder');
         expect(unknownStatusTriggers, emptySet, reason: 'Unknown status triggers: $folder');
         expect(unknownKeepingTypes, emptySet, reason: 'Unknown keeping types: $folder');
+        expect(unknownFuncTypeIds, emptySet, reason: 'Unknown funcTypeIds: $folder');
 
         // Structural validation
         expect(extraKeys, emptySet, reason: 'Extra fields found: $folder');

@@ -56,12 +56,16 @@ class BattleBuff {
               getStatusTriggerStandardTarget(simulation, data.statusTriggerStandard),
               data.statusTriggerType,
               data.statusTriggerValue,
+              getStatusTriggerStandardTarget(simulation, data.statusTrigger2Standard),
+              data.statusTrigger2Value,
             ) ||
             !BattleFunction.checkStatusTrigger(
               simulation,
               getStatusTriggerStandardTarget(simulation, data.statusTrigger2Standard),
               data.statusTrigger2Type,
               data.statusTrigger2Value,
+              getStatusTriggerStandardTarget(simulation, data.statusTriggerStandard),
+              data.statusTriggerValue,
             );
       case DurationType.timeSec:
       case DurationType.timeSecVer2:

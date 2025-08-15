@@ -60,7 +60,7 @@ class BattleSkill {
     if (skillData == null || skillType != SkillType.characterSkill || coolDown > 0) return false;
     if (skillNum != 3) return true;
 
-    final requiredStep = simulation.getNikkeOnPosition(ownerId)?.characterData.useBurstSkill;
+    final requiredStep = simulation.getNikkeOnPosition(ownerId)?.getUseBurstSkill(simulation);
     final allStepCheck = requiredStep == BurstStep.allStep && [1, 2, 3].contains(simulation.burstStage);
     final stepCheck = allStepCheck || requiredStep?.step == simulation.burstStage;
     final basicBurstCheck = simulation.reEnterBurstCd == 0 && stepCheck;
@@ -279,7 +279,7 @@ class BattleSkill {
       }
     }
 
-    final nextStep = owner.characterData.changeBurstStep;
+    final nextStep = owner.getChangeBurstStep(simulation);
     if (source == Source.burst) {
       owner.activatedBurstSkillThisCycle = true;
 
