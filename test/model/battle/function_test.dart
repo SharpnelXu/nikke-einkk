@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
+import 'package:nikke_einkk/model/battle/function.dart';
 import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 
@@ -30,6 +31,79 @@ void main() {
       expect(damageEvents.length, 2);
       expect(damageEvents.first.source, Source.bullet);
       expect(damageEvents.last.source, Source.skill2);
+    });
+  });
+
+  group('Status Trigger Tests verifications', () {
+    test('test isCheckTeamBurstNextStep & isNotCheckTeamBurstNextStep', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [Const.helm, Const.crown, Const.liter],
+        raptureOptions: [Const.trainingWaterTarget],
+        advancedOption: BattleAdvancedOption(maxSeconds: 3),
+      );
+      simulation.init();
+
+      final helm = simulation.nonnullNikkes.first;
+      final liter = simulation.nonnullNikkes[2];
+
+      expect(simulation.burstStage, 0);
+      bool result = BattleFunction.checkStatusTrigger(
+        simulation,
+        helm,
+        StatusTriggerType.isCheckTeamBurstNextStep,
+        1,
+        null,
+        0,
+      );
+      expect(result, isTrue);
+      result = BattleFunction.checkStatusTrigger(
+        simulation,
+        helm,
+        StatusTriggerType.isNotCheckTeamBurstNextStep,
+        1,
+        null,
+        0,
+      );
+      expect(result, isFalse);
+
+      result = BattleFunction.checkStatusTrigger(
+        simulation,
+        liter,
+        StatusTriggerType.isCheckTeamBurstNextStep,
+        1,
+        null,
+        0,
+      );
+      expect(result, isFalse);
+      result = BattleFunction.checkStatusTrigger(
+        simulation,
+        liter,
+        StatusTriggerType.isNotCheckTeamBurstNextStep,
+        1,
+        null,
+        0,
+      );
+      expect(result, isTrue);
+
+      result = BattleFunction.checkStatusTrigger(
+        simulation,
+        helm,
+        StatusTriggerType.isCheckTeamBurstNextStep,
+        3,
+        null,
+        0,
+      );
+      expect(result, isFalse);
+      result = BattleFunction.checkStatusTrigger(
+        simulation,
+        helm,
+        StatusTriggerType.isNotCheckTeamBurstNextStep,
+        3,
+        null,
+        0,
+      );
+      expect(result, isTrue);
     });
   });
 }

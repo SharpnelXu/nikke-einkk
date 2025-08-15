@@ -864,7 +864,7 @@ class BattleFunction {
                 return false;
               }
               final requiredStep = nikke.getUseBurstSkill(simulation);
-              return requiredStep.step == simulation.nextBurstStage || requiredStep == BurstStep.allStep;
+              return requiredStep.step == value || requiredStep == BurstStep.allStep;
             });
       case StatusTriggerType.isNotCheckTeamBurstNextStep:
         return target is BattleNikke &&
@@ -873,7 +873,7 @@ class BattleFunction {
                 return true;
               }
               final requiredStep = nikke.getUseBurstSkill(simulation);
-              return requiredStep.step != simulation.nextBurstStage && requiredStep != BurstStep.allStep;
+              return requiredStep.step != value && requiredStep != BurstStep.allStep;
             });
       case StatusTriggerType.isClassType:
         return target is BattleNikke && target.characterData.characterClass.classId == value;

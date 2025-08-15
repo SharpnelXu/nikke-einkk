@@ -247,5 +247,60 @@ class Const {
   );
   static NikkeOptions get crown => _crown.copy();
 
+  static final _grave = NikkeOptions(
+    nikkeResourceId: 514,
+    coreLevel: 11,
+    syncLevel: 884,
+    attractLevel: 40,
+    skillLevels: [10, 10, 10],
+    equips: [
+      EquipmentOption(
+        type: EquipType.head,
+        equipClass: NikkeClass.supporter,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [
+          EquipLine.onValue(EquipLineType.statCriticalDamage, 1448, global),
+          EquipLine.onValue(EquipLineType.statChargeDamage, 1111, global),
+          EquipLine.onValue(EquipLineType.statCritical, 264, global),
+        ],
+      ),
+      EquipmentOption(
+        type: EquipType.body,
+        equipClass: NikkeClass.supporter,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [
+          EquipLine.onValue(EquipLineType.statAtk, 1181, global),
+          EquipLine.onValue(EquipLineType.statCritical, 571, global),
+          EquipLine.onValue(EquipLineType.statAmmo, 6893, global),
+        ],
+      ),
+      EquipmentOption(
+        type: EquipType.arm,
+        equipClass: NikkeClass.supporter,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [
+          EquipLine.onValue(EquipLineType.statChargeDamage, 1111, global),
+          EquipLine.onValue(EquipLineType.statAtk, 1040, global),
+        ],
+      ),
+      EquipmentOption(
+        type: EquipType.leg,
+        equipClass: NikkeClass.supporter,
+        rarity: EquipRarity.t10,
+        level: 5,
+        equipLines: [
+          EquipLine.onValue(EquipLineType.statAmmo, 2784, global),
+          EquipLine.onValue(EquipLineType.statAtk, 829, global),
+        ],
+      ),
+    ],
+    favoriteItem: FavoriteItemOption(weaponType: WeaponType.ar, rarity: Rarity.sr, level: 15),
+    cube: null,
+  );
+  static NikkeOptions get grave => _grave.copy();
+
   Const._();
 }

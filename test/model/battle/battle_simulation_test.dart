@@ -791,4 +791,19 @@ void main() {
       expect(burstEvent.activatorId, 3);
     });
   });
+
+  group('Method Tests', () {
+    test('countSquad', () {
+      final simulation = BattleSimulation(
+        playerOptions: PlayerOptions(),
+        nikkeOptions: [Const.crown, Const.liter, Const.helm, Const.cindy, Const.grave],
+        raptureOptions: [Const.shootingRangeWaterBoss],
+      );
+
+      simulation.init();
+
+      final cindy = simulation.nonnullNikkes[3];
+      expect(simulation.countSquad(cindy), 2);
+    });
+  });
 }

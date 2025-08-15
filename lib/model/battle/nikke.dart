@@ -149,7 +149,17 @@ class BattleNikke extends BattleEntity {
   late BattleCover cover;
   List<Barrier> barriers = [];
   BattleDecoy? decoy;
-  int currentAmmo = 0;
+  int _currentAmmo = 0;
+  int? changeWeaponAmmo;
+  set currentAmmo(int value) {
+    if (changeWeaponAmmo == null) {
+      _currentAmmo = value;
+    } else {
+      changeWeaponAmmo = value;
+    }
+  }
+
+  int get currentAmmo => changeWeaponAmmo ?? _currentAmmo;
 
   WeaponType get currentWeaponType => currentWeaponData.weaponType;
   WeaponData get currentWeaponData => changeWeaponData ?? baseWeaponData;
@@ -457,6 +467,7 @@ class BattleNikke extends BattleEntity {
           FireType.homingProjectile,
           FireType.projectileCurve,
           FireType.projectileDirect,
+          FireType.stickyProjectileDirect,
         ].contains(currentWeaponData.fireType)) {
           final projectileCreateFrame = timeDataToFrame(
             currentWeaponData.maintainFireStance * toModifier(currentWeaponData.upTypeFireTiming),
@@ -502,7 +513,8 @@ class BattleNikke extends BattleEntity {
             // necessary for quick scope
             spotFirstDelayFrameCount = timeDataToFrame(currentWeaponData.spotFirstDelay, fps);
           }
-        } else if (currentWeaponData.inputType == InputType.downCharge) {
+        } else if (currentWeaponData.inputType == InputType.downCharge ||
+            currentWeaponData.inputType == InputType.down) {
           while (shootCountdown <= 0) {
             shootCountdown += shootThreshold;
           }
@@ -591,8 +603,14 @@ class BattleNikke extends BattleEntity {
     }
   }
 
-  void resetWeaponParams(BattleSimulation simulation) {
-    currentAmmo = getMaxAmmo(simulation);
+  void resetWeaponParams(BattleSimulation simulation, bool equipNew) {
+    final maxAmmo = getMaxAmmo(simulation);
+    if (equipNew) {
+      changeWeaponAmmo = maxAmmo;
+    } else if (changeWeaponAmmo != null) {
+      _currentAmmo = max(_currentAmmo, changeWeaponAmmo!);
+      changeWeaponAmmo = null;
+    }
     chargeFrames = 0;
     previousFullChargeFrameCount = 0;
     baseAccCircleScale = currentWeaponData.startAccuracyCircleScale;
@@ -609,10 +627,10 @@ class BattleNikke extends BattleEntity {
       changeWeaponSkill = null;
       changeWeaponData = null;
 
-      resetWeaponParams(simulation);
+      resetWeaponParams(simulation, false);
     }
     if (hasBuff(simulation, FunctionType.allAmmo)) {
-      currentAmmo = currentWeaponData.maxAmmo;
+      currentAmmo = getMaxAmmo(simulation);
     }
 
     // gainAmmo is put here because max ammo can change in this frame

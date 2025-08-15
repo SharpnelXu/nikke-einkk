@@ -93,7 +93,7 @@ manually set if each bullet is crit / core hit or not
 - ChangeWeapon values: damage rate, fire rate, weaponId, ?, ?. The fourth & fifth parameter's functions are unknown
 - `isCharacter`, used by Siren only, probably for arena trigger
 - `isCheckEnemyNikke`, likely arena only
-- `isCheckTeamBurstNextStep`, check next step or check trigger value?
+- `isCheckTeamBurstNextStep`, ~~check next step or check~~ trigger value?
 
 
 ## Niche Mechanisms Waiting To Be Categorized
