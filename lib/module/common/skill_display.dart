@@ -51,7 +51,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
 
     children.add(Container(constraints: BoxConstraints(maxWidth: 700), child: CustomTable(children: dataRows)));
 
-    if (data.skillType == CharacterSkillType.changeWeapon) {
+    if (data.skillType == CharacterSkillType.changeWeapon || data.skillType == CharacterSkillType.laserBeam) {
       children.addAll([
         const Divider(),
         Text('↓↓↓ Equip This Weapon  ↓↓↓', style: TextStyle(fontSize: 16)),
@@ -61,7 +61,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
             border: Border.all(color: Colors.grey, width: 2),
             borderRadius: BorderRadius.circular(5),
           ),
-          child: WeaponDataDisplay(weaponId: data.skillValueData[2].skillValue),
+          child: WeaponDataDisplay(weaponId: data.getSkillValue(2)),
         ),
       ]);
     } else if (data.skillType == CharacterSkillType.launchWeapon) {
@@ -74,7 +74,76 @@ class CharacterSkillDataDisplay extends StatelessWidget {
             border: Border.all(color: Colors.grey, width: 2),
             borderRadius: BorderRadius.circular(5),
           ),
-          child: WeaponDataDisplay(weaponId: data.skillValueData[2].skillValue),
+          child: WeaponDataDisplay(weaponId: data.getSkillValue(2)),
+        ),
+      ]);
+    } else if (data.skillType == CharacterSkillType.hitMonsterGetBuff) {
+      final hitMonsterFuncId = data.getSkillValue(0);
+      final hitPartFuncId = data.getSkillValue(1);
+      children.addAll([
+        const Divider(),
+        Text('↓↓↓ Hit Raptures Function ↓↓↓', style: TextStyle(fontSize: 16)),
+        Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: buffTypeColor(db.functionTable[hitMonsterFuncId]?.buff), width: 2),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 3,
+            children: [
+              Text(
+                'Hit Raptures Function',
+                style: TextStyle(fontSize: 16),
+              ),
+              SimpleFunctionDisplay(functionId: hitMonsterFuncId),
+            ],
+          ),
+        ),
+        Text('↓↓↓ Hit Parts Function ↓↓↓', style: TextStyle(fontSize: 16)),
+        Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: buffTypeColor(db.functionTable[hitPartFuncId]?.buff), width: 2),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 3,
+            children: [
+              Text(
+                'Hit Parts Function',
+                style: TextStyle(fontSize: 16),
+              ),
+              SimpleFunctionDisplay(functionId: hitPartFuncId),
+            ],
+          ),
+        ),
+      ]);
+    } else if (data.skillType == CharacterSkillType.targetHitCountGetBuff) {
+      final hitFuncId = data.getSkillValue(0);
+      final hitCount = data.getSkillValue(1);
+      children.addAll([
+        const Divider(),
+        Text('↓↓↓ Hit $hitCount shots for Function ↓↓↓', style: TextStyle(fontSize: 16)),
+        Container(
+          padding: const EdgeInsets.all(3.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: buffTypeColor(db.functionTable[hitFuncId]?.buff), width: 2),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 3,
+            children: [
+              Text(
+                'Hit $hitCount shots for Function',
+                style: TextStyle(fontSize: 16),
+              ),
+              SimpleFunctionDisplay(functionId: hitFuncId),
+            ],
+          ),
         ),
       ]);
     }

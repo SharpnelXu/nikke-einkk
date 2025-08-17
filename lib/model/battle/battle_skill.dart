@@ -99,14 +99,15 @@ class BattleSkill {
     }
   }
 
-  static void instantDamage(
-    BattleSimulation simulation,
-    SkillData skillData,
-    int ownerId,
-    Source source,
-    BattleEntity target,
-    bool isParts,
-  ) {
+  static void instantDamage({
+    required BattleSimulation simulation,
+    required SkillData skillData,
+    required int damageRate,
+    required int ownerId,
+    required Source source,
+    required BattleEntity target,
+    required bool targetParts,
+  }) {
     if (target is BattleRapture) {
       bool shareDamage = false;
       final shareDamageBuff = target.buffs.firstWhereOrNull(
@@ -125,12 +126,12 @@ class BattleSkill {
           nikke: simulation.getNikkeOnPosition(ownerId)!,
           rapture: target,
           source: source,
-          damageRate: skillData.skillValueData[0].skillValue,
+          damageRate: damageRate,
           isShareDamage: shareDamage,
         ),
       );
 
-      if (isParts) {
+      if (targetParts) {
         for (final part in target.parts) {
           // TODO: check if part can be damaged
           simulation.registerEvent(
@@ -140,7 +141,7 @@ class BattleSkill {
               nikke: simulation.getNikkeOnPosition(ownerId)!,
               rapture: target,
               source: source,
-              damageRate: skillData.skillValueData[0].skillValue,
+              damageRate: damageRate,
               partId: part.id,
             ),
           );
@@ -189,12 +190,28 @@ class BattleSkill {
       case CharacterSkillType.instantCircleSeparate:
       case CharacterSkillType.instantNumber:
         for (final target in skillTargets) {
-          instantDamage(simulation, skillData, ownerId, source, target, false);
+          instantDamage(
+            simulation: simulation,
+            skillData: skillData,
+            damageRate: skillData.getSkillValue(0),
+            ownerId: ownerId,
+            source: source,
+            target: target,
+            targetParts: false,
+          );
         }
         break;
       case CharacterSkillType.instantAllParts:
         for (final target in skillTargets) {
-          instantDamage(simulation, skillData, ownerId, source, target, true);
+          instantDamage(
+            simulation: simulation,
+            skillData: skillData,
+            damageRate: skillData.getSkillValue(0),
+            ownerId: ownerId,
+            source: source,
+            target: target,
+            targetParts: true,
+          );
         }
         break;
       case CharacterSkillType.instantSequentialAttack:
@@ -279,8 +296,35 @@ class BattleSkill {
           }
         }
         break;
-      case CharacterSkillType.launchWeapon:
       case CharacterSkillType.laserBeam:
+        for (final target in skillTargets) {
+          instantDamage(
+            simulation: simulation,
+            skillData: skillData,
+            damageRate: skillData.getSkillValue(0),
+            ownerId: ownerId,
+            source: source,
+            target: target,
+            targetParts: false,
+          );
+
+          final damageRate = skillData.getSkillValue(1);
+          final fireRate = skillData.getSkillValue(4);
+          final duration =
+              skillData.durationType.isTimed
+                  ? timeDataToFrame(skillData.durationValue, simulation.fps)
+                  : skillData.durationValue;
+          final weaponId = skillData.getSkillValue(2);
+          final weaponData = simulation.db.characterShotTable[weaponId];
+          if (target is BattleNikke && weaponData != null) {
+            target.changeWeaponSkill = skillData;
+            target.changeWeaponData = WeaponData.changeWeapon(damageRate, fireRate, weaponData);
+            target.changeWeaponDuration = duration;
+            target.resetWeaponParams(simulation, true);
+          }
+        }
+        break;
+      case CharacterSkillType.launchWeapon:
       case CharacterSkillType.explosiveCircuit:
       case CharacterSkillType.stigma:
       case CharacterSkillType.hitMonsterGetBuff:
