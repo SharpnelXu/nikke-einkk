@@ -105,6 +105,7 @@ class BattleSkill {
     int ownerId,
     Source source,
     BattleEntity target,
+    bool isParts,
   ) {
     if (target is BattleRapture) {
       bool shareDamage = false;
@@ -128,6 +129,24 @@ class BattleSkill {
           isShareDamage: shareDamage,
         ),
       );
+
+      if (isParts) {
+        for (final part in target.parts) {
+          // TODO: check if part can be damaged
+          simulation.registerEvent(
+            damageFrame,
+            NikkeDamageEvent.skill(
+              simulation: simulation,
+              nikke: simulation.getNikkeOnPosition(ownerId)!,
+              rapture: target,
+              source: source,
+              damageRate: skillData.skillValueData[0].skillValue,
+              partId: part.id,
+            ),
+          );
+        }
+      }
+
       simulation.registerEvent(damageFrame, SkillAttackEvent.create(ownerId, target.uniqueId, skillData, source));
     }
   }
@@ -170,7 +189,12 @@ class BattleSkill {
       case CharacterSkillType.instantCircleSeparate:
       case CharacterSkillType.instantNumber:
         for (final target in skillTargets) {
-          instantDamage(simulation, skillData, ownerId, source, target);
+          instantDamage(simulation, skillData, ownerId, source, target, false);
+        }
+        break;
+      case CharacterSkillType.instantAllParts:
+        for (final target in skillTargets) {
+          instantDamage(simulation, skillData, ownerId, source, target, true);
         }
         break;
       case CharacterSkillType.instantSequentialAttack:
@@ -260,10 +284,9 @@ class BattleSkill {
       case CharacterSkillType.explosiveCircuit:
       case CharacterSkillType.stigma:
       case CharacterSkillType.hitMonsterGetBuff:
+      case CharacterSkillType.targetHitCountGetBuff:
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.unknown:
-      case CharacterSkillType.instantAllParts:
-      case CharacterSkillType.targetHitCountGetBuff:
         break;
     }
 

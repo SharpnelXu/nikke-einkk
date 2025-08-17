@@ -155,6 +155,7 @@ class NikkeDamageEvent extends BattleEvent {
     required int damageRate,
     required Source source,
     bool isShareDamage = false,
+    int? partId,
   }) {
     final damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
@@ -172,6 +173,7 @@ class NikkeDamageEvent extends BattleEvent {
       addDamageBuff: nikke.getAddDamageBuffValues(simulation),
       distributedDamageBuff: isShareDamage ? nikke.getShareDamageBuffValues(simulation) : 0,
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
+      partDamageBuff: partId != null ? nikke.getPartsDamageBuffValues(simulation) : 0,
     );
 
     return NikkeDamageEvent._(
@@ -181,6 +183,7 @@ class NikkeDamageEvent extends BattleEvent {
       damageParameter: damageParameter,
       invalid: !rapture.validateSkillDamage(nikke),
       shareCount: isShareDamage ? simulation.raptures.length : 0,
+      partId: partId,
     );
   }
 
