@@ -458,6 +458,7 @@ class BattleRapture extends BattleEntity {
   NikkeElement get element => options.element;
 
   HitMonsterGetBuffData? hitMonsterGetBuffData;
+  TargetHitCountGetBuffData? targetHitCountGetBuffData;
 
   BattleRapture(this.options);
 
@@ -471,6 +472,7 @@ class BattleRapture extends BattleEntity {
     canBeTargeted = options.canBeTargeted;
     isStageTarget = options.isStageTarget;
     hitMonsterGetBuffData = null;
+    targetHitCountGetBuffData = null;
 
     hasRedCircle = false;
 
@@ -529,6 +531,14 @@ class BattleRapture extends BattleEntity {
       hitMonsterGetBuffData.duration -= 1;
       if (hitMonsterGetBuffData.duration <= 0) {
         this.hitMonsterGetBuffData = null;
+      }
+    }
+
+    final targetHitCountGetBuffData = this.targetHitCountGetBuffData;
+    if (targetHitCountGetBuffData != null) {
+      targetHitCountGetBuffData.duration -= 1;
+      if (targetHitCountGetBuffData.duration <= 0) {
+        this.targetHitCountGetBuffData = null;
       }
     }
 

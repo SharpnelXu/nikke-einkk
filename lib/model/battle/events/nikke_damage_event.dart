@@ -223,6 +223,7 @@ class NikkeDamageEvent extends BattleEvent {
       }
 
       rapture.hitMonsterGetBuffData?.applyBuff(simulation, this);
+      rapture.targetHitCountGetBuffData?.applyBuff(simulation, this);
     }
   }
 

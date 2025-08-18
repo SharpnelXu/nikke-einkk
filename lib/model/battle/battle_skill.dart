@@ -343,10 +343,24 @@ class BattleSkill {
           }
         }
         break;
+      case CharacterSkillType.targetHitCountGetBuff:
+        for (final target in skillTargets) {
+          if (target is BattleRapture) {
+            target.targetHitCountGetBuffData = TargetHitCountGetBuffData(
+              simulation: simulation,
+              funcId: skillData.getSkillValue(0),
+              hitCountTarget: skillData.getSkillValue(1),
+              limitPerReceiver: 1, // sklillValue 2?
+              ownerId: ownerId,
+              source: source,
+              duration: timeDataToFrame(skillData.durationValue, simulation.fps),
+            );
+          }
+        }
+        break;
       case CharacterSkillType.launchWeapon:
       case CharacterSkillType.explosiveCircuit:
       case CharacterSkillType.stigma:
-      case CharacterSkillType.targetHitCountGetBuff:
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.unknown:
         break;
@@ -417,6 +431,7 @@ class BattleSkill {
         break;
       case CharacterSkillType.instantSequentialAttack:
       case CharacterSkillType.hitMonsterGetBuff:
+      case CharacterSkillType.targetHitCountGetBuff:
         return isThisNikke ? simulation.raptures.sublist(0, 1) : simulation.nonnullNikkes.sublist(0, 1);
       case CharacterSkillType.instantAll:
       case CharacterSkillType.instantAllParts:
@@ -426,8 +441,6 @@ class BattleSkill {
         return isThisNikke ? simulation.raptures.toList() : simulation.nonnullNikkes.toList();
       case CharacterSkillType.explosiveCircuit: // trony
       case CharacterSkillType.stigma: // dorothy
-      // ^ D: Killer Wife's Ult
-      case CharacterSkillType.targetHitCountGetBuff:
       case CharacterSkillType.unknown:
         return [];
     }
@@ -643,11 +656,14 @@ class HitMonsterGetBuffData {
   });
 
   void applyBuff(BattleSimulation simulation, NikkeDamageEvent event) {
+    if (event.source != Source.bullet) {
+      return;
+    }
+
     final funcId = event.partId == null ? hitMonsterFuncId : hitPartsFuncId;
     final functionData = simulation.db.functionTable[funcId];
     if (functionData != null) {
       final receiverId = event.activatorId;
-      appliedTracker.putIfAbsent(funcId, () => <int, int>{});
       final funcApplyTimes = appliedTracker[funcId]?[receiverId] ?? 0;
       if (funcApplyTimes >= limitPerReceiver) {
         return; // already applied enough times
@@ -658,6 +674,52 @@ class HitMonsterGetBuffData {
       function.executeFunction(BattleEvent(ownerId, [receiverId]), simulation); // temp event to execute function
       appliedTracker.putIfAbsent(funcId, () => <int, int>{});
       appliedTracker[funcId]![receiverId] = funcApplyTimes + 1;
+    }
+  }
+}
+
+class TargetHitCountGetBuffData {
+  final int funcId;
+  final int hitCountTarget;
+  final int ownerId;
+  final int limitPerReceiver;
+  final Source source;
+  int duration;
+  int hitCount = 0;
+  final Map<int, int> appliedTracker = {};
+
+  TargetHitCountGetBuffData({
+    required BattleSimulation simulation,
+    required this.funcId,
+    required this.hitCountTarget,
+    required this.limitPerReceiver,
+    required this.ownerId,
+    required this.source,
+    required this.duration,
+  });
+
+  void applyBuff(BattleSimulation simulation, NikkeDamageEvent event) {
+    if (event.source != Source.bullet) {
+      return;
+    }
+
+    hitCount += 1;
+    if (hitCount < hitCountTarget) {
+      return; // not enough hits
+    }
+
+    final functionData = simulation.db.functionTable[funcId];
+    if (functionData != null) {
+      final receiverId = event.activatorId;
+      final funcApplyTimes = appliedTracker[receiverId] ?? 0;
+      if (funcApplyTimes >= limitPerReceiver) {
+        return; // already applied enough times
+      }
+
+      // or directly add buff?
+      final function = BattleFunction(functionData, ownerId, source);
+      function.executeFunction(BattleEvent(ownerId, [receiverId]), simulation); // temp event to execute function
+      appliedTracker[receiverId] = funcApplyTimes + 1;
     }
   }
 }
