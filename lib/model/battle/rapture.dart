@@ -6,6 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/battle/barrier.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/battle_skill.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
@@ -456,6 +457,8 @@ class BattleRapture extends BattleEntity {
   @override
   NikkeElement get element => options.element;
 
+  HitMonsterGetBuffData? hitMonsterGetBuffData;
+
   BattleRapture(this.options);
 
   void init(BattleSimulation simulation, int uniqueId) {
@@ -467,6 +470,7 @@ class BattleRapture extends BattleEntity {
     distance = options.startDistance;
     canBeTargeted = options.canBeTargeted;
     isStageTarget = options.isStageTarget;
+    hitMonsterGetBuffData = null;
 
     hasRedCircle = false;
 
@@ -517,6 +521,14 @@ class BattleRapture extends BattleEntity {
 
       if (barrier.hp <= 0) {
         this.barrier = null;
+      }
+    }
+
+    final hitMonsterGetBuffData = this.hitMonsterGetBuffData;
+    if (hitMonsterGetBuffData != null) {
+      hitMonsterGetBuffData.duration -= 1;
+      if (hitMonsterGetBuffData.duration <= 0) {
+        this.hitMonsterGetBuffData = null;
       }
     }
 

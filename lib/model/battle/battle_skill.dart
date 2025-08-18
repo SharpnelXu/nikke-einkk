@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:nikke_einkk/model/battle/barrier.dart';
 import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
+import 'package:nikke_einkk/model/battle/events/battle_event.dart';
 import 'package:nikke_einkk/model/battle/events/change_burst_step_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/events/skill_attack_event.dart';
@@ -324,10 +325,27 @@ class BattleSkill {
           }
         }
         break;
+      case CharacterSkillType.hitMonsterGetBuff:
+        for (final target in skillTargets) {
+          if (target is BattleRapture) {
+            final hitMonsterBuffId = skillData.getSkillValue(0);
+            final hitPartsBuffId = skillData.getSkillValue(1);
+            // skillValue[4] is limits per receiver? Only used by Killer Wife's Ult, so can't confirm
+            target.hitMonsterGetBuffData = HitMonsterGetBuffData(
+              simulation: simulation,
+              hitMonsterFuncId: hitMonsterBuffId,
+              hitPartsFuncId: hitPartsBuffId,
+              limitPerReceiver: 1,
+              ownerId: ownerId,
+              source: source,
+              duration: timeDataToFrame(skillData.durationValue, simulation.fps),
+            );
+          }
+        }
+        break;
       case CharacterSkillType.launchWeapon:
       case CharacterSkillType.explosiveCircuit:
       case CharacterSkillType.stigma:
-      case CharacterSkillType.hitMonsterGetBuff:
       case CharacterSkillType.targetHitCountGetBuff:
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.unknown:
@@ -382,6 +400,8 @@ class BattleSkill {
     switch (skillData.skillType) {
       case CharacterSkillType.installDecoy:
       case CharacterSkillType.changeWeapon:
+      case CharacterSkillType.launchWeapon:
+      case CharacterSkillType.laserBeam:
         return [if (owner != null) owner];
       case CharacterSkillType.installBarrier:
         targetCountIndex = 2;
@@ -396,6 +416,7 @@ class BattleSkill {
         targetEnemy = true;
         break;
       case CharacterSkillType.instantSequentialAttack:
+      case CharacterSkillType.hitMonsterGetBuff:
         return isThisNikke ? simulation.raptures.sublist(0, 1) : simulation.nonnullNikkes.sublist(0, 1);
       case CharacterSkillType.instantAll:
       case CharacterSkillType.instantAllParts:
@@ -403,12 +424,8 @@ class BattleSkill {
       case CharacterSkillType.instantCircle:
       case CharacterSkillType.instantCircleSeparate:
         return isThisNikke ? simulation.raptures.toList() : simulation.nonnullNikkes.toList();
-      case CharacterSkillType.launchWeapon:
-      case CharacterSkillType.laserBeam:
-      case CharacterSkillType.explosiveCircuit:
-      case CharacterSkillType.stigma:
-      // ^ not sure what these are
-      case CharacterSkillType.hitMonsterGetBuff:
+      case CharacterSkillType.explosiveCircuit: // trony
+      case CharacterSkillType.stigma: // dorothy
       // ^ D: Killer Wife's Ult
       case CharacterSkillType.targetHitCountGetBuff:
       case CharacterSkillType.unknown:
@@ -603,5 +620,44 @@ class BattleSkill {
     }
 
     return targetList.sublist(0, min(targetList.length, targetCount));
+  }
+}
+
+class HitMonsterGetBuffData {
+  final int hitMonsterFuncId;
+  final int hitPartsFuncId;
+  final int ownerId;
+  final int limitPerReceiver;
+  final Source source;
+  int duration;
+  final Map<int, Map<int, int>> appliedTracker = {};
+
+  HitMonsterGetBuffData({
+    required BattleSimulation simulation,
+    required this.hitMonsterFuncId,
+    required this.hitPartsFuncId,
+    required this.limitPerReceiver,
+    required this.ownerId,
+    required this.source,
+    required this.duration,
+  });
+
+  void applyBuff(BattleSimulation simulation, NikkeDamageEvent event) {
+    final funcId = event.partId == null ? hitMonsterFuncId : hitPartsFuncId;
+    final functionData = simulation.db.functionTable[funcId];
+    if (functionData != null) {
+      final receiverId = event.activatorId;
+      appliedTracker.putIfAbsent(funcId, () => <int, int>{});
+      final funcApplyTimes = appliedTracker[funcId]?[receiverId] ?? 0;
+      if (funcApplyTimes >= limitPerReceiver) {
+        return; // already applied enough times
+      }
+
+      // or directly add buff?
+      final function = BattleFunction(functionData, ownerId, source);
+      function.executeFunction(BattleEvent(ownerId, [receiverId]), simulation); // temp event to execute function
+      appliedTracker.putIfAbsent(funcId, () => <int, int>{});
+      appliedTracker[funcId]![receiverId] = funcApplyTimes + 1;
+    }
   }
 }

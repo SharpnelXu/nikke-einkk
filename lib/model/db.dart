@@ -320,6 +320,16 @@ class NikkeDatabase {
     for (final funcId in skillData.allValidFuncIds) {
       _processFunc(funcId, skillTypes, funcTypes, timingTypes, statusTypes);
     }
+
+    if (skillData.skillType == CharacterSkillType.hitMonsterGetBuff) {
+      final hitMonsterFuncId = skillData.getSkillValue(0);
+      final hitPartsFuncId = skillData.getSkillValue(1);
+      _processFunc(hitMonsterFuncId, skillTypes, funcTypes, timingTypes, statusTypes);
+      _processFunc(hitPartsFuncId, skillTypes, funcTypes, timingTypes, statusTypes);
+    } else if (skillData.skillType == CharacterSkillType.targetHitCountGetBuff) {
+      final funcId = skillData.getSkillValue(0);
+      _processFunc(funcId, skillTypes, funcTypes, timingTypes, statusTypes);
+    }
   }
 
   void _processFunc(

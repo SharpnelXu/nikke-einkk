@@ -488,9 +488,13 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
         list.add(Text('Covered'));
       }
     } else {
-      max = nikke.fullReloadFrameCount;
-      cur = nikke.reloadingFrameCount == 0 ? max : nikke.reloadingFrameCount;
-      addProgressBar('Reloading', cur, max);
+      if (nikke.fullReloadFrameCount > 0) {
+        max = nikke.fullReloadFrameCount;
+        cur = nikke.reloadingFrameCount == 0 ? max : nikke.reloadingFrameCount;
+        addProgressBar('Reloading', cur, max);
+      } else {
+        list.add(Text('Reloaded'));
+      }
     }
 
     return list;

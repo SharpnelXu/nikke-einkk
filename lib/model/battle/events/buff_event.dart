@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
-import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/module/common/custom_table.dart';

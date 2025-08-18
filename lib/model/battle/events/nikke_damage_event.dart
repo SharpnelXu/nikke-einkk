@@ -221,6 +221,8 @@ class NikkeDamageEvent extends BattleEvent {
         final expectedDamage = damageParameter.calculateExpectedDamage();
         nikke.changeHp(simulation, (toModifier(drainHp) * expectedDamage).round(), true);
       }
+
+      rapture.hitMonsterGetBuffData?.applyBuff(simulation, this);
     }
   }
 

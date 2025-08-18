@@ -93,10 +93,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
             children: [
-              Text(
-                'Hit Raptures Function',
-                style: TextStyle(fontSize: 16),
-              ),
+              Text('Hit Raptures Function', style: TextStyle(fontSize: 16)),
               SimpleFunctionDisplay(functionId: hitMonsterFuncId),
             ],
           ),
@@ -112,10 +109,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
             children: [
-              Text(
-                'Hit Parts Function',
-                style: TextStyle(fontSize: 16),
-              ),
+              Text('Hit Parts Function', style: TextStyle(fontSize: 16)),
               SimpleFunctionDisplay(functionId: hitPartFuncId),
             ],
           ),
@@ -137,10 +131,7 @@ class CharacterSkillDataDisplay extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
             children: [
-              Text(
-                'Hit $hitCount shots for Function',
-                style: TextStyle(fontSize: 16),
-              ),
+              Text('Hit $hitCount shots for Function', style: TextStyle(fontSize: 16)),
               SimpleFunctionDisplay(functionId: hitFuncId),
             ],
           ),
