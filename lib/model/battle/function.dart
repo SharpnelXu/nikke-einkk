@@ -448,6 +448,7 @@ class BattleFunction {
         break;
       case FunctionType.changeCurrentHpValue:
         // all function standard is user
+        // this is so the change immediately applies to the user
         final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
           final statusCheck = checkTargetStatus(event, simulation, target);
@@ -465,6 +466,7 @@ class BattleFunction {
           }
         }
 
+        // timed buffs also use this type, so has to add as buff
         addBuff(event, simulation);
         break;
       case FunctionType.timingTriggerValueChange:

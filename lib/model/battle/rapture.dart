@@ -459,6 +459,7 @@ class BattleRapture extends BattleEntity {
 
   HitMonsterGetBuffData? hitMonsterGetBuffData;
   TargetHitCountGetBuffData? targetHitCountGetBuffData;
+  StigmaData? stigmaData;
 
   BattleRapture(this.options);
 
@@ -473,6 +474,7 @@ class BattleRapture extends BattleEntity {
     isStageTarget = options.isStageTarget;
     hitMonsterGetBuffData = null;
     targetHitCountGetBuffData = null;
+    stigmaData = null;
 
     hasRedCircle = false;
 
@@ -539,6 +541,15 @@ class BattleRapture extends BattleEntity {
       targetHitCountGetBuffData.duration -= 1;
       if (targetHitCountGetBuffData.duration <= 0) {
         this.targetHitCountGetBuffData = null;
+      }
+    }
+
+    final stigmaData = this.stigmaData;
+    if (stigmaData != null) {
+      stigmaData.duration -= 1;
+      if (stigmaData.duration <= 0) {
+        stigmaData.releaseAccumulationDamage(simulation);
+        this.stigmaData = null;
       }
     }
 

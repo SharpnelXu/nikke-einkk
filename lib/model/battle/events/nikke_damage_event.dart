@@ -11,6 +11,63 @@ import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/module/common/custom_table.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 
+class NikkeFixDamageEvent extends BattleEvent {
+  final Source source;
+  final int damage;
+  final bool invalid;
+
+  int get targetId => targetIds.first;
+
+  NikkeFixDamageEvent._(super.activatorId, super.targetIds, this.source, this.damage, this.invalid);
+
+  factory NikkeFixDamageEvent.create(BattleNikke nikke, BattleRapture rapture, Source source, int damage) {
+    return NikkeFixDamageEvent._(
+      nikke.uniqueId,
+      [rapture.uniqueId],
+      source,
+      damage,
+      !rapture.validateBulletDamage(nikke),
+    );
+  }
+
+  @override
+  void processNikke(BattleSimulation simulation, BattleNikke nikke) {
+    if (activatorId == nikke.uniqueId) {
+      final rapture = simulation.getRaptureByUniqueId(targetId);
+      if (rapture == null) return;
+
+      final drainHp = nikke.getDrainHpBuff(simulation);
+      if (drainHp > 0) {
+        nikke.changeHp(simulation, (toModifier(drainHp) * damage).round(), true);
+      }
+    }
+  }
+
+  @override
+  Widget buildDisplayV2(BattleSimulation simulation) {
+    return CustomTable(
+      children: [
+        CustomTableRow(
+          children: [
+            battleHeaderData.copyWith(text: 'Nikke Damage', flex: 4),
+            battleHeaderData.copyWith(text: 'Activator', flex: 2),
+            battleHeaderData.copyWith(text: 'Target', flex: 2),
+            battleHeaderData.copyWith(text: 'Source', flex: 1),
+          ],
+        ),
+        CustomTableRow(
+          children: [
+            TableCellData(text: '${damage.decimalPattern}${invalid ? ' (Invalid)' : ''}', flex: 4),
+            TableCellData(text: '${simulation.getEntityName(activatorId)}', flex: 2),
+            TableCellData(text: '${simulation.getEntityName(targetId)}', flex: 2),
+            TableCellData(text: source.name.pascal, flex: 1),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class NikkeDamageEvent extends BattleEvent {
   final NikkeDamageParameter damageParameter;
   final Source source;
@@ -224,6 +281,7 @@ class NikkeDamageEvent extends BattleEvent {
 
       rapture.hitMonsterGetBuffData?.applyBuff(simulation, this);
       rapture.targetHitCountGetBuffData?.applyBuff(simulation, this);
+      rapture.stigmaData?.accumulateDamage(simulation, this);
     }
   }
 

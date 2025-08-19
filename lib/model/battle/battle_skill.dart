@@ -110,6 +110,8 @@ class BattleSkill {
     required bool targetParts,
   }) {
     if (target is BattleRapture) {
+      // TODO: shareDamage is definitely incorrect (idea: in getSkillTarget, if target contains this buff, gets all
+      //  raptures that contains this buff as target)
       bool shareDamage = false;
       final shareDamageBuff = target.buffs.firstWhereOrNull(
         (buff) => buff.data.functionType == FunctionType.damageShareInstant,
@@ -332,7 +334,6 @@ class BattleSkill {
             final hitPartsBuffId = skillData.getSkillValue(1);
             // skillValue[4] is limits per receiver? Only used by Killer Wife's Ult, so can't confirm
             target.hitMonsterGetBuffData = HitMonsterGetBuffData(
-              simulation: simulation,
               hitMonsterFuncId: hitMonsterBuffId,
               hitPartsFuncId: hitPartsBuffId,
               limitPerReceiver: 1,
@@ -347,7 +348,6 @@ class BattleSkill {
         for (final target in skillTargets) {
           if (target is BattleRapture) {
             target.targetHitCountGetBuffData = TargetHitCountGetBuffData(
-              simulation: simulation,
               funcId: skillData.getSkillValue(0),
               hitCountTarget: skillData.getSkillValue(1),
               limitPerReceiver: 1, // sklillValue 2?
@@ -358,9 +358,20 @@ class BattleSkill {
           }
         }
         break;
-      case CharacterSkillType.launchWeapon:
-      case CharacterSkillType.explosiveCircuit:
       case CharacterSkillType.stigma:
+        for (final target in skillTargets) {
+          if (target is BattleRapture) {
+            target.stigmaData = StigmaData(
+              skillData: skillData,
+              accumulationRatio: skillData.getSkillValue(0),
+              ownerId: ownerId,
+              source: source,
+              duration: timeDataToFrame(skillData.durationValue, simulation.fps),
+            );
+          }
+        }
+      case CharacterSkillType.explosiveCircuit:
+      case CharacterSkillType.launchWeapon:
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.unknown:
         break;
@@ -432,6 +443,8 @@ class BattleSkill {
       case CharacterSkillType.instantSequentialAttack:
       case CharacterSkillType.hitMonsterGetBuff:
       case CharacterSkillType.targetHitCountGetBuff:
+      case CharacterSkillType.explosiveCircuit: // trony
+      case CharacterSkillType.stigma: // dorothy
         return isThisNikke ? simulation.raptures.sublist(0, 1) : simulation.nonnullNikkes.sublist(0, 1);
       case CharacterSkillType.instantAll:
       case CharacterSkillType.instantAllParts:
@@ -439,8 +452,6 @@ class BattleSkill {
       case CharacterSkillType.instantCircle:
       case CharacterSkillType.instantCircleSeparate:
         return isThisNikke ? simulation.raptures.toList() : simulation.nonnullNikkes.toList();
-      case CharacterSkillType.explosiveCircuit: // trony
-      case CharacterSkillType.stigma: // dorothy
       case CharacterSkillType.unknown:
         return [];
     }
@@ -646,7 +657,6 @@ class HitMonsterGetBuffData {
   final Map<int, Map<int, int>> appliedTracker = {};
 
   HitMonsterGetBuffData({
-    required BattleSimulation simulation,
     required this.hitMonsterFuncId,
     required this.hitPartsFuncId,
     required this.limitPerReceiver,
@@ -689,7 +699,6 @@ class TargetHitCountGetBuffData {
   final Map<int, int> appliedTracker = {};
 
   TargetHitCountGetBuffData({
-    required BattleSimulation simulation,
     required this.funcId,
     required this.hitCountTarget,
     required this.limitPerReceiver,
@@ -721,5 +730,54 @@ class TargetHitCountGetBuffData {
       function.executeFunction(BattleEvent(ownerId, [receiverId]), simulation); // temp event to execute function
       appliedTracker[receiverId] = funcApplyTimes + 1;
     }
+  }
+}
+
+class StigmaData {
+  final SkillData skillData;
+  final int accumulationRatio;
+  final int ownerId;
+  final Source source;
+  int duration;
+  int currentAccumulation = 0;
+  int maxAccumulation = 0;
+
+  StigmaData({
+    required this.skillData,
+    required this.accumulationRatio,
+    required this.ownerId,
+    required this.source,
+    required this.duration,
+  });
+
+  void releaseAccumulationDamage(BattleSimulation simulation) {
+    // should execute pre & post functions, but just hardcoding the share damage logic here
+    final owner = simulation.getEntityById(ownerId);
+    if (owner == null || owner is! BattleNikke) {
+      return;
+    }
+
+    final targets = simulation.raptures;
+    final damagePerTarget = (currentAccumulation / targets.length).round();
+    for (final target in targets) {
+      // hardcoding 3 seconds delay
+      simulation.registerEvent(
+        simulation.currentFrame - 3 * simulation.fps,
+        NikkeFixDamageEvent.create(owner, target, source, damagePerTarget),
+      );
+    }
+  }
+
+  void accumulateDamage(BattleSimulation simulation, NikkeDamageEvent event) {
+    final owner = simulation.getEntityById(ownerId);
+    if (owner == null || owner is! BattleNikke) {
+      return;
+    }
+
+    maxAccumulation =
+        (accumulationRatio * owner.getFinalAttack(simulation) * toModifier(owner.getShareDamageBuffValues(simulation)))
+            .toInt();
+    currentAccumulation += event.damageParameter.calculateExpectedDamage();
+    currentAccumulation = min(currentAccumulation, maxAccumulation);
   }
 }
