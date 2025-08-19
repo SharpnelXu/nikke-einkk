@@ -282,6 +282,14 @@ class NikkeDamageEvent extends BattleEvent {
       rapture.hitMonsterGetBuffData?.applyBuff(simulation, this);
       rapture.targetHitCountGetBuffData?.applyBuff(simulation, this);
       rapture.stigmaData?.accumulateDamage(simulation, this);
+      final explosiveCircuitData = rapture.explosiveCircuitData;
+      if (explosiveCircuitData != null) {
+        explosiveCircuitData.accumulateDamage(simulation, this);
+        if (explosiveCircuitData.maxAccumulation <= explosiveCircuitData.currentAccumulation) {
+          explosiveCircuitData.releaseAccumulationDamage(simulation);
+          rapture.explosiveCircuitData = null;
+        }
+      }
     }
   }
 

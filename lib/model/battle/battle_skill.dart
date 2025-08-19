@@ -363,14 +363,25 @@ class BattleSkill {
           if (target is BattleRapture) {
             target.stigmaData = StigmaData(
               skillData: skillData,
-              accumulationRatio: skillData.getSkillValue(0),
               ownerId: ownerId,
               source: source,
               duration: timeDataToFrame(skillData.durationValue, simulation.fps),
             );
           }
         }
+        break;
       case CharacterSkillType.explosiveCircuit:
+        for (final target in skillTargets) {
+          if (target is BattleRapture) {
+            target.explosiveCircuitData = ExplosiveCircuitData(
+              skillData: skillData,
+              ownerId: ownerId,
+              source: source,
+              duration: timeDataToFrame(skillData.durationValue, simulation.fps),
+            );
+          }
+        }
+        break;
       case CharacterSkillType.launchWeapon:
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.unknown:
@@ -735,20 +746,13 @@ class TargetHitCountGetBuffData {
 
 class StigmaData {
   final SkillData skillData;
-  final int accumulationRatio;
   final int ownerId;
   final Source source;
   int duration;
   int currentAccumulation = 0;
   int maxAccumulation = 0;
 
-  StigmaData({
-    required this.skillData,
-    required this.accumulationRatio,
-    required this.ownerId,
-    required this.source,
-    required this.duration,
-  });
+  StigmaData({required this.skillData, required this.ownerId, required this.source, required this.duration});
 
   void releaseAccumulationDamage(BattleSimulation simulation) {
     // should execute pre & post functions, but just hardcoding the share damage logic here
@@ -774,10 +778,58 @@ class StigmaData {
       return;
     }
 
+    final attackAccumulationRatio = skillData.getSkillValue(0);
     maxAccumulation =
-        (accumulationRatio * owner.getFinalAttack(simulation) * toModifier(owner.getShareDamageBuffValues(simulation)))
+        (attackAccumulationRatio *
+                owner.getFinalAttack(simulation) *
+                toModifier(owner.getShareDamageBuffValues(simulation)))
             .toInt();
     currentAccumulation += event.damageParameter.calculateExpectedDamage();
+    currentAccumulation = min(currentAccumulation, maxAccumulation);
+  }
+}
+
+class ExplosiveCircuitData {
+  final SkillData skillData;
+  final int ownerId;
+  final Source source;
+  int duration;
+  int currentAccumulation = 0;
+  int maxAccumulation = 0;
+
+  ExplosiveCircuitData({required this.skillData, required this.ownerId, required this.source, required this.duration});
+
+  void releaseAccumulationDamage(BattleSimulation simulation) {
+    // should execute pre & post functions, but just hardcoding the share damage logic here
+    final owner = simulation.getEntityById(ownerId);
+    if (owner == null || owner is! BattleNikke) {
+      return;
+    }
+
+    final targets = simulation.raptures;
+    final damagePerTarget = (currentAccumulation / targets.length).round();
+    for (final target in targets) {
+      simulation.registerEvent(
+        simulation.currentFrame,
+        NikkeFixDamageEvent.create(owner, target, source, damagePerTarget),
+      );
+    }
+  }
+
+  void accumulateDamage(BattleSimulation simulation, NikkeDamageEvent event) {
+    final owner = simulation.getEntityById(ownerId);
+    if (owner == null || owner is! BattleNikke || owner.uniqueId != ownerId) {
+      return;
+    }
+
+    final attackAccumulationRatio = skillData.getSkillValue(0);
+    final accumulationRatio = toModifier(owner.getExplosiveCircuitAccumulationRatio(simulation));
+    maxAccumulation =
+        (attackAccumulationRatio *
+                owner.getFinalAttack(simulation) *
+                toModifier(owner.getShareDamageBuffValues(simulation)))
+            .toInt();
+    currentAccumulation += (event.damageParameter.calculateExpectedDamage() * accumulationRatio).toInt();
     currentAccumulation = min(currentAccumulation, maxAccumulation);
   }
 }

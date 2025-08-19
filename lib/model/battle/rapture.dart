@@ -460,6 +460,7 @@ class BattleRapture extends BattleEntity {
   HitMonsterGetBuffData? hitMonsterGetBuffData;
   TargetHitCountGetBuffData? targetHitCountGetBuffData;
   StigmaData? stigmaData;
+  ExplosiveCircuitData? explosiveCircuitData;
 
   BattleRapture(this.options);
 
@@ -475,6 +476,7 @@ class BattleRapture extends BattleEntity {
     hitMonsterGetBuffData = null;
     targetHitCountGetBuffData = null;
     stigmaData = null;
+    explosiveCircuitData = null;
 
     hasRedCircle = false;
 
@@ -550,6 +552,15 @@ class BattleRapture extends BattleEntity {
       if (stigmaData.duration <= 0) {
         stigmaData.releaseAccumulationDamage(simulation);
         this.stigmaData = null;
+      }
+    }
+
+    final explosiveCircuitData = this.explosiveCircuitData;
+    if (explosiveCircuitData != null) {
+      explosiveCircuitData.duration -= 1;
+      if (explosiveCircuitData.duration <= 0) {
+        explosiveCircuitData.releaseAccumulationDamage(simulation);
+        this.explosiveCircuitData = null;
       }
     }
 
