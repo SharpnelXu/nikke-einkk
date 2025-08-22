@@ -501,71 +501,57 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
       skillLvs: option.skillLevels,
       funcBpSum: equipBpMultMap.values.sum + cubeBpMult + dollBpMult,
     );
-    final skillBp =
-        bp -
-        getBattlePoint(
-          hp: totalStat[0],
-          atk: totalStat[1],
-          def: totalStat[2],
-          skillLvs: [0, 0, 0],
-          funcBpSum: equipBpMultMap.values.sum + cubeBpMult + dollBpMult,
-        );
-    final cubeBp =
-        bp -
-        getBattlePoint(
-          hp: totalStat[0] - (cubeStat[0] ?? 0),
-          atk: totalStat[1] - (cubeStat[1] ?? 0),
-          def: totalStat[2] - (cubeStat[2] ?? 0),
-          skillLvs: option.skillLevels,
-          funcBpSum: equipBpMultMap.values.sum + dollBpMult,
-        );
-    final dollBp =
-        bp -
-        getBattlePoint(
-          hp: totalStat[0] - (dollStat[0] ?? 0),
-          atk: totalStat[1] - (dollStat[1] ?? 0),
-          def: totalStat[2] - (dollStat[2] ?? 0),
-          skillLvs: option.skillLevels,
-          funcBpSum: equipBpMultMap.values.sum + cubeBpMult,
-        );
-    final headBp =
-        bp -
-        getBattlePoint(
-          hp: totalStat[0] - (equipStats[EquipType.head]?[0] ?? 0),
-          atk: totalStat[1] - (equipStats[EquipType.head]?[1] ?? 0),
-          def: totalStat[2] - (equipStats[EquipType.head]?[2] ?? 0),
-          skillLvs: option.skillLevels,
-          funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.head] ?? 0) + cubeBpMult + dollBpMult,
-        );
-    final bodyBp =
-        bp -
-        getBattlePoint(
-          hp: totalStat[0] - (equipStats[EquipType.body]?[0] ?? 0),
-          atk: totalStat[1] - (equipStats[EquipType.body]?[1] ?? 0),
-          def: totalStat[2] - (equipStats[EquipType.body]?[2] ?? 0),
-          skillLvs: option.skillLevels,
-          funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.body] ?? 0) + cubeBpMult + dollBpMult,
-        );
-    final armBp =
-        bp -
-        getBattlePoint(
-          hp: totalStat[0] - (equipStats[EquipType.arm]?[0] ?? 0),
-          atk: totalStat[1] - (equipStats[EquipType.arm]?[1] ?? 0),
-          def: totalStat[2] - (equipStats[EquipType.arm]?[2] ?? 0),
-          skillLvs: option.skillLevels,
-          funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.arm] ?? 0) + cubeBpMult + dollBpMult,
-        );
-    final legBp =
-        bp -
-        getBattlePoint(
-          hp: totalStat[0] - (equipStats[EquipType.leg]?[0] ?? 0),
-          atk: totalStat[1] - (equipStats[EquipType.leg]?[1] ?? 0),
-          def: totalStat[2] - (equipStats[EquipType.leg]?[2] ?? 0),
-          skillLvs: option.skillLevels,
-          funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.leg] ?? 0) + cubeBpMult + dollBpMult,
-        );
-    final statBp = bp - skillBp - cubeBp - dollBp - headBp - bodyBp - armBp - legBp;
+    final skillBp = getBattlePoint(
+      hp: totalStat[0],
+      atk: totalStat[1],
+      def: totalStat[2],
+      skillLvs: [0, 0, 0],
+      funcBpSum: equipBpMultMap.values.sum + cubeBpMult + dollBpMult,
+    );
+    final cubeBp = getBattlePoint(
+      hp: totalStat[0] - (cubeStat[0] ?? 0),
+      atk: totalStat[1] - (cubeStat[1] ?? 0),
+      def: totalStat[2] - (cubeStat[2] ?? 0),
+      skillLvs: option.skillLevels,
+      funcBpSum: equipBpMultMap.values.sum + dollBpMult,
+    );
+    final dollBp = getBattlePoint(
+      hp: totalStat[0] - (dollStat[0] ?? 0),
+      atk: totalStat[1] - (dollStat[1] ?? 0),
+      def: totalStat[2] - (dollStat[2] ?? 0),
+      skillLvs: option.skillLevels,
+      funcBpSum: equipBpMultMap.values.sum + cubeBpMult,
+    );
+    final headBp = getBattlePoint(
+      hp: totalStat[0] - (equipStats[EquipType.head]?[0] ?? 0),
+      atk: totalStat[1] - (equipStats[EquipType.head]?[1] ?? 0),
+      def: totalStat[2] - (equipStats[EquipType.head]?[2] ?? 0),
+      skillLvs: option.skillLevels,
+      funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.head] ?? 0) + cubeBpMult + dollBpMult,
+    );
+    final bodyBp = getBattlePoint(
+      hp: totalStat[0] - (equipStats[EquipType.body]?[0] ?? 0),
+      atk: totalStat[1] - (equipStats[EquipType.body]?[1] ?? 0),
+      def: totalStat[2] - (equipStats[EquipType.body]?[2] ?? 0),
+      skillLvs: option.skillLevels,
+      funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.body] ?? 0) + cubeBpMult + dollBpMult,
+    );
+    final armBp = getBattlePoint(
+      hp: totalStat[0] - (equipStats[EquipType.arm]?[0] ?? 0),
+      atk: totalStat[1] - (equipStats[EquipType.arm]?[1] ?? 0),
+      def: totalStat[2] - (equipStats[EquipType.arm]?[2] ?? 0),
+      skillLvs: option.skillLevels,
+      funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.arm] ?? 0) + cubeBpMult + dollBpMult,
+    );
+    final legBp = getBattlePoint(
+      hp: totalStat[0] - (equipStats[EquipType.leg]?[0] ?? 0),
+      atk: totalStat[1] - (equipStats[EquipType.leg]?[1] ?? 0),
+      def: totalStat[2] - (equipStats[EquipType.leg]?[2] ?? 0),
+      skillLvs: option.skillLevels,
+      funcBpSum: equipBpMultMap.values.sum - (equipBpMultMap[EquipType.leg] ?? 0) + cubeBpMult + dollBpMult,
+    );
 
+    final underline = TextStyle(decoration: TextDecoration.underline);
     return Column(
       mainAxisSize: MainAxisSize.min,
       spacing: 5,
@@ -622,17 +608,81 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
                 ),
                 DataRow(
                   cells: [
-                    DataCell(Tooltip(message: 'Total minus everything else', child: Text('Base'))),
-                    DataCell(Text(statBp.decimalPattern)),
+                    DataCell(Text('Skills')),
+                    DataCell(
+                      Tooltip(
+                        message: 'BP if skills were 1/1/1: ${skillBp.decimalPattern}',
+                        child: Text((bp - skillBp).decimalPattern, style: underline),
+                      ),
+                    ),
                   ],
                 ),
-                DataRow(cells: [DataCell(Text('Skills')), DataCell(Text(skillBp.decimalPattern))]),
-                DataRow(cells: [DataCell(Text('Cube')), DataCell(Text(cubeBp.decimalPattern))]),
-                DataRow(cells: [DataCell(Text('Doll')), DataCell(Text(dollBp.decimalPattern))]),
-                DataRow(cells: [DataCell(Text('Head')), DataCell(Text(headBp.decimalPattern))]),
-                DataRow(cells: [DataCell(Text('Body')), DataCell(Text(bodyBp.decimalPattern))]),
-                DataRow(cells: [DataCell(Text('Arm')), DataCell(Text(armBp.decimalPattern))]),
-                DataRow(cells: [DataCell(Text('Leg')), DataCell(Text(legBp.decimalPattern))]),
+                DataRow(
+                  cells: [
+                    DataCell(Text('Cube')),
+                    DataCell(
+                      Tooltip(
+                        message: 'BP if no cube: ${cubeBp.decimalPattern}',
+                        child: Text((bp - cubeBp).decimalPattern, style: underline),
+                      ),
+                    ),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text('Doll')),
+                    DataCell(
+                      Tooltip(
+                        message: 'BP if no doll: ${dollBp.decimalPattern}',
+                        child: Text((bp - dollBp).decimalPattern, style: underline),
+                      ),
+                    ),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text('Head')),
+                    DataCell(
+                      Tooltip(
+                        message: 'BP if no head gear: ${headBp.decimalPattern}',
+                        child: Text((bp - headBp).decimalPattern, style: underline),
+                      ),
+                    ),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text('Body')),
+                    DataCell(
+                      Tooltip(
+                        message: 'BP if no body gear: ${bodyBp.decimalPattern}',
+                        child: Text((bp - bodyBp).decimalPattern, style: underline),
+                      ),
+                    ),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text('Arm')),
+                    DataCell(
+                      Tooltip(
+                        message: 'BP if no arm gear: ${armBp.decimalPattern}',
+                        child: Text((bp - armBp).decimalPattern, style: underline),
+                      ),
+                    ),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text('Leg')),
+                    DataCell(
+                      Tooltip(
+                        message: 'BP if no leg gear: ${legBp.decimalPattern}',
+                        child: Text((bp - legBp).decimalPattern, style: underline),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ],
