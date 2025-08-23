@@ -563,10 +563,9 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
             DataTable(
               columns: [
                 DataColumn(label: Text('')),
-                ...statTypes.map(
-                  (type) =>
-                      DataColumn(label: Text(type.name.toUpperCase()), headingRowAlignment: MainAxisAlignment.center),
-                ),
+                DataColumn(label: Text('HP')),
+                DataColumn(label: Text('ATK')),
+                DataColumn(label: Text('DEF')),
               ],
               rows: [
                 DataRow(
@@ -582,7 +581,12 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
                   ],
                 ),
                 DataRow(cells: [DataCell(Text('Bond')), ..._statArrayToDataCell(attractiveStat)]),
-                DataRow(cells: [DataCell(Text('Console')), ..._statArrayToDataCell(consoleStat)]),
+                DataRow(
+                  cells: [
+                    DataCell(Text('Console', style: TextStyle(fontSize: 12))),
+                    ..._statArrayToDataCell(consoleStat),
+                  ],
+                ),
                 DataRow(cells: [DataCell(Text('Cube')), ..._statArrayToDataCell(cubeStat)]),
                 DataRow(cells: [DataCell(Text('Doll')), ..._statArrayToDataCell(dollStat)]),
                 ...NikkeOptions.equipTypes.map((type) {
@@ -593,11 +597,7 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
             DataTable(
               columns: [
                 DataColumn(label: Text('')),
-                DataColumn(
-                  label: Text('BP'),
-                  headingRowAlignment: MainAxisAlignment.center,
-                  tooltip: 'Cube, doll, equips includes stats bp',
-                ),
+                DataColumn(label: Text('BP'), tooltip: 'Cube, doll, equips includes stats bp'),
               ],
               rows: [
                 DataRow(
@@ -695,6 +695,6 @@ class _NikkeBaseStatColumnState extends State<NikkeBaseStatColumn> {
   }
 
   Iterable<DataCell> _statArrayToDataCell(Iterable<int?> stats) {
-    return stats.map((stat) => DataCell(Text(stat?.decimalPattern ?? 'None')));
+    return stats.map((stat) => DataCell(Text(stat != null && stat != 0 ? stat.decimalPattern : '-')));
   }
 }
