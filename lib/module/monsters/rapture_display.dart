@@ -345,6 +345,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
     final parts = db.rapturePartData[data.monsterModelId] ?? [];
     final stat = statEnhanceData;
     final List<Widget> children = [];
+    final mainPartPassiveSkillId = parts.firstWhereOrNull((part) => part.isMainPart)?.passiveSkillId;
     for (final part in parts) {
       if (mainPart != part.isMainPart) continue;
 
@@ -394,7 +395,9 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
                   ],
                 ),
               ),
-              if (part.isMainPart && part.passiveSkillId != 0 && db.stateEffectTable[part.passiveSkillId] != null)
+              if ((part.isMainPart || part.passiveSkillId != mainPartPassiveSkillId) &&
+                  part.passiveSkillId != 0 &&
+                  db.stateEffectTable[part.passiveSkillId] != null)
                 Container(
                   constraints: BoxConstraints(maxWidth: 700),
                   padding: const EdgeInsets.all(3.0),
