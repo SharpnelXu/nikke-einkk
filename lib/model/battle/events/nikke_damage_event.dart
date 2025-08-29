@@ -149,7 +149,60 @@ class NikkeDamageEvent extends BattleEvent {
       damageParameter: damageParameter,
       invalid: !rapture.validateBulletDamage(nikke),
       chargePercent: chargePercent,
-      shotCount: weaponData.shotCount,
+      shotCount: weaponData.shotCount * weaponData.muzzleCount,
+      partId: partId,
+    );
+  }
+
+  factory NikkeDamageEvent.launchWeapon({
+    required BattleSimulation simulation,
+    required BattleNikke nikke,
+    required WeaponData weaponData,
+    required BattleRapture rapture,
+  }) {
+    final pierce = weaponData.penetration;
+    final partId = rapture.getPartsInFront();
+    final customHitRateThreshold = nikke.option.customHitRateThreshold;
+    final customHitRate = nikke.option.customHitRate;
+    int pelletHitRate = 10000;
+    if (customHitRateThreshold != null &&
+        customHitRate != null &&
+        customHitRateThreshold <= nikke.getAccuracyCircleScale(simulation)) {
+      pelletHitRate = (customHitRate * 100).round();
+    }
+
+    final damageParameter = NikkeDamageParameter(
+      attack: nikke.baseAttack,
+      attackBuff: nikke.getAttackBuffValues(simulation),
+      defence: rapture.baseDefence,
+      defenceBuff: rapture.getDefenceBuffValues(simulation),
+      damageRate: weaponData.damage * weaponData.muzzleCount,
+      damageRateBuff: nikke.getNormalDamageRatioChangeBuffValues(simulation),
+      hitRate: pelletHitRate,
+      coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
+      coreDamageRate: weaponData.coreDamageRate,
+      coreDamageBuff: nikke.getCoreDamageBuffValues(simulation),
+      criticalRate: nikke.getCriticalRate(simulation) + nikke.getNormalCriticalBuff(simulation),
+      criticalDamageRate: nikke.characterData.criticalDamage,
+      criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
+      isBonusRange: false,
+      isFullBurst: simulation.burstStage == 4,
+      isStrongElement: nikke.effectiveElements.any((ele) => ele.strongAgainst(rapture.element)),
+      elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
+      // pierce won't hit rapture body as parts
+      partDamageBuff: pierce == 0 && partId != null ? nikke.getPartsDamageBuffValues(simulation) : 0,
+      pierceDamageBuff: pierce > 0 ? nikke.getPierceDamageBuffValues(simulation) : 0,
+      addDamageBuff: nikke.getAddDamageBuffValues(simulation),
+      damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
+    );
+
+    return NikkeDamageEvent._(
+      nikke.uniqueId,
+      [rapture.uniqueId],
+      source: Source.bullet,
+      damageParameter: damageParameter,
+      invalid: !rapture.validateBulletDamage(nikke),
+      shotCount: weaponData.shotCount * weaponData.muzzleCount,
       partId: partId,
     );
   }
@@ -200,7 +253,7 @@ class NikkeDamageEvent extends BattleEvent {
       damageParameter: damageParameter,
       invalid: !rapture.validateBulletDamage(nikke),
       chargePercent: chargePercent,
-      shotCount: weaponData.shotCount,
+      shotCount: weaponData.shotCount * weaponData.muzzleCount,
       partId: part.id,
     );
   }

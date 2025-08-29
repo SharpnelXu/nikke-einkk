@@ -6,6 +6,7 @@ import 'package:nikke_einkk/model/battle/battle_entity.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
 import 'package:nikke_einkk/model/battle/events/change_burst_step_event.dart';
+import 'package:nikke_einkk/model/battle/events/launch_weapon_event.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/events/skill_attack_event.dart';
 import 'package:nikke_einkk/model/battle/events/use_skill_event.dart';
@@ -383,6 +384,30 @@ class BattleSkill {
         }
         break;
       case CharacterSkillType.launchWeapon:
+        // only Vesti uses this, so it's hard to determine what each parameter does
+        // based on skill description, skillValue[0] is damage rate, skillValue[1] is fire rate
+        // skillValue[2] is weaponId, skillValue[3] is weapon count, skillValue[4] is unknown, maybe travel speed?
+        // if so, we can derive stage length via speed * time = 25 * 18 = 450 units?
+        // deploy time is weapon's exit cover time but duration is unknown, only knows it's 18 seconds
+        for (final target in skillTargets) {
+          final damageRate = skillData.getSkillValue(0);
+          final fireRate = skillData.getSkillValue(1);
+          final weaponId = skillData.getSkillValue(2);
+          final weaponCount = skillData.getSkillValue(3);
+          final weaponData = simulation.db.characterShotTable[weaponId];
+          final duration = timeDataToFrame(constData.vestiUltDuration, simulation.fps);
+          if (target is BattleNikke && weaponData != null) {
+            final launchWeaponData = WeaponData.changeWeapon(damageRate, fireRate, weaponData);
+            final deployFrames = timeDataToFrame(launchWeaponData.spotFirstDelay, simulation.fps);
+            final bulletInterval = (simulation.fps * 60 / fireRate).round();
+            for (int count = 0; count < duration; count += bulletInterval) {
+              final fireFrame = simulation.currentFrame - deployFrames - count;
+              for (int i = 0; i < weaponCount; i += 1) {
+                simulation.registerEvent(fireFrame, LaunchWeaponEvent.create(ownerId, launchWeaponData, source));
+              }
+            }
+          }
+        }
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.unknown:
         break;

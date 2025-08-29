@@ -85,6 +85,7 @@ class GameConstants {
   final sameBurstStageCd = 50; // 0.5 seconds
   final fullCountLimit = 999999; // assume all full counter greater than this is a function group
   final damageBurstApplyDelay = 100; // 1 second
+  final vestiUltDuration = 1800; // 18 seconds
 }
 
 class NikkeDatabase {
