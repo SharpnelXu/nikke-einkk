@@ -22,13 +22,16 @@ class RaptureDamageEvent extends BattleEvent {
     int damageRate,
     bool hitCover,
   ) {
+    final bool isStrongEle = nikke.baseElements.any(
+      (nEle) => rapture.getEffectiveElements().any((rEle) => rEle.strongAgainst(nEle)),
+    );
     final damageParameter = NikkeDamageParameter(
       attack: rapture.baseAttack,
       attackBuff: rapture.getAttackBuffValues(simulation),
       defence: nikke.baseDefence,
       defenceBuff: nikke.getDefenceBuffValues(simulation),
       damageRate: damageRate,
-      isStrongElement: rapture.element.strongAgainst(nikke.element),
+      isStrongElement: isStrongEle,
       damageReductionBuff: nikke.getDamageReductionBuffValues(simulation),
     );
     final invalid = nikke.buffs.any((buff) => buff.data.functionType == FunctionType.immuneDamage);

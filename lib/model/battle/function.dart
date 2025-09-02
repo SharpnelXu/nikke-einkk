@@ -442,6 +442,7 @@ class BattleFunction {
       case FunctionType.statReloadBulletRatio:
       case FunctionType.changeChangeBurstStep:
       case FunctionType.changeUseBurstSkill:
+      case FunctionType.addIncElementDmgType:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -584,7 +585,6 @@ class BattleFunction {
       case FunctionType.unknown:
         activated = true;
         break;
-      case FunctionType.addIncElementDmgType:
       case FunctionType.allStepBurstNextStep:
       case FunctionType.atkBuffChange:
       case FunctionType.atkChangHpRate:
@@ -827,7 +827,7 @@ class BattleFunction {
       case StatusTriggerType.isHaveDecoy:
         return target is BattleNikke && target.decoy != null && target.decoy!.currentHp > 0;
       case StatusTriggerType.isSearchElementId:
-        return target != null && target.element.id == value;
+        return target != null && target.baseElements.any((ele) => ele.id == value);
       case StatusTriggerType.isCheckPosition:
         return target is BattleNikke && target.uniqueId == value;
       case StatusTriggerType.isFullCount:

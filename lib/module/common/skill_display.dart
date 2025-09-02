@@ -285,7 +285,7 @@ class SimpleFunctionDisplay extends StatelessWidget {
           TableCellData(
             child: Tooltip(
               message: func.rawFunctionValueType,
-              child: Text(skillValueString(func.functionValue, func.functionValueType) ?? 'N/A'),
+              child: Text(functionValueString(func.functionType, func.functionValue, func.functionValueType) ?? 'N/A'),
             ),
           ),
           TableCellData(text: functionStandardString(func.functionStandard) ?? 'N/A'),

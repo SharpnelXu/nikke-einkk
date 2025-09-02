@@ -113,6 +113,9 @@ class NikkeDamageEvent extends BattleEvent {
       pelletHitRate = (customHitRate * 100).round();
     }
 
+    final bool isStrongEle = nikke.getEffectiveElements().any(
+      (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
+    );
     final damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
@@ -129,8 +132,8 @@ class NikkeDamageEvent extends BattleEvent {
       criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
       isBonusRange: nikke.isBonusRange(rapture.distance),
       isFullBurst: simulation.burstStage == 4,
-      isStrongElement: nikke.effectiveElements.any((ele) => ele.strongAgainst(rapture.element)),
-      elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
+      isStrongElement: isStrongEle,
+      elementDamageBuff: isStrongEle ? nikke.getIncreaseElementDamageBuffValues(simulation) : 0,
       chargeDamageRate: weaponData.fullChargeDamage,
       chargeDamageBuff: nikke.getChargeDamageBuffValues(simulation),
       chargePercent: chargePercent,
@@ -171,6 +174,9 @@ class NikkeDamageEvent extends BattleEvent {
       pelletHitRate = (customHitRate * 100).round();
     }
 
+    final bool isStrongEle = nikke.getEffectiveElements().any(
+      (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
+    );
     final damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
@@ -187,8 +193,8 @@ class NikkeDamageEvent extends BattleEvent {
       criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
       isBonusRange: false,
       isFullBurst: simulation.burstStage == 4,
-      isStrongElement: nikke.effectiveElements.any((ele) => ele.strongAgainst(rapture.element)),
-      elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
+      isStrongElement: isStrongEle,
+      elementDamageBuff: isStrongEle ? nikke.getIncreaseElementDamageBuffValues(simulation) : 0,
       // pierce won't hit rapture body as parts
       partDamageBuff: pierce == 0 && partId != null ? nikke.getPartsDamageBuffValues(simulation) : 0,
       pierceDamageBuff: pierce > 0 ? nikke.getPierceDamageBuffValues(simulation) : 0,
@@ -220,6 +226,9 @@ class NikkeDamageEvent extends BattleEvent {
             : 0;
     chargePercent = chargePercent.clamp(0, 10000);
 
+    final bool isStrongEle = nikke.getEffectiveElements().any(
+      (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
+    );
     final damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
@@ -235,8 +244,8 @@ class NikkeDamageEvent extends BattleEvent {
       criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
       isBonusRange: nikke.currentWeaponType != WeaponType.rl ? nikke.isBonusRange(rapture.distance) : false,
       isFullBurst: simulation.burstStage == 4,
-      isStrongElement: nikke.element.strongAgainst(rapture.element),
-      elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
+      isStrongElement: isStrongEle,
+      elementDamageBuff: isStrongEle ? nikke.getIncreaseElementDamageBuffValues(simulation) : 0,
       chargeDamageRate: weaponData.fullChargeDamage,
       chargeDamageBuff: nikke.getChargeDamageBuffValues(simulation),
       chargePercent: chargePercent,
@@ -267,6 +276,9 @@ class NikkeDamageEvent extends BattleEvent {
     bool isShareDamage = false,
     int? partId,
   }) {
+    final bool isStrongEle = nikke.getEffectiveElements().any(
+      (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
+    );
     final damageParameter = NikkeDamageParameter(
       attack: nikke.baseAttack,
       attackBuff: nikke.getAttackBuffValues(simulation),
@@ -278,8 +290,8 @@ class NikkeDamageEvent extends BattleEvent {
       criticalDamageRate: nikke.characterData.criticalDamage,
       criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
       isFullBurst: simulation.burstStage == 4,
-      isStrongElement: nikke.element.strongAgainst(rapture.element),
-      elementDamageBuff: nikke.getIncreaseElementDamageBuffValues(simulation),
+      isStrongElement: isStrongEle,
+      elementDamageBuff: isStrongEle ? nikke.getIncreaseElementDamageBuffValues(simulation) : 0,
       addDamageBuff: nikke.getAddDamageBuffValues(simulation),
       distributedDamageBuff: isShareDamage ? nikke.getShareDamageBuffValues(simulation) : 0,
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
@@ -291,7 +303,7 @@ class NikkeDamageEvent extends BattleEvent {
       [rapture.uniqueId],
       source: source,
       damageParameter: damageParameter,
-      invalid: !rapture.validateSkillDamage(nikke),
+      invalid: !rapture.validateSkillDamage(simulation, nikke),
       shareCount: isShareDamage ? simulation.raptures.length : 0,
       partId: partId,
     );

@@ -18,8 +18,7 @@ abstract class BattleEntity {
   int get baseAttack;
   int get baseDefence;
   int get baseHp;
-
-  NikkeElement get element => NikkeElement.unknown;
+  Set<NikkeElement> get baseElements => {NikkeElement.unknown};
 
   bool checkRatio(int groupId, int triggerValue) {
     int ratioTracker = funcRatioTracker[groupId] ?? 0;
@@ -250,6 +249,20 @@ abstract class BattleEntity {
         }
       }
     }
+    return result;
+  }
+
+  Set<NikkeElement> getEffectiveElements() {
+    final Set<NikkeElement> result = {...baseElements};
+    for (final buff in buffs) {
+      if (buff.data.functionType == FunctionType.addIncElementDmgType) {
+        final element = NikkeElement.fromId(buff.data.functionValue);
+        if (element != NikkeElement.unknown) {
+          result.add(element);
+        }
+      }
+    }
+
     return result;
   }
 }

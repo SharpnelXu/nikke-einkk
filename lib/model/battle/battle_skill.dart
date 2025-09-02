@@ -655,19 +655,19 @@ class BattleSkill {
         });
         break;
       case PreferTarget.fire:
-        targetList.retainWhere((entity) => entity.element == NikkeElement.fire);
+        targetList.retainWhere((entity) => entity.baseElements.contains(NikkeElement.fire));
         break;
       case PreferTarget.water:
-        targetList.retainWhere((entity) => entity.element == NikkeElement.water);
+        targetList.retainWhere((entity) => entity.baseElements.contains(NikkeElement.water));
         break;
       case PreferTarget.electronic:
-        targetList.retainWhere((entity) => entity.element == NikkeElement.electric);
+        targetList.retainWhere((entity) => entity.baseElements.contains(NikkeElement.electric));
         break;
       case PreferTarget.iron:
-        targetList.retainWhere((entity) => entity.element == NikkeElement.iron);
+        targetList.retainWhere((entity) => entity.baseElements.contains(NikkeElement.iron));
         break;
       case PreferTarget.wind:
-        targetList.retainWhere((entity) => entity.element == NikkeElement.wind);
+        targetList.retainWhere((entity) => entity.baseElements.contains(NikkeElement.wind));
         break;
       case PreferTarget.longInitChargeTime:
       case PreferTarget.targetAR:

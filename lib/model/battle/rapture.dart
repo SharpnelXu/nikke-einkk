@@ -455,7 +455,7 @@ class BattleRapture extends BattleEntity {
   Map<int, List<BattleRaptureAction>> endActions = {};
 
   @override
-  NikkeElement get element => options.element;
+  Set<NikkeElement> get baseElements => {options.element};
 
   HitMonsterGetBuffData? hitMonsterGetBuffData;
   TargetHitCountGetBuffData? targetHitCountGetBuffData;
@@ -504,12 +504,12 @@ class BattleRapture extends BattleEntity {
   bool validateBulletDamage(BattleNikke attacker) {
     return !invincible &&
         !outsideScreen &&
-        (elementalShield.isEmpty || attacker.effectiveElements.any((ele) => elementalShield.contains(ele)));
+        (elementalShield.isEmpty || attacker.getEffectiveElements().any((ele) => elementalShield.contains(ele)));
   }
 
-  bool validateSkillDamage(BattleNikke attacker) {
+  bool validateSkillDamage(BattleSimulation simulation, BattleNikke attacker) {
     return !invincible &&
-        (elementalShield.isEmpty || attacker.effectiveElements.any((ele) => elementalShield.contains(ele)));
+        (elementalShield.isEmpty || attacker.getEffectiveElements().any((ele) => elementalShield.contains(ele)));
   }
 
   @override

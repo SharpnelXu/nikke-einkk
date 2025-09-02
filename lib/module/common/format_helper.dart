@@ -122,6 +122,14 @@ String? skillValueString(int value, ValueType type, [num extraRate = 1]) {
   }
 }
 
+String? functionValueString(FunctionType functionType, int value, ValueType type) {
+  if (functionType == FunctionType.addIncElementDmgType) {
+    return NikkeElement.fromId(value).name.toUpperCase();
+  } else {
+    return skillValueString(value, type);
+  }
+}
+
 String? durationString(int value, DurationType type) {
   switch (type) {
     case DurationType.timeSec:

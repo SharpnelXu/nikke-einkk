@@ -87,10 +87,7 @@ class BattleNikke extends BattleEntity {
   NikkeClass get nikkeClass => characterData.characterClass;
   Corporation get corporation => characterData.corporation;
   @override
-  NikkeElement get element => NikkeElement.fromId(characterData.elementId.first);
-
-  List<NikkeElement> get effectiveElements =>
-      characterData.elementId.map((eleId) => NikkeElement.fromId(eleId)).toList();
+  Set<NikkeElement> get baseElements => characterData.elementId.map(NikkeElement.fromId).toSet();
 
   int get coreLevel => characterData.gradeCoreId;
 
