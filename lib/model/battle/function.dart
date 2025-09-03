@@ -443,6 +443,7 @@ class BattleFunction {
       case FunctionType.changeChangeBurstStep:
       case FunctionType.changeUseBurstSkill:
       case FunctionType.addIncElementDmgType:
+      case FunctionType.atkChangHpRate:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -585,9 +586,6 @@ class BattleFunction {
       case FunctionType.unknown:
         activated = true;
         break;
-      case FunctionType.allStepBurstNextStep:
-      case FunctionType.atkBuffChange:
-      case FunctionType.atkChangHpRate:
       case FunctionType.atkReplaceMaxHpRate:
       case FunctionType.bonusRangeDamageChange:
       case FunctionType.buffRemove:
@@ -700,6 +698,9 @@ class BattleFunction {
       case FunctionType.useSkill1:
       case FunctionType.defIgnoreSkillDamageInstant:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
+        break;
+      case FunctionType.allStepBurstNextStep: // no usage among nikkes
+      case FunctionType.atkBuffChange: // no usage among nikkes
         break;
     }
 

@@ -60,8 +60,15 @@ abstract class BattleEntity {
       0,
       (entity) => entity.getMaxHp(simulation),
     );
+    final hpLossConversion = getBuffValue(
+      simulation,
+      FunctionType.atkChangHpRate,
+      0,
+      (entity) => entity.baseAttack * (1 - entity.currentHp / entity.getMaxHp(simulation)).clamp(0, 1) * 100,
+    );
+
     final statAttack = getBuffValue(simulation, FunctionType.statAtk, 0, (entity) => entity.baseAttack);
-    return statAttack + maxHpConversion;
+    return statAttack + maxHpConversion + hpLossConversion;
   }
 
   int getFinalDefence(BattleSimulation simulation) {
@@ -134,7 +141,7 @@ abstract class BattleEntity {
     BattleSimulation simulation,
     FunctionType type,
     int baseValue,
-    int Function(BattleEntity) getStandardBaseValue,
+    num Function(BattleEntity) getStandardBaseValue,
   ) {
     return getBuffValueOfTypes(simulation, [type], baseValue, getStandardBaseValue);
   }
@@ -143,7 +150,7 @@ abstract class BattleEntity {
     BattleSimulation simulation,
     List<FunctionType> types,
     int baseValue,
-    int Function(BattleEntity) getStandardBaseValue,
+    num Function(BattleEntity) getStandardBaseValue,
   ) {
     // position to group Id to percentValues
     final Map<int, Map<int, int>> percents = {};
@@ -169,8 +176,8 @@ abstract class BattleEntity {
     for (final standardUniqueId in percents.keys) {
       final standard = simulation.getEntityById(standardUniqueId);
       if (standard != null) {
-        for (final buffType in percents[standardUniqueId]!.keys) {
-          final percent = percents[standardUniqueId]![buffType]!;
+        for (final buffGroup in percents[standardUniqueId]!.keys) {
+          final percent = percents[standardUniqueId]![buffGroup]!;
           result += (getStandardBaseValue(standard) * toModifier(percent)).round();
         }
       }
