@@ -117,8 +117,7 @@ class NikkeDamageEvent extends BattleEvent {
       (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
     );
     final damageParameter = NikkeDamageParameter(
-      attack: nikke.baseAttack,
-      attackBuff: nikke.getAttackBuffValues(simulation),
+      attack: nikke.getFinalAttack(simulation),
       defence: rapture.baseDefence,
       defenceBuff: rapture.getDefenceBuffValues(simulation),
       damageRate: weaponData.damage * weaponData.muzzleCount,
@@ -178,8 +177,7 @@ class NikkeDamageEvent extends BattleEvent {
       (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
     );
     final damageParameter = NikkeDamageParameter(
-      attack: nikke.baseAttack,
-      attackBuff: nikke.getAttackBuffValues(simulation),
+      attack: nikke.getFinalAttack(simulation),
       defence: rapture.baseDefence,
       defenceBuff: rapture.getDefenceBuffValues(simulation),
       damageRate: weaponData.damage * weaponData.muzzleCount,
@@ -230,8 +228,7 @@ class NikkeDamageEvent extends BattleEvent {
       (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
     );
     final damageParameter = NikkeDamageParameter(
-      attack: nikke.baseAttack,
-      attackBuff: nikke.getAttackBuffValues(simulation),
+      attack: nikke.getFinalAttack(simulation),
       defence: rapture.baseDefence,
       defenceBuff: rapture.getDefenceBuffValues(simulation),
       damageRate: weaponData.damage * weaponData.muzzleCount,
@@ -280,8 +277,7 @@ class NikkeDamageEvent extends BattleEvent {
       (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
     );
     final damageParameter = NikkeDamageParameter(
-      attack: nikke.baseAttack,
-      attackBuff: nikke.getAttackBuffValues(simulation),
+      attack: nikke.getFinalAttack(simulation),
       defence: rapture.baseDefence,
       defenceBuff: rapture.getDefenceBuffValues(simulation),
       damageRate: damageRate,

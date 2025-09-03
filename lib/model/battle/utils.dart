@@ -86,7 +86,7 @@ class NikkeDamageParameter {
   // base
   int attack = 0;
   int defence = 0;
-  int attackBuff = 0;
+  int testOnlyAttackBuff = 0; // deprecated due to atkReplaceMaxHpRate buff invalidating concept of attack buff
   int defenceBuff = 0;
   int damageRate = 10000; // 100%
   int damageRateBuff = 0;
@@ -126,7 +126,7 @@ class NikkeDamageParameter {
   NikkeDamageParameter({
     this.attack = 0,
     this.defence = 0,
-    this.attackBuff = 0,
+    this.testOnlyAttackBuff = 0,
     this.defenceBuff = 0,
     this.damageRate = 10000,
     this.damageRateBuff = 0,
@@ -159,7 +159,7 @@ class NikkeDamageParameter {
     return 'NikkeDamageParameter{'
         'attack: $attack, '
         'defence: $defence, '
-        'attackBuff: $attackBuff, '
+        'testOnlyAttackBuff: $testOnlyAttackBuff, '
         'defenceBuff: $defenceBuff, '
         'damageRate: $damageRate, '
         'damageRateBuff: $damageRateBuff, '
@@ -192,7 +192,7 @@ class NikkeDamageParameter {
     return NikkeDamageParameter(
       attack: attack,
       defence: defence,
-      attackBuff: attackBuff,
+      testOnlyAttackBuff: testOnlyAttackBuff,
       defenceBuff: defenceBuff,
       damageRate: damageRate,
       damageRateBuff: damageRateBuff,
@@ -242,7 +242,10 @@ class NikkeDamageParameter {
   }
 
   int calculateDamage({bool critical = false, bool core = false}) {
-    final finalAttack = attack + attackBuff - defence - defenceBuff;
+    if (testOnlyAttackBuff != 0) {
+      logger.w('Using testAttackBuff in damage calculation is deprecated.');
+    }
+    final finalAttack = attack + testOnlyAttackBuff - defence - defenceBuff;
     final finalRate = toModifier(damageRate + damageRateBuff) * toModifier(hitRate);
 
     final coreCorrection = core ? correction(coreDamageRate + coreDamageBuff) : 0;

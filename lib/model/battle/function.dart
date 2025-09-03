@@ -444,6 +444,7 @@ class BattleFunction {
       case FunctionType.changeUseBurstSkill:
       case FunctionType.addIncElementDmgType:
       case FunctionType.atkChangHpRate:
+      case FunctionType.atkReplaceMaxHpRate:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -586,7 +587,6 @@ class BattleFunction {
       case FunctionType.unknown:
         activated = true;
         break;
-      case FunctionType.atkReplaceMaxHpRate:
       case FunctionType.bonusRangeDamageChange:
       case FunctionType.buffRemove:
       case FunctionType.callingMonster:

@@ -50,6 +50,15 @@ abstract class BattleEntity {
   }
 
   int getFinalAttack(BattleSimulation simulation) {
+    final maxHpReplace = getBuffValue(
+      simulation,
+      FunctionType.atkReplaceMaxHpRate,
+      0,
+      (entity) => entity.getMaxHp(simulation),
+    );
+    if (maxHpReplace > 0) {
+      return maxHpReplace;
+    }
     return baseAttack + getAttackBuffValues(simulation);
   }
 

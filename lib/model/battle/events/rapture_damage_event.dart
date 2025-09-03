@@ -26,8 +26,7 @@ class RaptureDamageEvent extends BattleEvent {
       (nEle) => rapture.getEffectiveElements().any((rEle) => rEle.strongAgainst(nEle)),
     );
     final damageParameter = NikkeDamageParameter(
-      attack: rapture.baseAttack,
-      attackBuff: rapture.getAttackBuffValues(simulation),
+      attack: rapture.getFinalAttack(simulation),
       defence: nikke.baseDefence,
       defenceBuff: nikke.getDefenceBuffValues(simulation),
       damageRate: damageRate,
