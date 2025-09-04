@@ -284,6 +284,8 @@ enum BuffRemoveType {
   resist,
   unknown;
 
+  bool get canRemove => this == clear;
+
   static final Map<String, BuffRemoveType> _reverseMap = Map.fromIterable(
     BuffRemoveType.values,
     key: (v) => (v as BuffRemoveType).name.pascal,

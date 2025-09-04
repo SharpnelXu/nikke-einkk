@@ -442,9 +442,9 @@ class BattleFunction {
       case FunctionType.statReloadBulletRatio:
       case FunctionType.changeChangeBurstStep:
       case FunctionType.changeUseBurstSkill:
-      case FunctionType.addIncElementDmgType:
+      case FunctionType.addIncElementDmgType: // only used by Rapi:RH S2
       case FunctionType.atkChangHpRate:
-      case FunctionType.atkReplaceMaxHpRate:
+      case FunctionType.atkReplaceMaxHpRate: // only used by Kilo Ult
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -587,8 +587,27 @@ class BattleFunction {
       case FunctionType.unknown:
         activated = true;
         break;
-      case FunctionType.bonusRangeDamageChange:
       case FunctionType.buffRemove:
+        // only Rosana uses this
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck) continue;
+
+          activated = true;
+          for (int removeCount = 0; removeCount < data.functionValue; removeCount++) {
+            final buffToRemove = target.buffs.firstWhereOrNull(
+              (buff) => buff.data.buff.isBuff && buff.data.buffRemove.canRemove,
+            );
+            if (buffToRemove == null) {
+              break;
+            }
+
+            target.buffs.remove(buffToRemove);
+            simulation.registerEvent(simulation.currentFrame, BuffEvent.remove(buffToRemove));
+          }
+        }
+        break;
       case FunctionType.callingMonster:
       case FunctionType.changeCoolTimeAll:
       case FunctionType.changeCoolTimeSkill1:
@@ -701,6 +720,7 @@ class BattleFunction {
         break;
       case FunctionType.allStepBurstNextStep: // no usage among nikkes
       case FunctionType.atkBuffChange: // no usage among nikkes
+      case FunctionType.bonusRangeDamageChange: // no usage among nikkes
         break;
     }
 
