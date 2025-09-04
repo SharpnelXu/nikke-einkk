@@ -639,17 +639,44 @@ class BattleNikke extends BattleEntity {
     );
     currentAmmo = (currentAmmo + gainAmmo).clamp(0, getMaxAmmo(simulation));
 
-    final ultCdReduceTimeData = getBuffValue(
-      simulation,
-      FunctionType.changeCoolTimeUlti,
-      0,
-      (nikke) => nikke is BattleNikke ? nikke.skills[2].skillData?.skillCooltime ?? 0 : 0,
-    );
-    skills[2].changeCd(simulation, ultCdReduceTimeData);
+    for (int skillIndex = 0; skillIndex < 3; skillIndex++) {
+      final skill = skills[skillIndex];
+      final changeCdType =
+          [
+            FunctionType.changeCoolTimeSkill1,
+            FunctionType.changeCoolTimeSkill2,
+            FunctionType.changeCoolTimeUlti,
+          ][skillIndex];
+      final cdReduceTimeData = getBuffValue(
+        simulation,
+        changeCdType,
+        0,
+        (nikke) => nikke is BattleNikke ? nikke.getSkillCoolTime(simulation, skillIndex) : 0,
+      );
+      skill.changeCd(simulation, cdReduceTimeData);
+    }
 
     super.endCurrentFrame(simulation);
 
     currentAmmo = currentAmmo.clamp(0, getMaxAmmo(simulation));
+  }
+
+  int getSkillCoolTime(BattleSimulation simulation, int skillIndex) {
+    final maxCoolChangeFuncType =
+        [
+          FunctionType.changeMaxSkillCoolTime1,
+          FunctionType.changeMaxSkillCoolTime2,
+          FunctionType.changeMaxSkillCoolTimeUlti,
+        ][skillIndex];
+
+    final maxCoolChange = getBuffValue(
+      simulation,
+      maxCoolChangeFuncType,
+      0,
+      (nikke) => nikke is BattleNikke ? nikke.skills[skillIndex].skillData?.skillCooltime ?? 0 : 0,
+    );
+
+    return (skills[skillIndex].skillData?.skillCooltime ?? 0) - maxCoolChange;
   }
 
   int getFramesCharged(BattleSimulation simulation) {

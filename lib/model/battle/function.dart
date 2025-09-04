@@ -406,7 +406,17 @@ class BattleFunction {
       case FunctionType.attention:
       case FunctionType.barrierDamage: // TODO: actually implement after boss can install barriers
       case FunctionType.breakDamage:
-      case FunctionType.changeCoolTimeUlti: // act as a buff for rounding
+
+      /// act as buffs for rounding
+      case FunctionType.changeCoolTimeAll:
+      case FunctionType.changeCoolTimeSkill1:
+      case FunctionType.changeCoolTimeSkill2:
+      case FunctionType.changeCoolTimeUlti:
+      case FunctionType.changeMaxSkillCoolTime1:
+      case FunctionType.changeMaxSkillCoolTime2:
+      case FunctionType.changeMaxSkillCoolTimeUlti:
+
+      /// end change cool time
       case FunctionType.coreShotDamageChange:
       case FunctionType.damageReduction:
       case FunctionType.damageShareInstant: // used by SBS's skills to denote the next skill damage is shared damage
@@ -608,12 +618,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.callingMonster:
-      case FunctionType.changeCoolTimeAll:
-      case FunctionType.changeCoolTimeSkill1:
-      case FunctionType.changeCoolTimeSkill2:
-      case FunctionType.changeMaxSkillCoolTime2:
-      case FunctionType.changeMaxSkillCoolTimeUlti:
       case FunctionType.changeNormalDefIgnoreDamage:
       case FunctionType.chargeDamageChangeMaxStatAmmo:
       case FunctionType.chargeTimeChangetoDamage:
@@ -721,6 +725,7 @@ class BattleFunction {
       case FunctionType.allStepBurstNextStep: // no usage among nikkes
       case FunctionType.atkBuffChange: // no usage among nikkes
       case FunctionType.bonusRangeDamageChange: // no usage among nikkes
+      case FunctionType.callingMonster:
         break;
     }
 

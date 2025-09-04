@@ -320,6 +320,7 @@ enum FunctionType {
   changeCoolTimeSkill2,
   changeCoolTimeUlti,
   changeCurrentHpValue,
+  changeMaxSkillCoolTime1, // no usage, but definitely can exist in the future
   changeMaxSkillCoolTime2,
   changeMaxSkillCoolTimeUlti,
   changeNormalDefIgnoreDamage,

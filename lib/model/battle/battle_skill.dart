@@ -42,7 +42,7 @@ class BattleSkill {
     if (skillType == SkillType.characterSkill && skillData != null) {
       if (skillNum != 3) {
         // normal skills start with coolDown
-        coolDown = timeDataToFrame(skillData!.skillCooltime, simulation.fps);
+        coolDown = timeDataToFrame(getSkillCoolDown(simulation), simulation.fps);
       }
     }
 
@@ -83,22 +83,28 @@ class BattleSkill {
     }
   }
 
-  void changeCd(BattleSimulation simulation, int ultCdChangeTimeData) {
-    if (ultCdChangeTimeData == 0) return;
+  void changeCd(BattleSimulation simulation, int cdChangeTImdData) {
+    if (cdChangeTImdData == 0) return;
 
-    coolDown = max(coolDown + timeDataToFrame(ultCdChangeTimeData, simulation.fps).round(), 0);
+    final maxCd = timeDataToFrame(getSkillCoolDown(simulation), simulation.fps);
+    final changeFrames = timeDataToFrame(cdChangeTImdData, simulation.fps);
+    coolDown = (coolDown + changeFrames).clamp(0, maxCd);
   }
 
   void processFrame(BattleSimulation simulation) {
     if (skillType == SkillType.stateEffect) return;
-    if (coolDown > 0) {
-      coolDown -= 1;
-    }
+    final maxCd = timeDataToFrame(getSkillCoolDown(simulation), simulation.fps);
+    coolDown = (coolDown - 1).clamp(0, maxCd);
 
     if (coolDown == 0 && canUseSkill(simulation)) {
       activateSkill(simulation, skillData!, ownerId, skillGroupId!, source);
-      coolDown = timeDataToFrame(skillData!.skillCooltime, simulation.fps);
+      coolDown = timeDataToFrame(getSkillCoolDown(simulation), simulation.fps);
     }
+  }
+
+  int getSkillCoolDown(BattleSimulation simulation) {
+    return simulation.getNikkeOnPosition(ownerId)?.getSkillCoolTime(simulation, skillNum - 1) ??
+        skillData!.skillCooltime;
   }
 
   static void instantDamage({
