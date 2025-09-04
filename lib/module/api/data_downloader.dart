@@ -75,8 +75,13 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
                 FilledButton.icon(
                   onPressed: () async {
                     await EasyLoading.show(status: 'Downloading', maskType: EasyLoadingMaskType.clear);
-                    await downloadStaticData();
+                    final downloadSuccess = await downloadStaticData();
                     await EasyLoading.dismiss();
+
+                    if (!downloadSuccess) {
+                      setState(() {});
+                      return;
+                    }
 
                     await EasyLoading.showInfo('Extracting...', maskType: EasyLoadingMaskType.clear);
 
@@ -85,8 +90,22 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
                       Uint8List.fromList(pack!.salt1),
                       Uint8List.fromList(pack!.salt2),
                     );
-                    unpacker!.loadGameData();
-                    unpacker!.extractFiles(getExtractDataFolderPath(downloadedGlobal));
+
+                    final loadSuccess = unpacker!.loadGameData();
+                    if (!loadSuccess) {
+                      errorText = 'Error loading static data, possibly wrong salts';
+                      await EasyLoading.dismiss();
+                      setState(() {});
+                      return;
+                    }
+
+                    final extractSuccess = unpacker!.extractFiles(getExtractDataFolderPath(downloadedGlobal));
+                    if (!extractSuccess) {
+                      errorText = 'Error extracting static data';
+                      await EasyLoading.dismiss();
+                      setState(() {});
+                      return;
+                    }
 
                     if (downloadedGlobal) {
                       global.init();
@@ -144,12 +163,12 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
     );
   }
 
-  Future<void> downloadStaticData() async {
+  Future<bool> downloadStaticData() async {
     staticDataDownloaded = false;
     final packUri = Uri.tryParse(downloadHtmlController.text);
     if (packUri == null) {
       errorText = 'Link is invalid';
-      return;
+      return false;
     }
 
     http.Response packResponse;
@@ -162,7 +181,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
       );
     } catch (e) {
       errorText = 'Error sending request: $e';
-      return;
+      return false;
     }
 
     try {
@@ -170,13 +189,13 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
       downloadedGlobal = useGlobal;
     } catch (e) {
       errorText = 'Error parsing response: $e';
-      return;
+      return false;
     }
 
     final staticDataUri = Uri.tryParse(pack!.url);
     if (staticDataUri == null) {
       errorText = 'Parsed URL is invalid: ${pack!.url}';
-      return;
+      return false;
     }
 
     try {
@@ -185,12 +204,13 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
       await dataFile.writeAsBytes(dataResponse.bodyBytes);
     } catch (e) {
       errorText = 'Error parsing data response: $e';
-      return;
+      return false;
     }
 
     staticDataDownloaded = true;
     errorText = null;
     unpacker = null;
+    return true;
   }
 
   void serverRadioChange(bool? v) {
