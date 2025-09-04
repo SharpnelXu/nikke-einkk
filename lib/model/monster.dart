@@ -81,6 +81,8 @@ class MonsterData {
   final int statEnhanceId;
   @JsonKey(name: 'ui_grade')
   final String? uiGrade;
+  @JsonKey(name: 'passive_skill_id')
+  final int? passiveSkillId;
   List<MonsterSkillInfoData> get validSkillData => skillData.where((data) => data.skillId != 0).toList();
 
   MonsterData({
@@ -115,6 +117,7 @@ class MonsterData {
     this.skillData = const [],
     this.statEnhanceId = 0,
     this.uiGrade,
+    this.passiveSkillId,
   });
 
   factory MonsterData.fromJson(Map<String, dynamic> json) => _$MonsterDataFromJson(json);

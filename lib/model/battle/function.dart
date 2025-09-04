@@ -280,6 +280,7 @@ class BattleFunction {
       case TimingTriggerType.onUseTeamAmmo:
       case TimingTriggerType.onPelletCriticalHitNum:
       case TimingTriggerType.onFunctionDamageCriticalHit:
+      case TimingTriggerType.onFullChargeBonusRangeHitNum:
         // logger.i('Unimplemented TimingTriggerType: ${data.timingTriggerType}');
         break;
     }
@@ -720,6 +721,9 @@ class BattleFunction {
       case FunctionType.durationDamage:
       case FunctionType.useSkill1:
       case FunctionType.defIgnoreSkillDamageInstant:
+      case FunctionType.forcedReload:
+      case FunctionType.statBonusRangeMin:
+      case FunctionType.damageShareLowestPriority:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
       case FunctionType.allStepBurstNextStep: // no usage among nikkes

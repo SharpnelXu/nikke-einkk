@@ -74,6 +74,7 @@ class BattleBuff {
       case DurationType.hitsVer2:
         return duration <= 0;
       case DurationType.unknown:
+      case DurationType.reloadAllAmmoCount:
         return true;
     }
   }

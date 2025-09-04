@@ -144,6 +144,8 @@ String? durationString(int value, DurationType type) {
       return '$value hits';
     case DurationType.timeSecBattles:
       return 'Every ${value.timeString}';
+    case DurationType.reloadAllAmmoCount:
+      return '$value full reloads';
     case DurationType.none:
     case DurationType.unknown:
       return null;

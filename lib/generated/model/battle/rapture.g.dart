@@ -135,6 +135,7 @@ const _$DurationTypeEnumMap = {
   DurationType.timeSecBattles: 'TimeSecBattles',
   DurationType.timeSecVer2: 'TimeSec_Ver2',
   DurationType.hitsVer2: 'Hits_Ver2',
+  DurationType.reloadAllAmmoCount: 'ReloadAllAmmoCount',
   DurationType.unknown: 'Unknown',
 };
 
@@ -182,6 +183,7 @@ const _$FunctionTypeEnumMap = {
   FunctionType.changeCoolTimeSkill2: 'ChangeCoolTimeSkill2',
   FunctionType.changeCoolTimeUlti: 'ChangeCoolTimeUlti',
   FunctionType.changeCurrentHpValue: 'ChangeCurrentHpValue',
+  FunctionType.changeMaxSkillCoolTime1: 'ChangeMaxSkillCoolTime1',
   FunctionType.changeMaxSkillCoolTime2: 'ChangeMaxSkillCoolTime2',
   FunctionType.changeMaxSkillCoolTimeUlti: 'ChangeMaxSkillCoolTimeUlti',
   FunctionType.changeNormalDefIgnoreDamage: 'ChangeNormalDefIgnoreDamage',
@@ -328,6 +330,9 @@ const _$FunctionTypeEnumMap = {
   FunctionType.durationDamage: 'DurationDamage',
   FunctionType.useSkill1: 'UseSkill1',
   FunctionType.defIgnoreSkillDamageInstant: 'DefIgnoreSkillDamageInstant',
+  FunctionType.forcedReload: 'ForcedReload',
+  FunctionType.statBonusRangeMin: 'StatBonusRangeMin',
+  FunctionType.damageShareLowestPriority: 'DamageShareLowestPriority',
 };
 
 BattleRaptureParts _$BattleRapturePartsFromJson(Map<String, dynamic> json) => BattleRaptureParts(

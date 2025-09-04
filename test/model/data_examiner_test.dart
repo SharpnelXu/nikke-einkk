@@ -1261,6 +1261,7 @@ void main() {
           'skill_data',
           'statenhance_id',
           'ui_grade',
+          'passive_skill_id',
         };
 
         final skillDataExpectedKeys = {'skill_id', 'use_function_id_skill', 'hurt_function_id_skill'};

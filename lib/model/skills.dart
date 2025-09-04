@@ -69,6 +69,7 @@ enum DurationType {
   timeSecVer2,
   @JsonValue('Hits_Ver2')
   hitsVer2,
+  reloadAllAmmoCount,
   unknown;
 
   static final Map<String, DurationType> _reverseMap = Map.fromIterable(
@@ -467,7 +468,10 @@ enum FunctionType {
   plusBuffCount, // seems to be CN exclusive
   durationDamage,
   useSkill1,
-  defIgnoreSkillDamageInstant;
+  defIgnoreSkillDamageInstant,
+  forcedReload,
+  statBonusRangeMin,
+  damageShareLowestPriority;
 
   static final Map<String, FunctionType> _reverseMap = Map.fromIterable(
     FunctionType.values,
@@ -592,7 +596,8 @@ enum TimingTriggerType {
   onEnemyDead,
   onUseTeamAmmo,
   onPelletCriticalHitNum,
-  onFunctionDamageCriticalHit;
+  onFunctionDamageCriticalHit,
+  onFullChargeBonusRangeHitNum;
 
   static List<TimingTriggerType> sorted = TimingTriggerType.values.toList().sorted((a, b) => a.name.compareTo(b.name));
 

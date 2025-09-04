@@ -50,6 +50,7 @@ MonsterData _$MonsterDataFromJson(Map<String, dynamic> json) => MonsterData(
       const [],
   statEnhanceId: (json['statenhance_id'] as num?)?.toInt() ?? 0,
   uiGrade: json['ui_grade'] as String?,
+  passiveSkillId: (json['passive_skill_id'] as num?)?.toInt(),
 );
 
 MonsterStatEnhanceData _$MonsterStatEnhanceDataFromJson(Map<String, dynamic> json) => MonsterStatEnhanceData(
