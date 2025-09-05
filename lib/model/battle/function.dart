@@ -456,6 +456,7 @@ class BattleFunction {
       case FunctionType.addIncElementDmgType: // only used by Rapi:RH S2
       case FunctionType.atkChangHpRate:
       case FunctionType.atkReplaceMaxHpRate: // only used by Kilo Ult
+      case FunctionType.changeNormalDefIgnoreDamage:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -619,7 +620,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.changeNormalDefIgnoreDamage:
       case FunctionType.chargeDamageChangeMaxStatAmmo:
       case FunctionType.chargeTimeChangetoDamage:
       case FunctionType.copyAtk:

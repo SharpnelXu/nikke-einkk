@@ -118,6 +118,7 @@ class NikkeDamageEvent extends BattleEvent {
     );
     final damageParameter = NikkeDamageParameter(
       attack: nikke.getFinalAttack(simulation),
+      isIgnoreDefence: nikke.hasChangeNormalDefIgnoreDamage(simulation),
       defence: rapture.baseDefence,
       defenceBuff: rapture.getDefenceBuffValues(simulation),
       damageRate: weaponData.damage * weaponData.muzzleCount,

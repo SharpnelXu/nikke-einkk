@@ -195,6 +195,10 @@ abstract class BattleEntity {
     return result;
   }
 
+  bool hasChangeNormalDefIgnoreDamage(BattleSimulation simulation) {
+    return hasBuff(simulation, FunctionType.changeNormalDefIgnoreDamage);
+  }
+
   bool hasBuff(BattleSimulation simulation, FunctionType type) {
     return buffs.any((buff) => buff.data.functionType == type);
   }

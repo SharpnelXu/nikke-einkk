@@ -85,6 +85,7 @@ int getBattlePoint({
 class NikkeDamageParameter {
   // base
   int attack = 0;
+  bool isIgnoreDefence = false;
   int defence = 0;
   int testOnlyAttackBuff = 0; // deprecated due to atkReplaceMaxHpRate buff invalidating concept of attack buff
   int defenceBuff = 0;
@@ -125,6 +126,7 @@ class NikkeDamageParameter {
 
   NikkeDamageParameter({
     this.attack = 0,
+    this.isIgnoreDefence = false,
     this.defence = 0,
     this.testOnlyAttackBuff = 0,
     this.defenceBuff = 0,
@@ -158,6 +160,7 @@ class NikkeDamageParameter {
   String toString() {
     return 'NikkeDamageParameter{'
         'attack: $attack, '
+        'isIgnoreDefence: $isIgnoreDefence, '
         'defence: $defence, '
         'testOnlyAttackBuff: $testOnlyAttackBuff, '
         'defenceBuff: $defenceBuff, '
@@ -191,6 +194,7 @@ class NikkeDamageParameter {
   NikkeDamageParameter copy() {
     return NikkeDamageParameter(
       attack: attack,
+      isIgnoreDefence: isIgnoreDefence,
       defence: defence,
       testOnlyAttackBuff: testOnlyAttackBuff,
       defenceBuff: defenceBuff,
@@ -245,7 +249,7 @@ class NikkeDamageParameter {
     if (testOnlyAttackBuff != 0) {
       logger.w('Using testAttackBuff in damage calculation is deprecated.');
     }
-    final finalAttack = attack + testOnlyAttackBuff - defence - defenceBuff;
+    final finalAttack = attack + testOnlyAttackBuff - (isIgnoreDefence ? 0 : defence + defenceBuff);
     final finalRate = toModifier(damageRate + damageRateBuff) * toModifier(hitRate);
 
     final coreCorrection = core ? correction(coreDamageRate + coreDamageBuff) : 0;
