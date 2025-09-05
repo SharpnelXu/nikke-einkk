@@ -676,6 +676,16 @@ class BattleSkill {
         targetList.retainWhere((entity) => entity.baseElements.contains(NikkeElement.wind));
         break;
       case PreferTarget.longInitChargeTime:
+        targetList.sort((a, b) {
+          if (a is BattleNikke && b is BattleNikke) {
+            final chargeA = a.currentWeaponData.chargeTime;
+            final chargeB = b.currentWeaponData.chargeTime;
+            return chargeA != chargeB ? chargeB - chargeA : a.uniqueId - b.uniqueId;
+          } else {
+            return 0;
+          }
+        });
+        break;
       case PreferTarget.targetAR:
       case PreferTarget.targetGL:
       case PreferTarget.targetPS:

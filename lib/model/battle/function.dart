@@ -457,6 +457,8 @@ class BattleFunction {
       case FunctionType.atkChangHpRate:
       case FunctionType.atkReplaceMaxHpRate: // only used by Kilo Ult
       case FunctionType.changeNormalDefIgnoreDamage:
+      case FunctionType.chargeDamageChangeMaxStatAmmo:
+      case FunctionType.chargeTimeChangetoDamage:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -620,8 +622,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.chargeDamageChangeMaxStatAmmo:
-      case FunctionType.chargeTimeChangetoDamage:
       case FunctionType.copyAtk:
       case FunctionType.copyHp:
       case FunctionType.coverResurrection:

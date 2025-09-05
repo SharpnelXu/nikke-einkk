@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
@@ -370,12 +371,24 @@ class NikkeDamageEvent extends BattleEvent {
         CustomTableRow(
           children: [
             TableCellData(
-              text:
-                  '${damageParameter.calculateExpectedDamage().decimalPattern}${invalid ? ' (Invalid)' : ''}'
-                  '${shotCount > 1 ? ' ($shotCount shots)' : ''}'
-                  '${damageParameter.criticalRate > 0 ? ' Crit: ${damageParameter.criticalRate.percentString}' : ''}'
-                  '${damageParameter.coreHitRate > 0 ? ' Core: ${damageParameter.coreHitRate.percentString}' : ''}'
-                  '${shareCount > 0 ? ' (Shared by $shareCount targets)' : ''}',
+              child: Tooltip(
+                message:
+                    'Shot Count: $shotCount\n'
+                    'Crit: ${damageParameter.criticalRate.percentString}\n'
+                    'Core: ${damageParameter.coreHitRate.percentString}\n'
+                    'Share Count: $shareCount\n'
+                    'Charge Damage Rate: ${damageParameter.chargeDamageRate.percentString}\n'
+                    'Charge Damage Buff: ${damageParameter.chargeDamageBuff.percentString}',
+                child: Wrap(
+                  spacing: 4,
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Icon(CupertinoIcons.info_circle, size: 16),
+                    Text('${damageParameter.calculateExpectedDamage().decimalPattern}${invalid ? ' (Invalid)' : ''}'),
+                  ],
+                ),
+              ),
               flex: 4,
             ),
             TableCellData(text: '${simulation.getEntityName(activatorId)}', flex: 2),

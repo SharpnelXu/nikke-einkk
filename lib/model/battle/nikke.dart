@@ -679,16 +679,14 @@ class BattleNikke extends BattleEntity {
     return (skills[skillIndex].skillData?.skillCooltime ?? 0) - maxCoolChange;
   }
 
-  int getFramesCharged(BattleSimulation simulation) {
-    final chargeSpeedSubtractedFrame = getBuffValue(
+  int getFramesToFullCharge(BattleSimulation simulation) {
+    final result = getBuffValue(
       simulation,
       FunctionType.statChargeTime,
       currentWeaponData.chargeTime,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
     );
-    final framesToFullCharge = getFramesToFullCharge(simulation);
-    final framesCharged = framesToFullCharge / max(1, framesToFullCharge - chargeSpeedSubtractedFrame);
-    return framesCharged.round();
+    return max(1, timeDataToFrame(result, fps));
   }
 
   int getCriticalRate(BattleSimulation simulation) {
@@ -765,12 +763,33 @@ class BattleNikke extends BattleEntity {
   }
 
   int getChargeDamageBuffValues(BattleSimulation simulation) {
-    return getBuffValue(
+    int result = getBuffValue(
       simulation,
       FunctionType.statChargeDamage,
       0,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.fullChargeDamage : 0,
     );
+
+    // plain buff since it's always integer
+    final changePerAmmo = getPlainBuffValues(simulation, FunctionType.chargeDamageChangeMaxStatAmmo);
+    if (changePerAmmo != 0) {
+      result += changePerAmmo * getMaxAmmo(simulation);
+    }
+
+    final chargeTime = currentWeaponData.chargeTime;
+    final changePerExceedChargeSpeed = getPlainBuffValues(simulation, FunctionType.chargeTimeChangetoDamage);
+    if (chargeTime > 0 && changePerExceedChargeSpeed != 0) {
+      final timeToFullCharge = getBuffValue(
+        simulation,
+        FunctionType.statChargeTime,
+        chargeTime,
+        (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
+      );
+      final exceedChargeSpeed = timeToFullCharge < 0 ? timeToFullCharge.abs() / chargeTime * 10000 : 0;
+      result += (toModifier(changePerExceedChargeSpeed) * exceedChargeSpeed).round();
+    }
+
+    return result;
   }
 
   int getCoreDamageBuffValues(BattleSimulation simulation) {
@@ -784,16 +803,6 @@ class BattleNikke extends BattleEntity {
       0,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.damage : 0,
     );
-  }
-
-  int getFramesToFullCharge(BattleSimulation simulation) {
-    final result = getBuffValue(
-      simulation,
-      FunctionType.statChargeTime,
-      currentWeaponData.chargeTime,
-      (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
-    );
-    return max(1, timeDataToFrame(result, fps));
   }
 
   int getTimeToReload(BattleSimulation simulation) {
