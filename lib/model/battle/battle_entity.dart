@@ -93,12 +93,17 @@ abstract class BattleEntity {
   }
 
   int getMaxHp(BattleSimulation simulation) {
-    return getBuffValueOfTypes(
+    final highestAllyHp = simulation.aliveNikkes.sorted((a, b) => b.baseHp - a.baseHp).first;
+    final copyHp = toModifier(getPlainBuffValues(simulation, FunctionType.copyHp)) * highestAllyHp.baseHp;
+
+    final statHp = getBuffValueOfTypes(
       simulation,
       [FunctionType.statHp, FunctionType.statHpHeal],
       baseHp,
       (entity) => entity.baseHp,
     );
+
+    return statHp + copyHp.round();
   }
 
   int getHealVariation(BattleSimulation simulation) {

@@ -460,6 +460,7 @@ class BattleFunction {
       case FunctionType.chargeDamageChangeMaxStatAmmo:
       case FunctionType.chargeTimeChangetoDamage:
       case FunctionType.copyAtk:
+      case FunctionType.copyHp:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -643,7 +644,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.copyHp:
       case FunctionType.coverResurrection:
       case FunctionType.currentHpRatioDamage:
       case FunctionType.damageBio:
