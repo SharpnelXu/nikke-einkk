@@ -622,6 +622,26 @@ class BattleFunction {
           }
         }
         break;
+      case FunctionType.debuffRemove:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck) continue;
+
+          activated = true;
+          for (int removeCount = 0; removeCount < data.functionValue; removeCount++) {
+            final buffToRemove = target.buffs.firstWhereOrNull(
+              (buff) => buff.data.buff.isDeBuff && buff.data.buffRemove.canRemove,
+            );
+            if (buffToRemove == null) {
+              break;
+            }
+
+            target.buffs.remove(buffToRemove);
+            simulation.registerEvent(simulation.currentFrame, BuffEvent.remove(buffToRemove));
+          }
+        }
+        break;
       case FunctionType.copyAtk:
       case FunctionType.copyHp:
       case FunctionType.coverResurrection:
@@ -637,7 +657,6 @@ class BattleFunction {
       case FunctionType.damageShare:
       case FunctionType.damageShareInstantUnable:
       case FunctionType.debuffImmune:
-      case FunctionType.debuffRemove:
       case FunctionType.defChangHpRate:
       case FunctionType.defIgnoreDamage:
       case FunctionType.defIgnoreDamageRatio:
