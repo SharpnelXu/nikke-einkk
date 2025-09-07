@@ -180,7 +180,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
 
   Widget _buildDpsChart() {
     final Map<int, List<int>> dpsMap = {};
-    for (final nikke in simulation.nonnullNikkes) {
+    for (final nikke in simulation.aliveNikkes) {
       dpsMap[nikke.uniqueId] = [];
     }
     final secondsToCheck = ((simulation.maxFrames - simulation.previousFrame) / simulation.fps).ceil();
@@ -229,8 +229,8 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
                       alignment: WrapAlignment.center,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       spacing: 10,
-                      children: List.generate(simulation.nonnullNikkes.length, (idx) {
-                        final nikke = simulation.nonnullNikkes[idx];
+                      children: List.generate(simulation.aliveNikkes.length, (idx) {
+                        final nikke = simulation.aliveNikkes[idx];
                         final color = dpsColorChart[idx];
                         return Row(
                           mainAxisSize: MainAxisSize.min,
@@ -247,8 +247,8 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
                       alignment: WrapAlignment.center,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       spacing: 10,
-                      children: List.generate(simulation.nonnullNikkes.length, (idx) {
-                        final nikke = simulation.nonnullNikkes[idx];
+                      children: List.generate(simulation.aliveNikkes.length, (idx) {
+                        final nikke = simulation.aliveNikkes[idx];
                         final color = dpsColorChart[idx];
                         final nikkeDamage = totalDamageMap[nikke.uniqueId]!;
                         return Row(
@@ -269,8 +269,8 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
                 sideTitles: SideTitles(showTitles: true, reservedSize: 30),
               ),
             ),
-            lineBarsData: List.generate(simulation.nonnullNikkes.length, (idx) {
-              final nikke = simulation.nonnullNikkes[idx];
+            lineBarsData: List.generate(simulation.aliveNikkes.length, (idx) {
+              final nikke = simulation.aliveNikkes[idx];
               final dpsList = dpsMap[nikke.uniqueId]!;
               return LineChartBarData(
                 color: dpsColorChart[idx],

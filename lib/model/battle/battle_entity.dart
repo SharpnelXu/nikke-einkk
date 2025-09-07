@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/events/hp_change_event.dart';
@@ -76,8 +77,11 @@ abstract class BattleEntity {
       (entity) => entity.baseAttack * (1 - entity.currentHp / entity.getMaxHp(simulation)).clamp(0, 1) * 100,
     );
 
+    final highestAllyAttack = simulation.aliveNikkes.sorted((a, b) => b.baseAttack - a.baseAttack).first;
+    final copyAttack = toModifier(getPlainBuffValues(simulation, FunctionType.copyAtk)) * highestAllyAttack.baseAttack;
+
     final statAttack = getBuffValue(simulation, FunctionType.statAtk, 0, (entity) => entity.baseAttack);
-    return statAttack + maxHpConversion + hpLossConversion;
+    return statAttack + maxHpConversion + hpLossConversion + copyAttack.round();
   }
 
   int getFinalDefence(BattleSimulation simulation) {

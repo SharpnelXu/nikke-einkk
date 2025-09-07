@@ -487,13 +487,13 @@ class BattleSkill {
       case CharacterSkillType.targetHitCountGetBuff:
       case CharacterSkillType.explosiveCircuit: // trony
       case CharacterSkillType.stigma: // dorothy
-        return isThisNikke ? simulation.raptures.sublist(0, 1) : simulation.nonnullNikkes.sublist(0, 1);
+        return isThisNikke ? simulation.raptures.sublist(0, 1) : simulation.aliveNikkes.sublist(0, 1);
       case CharacterSkillType.instantAll:
       case CharacterSkillType.instantAllParts:
       case CharacterSkillType.instantArea:
       case CharacterSkillType.instantCircle:
       case CharacterSkillType.instantCircleSeparate:
-        return isThisNikke ? simulation.raptures.toList() : simulation.nonnullNikkes.toList();
+        return isThisNikke ? simulation.raptures.toList() : simulation.aliveNikkes.toList();
       case CharacterSkillType.unknown:
         return [];
     }
@@ -509,7 +509,7 @@ class BattleSkill {
     // 0            1           nikkes
     // 0            0           raptures
     final targetNikkes = isThisNikke ^ targetEnemy;
-    final targetList = targetNikkes ? simulation.nonnullNikkes.toList() : simulation.raptures.toList();
+    final targetList = targetNikkes ? simulation.aliveNikkes.toList() : simulation.raptures.toList();
 
     switch (skillData.preferTargetCondition) {
       case PreferTargetCondition.unknown:
@@ -571,9 +571,9 @@ class BattleSkill {
         break;
       case PreferTarget.back:
         // some conditions like this don't need target list
-        return simulation.nonnullNikkes.where((nikke) => [2, 4].contains(nikke.uniqueId)).toList();
+        return simulation.aliveNikkes.where((nikke) => [2, 4].contains(nikke.uniqueId)).toList();
       case PreferTarget.front:
-        return simulation.nonnullNikkes.where((nikke) => [1, 3, 5].contains(nikke.uniqueId)).toList();
+        return simulation.aliveNikkes.where((nikke) => [1, 3, 5].contains(nikke.uniqueId)).toList();
       case PreferTarget.haveDebuff:
         targetList.retainWhere(
           (entity) => entity.buffs.any((buff) => [BuffType.deBuff, BuffType.deBuffEtc].contains(buff.data.buff)),

@@ -702,17 +702,17 @@ class BattleRapture extends BattleEntity {
   List<BattleEntity> getActionTargets(BattleSimulation simulation, BattleRaptureAction action) {
     switch (action.targetType!) {
       case BattleRaptureActionTarget.allNikkes:
-        return simulation.nonnullNikkes.toList();
+        return simulation.aliveNikkes.toList();
       case BattleRaptureActionTarget.allRaptures:
         return simulation.raptures.toList();
       case BattleRaptureActionTarget.allRapturesExceptSelf:
         return simulation.raptures.toList()..remove(this);
       case BattleRaptureActionTarget.allActors:
-        return [...simulation.nonnullNikkes, ...simulation.raptures];
+        return [...simulation.aliveNikkes, ...simulation.raptures];
       case BattleRaptureActionTarget.self:
         return [this];
       case BattleRaptureActionTarget.targetedNikkes:
-        final nikkes = simulation.nonnullNikkes.toList();
+        final nikkes = simulation.aliveNikkes.toList();
         final subtype = action.targetSubtype!;
         if (subtype == BattleRaptureActionTargetSubtype.position) {
           int position = action.position!;

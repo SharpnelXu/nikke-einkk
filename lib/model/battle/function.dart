@@ -459,6 +459,7 @@ class BattleFunction {
       case FunctionType.changeNormalDefIgnoreDamage:
       case FunctionType.chargeDamageChangeMaxStatAmmo:
       case FunctionType.chargeTimeChangetoDamage:
+      case FunctionType.copyAtk:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -642,7 +643,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.copyAtk:
       case FunctionType.copyHp:
       case FunctionType.coverResurrection:
       case FunctionType.currentHpRatioDamage:
@@ -780,7 +780,7 @@ class BattleFunction {
     final List<BattleEntity> result = [];
     switch (data.functionTarget) {
       case FunctionTargetType.allCharacter:
-        result.addAll(simulation.nonnullNikkes);
+        result.addAll(simulation.aliveNikkes);
         break;
       case FunctionTargetType.self:
         final self = simulation.getNikkeOnPosition(ownerId);
@@ -910,7 +910,7 @@ class BattleFunction {
         return target is BattleRapture && target.isStageTarget;
       case StatusTriggerType.isCheckTeamBurstNextStep:
         return target is BattleNikke &&
-            simulation.nonnullNikkes.any((nikke) {
+            simulation.aliveNikkes.any((nikke) {
               if (nikke.uniqueId == target.uniqueId) {
                 return false;
               }
@@ -919,7 +919,7 @@ class BattleFunction {
             });
       case StatusTriggerType.isNotCheckTeamBurstNextStep:
         return target is BattleNikke &&
-            simulation.nonnullNikkes.every((nikke) {
+            simulation.aliveNikkes.every((nikke) {
               if (nikke.uniqueId == target.uniqueId) {
                 return true;
               }

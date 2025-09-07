@@ -44,8 +44,8 @@ void main() {
       );
       simulation.init();
 
-      final helm = simulation.nonnullNikkes.first;
-      final liter = simulation.nonnullNikkes[2];
+      final helm = simulation.aliveNikkes.first;
+      final liter = simulation.aliveNikkes[2];
 
       expect(simulation.burstStage, 0);
       bool result = BattleFunction.checkStatusTrigger(

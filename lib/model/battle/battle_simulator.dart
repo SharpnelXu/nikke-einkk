@@ -23,7 +23,7 @@ class BattleSimulation {
   BattleAdvancedOption? advancedOption;
 
   List<BattleNikke?> battleNikkes = [];
-  List<BattleNikke> get nonnullNikkes => battleNikkes.nonNulls.toList();
+  List<BattleNikke> get aliveNikkes => battleNikkes.nonNulls.where((nikke) => nikke.currentHp > 0).toList();
   List<BattleRapture> raptures = [];
   // timeline
   SplayTreeMap<int, List<BattleEvent>> timeline = SplayTreeMap((a, b) => b.compareTo(a));
@@ -86,7 +86,7 @@ class BattleSimulation {
       battleNikkes[index]?.init(this, index + 1);
     }
     if (currentNikke >= battleNikkes.length || battleNikkes[currentNikke - 1] == null) {
-      currentNikke = nonnullNikkes.first.uniqueId;
+      currentNikke = aliveNikkes.first.uniqueId;
     }
 
     for (int index = 0; index < raptures.length; index += 1) {
@@ -95,7 +95,7 @@ class BattleSimulation {
 
     currentFrame = maxFrames + 1;
     // BattleStart
-    for (final nikke in nonnullNikkes) {
+    for (final nikke in aliveNikkes) {
       nikke.broadcast(BattleStartEvent.battleStartEvent, this);
     }
     currentFrame = maxFrames;
@@ -106,7 +106,7 @@ class BattleSimulation {
       return;
     }
 
-    for (final entity in [...nonnullNikkes, ...raptures]) {
+    for (final entity in [...aliveNikkes, ...raptures]) {
       entity.normalAction(this);
     }
 
@@ -155,7 +155,7 @@ class BattleSimulation {
         }
       }
 
-      for (final nikke in nonnullNikkes) {
+      for (final nikke in aliveNikkes) {
         nikke.broadcast(event, this);
       }
 
@@ -164,7 +164,7 @@ class BattleSimulation {
       }
     }
 
-    for (final entity in [...nonnullNikkes, ...raptures]) {
+    for (final entity in [...aliveNikkes, ...raptures]) {
       entity.endCurrentFrame(this);
     }
 
@@ -178,8 +178,6 @@ class BattleSimulation {
   }
 
   void simulate() {
-    if (nonnullNikkes.isEmpty) return;
-
     init();
 
     while (currentFrame > 0) {
@@ -188,7 +186,7 @@ class BattleSimulation {
   }
 
   BattleNikke? getNikkeOnPosition(int position) {
-    return nonnullNikkes.firstWhereOrNull((nikke) => nikke.uniqueId == position);
+    return aliveNikkes.firstWhereOrNull((nikke) => nikke.uniqueId == position);
   }
 
   BattleRapture? getRaptureByUniqueId(int uniqueId) {
@@ -196,7 +194,7 @@ class BattleSimulation {
   }
 
   String? getEntityName(int uniqueId) {
-    for (final nikke in nonnullNikkes) {
+    for (final nikke in aliveNikkes) {
       if (nikke.uniqueId == uniqueId) {
         return '${nikke.name} (P$uniqueId)';
       } else if (nikke.cover.uniqueId == uniqueId) {
@@ -208,7 +206,7 @@ class BattleSimulation {
   }
 
   BattleEntity? getEntityById(int uniqueId) {
-    for (final nikke in nonnullNikkes) {
+    for (final nikke in aliveNikkes) {
       if (nikke.uniqueId == uniqueId) {
         return nikke;
       } else if (nikke.cover.uniqueId == uniqueId) {
@@ -241,6 +239,6 @@ class BattleSimulation {
   }
 
   int countSquad(BattleNikke targetSquad) {
-    return nonnullNikkes.where((nikke) => nikke.characterData.squad == targetSquad.characterData.squad).length;
+    return aliveNikkes.where((nikke) => nikke.characterData.squad == targetSquad.characterData.squad).length;
   }
 }

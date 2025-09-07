@@ -253,7 +253,7 @@ void main() {
 
       simulation.simulate();
 
-      final scarlet = simulation.nonnullNikkes.first;
+      final scarlet = simulation.aliveNikkes.first;
       expect(scarlet.getMaxAmmo(simulation), 66);
     });
   });
@@ -366,14 +366,14 @@ void main() {
       final finalShot = simulation.timeline[simulation.previousFrame]?.whereType<NikkeFireEvent>().toList();
       expect(finalShot, isNotNull);
       expect(finalShot, isNotEmpty);
-      expect(simulation.nonnullNikkes.first.totalBulletsFired, 24);
+      expect(simulation.aliveNikkes.first.totalBulletsFired, 24);
 
       final secondClipFirstShotFrame = 12 + 120 + 12 + 59; // enter cover + reload + exit cover + charging
       simulation.proceedNFrames(secondClipFirstShotFrame);
       final secondClipFirstShot = simulation.timeline[simulation.previousFrame]?.whereType<NikkeFireEvent>().toList();
       expect(secondClipFirstShot, isNotNull);
       expect(secondClipFirstShot, isNotEmpty);
-      expect(simulation.nonnullNikkes.first.totalBulletsFired, 25);
+      expect(simulation.aliveNikkes.first.totalBulletsFired, 25);
     });
 
     // test damage & burst
@@ -576,7 +576,7 @@ void main() {
     );
 
     simulation.init();
-    final tove = simulation.nonnullNikkes[0];
+    final tove = simulation.aliveNikkes[0];
     int shootCounter = 0;
     int triggerCount = 0;
     final expectedShootFrames = List.generate(61, (idx) {

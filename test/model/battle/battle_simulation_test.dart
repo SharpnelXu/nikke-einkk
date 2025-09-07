@@ -91,7 +91,7 @@ void main() {
 
       simulation.simulate();
 
-      final scarlet = simulation.nonnullNikkes.first;
+      final scarlet = simulation.aliveNikkes.first;
       expect(scarlet.baseAttack, 904831);
       expect(scarlet.baseDefence, 138266);
       expect(scarlet.getMaxAmmo(simulation), 57);
@@ -163,13 +163,13 @@ void main() {
 
       simulation.simulate();
 
-      final scarlet1 = simulation.nonnullNikkes.first;
+      final scarlet1 = simulation.aliveNikkes.first;
       expect(scarlet1.baseAttack, 904831);
       expect(scarlet1.baseDefence, 138266);
       expect(scarlet1.getMaxAmmo(simulation), 57);
       expect(scarlet1.getMaxHp(simulation), 20565804);
 
-      final scarlet3 = simulation.nonnullNikkes[2];
+      final scarlet3 = simulation.aliveNikkes[2];
       expect(scarlet3.baseAttack, 902961);
       expect(scarlet3.baseDefence, 137894);
       expect(scarlet3.getMaxAmmo(simulation), 63);
@@ -269,7 +269,7 @@ void main() {
 
       simulation.simulate();
 
-      final alice1 = simulation.nonnullNikkes.first;
+      final alice1 = simulation.aliveNikkes.first;
       expect(alice1.baseAttack, 903741);
       expect(alice1.baseDefence, 117328);
       expect(alice1.getMaxAmmo(simulation), 18);
@@ -325,7 +325,7 @@ void main() {
 
       simulation.simulate();
 
-      final scarlet = simulation.nonnullNikkes.first;
+      final scarlet = simulation.aliveNikkes.first;
       expect(scarlet.getMaxHp(simulation), 20565804);
       final hpChangeEvent1 =
           simulation.timeline[10743]?.firstWhereOrNull((event) => event is HpChangeEvent) as HpChangeEvent;
@@ -414,7 +414,7 @@ void main() {
 
       simulation.simulate();
 
-      final snowWhite = simulation.nonnullNikkes.first;
+      final snowWhite = simulation.aliveNikkes.first;
       expect(snowWhite.baseAttack, 900990);
       expect(snowWhite.baseDefence, 137056);
       expect(snowWhite.getMaxAmmo(simulation), 60);
@@ -623,7 +623,7 @@ void main() {
 
       simulation.simulate();
 
-      final crown = simulation.nonnullNikkes[1];
+      final crown = simulation.aliveNikkes[1];
       expect(crown.baseHp, 25116193);
       expect(crown.baseAttack, 614834);
       expect(crown.baseDefence, 142547);
@@ -802,7 +802,7 @@ void main() {
 
       simulation.init();
 
-      final cindy = simulation.nonnullNikkes[3];
+      final cindy = simulation.aliveNikkes[3];
       expect(simulation.countSquad(cindy), 2);
     });
   });
