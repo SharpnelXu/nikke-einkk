@@ -645,6 +645,17 @@ class BattleFunction {
         }
         break;
       case FunctionType.coverResurrection:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          if (target is! BattleNikke) continue;
+
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck || target.cover.currentHp > 0) continue;
+
+          activated = true;
+          target.cover.currentHp = (target.cover.getMaxHp(simulation) * toModifier(data.functionValue)).round();
+        }
+        break;
       case FunctionType.currentHpRatioDamage:
       case FunctionType.damageBio:
       case FunctionType.damageEnergy:
