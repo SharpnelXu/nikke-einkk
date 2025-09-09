@@ -461,6 +461,7 @@ class BattleFunction {
       case FunctionType.chargeTimeChangetoDamage:
       case FunctionType.copyAtk:
       case FunctionType.copyHp:
+      case FunctionType.explosiveCircuitAccrueDamageRatio:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -656,24 +657,15 @@ class BattleFunction {
           target.cover.currentHp = (target.cover.getMaxHp(simulation) * toModifier(data.functionValue)).round();
         }
         break;
-      case FunctionType.currentHpRatioDamage:
-      case FunctionType.damageBio:
-      case FunctionType.damageEnergy:
       case FunctionType.damageFunctionTargetGroupId:
-      case FunctionType.damageFunctionUnable:
       case FunctionType.damageFunctionValueChange:
-      case FunctionType.damageMetal:
-      case FunctionType.damageRatioEnergy:
-      case FunctionType.damageRatioMetal:
       case FunctionType.damageShare:
-      case FunctionType.damageShareInstantUnable:
       case FunctionType.debuffImmune:
       case FunctionType.defChangHpRate:
       case FunctionType.defIgnoreDamage:
       case FunctionType.defIgnoreDamageRatio:
       case FunctionType.durationDamageRatio:
       case FunctionType.durationValueChange:
-      case FunctionType.explosiveCircuitAccrueDamageRatio:
       case FunctionType.finalStatHpHeal:
       case FunctionType.fixStatReloadTime:
       case FunctionType.forcedStop:
@@ -753,13 +745,21 @@ class BattleFunction {
       case FunctionType.defIgnoreSkillDamageInstant:
       case FunctionType.forcedReload:
       case FunctionType.statBonusRangeMin:
-      case FunctionType.damageShareLowestPriority:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
       case FunctionType.allStepBurstNextStep: // no usage among nikkes
       case FunctionType.atkBuffChange: // no usage among nikkes
       case FunctionType.bonusRangeDamageChange: // no usage among nikkes
       case FunctionType.callingMonster:
+      case FunctionType.currentHpRatioDamage:
+      case FunctionType.damageBio:
+      case FunctionType.damageEnergy:
+      case FunctionType.damageMetal:
+      case FunctionType.damageRatioEnergy:
+      case FunctionType.damageRatioMetal:
+      case FunctionType.damageFunctionUnable:
+      case FunctionType.damageShareInstantUnable:
+      case FunctionType.damageShareLowestPriority:
         break;
     }
 
