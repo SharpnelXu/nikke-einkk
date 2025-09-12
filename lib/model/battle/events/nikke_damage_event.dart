@@ -273,6 +273,7 @@ class NikkeDamageEvent extends BattleEvent {
     required int damageRate,
     required Source source,
     bool isShareDamage = false,
+    bool isDurationDamage = false,
     int? partId,
   }) {
     final bool isStrongEle = nikke.getEffectiveElements().any(
@@ -293,6 +294,7 @@ class NikkeDamageEvent extends BattleEvent {
       addDamageBuff: nikke.getAddDamageBuffValues(simulation),
       distributedDamageBuff: isShareDamage ? nikke.getShareDamageBuffValues(simulation) : 0,
       damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
+      sustainedDamageBuff: isDurationDamage ? nikke.getDurationDamageRatioBuffValues(simulation) : 0,
       partDamageBuff: partId != null ? nikke.getPartsDamageBuffValues(simulation) : 0,
     );
 
@@ -373,6 +375,7 @@ class NikkeDamageEvent extends BattleEvent {
             TableCellData(
               child: Tooltip(
                 message:
+                    'Damage Rate: ${damageParameter.damageRate.percentString}\n'
                     'Shot Count: $shotCount\n'
                     'Crit: ${damageParameter.criticalRate.percentString}\n'
                     'Core: ${damageParameter.coreHitRate.percentString}\n'

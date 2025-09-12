@@ -135,6 +135,10 @@ abstract class BattleEntity {
     return getPlainBuffValues(simulation, FunctionType.damageReduction);
   }
 
+  int getDurationDamageRatioBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.durationDamageRatio);
+  }
+
   int getPlainBuffValues(BattleSimulation simulation, FunctionType type) {
     int result = 0;
     for (final buff in buffs) {
@@ -271,6 +275,20 @@ abstract class BattleEntity {
     int result = 0;
     for (final buff in buffs) {
       if (buff.data.functionType == FunctionType.timingTriggerValueChange && buff.targetGroupId == groupId) {
+        if (buff.data.functionValueType == ValueType.integer) {
+          result += buff.data.functionValue;
+        } else if (buff.data.functionValueType == ValueType.percent) {
+          result += (baseValue * toModifier(buff.data.functionValue)).round();
+        }
+      }
+    }
+    return result;
+  }
+
+  int getDamageValueChange(BattleSimulation simulation, int baseValue, int groupId) {
+    int result = 0;
+    for (final buff in buffs) {
+      if (buff.data.functionType == FunctionType.damageFunctionValueChange && buff.targetGroupId == groupId) {
         if (buff.data.functionValueType == ValueType.integer) {
           result += buff.data.functionValue;
         } else if (buff.data.functionValueType == ValueType.percent) {

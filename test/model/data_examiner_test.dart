@@ -981,17 +981,17 @@ void main() {
           if (data.keepingType == FunctionStatus.unknown) unknownKeepingTypes.add(data.rawKeepingType);
 
           if (functionTypeCheck.contains(data.statusTriggerType) &&
-              !NikkeDatabase.functionTypeId.containsKey(data.statusTriggerValue)) {
+              !constData.functionTypeId.containsKey(data.statusTriggerValue)) {
             unknownFuncTypeIds.add(data.statusTriggerValue);
           }
 
           if (functionTypeCheck.contains(data.statusTrigger2Type) &&
-              !NikkeDatabase.functionTypeId.containsKey(data.statusTrigger2Value)) {
+              !constData.functionTypeId.containsKey(data.statusTrigger2Value)) {
             unknownFuncTypeIds.add(data.statusTrigger2Value);
           }
 
           if (data.timingTriggerType == TimingTriggerType.onFunctionBuffCheck &&
-              !NikkeDatabase.functionTypeId.containsKey(data.timingTriggerValue)) {
+              !constData.functionTypeId.containsKey(data.timingTriggerValue)) {
             unknownFuncTypeIds.add(data.timingTriggerValue);
           }
 

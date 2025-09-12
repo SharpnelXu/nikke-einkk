@@ -564,6 +564,42 @@ class BattleRapture extends BattleEntity {
       }
     }
 
+    for (final buff in buffs) {
+      final data = buff.data;
+
+      if (data.functionType == FunctionType.damage && data.durationType.isDurationBuff) {
+        final activeFrame = data.durationValue > 0 && (buff.fullDuration - buff.duration) % simulation.fps == 0;
+        if (activeFrame) {
+          // status check is probably for adding only?
+          // final statusCheck = checkTargetStatus(event, simulation, target);
+          // if (!statusCheck) continue;
+
+          final activator = simulation.getEntityById(buff.buffGiverId);
+          if (activator is BattleNikke) {
+            int baseRate = data.functionValue;
+            baseRate += activator.getDamageValueChange(simulation, baseRate, data.groupId);
+            int stack = buff.count;
+            if (data.fullCount > constData.fullCountLimit) {
+              final sourceBuff = activator.buffs.where((buff) => buff.data.groupId == data.fullCount).firstOrNull;
+              if (sourceBuff != null) {
+                stack = max(sourceBuff.count, stack);
+              }
+            }
+            simulation.registerEvent(
+              simulation.currentFrame,
+              NikkeDamageEvent.skill(
+                simulation: simulation,
+                nikke: activator,
+                rapture: this,
+                damageRate: baseRate * stack,
+                source: buff.source,
+              ),
+            );
+          }
+        }
+      }
+    }
+
     if (options.actions.containsKey(simulation.currentFrame)) {
       executeRaptureActions(simulation, options.actions[simulation.currentFrame]!);
     }

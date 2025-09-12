@@ -239,6 +239,14 @@ class BattleFunction {
           }
         }
         break;
+      case TimingTriggerType.onFunctionBuffCheck:
+        if (event is BuffEvent && event.isAdd && event.targetId == ownerId) {
+          final isExpectedBuff = event.data.functionType == constData.functionTypeId[timingTriggerValue];
+          if (isExpectedBuff) {
+            executeFunction(event, simulation);
+          }
+        }
+        break;
       case TimingTriggerType.none:
       case TimingTriggerType.onAmmoRatioUnder:
       case TimingTriggerType.onBurstSkillStep:
@@ -248,7 +256,6 @@ class BattleFunction {
       case TimingTriggerType.onCriticalHitNum:
       case TimingTriggerType.onDead:
       case TimingTriggerType.onEndFullBurst:
-      case TimingTriggerType.onFunctionBuffCheck:
       case TimingTriggerType.onHealCover:
       case TimingTriggerType.onHitNumExceptCore:
       case TimingTriggerType.onHitNumberOver:
@@ -462,6 +469,7 @@ class BattleFunction {
       case FunctionType.copyAtk:
       case FunctionType.copyHp:
       case FunctionType.explosiveCircuitAccrueDamageRatio:
+      case FunctionType.durationDamageRatio:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -490,6 +498,7 @@ class BattleFunction {
         addBuff(event, simulation);
         break;
       case FunctionType.timingTriggerValueChange:
+      case FunctionType.damageFunctionValueChange:
         if (parentFunctionValue != null) {
           activated = true;
           addBuff(event, simulation, parentFunctionValue: parentFunctionValue);
@@ -503,10 +512,12 @@ class BattleFunction {
             if (!statusCheck) continue;
 
             activated = true;
-            final baseRate = data.functionValue;
+            final isDurationDamage = data.durationType.isTimed && data.durationValue > 0;
+            final activator = simulation.getEntityById(event.activatorId);
+            int baseRate = data.functionValue;
+            baseRate += activator?.getDamageValueChange(simulation, baseRate, data.groupId) ?? 0;
             int stack = 1;
             if (data.fullCount > constData.fullCountLimit) {
-              final activator = simulation.getEntityById(event.activatorId);
               final sourceBuff = activator?.buffs.where((buff) => buff.data.groupId == data.fullCount).firstOrNull;
               if (sourceBuff != null) {
                 stack = max(sourceBuff.count, stack);
@@ -520,8 +531,14 @@ class BattleFunction {
                 rapture: target,
                 damageRate: baseRate * stack,
                 source: source,
+                isDurationDamage: isDurationDamage,
               ),
             );
+
+            if (isDurationDamage) {
+              // add a buff to denote the damage over time
+              addBuff(event, simulation);
+            }
           }
         }
         break;
@@ -601,6 +618,7 @@ class BattleFunction {
         break;
       case FunctionType.cycleUse: // this cycles through connected functions, no actual use
       case FunctionType.targetGroupid: // only func value needed, pass it to the connected function
+      case FunctionType.damageFunctionTargetGroupId:
       case FunctionType.unknown:
         activated = true;
         break;
@@ -657,14 +675,11 @@ class BattleFunction {
           target.cover.currentHp = (target.cover.getMaxHp(simulation) * toModifier(data.functionValue)).round();
         }
         break;
-      case FunctionType.damageFunctionTargetGroupId:
-      case FunctionType.damageFunctionValueChange:
       case FunctionType.damageShare:
       case FunctionType.debuffImmune:
       case FunctionType.defChangHpRate:
       case FunctionType.defIgnoreDamage:
       case FunctionType.defIgnoreDamageRatio:
-      case FunctionType.durationDamageRatio:
       case FunctionType.durationValueChange:
       case FunctionType.finalStatHpHeal:
       case FunctionType.fixStatReloadTime:
@@ -961,11 +976,10 @@ class BattleFunction {
       case StatusTriggerType.isSameSquadUp:
         return target is BattleNikke && simulation.countSquad(target) >= value;
       case StatusTriggerType.isFunctionBuffCheck:
-        return target != null &&
-            target.buffs.any((buff) => buff.data.functionType == NikkeDatabase.functionTypeId[value]);
+        return target != null && target.buffs.any((buff) => buff.data.functionType == constData.functionTypeId[value]);
       case StatusTriggerType.isFunctionTypeOffCheck:
         return target != null &&
-            target.buffs.every((buff) => buff.data.functionType != NikkeDatabase.functionTypeId[value]);
+            target.buffs.every((buff) => buff.data.functionType != constData.functionTypeId[value]);
       // likely used by raptures
       case StatusTriggerType.isCover:
         return target is BattleCover;
