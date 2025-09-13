@@ -4,6 +4,7 @@ import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/buff.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/nikke.dart';
+import 'package:nikke_einkk/model/battle/rapture.dart';
 import 'package:nikke_einkk/model/common.dart';
 import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
@@ -258,6 +259,132 @@ class _BattleNikkeStatusPageState extends State<BattleNikkeStatusPage> {
       padding: const EdgeInsets.all(8.0),
       constraints: const BoxConstraints(maxWidth: 700),
       child: Column(mainAxisSize: MainAxisSize.min, spacing: 3, children: children),
+    );
+  }
+}
+
+class BattleRaptureStatusPage extends StatefulWidget {
+  final BattleSimulation simulation;
+  final BattleRapture rapture;
+  const BattleRaptureStatusPage({super.key, required this.simulation, required this.rapture});
+
+  @override
+  State<BattleRaptureStatusPage> createState() => _BattleRaptureStatusPageState();
+}
+
+class _BattleRaptureStatusPageState extends State<BattleRaptureStatusPage> {
+  BattleSimulation get simulation => widget.simulation;
+  BattleRapture get rapture => widget.rapture;
+  NikkeDatabase get db => simulation.db;
+
+  int tab = 0;
+
+  List<(String, Widget Function())> get tabs => [('Buffs', () => buildBuffs())];
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> children = [buildTabs(), const Divider(), tabs[tab].$2()];
+    return Scaffold(
+      appBar: AppBar(title: Text('${simulation.getEntityName(rapture.uniqueId)} Status')),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView.builder(
+          itemBuilder: (ctx, idx) => Align(child: Padding(padding: const EdgeInsets.all(2.0), child: children[idx])),
+          itemCount: children.length,
+        ),
+      ),
+      bottomNavigationBar: commonBottomNavigationBar(() => setState(() {})),
+    );
+  }
+
+  Widget buildBuffs() {
+    final List<Widget> children = [];
+    final passiveTypes = [Source.rapturePassive]; // there will be passive rapture skills later
+    children.add(Text('Active Buffs', style: boldStyle));
+    final activeBuffs = rapture.buffs.whereNot((buff) => passiveTypes.contains(buff.source));
+    children.addAll(activeBuffs.map(buildBuff));
+
+    for (final type in passiveTypes) {
+      final buffs = rapture.buffs.where((buff) => buff.source == type);
+      if (buffs.isNotEmpty) {
+        children.add(Text('${type.name.pascal} Buffs', style: boldStyle));
+        children.addAll(buffs.map(buildBuff));
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 10,
+        children: children,
+      ),
+    );
+  }
+
+  Widget buildBuff(BattleBuff buff) {
+    final func = buff.data;
+    final name = locale.getTranslation(func.nameLocalkey);
+    final description = formatFunctionDescription(func).replaceAll('\n', '');
+    final secondaryStyle = TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.secondary);
+    return Row(
+      spacing: 8,
+      children: [
+        simpleBuffIcon(simulation, buff),
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 3,
+            children: [
+              Text(
+                '${name == null ? '' : '$name: '}'
+                '${func.functionType.name.pascal}'
+                ' by ${simulation.getEntityName(buff.buffGiverId)} ${buff.source.name.pascal}',
+              ),
+              if (description.isNotEmpty) Text(description, style: secondaryStyle),
+              Text('${func.groupId}', style: secondaryStyle),
+            ],
+          ),
+        ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          spacing: 3,
+          children: [
+            Text(
+              '${skillValueString(func.functionValue, func.functionValueType) ?? 'N/A'}'
+              '${buff.count > 1 ? ' (${buff.count} stacks)' : ''}'
+              '${func.functionStandard == StandardType.user && buff.buffReceiverId != buff.buffGiverId ? ' of Activator' : ''}',
+            ),
+            if (func.durationType.isTimed)
+              Text(
+                '${(buff.duration / simulation.fps).toStringAsFixed(3)}s (${buff.duration} frames)'
+                ' / ${(buff.fullDuration / simulation.fps).toStringAsFixed(3)}s (${buff.fullDuration} frames)',
+                style: secondaryStyle,
+              ),
+            if (func.durationType.isHits) Text('${buff.duration} shots', style: secondaryStyle),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget buildTabs() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: List.generate(tabs.length, (idx) {
+        return TextButton(
+          onPressed: () {
+            tab = idx;
+            setState(() {});
+          },
+          child: Text(tabs[idx].$1, style: TextStyle(fontWeight: tab == idx ? FontWeight.bold : null)),
+        );
+      }),
     );
   }
 }

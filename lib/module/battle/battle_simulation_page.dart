@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/nikke_damage_event.dart';
 import 'package:nikke_einkk/model/battle/events/time_event.dart';
@@ -66,8 +67,19 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
             onPressed:
                 simulation.currentFrame <= 0
                     ? null
-                    : () {
-                      simulation.proceedNFrames(simulation.currentFrame);
+                    : () async {
+                      for (int i = simulation.currentFrame; i > 0; i -= 1) {
+                        if (i % simulation.fps == 0) {
+                          EasyLoading.showProgress(
+                            (simulation.maxFrames - simulation.currentFrame) / simulation.maxFrames,
+                            status: '${(i / simulation.fps).round()} / ${simulation.maxSeconds}',
+                            maskType: EasyLoadingMaskType.clear,
+                          );
+                          await Future.delayed(const Duration(milliseconds: 5));
+                        }
+                        simulation.proceedOneFrame();
+                      }
+                      await EasyLoading.dismiss();
                       setState(() {});
                     },
             icon: Icon(Icons.skip_next),
@@ -161,6 +173,12 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       body: ListView(
         children: [
           _buildMiscColumn(),
+          const Divider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: simulation.raptures.mapIndexed(_buildRapture).toList(),
+          ),
           const Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -498,6 +516,50 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
     }
 
     return list;
+  }
+
+  Widget _buildRapture(int idx, BattleRapture rapture) {
+    final List<Widget> children = [
+      InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (ctx) => BattleRaptureStatusPage(simulation: simulation, rapture: rapture)),
+          );
+        },
+        child: buildRaptureIcon(rapture.options),
+      ),
+    ];
+
+    // HP Section
+    final currentHp = rapture.currentHp;
+    final maxHp = rapture.getMaxHp(simulation);
+    children.addAll([
+      SimplePercentBar(percent: currentHp / maxHp, color: Colors.white),
+      Text(currentHp.decimalPattern),
+    ]);
+
+    children.addAll([
+      divider,
+      Text('ATK: ${rapture.getFinalAttack(simulation).decimalPattern}'),
+      Text('DEF: ${rapture.getFinalDefence(simulation).decimalPattern}'),
+    ]);
+
+    final displayBuffs = rapture.buffs;
+    if (displayBuffs.isNotEmpty) {
+      children.addAll([
+        divider,
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 3,
+          runSpacing: 3,
+          children: displayBuffs.map((buff) => simpleBuffIcon(simulation, buff)).toList(),
+        ),
+      ]);
+    }
+
+    return Container(constraints: BoxConstraints(maxWidth: 250), child: Column(spacing: 5, children: children));
   }
 }
 
