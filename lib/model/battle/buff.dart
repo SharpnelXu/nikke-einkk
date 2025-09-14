@@ -14,6 +14,7 @@ class BattleBuff {
   int fullDuration = 0;
   int duration = 0;
   int count = 1;
+  int applyCount = 0;
 
   BattleBuff._({
     required this.data,

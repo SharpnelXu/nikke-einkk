@@ -341,6 +341,17 @@ class BattleFunction {
       final statusCheck = checkTargetStatus(event, simulation, target);
       if (!statusCheck) continue;
 
+      // debuff immune related
+      final debuffImmune = target.buffs.firstWhereOrNull((buff) => buff.data.functionType == FunctionType.debuffImmune);
+      if (data.buff.isDeBuff && data.buffRemove.canRemove && debuffImmune != null) {
+        debuffImmune.applyCount += 1;
+        if (debuffImmune.applyCount == debuffImmune.data.functionValue) {
+          target.buffs.remove(debuffImmune);
+          simulation.registerEvent(simulation.currentFrame, BuffEvent.remove(debuffImmune));
+        }
+        continue;
+      }
+
       result = true;
       final previousMaxAmmo = target is BattleNikke ? target.getMaxAmmo(simulation) : 0;
       final previousMaxHp = target.getMaxHp(simulation);
@@ -399,6 +410,22 @@ class BattleFunction {
             isMaxHpOnly: true,
           ),
         );
+      } else if (data.functionType == FunctionType.debuffImmune) {
+        do {
+          BattleBuff? debuff = target.buffs.firstWhereOrNull(
+            (buff) => buff.data.buff.isDeBuff && buff.data.buffRemove.canRemove,
+          );
+          if (debuff == null) break;
+
+          target.buffs.remove(debuff);
+          simulation.registerEvent(simulation.currentFrame, BuffEvent.remove(debuff));
+          addedBuff.applyCount += 1;
+        } while (addedBuff.applyCount < addedBuff.data.functionValue);
+
+        if (addedBuff.applyCount >= addedBuff.data.functionValue) {
+          target.buffs.remove(addedBuff);
+          simulation.registerEvent(simulation.currentFrame, BuffEvent.remove(addedBuff));
+        }
       }
     }
     status = data.keepingType;
@@ -470,6 +497,7 @@ class BattleFunction {
       case FunctionType.copyHp:
       case FunctionType.explosiveCircuitAccrueDamageRatio:
       case FunctionType.durationDamageRatio:
+      case FunctionType.debuffImmune:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -676,7 +704,6 @@ class BattleFunction {
         }
         break;
       case FunctionType.damageShare:
-      case FunctionType.debuffImmune:
       case FunctionType.defChangHpRate:
       case FunctionType.defIgnoreDamage:
       case FunctionType.defIgnoreDamageRatio:
