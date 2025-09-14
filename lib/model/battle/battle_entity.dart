@@ -89,7 +89,15 @@ abstract class BattleEntity {
   }
 
   int getDefenceBuffValues(BattleSimulation simulation) {
-    return getBuffValue(simulation, FunctionType.statDef, 0, (entity) => entity.baseDefence);
+    final hpLossConversion = getBuffValue(
+      simulation,
+      FunctionType.defChangHpRate,
+      0,
+      (entity) => entity.baseDefence * (1 - entity.currentHp / entity.getMaxHp(simulation)).clamp(0, 1) * 100,
+    );
+    final statDef = getBuffValue(simulation, FunctionType.statDef, 0, (entity) => entity.baseDefence);
+
+    return statDef + hpLossConversion;
   }
 
   int getMaxHp(BattleSimulation simulation) {

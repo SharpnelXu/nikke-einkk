@@ -498,6 +498,7 @@ class BattleFunction {
       case FunctionType.explosiveCircuitAccrueDamageRatio:
       case FunctionType.durationDamageRatio:
       case FunctionType.debuffImmune:
+      case FunctionType.defChangHpRate:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -704,7 +705,6 @@ class BattleFunction {
         }
         break;
       case FunctionType.damageShare:
-      case FunctionType.defChangHpRate:
       case FunctionType.defIgnoreDamage:
       case FunctionType.defIgnoreDamageRatio:
       case FunctionType.durationValueChange:
