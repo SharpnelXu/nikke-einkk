@@ -499,6 +499,7 @@ class BattleFunction {
       case FunctionType.durationDamageRatio:
       case FunctionType.debuffImmune:
       case FunctionType.defChangHpRate:
+      case FunctionType.defIgnoreDamageRatio:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -534,6 +535,7 @@ class BattleFunction {
         }
         break;
       case FunctionType.damage:
+      case FunctionType.defIgnoreDamage:
         final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
           if (target is BattleRapture) {
@@ -705,8 +707,6 @@ class BattleFunction {
         }
         break;
       case FunctionType.damageShare:
-      case FunctionType.defIgnoreDamage:
-      case FunctionType.defIgnoreDamageRatio:
       case FunctionType.durationValueChange:
       case FunctionType.finalStatHpHeal:
       case FunctionType.fixStatReloadTime:

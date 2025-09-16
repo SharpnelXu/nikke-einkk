@@ -85,7 +85,6 @@ int getBattlePoint({
 class NikkeDamageParameter {
   // base
   int attack = 0;
-  bool isIgnoreDefence = false;
   int defence = 0;
   int testOnlyAttackBuff = 0; // deprecated due to atkReplaceMaxHpRate buff invalidating concept of attack buff
   int defenceBuff = 0;
@@ -115,7 +114,7 @@ class NikkeDamageParameter {
   // add damage, parts, sustain, pierce
   int addDamageBuff = 0;
   int partDamageBuff = 0;
-  int interruptionPartDamageBuff = 0;
+  int defIgnoreDamageBuff = 0;
   int sustainedDamageBuff = 0;
   int pierceDamageBuff = 0;
   int breakDamageBuff = 0;
@@ -126,7 +125,6 @@ class NikkeDamageParameter {
 
   NikkeDamageParameter({
     this.attack = 0,
-    this.isIgnoreDefence = false,
     this.defence = 0,
     this.testOnlyAttackBuff = 0,
     this.defenceBuff = 0,
@@ -148,7 +146,7 @@ class NikkeDamageParameter {
     this.chargePercent = 0,
     this.addDamageBuff = 0,
     this.partDamageBuff = 0,
-    this.interruptionPartDamageBuff = 0,
+    this.defIgnoreDamageBuff = 0,
     this.sustainedDamageBuff = 0,
     this.pierceDamageBuff = 0,
     this.breakDamageBuff = 0,
@@ -160,7 +158,6 @@ class NikkeDamageParameter {
   String toString() {
     return 'NikkeDamageParameter{'
         'attack: $attack, '
-        'isIgnoreDefence: $isIgnoreDefence, '
         'defence: $defence, '
         'testOnlyAttackBuff: $testOnlyAttackBuff, '
         'defenceBuff: $defenceBuff, '
@@ -182,7 +179,7 @@ class NikkeDamageParameter {
         'chargePercent: $chargePercent, '
         'addDamageBuff: $addDamageBuff, '
         'partDamageBuff: $partDamageBuff, '
-        'interruptionPartDamageBuff: $interruptionPartDamageBuff, '
+        'defIgnoreDamageBuff: $defIgnoreDamageBuff, '
         'sustainedDamageBuff: $sustainedDamageBuff, '
         'pierceDamageBuff: $pierceDamageBuff, '
         'breakDamageBuff: $breakDamageBuff, '
@@ -194,7 +191,6 @@ class NikkeDamageParameter {
   NikkeDamageParameter copy() {
     return NikkeDamageParameter(
       attack: attack,
-      isIgnoreDefence: isIgnoreDefence,
       defence: defence,
       testOnlyAttackBuff: testOnlyAttackBuff,
       defenceBuff: defenceBuff,
@@ -216,7 +212,7 @@ class NikkeDamageParameter {
       chargePercent: chargePercent,
       addDamageBuff: addDamageBuff,
       partDamageBuff: partDamageBuff,
-      interruptionPartDamageBuff: interruptionPartDamageBuff,
+      defIgnoreDamageBuff: defIgnoreDamageBuff,
       sustainedDamageBuff: sustainedDamageBuff,
       pierceDamageBuff: pierceDamageBuff,
       breakDamageBuff: breakDamageBuff,
@@ -249,7 +245,7 @@ class NikkeDamageParameter {
     if (testOnlyAttackBuff != 0) {
       logger.w('Using testAttackBuff in damage calculation is deprecated.');
     }
-    final finalAttack = attack + testOnlyAttackBuff - (isIgnoreDefence ? 0 : defence + defenceBuff);
+    final finalAttack = attack + testOnlyAttackBuff - defence - defenceBuff;
     final finalRate = toModifier(damageRate + damageRateBuff) * toModifier(hitRate);
 
     final coreCorrection = core ? correction(coreDamageRate + coreDamageBuff) : 0;
@@ -265,7 +261,13 @@ class NikkeDamageParameter {
     final chargeRate = toModifier(10000 + actualCharge.round());
 
     final addDamageRate = toModifier(
-      10000 + addDamageBuff + partDamageBuff + interruptionPartDamageBuff + sustainedDamageBuff + pierceDamageBuff,
+      10000 +
+          addDamageBuff +
+          partDamageBuff +
+          breakDamageBuff +
+          sustainedDamageBuff +
+          pierceDamageBuff +
+          defIgnoreDamageBuff,
     );
 
     final receiveDamage = toModifier(10000 - damageReductionBuff + distributedDamageBuff);

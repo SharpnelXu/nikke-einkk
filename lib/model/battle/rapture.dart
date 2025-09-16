@@ -593,6 +593,7 @@ class BattleRapture extends BattleEntity {
                 rapture: this,
                 damageRate: baseRate * stack,
                 source: buff.source,
+                isDurationDamage: true,
               ),
             );
           }

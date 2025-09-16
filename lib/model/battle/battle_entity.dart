@@ -147,6 +147,10 @@ abstract class BattleEntity {
     return getPlainBuffValues(simulation, FunctionType.durationDamageRatio);
   }
 
+  int getDefIgnoreDamageBuffValues(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.defIgnoreDamageRatio);
+  }
+
   int getPlainBuffValues(BattleSimulation simulation, FunctionType type) {
     int result = 0;
     for (final buff in buffs) {
