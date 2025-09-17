@@ -111,7 +111,12 @@ abstract class BattleEntity {
       (entity) => entity.baseHp,
     );
 
-    return statHp + copyHp.round();
+    int finalStatHp = 0;
+    for (final buff in buffs.where((buff) => buff.data.functionType == FunctionType.finalStatHpHeal)) {
+      finalStatHp += buff.finalValue * buff.count;
+    }
+
+    return statHp + copyHp.round() + finalStatHp;
   }
 
   int getHealVariation(BattleSimulation simulation) {
@@ -244,6 +249,19 @@ abstract class BattleEntity {
             final functionStandard = simulation.getEntityById(buff.getFunctionStandardId());
             if (functionStandard != null) {
               final changeValue = toModifier(data.functionValue) * functionStandard.currentHp;
+              changeHp(simulation, changeValue.round());
+            }
+          }
+        }
+      } else if (data.functionType == FunctionType.healCharacter && data.durationType.isDurationBuff) {
+        final activeFrame = data.durationValue > 0 && (buff.fullDuration - buff.duration) % simulation.fps == 0;
+        if (activeFrame) {
+          if (data.functionValueType == ValueType.integer) {
+            changeHp(simulation, data.functionValue);
+          } else if (data.functionValueType == ValueType.percent) {
+            final functionStandard = simulation.getEntityById(buff.getFunctionStandardId());
+            if (functionStandard != null) {
+              final changeValue = toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
               changeHp(simulation, changeValue.round());
             }
           }

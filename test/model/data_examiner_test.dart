@@ -995,6 +995,11 @@ void main() {
             unknownFuncTypeIds.add(data.timingTriggerValue);
           }
 
+          if (data.functionType == FunctionType.durationValueChange) {
+            expect(data.statusTriggerType, StatusTriggerType.isFunctionOn, reason: 'Assumption violated');
+            expect(data.functionValueType, ValueType.integer, reason: 'Assumption violated');
+          }
+
           // Check for extra fields
           recordKeys.removeAll(expectedKeys);
           if (recordKeys.isNotEmpty) {

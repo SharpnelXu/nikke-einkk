@@ -395,6 +395,13 @@ class BattleFunction {
       if (data.functionType == FunctionType.statHpHeal) {
         final afterMaxHp = target.getMaxHp(simulation);
         target.changeHp(simulation, afterMaxHp - previousMaxHp);
+      } else if (data.functionType == FunctionType.finalStatHpHeal) {
+        // stacking would recalculate maxHp
+        final standard = addedBuff.getFunctionStandardId();
+        final standardMaxHp = simulation.getEntityById(standard)?.getMaxHp(simulation) ?? 0;
+        addedBuff.finalValue = (standardMaxHp * toModifier(data.functionValue)).round();
+        final afterMaxHp = target.getMaxHp(simulation);
+        target.changeHp(simulation, afterMaxHp - previousMaxHp);
       } else if (target is BattleNikke && data.functionType == FunctionType.statAmmoLoad) {
         final afterMaxAmmo = target.getMaxAmmo(simulation);
         target.currentAmmo = (target.currentAmmo + afterMaxAmmo - previousMaxAmmo).clamp(0, afterMaxAmmo);
@@ -500,6 +507,7 @@ class BattleFunction {
       case FunctionType.debuffImmune:
       case FunctionType.defChangHpRate:
       case FunctionType.defIgnoreDamageRatio:
+      case FunctionType.finalStatHpHeal:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -601,6 +609,7 @@ class BattleFunction {
 
           final activator = simulation.getEntityById(event.getActivatorId());
           final healVariation = activator?.getHealVariation(simulation) ?? 0;
+          final isDuration = data.durationType.isTimed && data.durationValue > 0;
 
           int healValue = 0;
           if (data.functionValueType == ValueType.integer) {
@@ -612,6 +621,11 @@ class BattleFunction {
           }
           final finalHeal = healValue + healValue * toModifier(healVariation);
           target.changeHp(simulation, finalHeal.round(), true);
+
+          if (isDuration) {
+            // add a buff to denote the heal over time
+            addBuff(event, simulation);
+          }
         }
         break;
       case FunctionType.useCharacterSkillId:
@@ -706,9 +720,21 @@ class BattleFunction {
           target.cover.currentHp = (target.cover.getMaxHp(simulation) * toModifier(data.functionValue)).round();
         }
         break;
-      case FunctionType.damageShare:
       case FunctionType.durationValueChange:
-      case FunctionType.finalStatHpHeal:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck) continue;
+
+          activated = true;
+          final targetFunc = data.statusTriggerValue;
+          for (final buff in target.buffs.where((buff) => buff.data.groupId == targetFunc)) {
+            buff.fullDuration += timeDataToFrame(data.functionValue, simulation.fps);
+            buff.duration += timeDataToFrame(data.functionValue, simulation.fps);
+          }
+        }
+        break;
+      case FunctionType.damageShare:
       case FunctionType.fixStatReloadTime:
       case FunctionType.forcedStop:
       case FunctionType.fullChargeHitDamageRepeat:

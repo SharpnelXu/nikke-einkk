@@ -10,6 +10,10 @@ class BattleBuff {
   FunctionData data;
   Source source;
 
+  // didn't realize there is FunctionType.finalStatHpHeal. It means all buff values should be calculated when they are
+  // added, not when they are applied. May need to addBuff? If there is another finalStat function I would probably
+  // rewrite buff value calculation logic
+  int finalValue = 0;
   int targetGroupId = 0;
   int fullDuration = 0;
   int duration = 0;
