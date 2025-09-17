@@ -505,6 +505,8 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       } else {
         list.add(Text('Covered'));
       }
+    } else if (status == BattleNikkeStatus.stunned) {
+      list.add(Text('Stunned'));
     } else {
       if (nikke.fullReloadFrameCount > 0) {
         max = nikke.fullReloadFrameCount;

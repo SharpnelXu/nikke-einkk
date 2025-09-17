@@ -18,7 +18,7 @@ import 'package:nikke_einkk/model/db.dart';
 import 'package:nikke_einkk/model/skills.dart';
 import 'package:nikke_einkk/model/user_data.dart';
 
-enum BattleNikkeStatus { behindCover, reloading, forceReloading, shooting }
+enum BattleNikkeStatus { behindCover, reloading, forceReloading, shooting, stunned }
 
 class BattleCover extends BattleEntity {
   int level;
@@ -295,6 +295,8 @@ class BattleNikke extends BattleEntity {
     determineStatus(simulation);
 
     switch (status) {
+      case BattleNikkeStatus.stunned:
+        break;
       case BattleNikkeStatus.behindCover:
         processBehindCoverStatus(simulation);
         break;
@@ -559,6 +561,10 @@ class BattleNikke extends BattleEntity {
   }
 
   void determineStatus(BattleSimulation simulation) {
+    if (hasBuff(simulation, FunctionType.stun) && !hasBuff(simulation, FunctionType.immuneStun)) {
+      status = BattleNikkeStatus.stunned;
+      return;
+    }
     if (status == BattleNikkeStatus.forceReloading && currentAmmo != getMaxAmmo(simulation)) return;
 
     final target = simulation.raptures.where((rapture) => canTarget(rapture)).firstOrNull;
@@ -647,6 +653,10 @@ class BattleNikke extends BattleEntity {
             FunctionType.changeCoolTimeSkill2,
             FunctionType.changeCoolTimeUlti,
           ][skillIndex];
+      final immuneType = [null, null, FunctionType.immuneChangeCoolTimeUlti][skillIndex];
+      if (immuneType != null && hasBuff(simulation, immuneType)) {
+        continue;
+      }
       final cdReduceTimeData = getBuffValue(
         simulation,
         changeCdType,
@@ -806,6 +816,16 @@ class BattleNikke extends BattleEntity {
   }
 
   int getTimeToReload(BattleSimulation simulation) {
+    if (hasBuff(simulation, FunctionType.fixStatReloadTime)) {
+      final result = getBuffValue(
+        simulation,
+        FunctionType.fixStatReloadTime,
+        currentWeaponData.reloadTime,
+        (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.reloadTime : 0,
+      );
+      return max(1, result + (fullReloadFrameCount == 0 ? currentWeaponData.spotLastDelay : 0));
+    }
+
     final result = getBuffValue(
       simulation,
       FunctionType.statReloadTime,

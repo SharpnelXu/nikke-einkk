@@ -508,6 +508,18 @@ class BattleFunction {
       case FunctionType.defChangHpRate:
       case FunctionType.defIgnoreDamageRatio:
       case FunctionType.finalStatHpHeal:
+      case FunctionType.fixStatReloadTime:
+      case FunctionType.forcedStop:
+      case FunctionType.immuneForcedStop:
+      case FunctionType.immuneAttention:
+      case FunctionType.immuneChangeCoolTimeUlti:
+      case FunctionType.immuneDamageMainHp:
+      case FunctionType.immuneGravityBomb:
+      case FunctionType.immuneInstantDeath:
+      case FunctionType.immuneInstallBarrier:
+      case FunctionType.immuneOtherElement:
+      case FunctionType.immuneStun:
+      case FunctionType.immuneTaunt:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -734,9 +746,17 @@ class BattleFunction {
           }
         }
         break;
+      case FunctionType.forcedReload:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (statusCheck && target is BattleNikke) {
+            activated = true;
+            target.status == BattleNikkeStatus.forceReloading;
+          }
+        }
+        break;
       case FunctionType.damageShare:
-      case FunctionType.fixStatReloadTime:
-      case FunctionType.forcedStop:
       case FunctionType.fullChargeHitDamageRepeat:
       case FunctionType.functionOverlapChange:
       case FunctionType.gainUltiGauge:
@@ -746,19 +766,6 @@ class BattleFunction {
       case FunctionType.healShare:
       case FunctionType.hide:
       case FunctionType.hpProportionDamage:
-      case FunctionType.immuneAttention:
-      case FunctionType.immuneBio:
-      case FunctionType.immuneChangeCoolTimeUlti:
-      case FunctionType.immuneDamageMainHp:
-      case FunctionType.immuneEnergy:
-      case FunctionType.immuneForcedStop:
-      case FunctionType.immuneGravityBomb:
-      case FunctionType.immuneInstantDeath:
-      case FunctionType.immuneInstallBarrier:
-      case FunctionType.immuneMetal:
-      case FunctionType.immuneOtherElement:
-      case FunctionType.immuneStun:
-      case FunctionType.immuneTaunt:
       case FunctionType.immortal:
       case FunctionType.incBarrierHp:
       case FunctionType.incBurstDuration:
@@ -811,7 +818,6 @@ class BattleFunction {
       case FunctionType.durationDamage:
       case FunctionType.useSkill1:
       case FunctionType.defIgnoreSkillDamageInstant:
-      case FunctionType.forcedReload:
       case FunctionType.statBonusRangeMin:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
@@ -828,6 +834,9 @@ class BattleFunction {
       case FunctionType.damageFunctionUnable:
       case FunctionType.damageShareInstantUnable:
       case FunctionType.damageShareLowestPriority:
+      case FunctionType.immuneBio:
+      case FunctionType.immuneEnergy:
+      case FunctionType.immuneMetal:
         break;
     }
 

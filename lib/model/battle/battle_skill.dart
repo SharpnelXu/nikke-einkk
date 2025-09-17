@@ -260,6 +260,10 @@ class BattleSkill {
         break;
       case CharacterSkillType.installBarrier:
         for (final target in skillTargets) {
+          if (target.hasBuff(simulation, FunctionType.immuneInstallBarrier)) {
+            continue;
+          }
+
           final barrierHp = owner.getMaxHp(simulation) * toModifier(skillData.getSkillValue(1));
           final barrier = Barrier(
             skillData.id,
