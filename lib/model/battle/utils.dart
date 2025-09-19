@@ -109,7 +109,7 @@ class NikkeDamageParameter {
   // full charge
   int chargeDamageRate = 10000;
   int chargeDamageBuff = 0;
-  int chargePercent = 10000;
+  int chargePercent = 0;
 
   // add damage, parts, sustain, pierce
   int addDamageBuff = 0;

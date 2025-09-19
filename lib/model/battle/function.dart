@@ -514,12 +514,15 @@ class BattleFunction {
       case FunctionType.immuneAttention:
       case FunctionType.immuneChangeCoolTimeUlti:
       case FunctionType.immuneDamageMainHp:
+      case FunctionType.gravityBomb:
       case FunctionType.immuneGravityBomb:
       case FunctionType.immuneInstantDeath:
       case FunctionType.immuneInstallBarrier:
       case FunctionType.immuneOtherElement:
+      case FunctionType.stun:
       case FunctionType.immuneStun:
       case FunctionType.immuneTaunt:
+      case FunctionType.fullChargeHitDamageRepeat:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -756,11 +759,22 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.damageShare:
-      case FunctionType.fullChargeHitDamageRepeat:
       case FunctionType.functionOverlapChange:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (statusCheck) {
+            activated = true;
+            for (final buff in target.buffs) {
+              if (buff.count < buff.data.fullCount) {
+                buff.count += 1;
+              }
+            }
+          }
+        }
+        break;
+      case FunctionType.damageShare:
       case FunctionType.gainUltiGauge:
-      case FunctionType.gravityBomb:
       case FunctionType.healBarrier:
       case FunctionType.healDecoy:
       case FunctionType.healShare:
@@ -801,7 +815,6 @@ class BattleFunction {
       case FunctionType.stickyProjectileCollisionDamage:
       case FunctionType.stickyProjectileExplosion:
       case FunctionType.stickyProjectileInstantExplosion:
-      case FunctionType.stun:
       case FunctionType.taunt:
       case FunctionType.targetPartsId:
       case FunctionType.transformation:

@@ -86,7 +86,7 @@ class NikkeDamageEvent extends BattleEvent {
     required this.source,
     required this.damageParameter,
     required this.invalid,
-    this.chargePercent = 10000,
+    this.chargePercent = 0,
     this.shotCount = 1,
     this.partId,
     this.shareCount = 0,
@@ -347,6 +347,19 @@ class NikkeDamageEvent extends BattleEvent {
       if (drainHp > 0) {
         final expectedDamage = damageParameter.calculateExpectedDamage();
         nikke.changeHp(simulation, (toModifier(drainHp) * expectedDamage).round(), true);
+      }
+
+      if (source == Source.bullet &&
+          chargePercent >= 10000 &&
+          nikke.hasBuff(simulation, FunctionType.fullChargeHitDamageRepeat)) {
+        final expectedDamage = damageParameter.calculateExpectedDamage();
+        for (final repeat in nikke.buffs.where((b) => b.data.functionType == FunctionType.fullChargeHitDamageRepeat)) {
+          final repeatDamage = (expectedDamage * (toModifier(repeat.data.functionValue) * repeat.count)).round();
+          simulation.registerEvent(
+            simulation.currentFrame,
+            NikkeFixDamageEvent.create(nikke, rapture, Source.bullet, repeatDamage),
+          );
+        }
       }
 
       rapture.hitMonsterGetBuffData?.applyBuff(simulation, this);
