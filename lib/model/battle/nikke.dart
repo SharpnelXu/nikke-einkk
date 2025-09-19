@@ -325,6 +325,29 @@ class BattleNikke extends BattleEntity {
         barrier.duration -= 1;
       }
     }
+
+    //   for (final buff in buffs) {
+    //     final data = buff.data;
+    //     if (data.functionType == FunctionType.healBarrier && data.durationType.isDurationBuff) {
+    //       final activeFrame = data.durationValue > 0 && (buff.fullDuration - buff.duration) % simulation.fps == 0;
+    //       if (activeFrame && barriers.isNotEmpty) {
+    //         int healValue = 0;
+    //         if (data.functionValueType == ValueType.integer) {
+    //           healValue = data.functionValue;
+    //         } else if (data.functionValueType == ValueType.percent) {
+    //           final functionStandard = simulation.getEntityById(buff.getFunctionStandardId());
+    //           final changeValue = toModifier(data.functionValue) * (functionStandard?.getMaxHp(simulation) ?? 0);
+    //           healValue = changeValue.round();
+    //         }
+    //         final finalHeal = healValue;
+    //         for (final barrier in barriers) {
+    //           if (barrier.hp > 0) {
+    //             barrier.hp = (barrier.hp + finalHeal.round()).clamp(1, barrier.maxHp);
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
   }
 
   void processBehindCoverStatus(BattleSimulation simulation) {

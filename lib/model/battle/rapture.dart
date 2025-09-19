@@ -599,6 +599,21 @@ class BattleRapture extends BattleEntity {
           }
         }
       }
+      // else if (data.functionType == FunctionType.healBarrier && data.durationType.isDurationBuff) {
+      //   final activeFrame = data.durationValue > 0 && (buff.fullDuration - buff.duration) % simulation.fps == 0;
+      //   if (activeFrame && this.barrier != null && this.barrier!.hp > 0) {
+      //     int healValue = 0;
+      //     if (data.functionValueType == ValueType.integer) {
+      //       healValue = data.functionValue;
+      //     } else if (data.functionValueType == ValueType.percent) {
+      //       final functionStandard = simulation.getEntityById(buff.getFunctionStandardId());
+      //       final changeValue = toModifier(data.functionValue) * (functionStandard?.getMaxHp(simulation) ?? 0);
+      //       healValue = changeValue.round();
+      //     }
+      //     final finalHeal = healValue;
+      //     this.barrier!.hp = (this.barrier!.hp + finalHeal.round()).clamp(1, this.barrier!.maxHp);
+      //   }
+      // }
     }
 
     if (options.actions.containsKey(simulation.currentFrame)) {
@@ -674,7 +689,7 @@ class BattleRapture extends BattleEntity {
           elementalShield.clear();
           break;
         case BattleRaptureActionType.generateBarrier:
-          barrier = Barrier(-1, action.barrierHp!, action.durationType!, action.frameDuration ?? 0);
+          barrier = Barrier(-1, action.barrierHp!, action.barrierHp!, action.durationType!, action.frameDuration ?? 0);
           break;
         case BattleRaptureActionType.generateParts:
           final partId = action.partId!;

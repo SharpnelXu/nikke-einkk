@@ -523,6 +523,11 @@ class BattleFunction {
       case FunctionType.immuneStun:
       case FunctionType.immuneTaunt:
       case FunctionType.fullChargeHitDamageRepeat:
+      case FunctionType.hide:
+      case FunctionType.healShare: //  TODO: implement
+      case FunctionType.damageShare: //  TODO: implement
+      case FunctionType.immortal: //  TODO: implement
+      case FunctionType.incBarrierHp:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -623,7 +628,9 @@ class BattleFunction {
           activated = true;
 
           final activator = simulation.getEntityById(event.getActivatorId());
-          final healVariation = activator?.getHealVariation(simulation) ?? 0;
+          // todo: add or multiply?
+          final healVariation =
+              (activator?.getGivingHealVariationBuffValues(simulation) ?? 0) + target.getHealVariation(simulation);
           final isDuration = data.durationType.isTimed && data.durationValue > 0;
 
           int healValue = 0;
@@ -773,15 +780,66 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.damageShare:
-      case FunctionType.gainUltiGauge:
       case FunctionType.healBarrier:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck) continue;
+
+          activated = true;
+
+          int healValue = 0;
+          if (data.functionValueType == ValueType.integer) {
+            healValue = data.functionValue;
+          } else if (data.functionValueType == ValueType.percent) {
+            final functionStandard = simulation.getNikkeOnPosition(getFunctionStandardUniqueId(target.uniqueId))!;
+            final changeValue = toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
+            healValue = changeValue.round();
+          }
+          final finalHeal = healValue;
+          if (target is BattleNikke) {
+            for (final barrier in target.barriers) {
+              if (barrier.hp > 0) {
+                barrier.hp = (barrier.hp + finalHeal.round()).clamp(1, barrier.maxHp);
+              }
+            }
+          } else if (target is BattleRapture && target.barrier != null && target.barrier!.hp > 0) {
+            target.barrier!.hp = (target.barrier!.hp + finalHeal.round()).clamp(1, target.barrier!.maxHp);
+          }
+
+          // final isDuration = data.durationType.isTimed && data.durationValue > 0;
+          // if (isDuration) {
+          //   // add a buff to denote the heal over time
+          //   addBuff(event, simulation);
+          // }
+        }
+        break;
       case FunctionType.healDecoy:
-      case FunctionType.healShare:
-      case FunctionType.hide:
-      case FunctionType.hpProportionDamage:
-      case FunctionType.immortal:
-      case FunctionType.incBarrierHp:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (statusCheck && target is BattleNikke && target.decoy != null) {
+            activated = true;
+            final decoy = target.decoy!;
+            int healValue = 0;
+            if (data.functionValueType == ValueType.integer) {
+              healValue = data.functionValue;
+            } else if (data.functionValueType == ValueType.percent) {
+              final functionStandard = simulation.getNikkeOnPosition(getFunctionStandardUniqueId(target.uniqueId))!;
+              final changeValue = toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
+              healValue = changeValue.round();
+            }
+
+            decoy.changeHp(simulation, healValue, true);
+
+            // final isDuration = data.durationType.isTimed && data.durationValue > 0;
+            // if (isDuration) {
+            //   // add a buff to denote the heal over time
+            //   addBuff(event, simulation);
+            // }
+          }
+        }
+        break;
       case FunctionType.incBurstDuration:
       case FunctionType.infection:
       case FunctionType.instantAllBurstDamage:
@@ -850,6 +908,8 @@ class BattleFunction {
       case FunctionType.immuneBio:
       case FunctionType.immuneEnergy:
       case FunctionType.immuneMetal:
+      case FunctionType.gainUltiGauge:
+      case FunctionType.hpProportionDamage:
         break;
     }
 

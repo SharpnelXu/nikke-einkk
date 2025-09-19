@@ -123,6 +123,10 @@ abstract class BattleEntity {
     return getPlainBuffValues(simulation, FunctionType.healVariation);
   }
 
+  int getIncBarrierHp(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.incBarrierHp);
+  }
+
   int getAddDamageBuffValues(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.addDamage);
   }
@@ -256,15 +260,19 @@ abstract class BattleEntity {
       } else if (data.functionType == FunctionType.healCharacter && data.durationType.isDurationBuff) {
         final activeFrame = data.durationValue > 0 && (buff.fullDuration - buff.duration) % simulation.fps == 0;
         if (activeFrame) {
+          final activator = simulation.getEntityById(buff.buffGiverId);
+          final healVariation =
+              (activator?.getGivingHealVariationBuffValues(simulation) ?? 0) + getHealVariation(simulation);
+          int healValue = 0;
           if (data.functionValueType == ValueType.integer) {
-            changeHp(simulation, data.functionValue);
+            healValue = data.functionValue;
           } else if (data.functionValueType == ValueType.percent) {
             final functionStandard = simulation.getEntityById(buff.getFunctionStandardId());
-            if (functionStandard != null) {
-              final changeValue = toModifier(data.functionValue) * functionStandard.getMaxHp(simulation);
-              changeHp(simulation, changeValue.round());
-            }
+            final changeValue = toModifier(data.functionValue) * (functionStandard?.getMaxHp(simulation) ?? 0);
+            healValue = changeValue.round();
           }
+          final finalHeal = healValue + healValue * toModifier(healVariation);
+          changeHp(simulation, finalHeal.round(), true);
         }
       }
     }

@@ -264,9 +264,13 @@ class BattleSkill {
             continue;
           }
 
-          final barrierHp = owner.getMaxHp(simulation) * toModifier(skillData.getSkillValue(1));
+          final barrierHpIncrease = target.getIncBarrierHp(simulation);
+          final barrierHp =
+              owner.getMaxHp(simulation) * toModifier(skillData.getSkillValue(1)) * (1 + toModifier(barrierHpIncrease));
+
           final barrier = Barrier(
             skillData.id,
+            barrierHp.round(),
             barrierHp.round(),
             skillData.durationType,
             timeDataToFrame(skillData.durationValue, simulation.fps),
