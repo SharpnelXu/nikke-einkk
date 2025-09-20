@@ -917,7 +917,11 @@ class BattleNikke extends BattleEntity {
     return BurstStep.fromStep(changeBuffVal) ?? characterData.changeBurstStep;
   }
 
-  getExplosiveCircuitAccumulationRatio(BattleSimulation simulation) {
+  int getExplosiveCircuitAccumulationRatio(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.explosiveCircuitAccrueDamageRatio);
+  }
+
+  int getBurstDuration(BattleSimulation simulation) {
+    return characterData.burstDuration + getPlainBuffValues(simulation, FunctionType.incBurstDuration);
   }
 }

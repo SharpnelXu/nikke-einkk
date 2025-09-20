@@ -357,7 +357,7 @@ class NikkeDamageEvent extends BattleEvent {
           final repeatDamage = (expectedDamage * (toModifier(repeat.data.functionValue) * repeat.count)).round();
           simulation.registerEvent(
             simulation.currentFrame,
-            NikkeFixDamageEvent.create(nikke, rapture, Source.bullet, repeatDamage),
+            NikkeFixDamageEvent.create(nikke, rapture, repeat.source, repeatDamage),
           );
         }
       }

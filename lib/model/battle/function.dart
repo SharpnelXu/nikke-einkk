@@ -528,6 +528,7 @@ class BattleFunction {
       case FunctionType.damageShare: //  TODO: implement
       case FunctionType.immortal: //  TODO: implement
       case FunctionType.incBarrierHp:
+      case FunctionType.incBurstDuration:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -773,8 +774,8 @@ class BattleFunction {
           if (statusCheck) {
             activated = true;
             for (final buff in target.buffs) {
-              if (buff.count < buff.data.fullCount) {
-                buff.count += 1;
+              if (buff.data.groupId == data.functionValue || data.functionValue < constData.fullCountLimit) {
+                buff.count = min(buff.count + data.fullCount, buff.data.fullCount);
               }
             }
           }
@@ -840,7 +841,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.incBurstDuration:
       case FunctionType.infection:
       case FunctionType.instantAllBurstDamage:
       case FunctionType.instantDeath:

@@ -452,7 +452,7 @@ class BattleSkill {
             ownerId,
             currentStage: simulation.burstStage,
             nextStage: nextStageNum,
-            duration: owner.characterData.burstDuration,
+            duration: owner.getBurstDuration(simulation),
           ),
         );
       }
