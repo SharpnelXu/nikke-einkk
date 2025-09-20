@@ -532,6 +532,9 @@ class BattleFunction {
       case FunctionType.incBurstDuration:
       case FunctionType.instantAllBurstDamage:
       case FunctionType.singleBurstDamage:
+      case FunctionType.shareDamageIncrease:
+      case FunctionType.statBonusRangeMax:
+      case FunctionType.statBonusRangeMin:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -844,9 +847,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.instantDeath:
-      case FunctionType.linkAtk:
-      case FunctionType.linkDef:
       case FunctionType.outBonusRangeDamageChange:
       case FunctionType.overHealSave:
       case FunctionType.partsHpChangeUIOff:
@@ -858,9 +858,6 @@ class BattleFunction {
       case FunctionType.projectileExplosionDamage:
       case FunctionType.repeatUseBurstStep:
       case FunctionType.resurrection:
-      case FunctionType.shareDamageIncrease:
-      case FunctionType.silence:
-      case FunctionType.statBonusRangeMax:
       case FunctionType.statBurstSkillCoolTime:
       case FunctionType.statChargeTimeImmune:
       case FunctionType.statExplosion:
@@ -872,7 +869,6 @@ class BattleFunction {
       case FunctionType.stickyProjectileExplosion:
       case FunctionType.stickyProjectileInstantExplosion:
       case FunctionType.taunt:
-      case FunctionType.targetPartsId:
       case FunctionType.transformation:
       case FunctionType.uncoverable:
       case FunctionType.useSkill2:
@@ -887,29 +883,36 @@ class BattleFunction {
       case FunctionType.durationDamage:
       case FunctionType.useSkill1:
       case FunctionType.defIgnoreSkillDamageInstant:
-      case FunctionType.statBonusRangeMin:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
       case FunctionType.allStepBurstNextStep: // no usage among nikkes
       case FunctionType.atkBuffChange: // no usage among nikkes
       case FunctionType.bonusRangeDamageChange: // no usage among nikkes
-      case FunctionType.callingMonster:
+      case FunctionType.damageFunctionUnable: // likely a buff that dispels damage function
+      case FunctionType.damageShareInstantUnable: // likely a buff that dispels damage share instant
+      case FunctionType.damageShareLowestPriority: // likely a buff that changes damage share priority when calculating
       case FunctionType.currentHpRatioDamage:
+      // ^^^ likely useful in the future
+      case FunctionType.callingMonster:
+      case FunctionType.gainUltiGauge:
+      case FunctionType.hpProportionDamage:
+      case FunctionType.instantDeath:
+      case FunctionType.linkAtk:
+      case FunctionType.linkDef:
+      case FunctionType.silence:
+      case FunctionType.targetPartsId:
+      // ^^^ likely monster only skills
       case FunctionType.damageBio:
       case FunctionType.damageEnergy:
       case FunctionType.damageMetal:
       case FunctionType.damageRatioEnergy:
       case FunctionType.damageRatioMetal:
-      case FunctionType.damageFunctionUnable:
-      case FunctionType.damageShareInstantUnable:
-      case FunctionType.damageShareLowestPriority:
       case FunctionType.immuneBio:
       case FunctionType.immuneEnergy:
       case FunctionType.immuneMetal:
-      case FunctionType.gainUltiGauge:
-      case FunctionType.hpProportionDamage:
       case FunctionType.statBioResist:
       case FunctionType.statEnergyResist:
+        // ^^^ likely deprecated
         break;
     }
 

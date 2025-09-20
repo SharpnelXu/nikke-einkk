@@ -611,8 +611,18 @@ class BattleNikke extends BattleEntity {
     }
   }
 
-  bool isBonusRange(int distance) {
-    return distance >= characterData.bonusRangeMin && distance <= characterData.bonusRangeMax;
+  int getBonusRangeMax(BattleSimulation simulation) {
+    return characterData.bonusRangeMax + getPlainBuffValues(simulation, FunctionType.statBonusRangeMax);
+  }
+
+  int getBonusRangeMin(BattleSimulation simulation) {
+    return characterData.bonusRangeMin + getPlainBuffValues(simulation, FunctionType.statBonusRangeMin);
+  }
+
+  bool isBonusRange(BattleSimulation simulation, int distance) {
+    return currentWeaponType != WeaponType.rl &&
+        distance >= getBonusRangeMin(simulation) &&
+        distance <= getBonusRangeMax(simulation);
   }
 
   bool canTarget(BattleRapture rapture) {
