@@ -116,9 +116,18 @@ class BattleSkill {
     required BattleEntity target,
     required bool targetParts,
   }) {
-    if (target is BattleRapture) {
+    final owner = simulation.getNikkeOnPosition(ownerId);
+    if (target is BattleRapture && owner != null) {
       // TODO: shareDamage is definitely incorrect (idea: in getSkillTarget, if target contains this buff, gets all
       //  raptures that contains this buff as target)
+
+      final rateIncrease =
+          Source.burst == source
+              ? [CharacterSkillType.instantAllParts, CharacterSkillType.instantAll].contains(skillData.skillType)
+                  ? owner.getIncInstantAllBurstDamage(simulation)
+                  : owner.getIncSingleBurstDamage(simulation)
+              : 0;
+
       bool shareDamage = false;
       final shareDamageBuff = target.buffs.firstWhereOrNull(
         (buff) => buff.data.functionType == FunctionType.damageShareInstant,
@@ -133,10 +142,10 @@ class BattleSkill {
         damageFrame,
         NikkeDamageEvent.skill(
           simulation: simulation,
-          nikke: simulation.getNikkeOnPosition(ownerId)!,
+          nikke: owner,
           rapture: target,
           source: source,
-          damageRate: damageRate,
+          damageRate: damageRate + rateIncrease,
           isShareDamage: shareDamage,
         ),
       );

@@ -524,11 +524,14 @@ class BattleFunction {
       case FunctionType.immuneTaunt:
       case FunctionType.fullChargeHitDamageRepeat:
       case FunctionType.hide:
-      case FunctionType.healShare: //  TODO: implement
-      case FunctionType.damageShare: //  TODO: implement
-      case FunctionType.immortal: //  TODO: implement
+      case FunctionType.healShare: // TODO: implement
+      case FunctionType.damageShare: // TODO: implement
+      case FunctionType.immortal: // TODO: implement
+      case FunctionType.infection: // TODO: implement
       case FunctionType.incBarrierHp:
       case FunctionType.incBurstDuration:
+      case FunctionType.instantAllBurstDamage:
+      case FunctionType.singleBurstDamage:
       case FunctionType.none: // misc counters etc.
         // add buff
         activated = addBuff(event, simulation);
@@ -841,8 +844,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.infection:
-      case FunctionType.instantAllBurstDamage:
       case FunctionType.instantDeath:
       case FunctionType.linkAtk:
       case FunctionType.linkDef:
@@ -859,12 +860,9 @@ class BattleFunction {
       case FunctionType.resurrection:
       case FunctionType.shareDamageIncrease:
       case FunctionType.silence:
-      case FunctionType.singleBurstDamage:
-      case FunctionType.statBioResist:
       case FunctionType.statBonusRangeMax:
       case FunctionType.statBurstSkillCoolTime:
       case FunctionType.statChargeTimeImmune:
-      case FunctionType.statEnergyResist:
       case FunctionType.statExplosion:
       case FunctionType.statInstantSkillRange:
       case FunctionType.statMaintainFireStance:
@@ -910,6 +908,8 @@ class BattleFunction {
       case FunctionType.immuneMetal:
       case FunctionType.gainUltiGauge:
       case FunctionType.hpProportionDamage:
+      case FunctionType.statBioResist:
+      case FunctionType.statEnergyResist:
         break;
     }
 

@@ -924,4 +924,12 @@ class BattleNikke extends BattleEntity {
   int getBurstDuration(BattleSimulation simulation) {
     return characterData.burstDuration + getPlainBuffValues(simulation, FunctionType.incBurstDuration);
   }
+
+  int getIncInstantAllBurstDamage(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.instantAllBurstDamage);
+  }
+
+  int getIncSingleBurstDamage(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.singleBurstDamage);
+  }
 }
