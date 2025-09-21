@@ -418,11 +418,21 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       }
       final currentCoverHp = nikke.cover.currentHp;
       final maxCoverHp = nikke.cover.getMaxHp(simulation);
-      final currentHp = nikke.currentHp;
-      final maxHp = nikke.getMaxHp(simulation);
       children.addAll([
         SimplePercentBar(percent: currentCoverHp / maxCoverHp, color: Colors.blue[200]),
         Text(currentCoverHp.decimalPattern),
+      ]);
+      final overHealSaveTotal = nikke.getOverHeal(simulation);
+      if (overHealSaveTotal > 0) {
+        children.addAll([
+          SimplePercentBar(percent: nikke.overHealSave / overHealSaveTotal, color: Colors.green[400]),
+          Text(nikke.overHealSave.decimalPattern),
+        ]);
+      }
+
+      final currentHp = nikke.currentHp;
+      final maxHp = nikke.getMaxHp(simulation);
+      children.addAll([
         SimplePercentBar(percent: currentHp / maxHp, color: Colors.white),
         Text(currentHp.decimalPattern),
       ]);

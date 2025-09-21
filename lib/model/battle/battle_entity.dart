@@ -11,6 +11,7 @@ import 'events/buff_event.dart';
 abstract class BattleEntity {
   int uniqueId = 0;
   int currentHp = 0;
+  int overHealSave = 0;
 
   final List<BattleBuff> buffs = [];
   final Map<int, int> funcRatioTracker = {};
@@ -36,7 +37,15 @@ abstract class BattleEntity {
   }
 
   void changeHp(BattleSimulation simulation, int changeValue, [bool isHeal = false]) {
-    currentHp = (currentHp + changeValue).clamp(1, getMaxHp(simulation));
+    final maxHp = getMaxHp(simulation);
+    final overHeal = currentHp + changeValue - maxHp;
+    currentHp = (currentHp + changeValue).clamp(1, maxHp);
+    if (isHeal && overHeal > 0) {
+      final overHealSaveValue = getOverHeal(simulation);
+      if (overHealSaveValue > 0) {
+        overHealSave += overHeal.clamp(0, overHealSaveValue);
+      }
+    }
 
     simulation.registerEvent(
       simulation.currentFrame,
@@ -160,6 +169,10 @@ abstract class BattleEntity {
     return getPlainBuffValues(simulation, FunctionType.defIgnoreDamageRatio);
   }
 
+  int getOverHeal(BattleSimulation simulation) {
+    return getBuffValue(simulation, FunctionType.overHealSave, baseHp, (entity) => entity.baseHp);
+  }
+
   int getPlainBuffValues(BattleSimulation simulation, FunctionType type) {
     int result = 0;
     for (final buff in buffs) {
@@ -276,6 +289,17 @@ abstract class BattleEntity {
         }
       }
     }
+
+    final maxHp = getMaxHp(simulation);
+    if (overHealSave > 0 && currentHp < maxHp) {
+      final healAmount = (maxHp - currentHp).clamp(0, overHealSave);
+      currentHp += healAmount;
+      overHealSave -= healAmount;
+      simulation.registerEvent(
+        simulation.currentFrame,
+        HpChangeEvent(uniqueId, changeAmount: healAmount, afterChangeHp: currentHp, maxHp: maxHp),
+      );
+    }
   }
 
   void endCurrentFrame(BattleSimulation simulation) {
@@ -295,6 +319,7 @@ abstract class BattleEntity {
     }
 
     final afterMaxHp = getMaxHp(simulation);
+    currentHp = currentHp.clamp(1, afterMaxHp);
     if (previousMaxHp != afterMaxHp) {
       simulation.registerEvent(
         simulation.nextFrame,
@@ -306,6 +331,10 @@ abstract class BattleEntity {
           isMaxHpOnly: true,
         ),
       );
+    }
+
+    if (!hasBuff(simulation, FunctionType.overHealSave)) {
+      overHealSave = 0;
     }
   }
 

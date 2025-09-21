@@ -535,8 +535,8 @@ class BattleFunction {
       case FunctionType.shareDamageIncrease:
       case FunctionType.statBonusRangeMax:
       case FunctionType.statBonusRangeMin:
+      case FunctionType.overHealSave:
       case FunctionType.none: // misc counters etc.
-        // add buff
         activated = addBuff(event, simulation);
         break;
       case FunctionType.changeCurrentHpValue:
@@ -847,11 +847,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.outBonusRangeDamageChange:
-      case FunctionType.overHealSave:
-      case FunctionType.partsHpChangeUIOff:
-      case FunctionType.partsHpChangeUIOn:
-      case FunctionType.partsImmuneDamage:
       case FunctionType.plusDebuffCount:
       case FunctionType.plusInstantSkillTargetNum:
       case FunctionType.projectileDamage:
@@ -888,6 +883,7 @@ class BattleFunction {
       case FunctionType.allStepBurstNextStep: // no usage among nikkes
       case FunctionType.atkBuffChange: // no usage among nikkes
       case FunctionType.bonusRangeDamageChange: // no usage among nikkes
+      case FunctionType.outBonusRangeDamageChange:
       case FunctionType.damageFunctionUnable: // likely a buff that dispels damage function
       case FunctionType.damageShareInstantUnable: // likely a buff that dispels damage share instant
       case FunctionType.damageShareLowestPriority: // likely a buff that changes damage share priority when calculating
@@ -901,6 +897,9 @@ class BattleFunction {
       case FunctionType.linkDef:
       case FunctionType.silence:
       case FunctionType.targetPartsId:
+      case FunctionType.partsHpChangeUIOff:
+      case FunctionType.partsHpChangeUIOn:
+      case FunctionType.partsImmuneDamage:
       // ^^^ likely monster only skills
       case FunctionType.damageBio:
       case FunctionType.damageEnergy:
