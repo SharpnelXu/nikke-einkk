@@ -537,6 +537,8 @@ class BattleFunction {
       case FunctionType.statBonusRangeMin:
       case FunctionType.overHealSave:
       case FunctionType.none: // misc counters etc.
+      case FunctionType.transformation: // animation only
+      case FunctionType.focusAttack:
         activated = addBuff(event, simulation);
         break;
       case FunctionType.changeCurrentHpValue:
@@ -774,13 +776,26 @@ class BattleFunction {
         }
         break;
       case FunctionType.functionOverlapChange:
+      case FunctionType.plusBuffCount:
+      case FunctionType.plusDebuffCount:
         final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
           final statusCheck = checkTargetStatus(event, simulation, target);
           if (statusCheck) {
             activated = true;
             for (final buff in target.buffs) {
-              if (buff.data.groupId == data.functionValue || data.functionValue < constData.fullCountLimit) {
+              bool shouldAddCount = false;
+              if (data.functionType == FunctionType.functionOverlapChange) {
+                shouldAddCount =
+                    (buff.data.groupId == data.functionValue && data.functionValue > constData.fullCountLimit) ||
+                    (buff.data.buff.isBuff && data.functionValue == 1) ||
+                    (buff.data.buff.isDeBuff && data.functionValue == 0);
+              } else if (data.functionType == FunctionType.plusBuffCount) {
+                shouldAddCount = buff.data.buff.isBuff; // CN only function
+              } else if (data.functionType == FunctionType.plusDebuffCount) {
+                shouldAddCount = buff.data.buff.isDeBuff; // CN only function
+              }
+              if (shouldAddCount) {
                 buff.count = min(buff.count + data.fullCount, buff.data.fullCount);
               }
             }
@@ -847,7 +862,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.plusDebuffCount:
       case FunctionType.plusInstantSkillTargetNum:
       case FunctionType.projectileDamage:
       case FunctionType.projectileExplosionDamage:
@@ -864,17 +878,10 @@ class BattleFunction {
       case FunctionType.stickyProjectileExplosion:
       case FunctionType.stickyProjectileInstantExplosion:
       case FunctionType.taunt:
-      case FunctionType.transformation:
       case FunctionType.uncoverable:
       case FunctionType.useSkill2:
       case FunctionType.windReduction:
-      case FunctionType.focusAttack:
       case FunctionType.noOverlapStatAmmo:
-      case FunctionType.dmgReductionExcludingBreakCol:
-      case FunctionType.durationBuffCheckImmune:
-      case FunctionType.immediatelyBuffCheckImmune:
-      case FunctionType.changeHurtFxExcludingBreakCol:
-      case FunctionType.plusBuffCount:
       case FunctionType.durationDamage:
       case FunctionType.useSkill1:
       case FunctionType.defIgnoreSkillDamageInstant:
@@ -900,6 +907,10 @@ class BattleFunction {
       case FunctionType.partsHpChangeUIOff:
       case FunctionType.partsHpChangeUIOn:
       case FunctionType.partsImmuneDamage:
+      case FunctionType.changeHurtFxExcludingBreakCol:
+      case FunctionType.dmgReductionExcludingBreakCol:
+      case FunctionType.durationBuffCheckImmune:
+      case FunctionType.immediatelyBuffCheckImmune:
       // ^^^ likely monster only skills
       case FunctionType.damageBio:
       case FunctionType.damageEnergy:
