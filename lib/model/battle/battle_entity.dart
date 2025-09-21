@@ -173,6 +173,10 @@ abstract class BattleEntity {
     return getBuffValue(simulation, FunctionType.overHealSave, baseHp, (entity) => entity.baseHp);
   }
 
+  int getPlusInstantSkillTargetNum(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.plusInstantSkillTargetNum);
+  }
+
   int getPlainBuffValues(BattleSimulation simulation, FunctionType type) {
     int result = 0;
     for (final buff in buffs) {

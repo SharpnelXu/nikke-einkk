@@ -536,6 +536,8 @@ class BattleFunction {
       case FunctionType.statBonusRangeMax:
       case FunctionType.statBonusRangeMin:
       case FunctionType.overHealSave:
+      case FunctionType.plusInstantSkillTargetNum:
+      case FunctionType.projectileDamage:
       case FunctionType.none: // misc counters etc.
       case FunctionType.transformation: // animation only
       case FunctionType.focusAttack:
@@ -862,8 +864,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.plusInstantSkillTargetNum:
-      case FunctionType.projectileDamage:
       case FunctionType.projectileExplosionDamage:
       case FunctionType.repeatUseBurstStep:
       case FunctionType.resurrection:

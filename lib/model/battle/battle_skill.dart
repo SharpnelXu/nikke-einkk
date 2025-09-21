@@ -178,8 +178,8 @@ class BattleSkill {
     int skillGroupId,
     Source source,
   ) {
-    final skillTargets = getSkillTargets(simulation, skillData, ownerId);
     final owner = simulation.getNikkeOnPosition(ownerId)!;
+    final skillTargets = getSkillTargets(simulation, skillData, ownerId);
 
     final event = UseSkillEvent(
       ownerId,
@@ -481,6 +481,7 @@ class BattleSkill {
     final isThisNikke = owner is BattleNikke;
     bool targetEnemy;
     int targetCountIndex;
+    bool shouldUsePlusInstantTargetNum = false;
     switch (skillData.skillType) {
       case CharacterSkillType.installDecoy:
       case CharacterSkillType.changeWeapon:
@@ -498,6 +499,7 @@ class BattleSkill {
       case CharacterSkillType.instantNumber:
         targetCountIndex = 1;
         targetEnemy = true;
+        shouldUsePlusInstantTargetNum = true;
         break;
       case CharacterSkillType.instantSequentialAttack:
       case CharacterSkillType.hitMonsterGetBuff:
@@ -510,15 +512,19 @@ class BattleSkill {
       case CharacterSkillType.instantArea:
       case CharacterSkillType.instantCircle:
       case CharacterSkillType.instantCircleSeparate:
+        // just target all
         return isThisNikke ? simulation.raptures.toList() : simulation.aliveNikkes.toList();
       case CharacterSkillType.unknown:
         return [];
     }
 
+    final extraTarget =
+        shouldUsePlusInstantTargetNum && owner != null ? owner.getPlusInstantSkillTargetNum(simulation) : 0;
     final targetCount =
-        skillData.skillValueData[targetCountIndex].skillValueType == ValueType.integer
+        (skillData.skillValueData[targetCountIndex].skillValueType == ValueType.integer
             ? skillData.skillValueData[targetCountIndex].skillValue
-            : 0;
+            : 0) +
+        extraTarget;
 
     // isThisNikke  targetEnemy list
     // 1            1           raptures
