@@ -121,13 +121,6 @@ class BattleSkill {
       // TODO: shareDamage is definitely incorrect (idea: in getSkillTarget, if target contains this buff, gets all
       //  raptures that contains this buff as target)
 
-      final rateIncrease =
-          Source.burst == source
-              ? [CharacterSkillType.instantAllParts, CharacterSkillType.instantAll].contains(skillData.skillType)
-                  ? owner.getIncInstantAllBurstDamage(simulation)
-                  : owner.getIncSingleBurstDamage(simulation)
-              : 0;
-
       bool shareDamage = false;
       final shareDamageBuff = target.buffs.firstWhereOrNull(
         (buff) => buff.data.functionType == FunctionType.damageShareInstant,
@@ -145,7 +138,8 @@ class BattleSkill {
           nikke: owner,
           rapture: target,
           source: source,
-          damageRate: damageRate + rateIncrease,
+          damageRate: damageRate,
+          skillType: skillData.skillType,
           isShareDamage: shareDamage,
         ),
       );
@@ -161,6 +155,7 @@ class BattleSkill {
               rapture: target,
               source: source,
               damageRate: damageRate,
+              skillType: skillData.skillType,
               partId: part.id,
             ),
           );
@@ -846,7 +841,7 @@ class StigmaData {
     maxAccumulation =
         (attackAccumulationRatio *
                 owner.getFinalAttack(simulation) *
-                toModifier(owner.getShareDamageBuffValues(simulation)))
+                toModifier(owner.getShareDamageIncrease(simulation)))
             .toInt();
     currentAccumulation += event.damageParameter.calculateExpectedDamage();
     currentAccumulation = min(currentAccumulation, maxAccumulation);
@@ -891,7 +886,7 @@ class ExplosiveCircuitData {
     maxAccumulation =
         (attackAccumulationRatio *
                 owner.getFinalAttack(simulation) *
-                toModifier(owner.getShareDamageBuffValues(simulation)))
+                toModifier(owner.getShareDamageIncrease(simulation)))
             .toInt();
     currentAccumulation += (event.damageParameter.calculateExpectedDamage() * accumulationRatio).toInt();
     currentAccumulation = min(currentAccumulation, maxAccumulation);

@@ -85,9 +85,9 @@ int getBattlePoint({
 class NikkeDamageParameter {
   // base
   int attack = 0;
+  bool ignoreDefence = false;
   int defence = 0;
-  int testOnlyAttackBuff = 0; // deprecated due to atkReplaceMaxHpRate buff invalidating concept of attack buff
-  int defenceBuff = 0;
+
   int damageRate = 10000; // 100%
   int damageRateBuff = 0;
   int hitRate = 10000;
@@ -100,6 +100,9 @@ class NikkeDamageParameter {
   int criticalDamageRate = 10000;
   int criticalDamageBuff = 0;
   bool isBonusRange = false;
+  // unclear if this is in correction or add damage
+  int bonusRangeDamageBuff = 0;
+  int outBonusRangeDamageBuff = 0;
   bool isFullBurst = false;
 
   // element
@@ -107,27 +110,34 @@ class NikkeDamageParameter {
   int elementDamageBuff = 0;
 
   // full charge
+  bool get isCharge => chargePercent > 0;
+  int chargePercent = 0;
   int chargeDamageRate = 10000;
   int chargeDamageBuff = 0;
-  int chargePercent = 0;
 
   // add damage, parts, sustain, pierce
   int addDamageBuff = 0;
-  int partDamageBuff = 0;
   int defIgnoreDamageBuff = 0;
-  int sustainedDamageBuff = 0;
+  bool isPartsDamage = false;
+  int partDamageBuff = 0;
+  bool isDurationDamage = false;
+  int durationDamageBuff = 0;
+  bool isPierceDamage = false;
   int pierceDamageBuff = 0;
+  bool isBreakDamage = false;
   int breakDamageBuff = 0;
+  bool isProjectileDamage = false;
+  int projectileDamageBuff = 0;
 
   // receive damage, distribute
   int damageReductionBuff = 0;
-  int distributedDamageBuff = 0;
+  bool isSharedDamage = false;
+  int sharedDamageBuff = 0;
 
   NikkeDamageParameter({
     this.attack = 0,
+    this.ignoreDefence = false,
     this.defence = 0,
-    this.testOnlyAttackBuff = 0,
-    this.defenceBuff = 0,
     this.damageRate = 10000,
     this.damageRateBuff = 0,
     this.hitRate = 10000,
@@ -138,29 +148,37 @@ class NikkeDamageParameter {
     this.criticalDamageRate = 10000,
     this.criticalDamageBuff = 0,
     this.isBonusRange = false,
+    this.bonusRangeDamageBuff = 0,
+    this.outBonusRangeDamageBuff = 0,
     this.isFullBurst = false,
     this.isStrongElement = false,
     this.elementDamageBuff = 0,
+    this.chargePercent = 0,
     this.chargeDamageRate = 10000,
     this.chargeDamageBuff = 0,
-    this.chargePercent = 0,
     this.addDamageBuff = 0,
-    this.partDamageBuff = 0,
     this.defIgnoreDamageBuff = 0,
-    this.sustainedDamageBuff = 0,
+    this.isPartsDamage = false,
+    this.partDamageBuff = 0,
+    this.isDurationDamage = false,
+    this.durationDamageBuff = 0,
+    this.isPierceDamage = false,
     this.pierceDamageBuff = 0,
+    this.isBreakDamage = false,
     this.breakDamageBuff = 0,
+    this.isProjectileDamage = false,
+    this.projectileDamageBuff = 0,
     this.damageReductionBuff = 0,
-    this.distributedDamageBuff = 0,
+    this.isSharedDamage = false,
+    this.sharedDamageBuff = 0,
   });
 
   @override
   String toString() {
     return 'NikkeDamageParameter{'
         'attack: $attack, '
+        'ignoreDefence: $ignoreDefence, '
         'defence: $defence, '
-        'testOnlyAttackBuff: $testOnlyAttackBuff, '
-        'defenceBuff: $defenceBuff, '
         'damageRate: $damageRate, '
         'damageRateBuff: $damageRateBuff, '
         'hitRate: $hitRate, '
@@ -171,20 +189,29 @@ class NikkeDamageParameter {
         'criticalDamageRate: $criticalDamageRate, '
         'criticalDamageBuff: $criticalDamageBuff, '
         'isBonusRange: $isBonusRange, '
+        'bonusRangeDamageBuff: $bonusRangeDamageBuff, '
+        'outBonusRangeDamageBuff: $outBonusRangeDamageBuff, '
         'isFullBurst: $isFullBurst, '
         'isStrongElement: $isStrongElement, '
         'elementDamageBuff: $elementDamageBuff, '
+        'chargePercent: $chargePercent, '
         'chargeDamageRate: $chargeDamageRate, '
         'chargeDamageBuff: $chargeDamageBuff, '
-        'chargePercent: $chargePercent, '
         'addDamageBuff: $addDamageBuff, '
-        'partDamageBuff: $partDamageBuff, '
         'defIgnoreDamageBuff: $defIgnoreDamageBuff, '
-        'sustainedDamageBuff: $sustainedDamageBuff, '
+        'isPartsDamage: $isPartsDamage, '
+        'partDamageBuff: $partDamageBuff, '
+        'isDurationDamage: $isDurationDamage, '
+        'durationDamageBuff: $durationDamageBuff, '
+        'isPierceDamage: $isPierceDamage, '
         'pierceDamageBuff: $pierceDamageBuff, '
+        'isBreakDamage: $isBreakDamage, '
         'breakDamageBuff: $breakDamageBuff, '
+        'isProjectileDamage: $isProjectileDamage, '
+        'projectileDamageBuff: $projectileDamageBuff, '
         'damageReductionBuff: $damageReductionBuff, '
-        'distributedDamageBuff: $distributedDamageBuff'
+        'isSharedDamage: $isSharedDamage, '
+        'sharedDamageBuff: $sharedDamageBuff'
         '}';
   }
 
@@ -192,8 +219,7 @@ class NikkeDamageParameter {
     return NikkeDamageParameter(
       attack: attack,
       defence: defence,
-      testOnlyAttackBuff: testOnlyAttackBuff,
-      defenceBuff: defenceBuff,
+      ignoreDefence: ignoreDefence,
       damageRate: damageRate,
       damageRateBuff: damageRateBuff,
       hitRate: hitRate,
@@ -204,6 +230,8 @@ class NikkeDamageParameter {
       criticalDamageRate: criticalDamageRate,
       criticalDamageBuff: criticalDamageBuff,
       isBonusRange: isBonusRange,
+      bonusRangeDamageBuff: bonusRangeDamageBuff,
+      outBonusRangeDamageBuff: outBonusRangeDamageBuff,
       isFullBurst: isFullBurst,
       isStrongElement: isStrongElement,
       elementDamageBuff: elementDamageBuff,
@@ -211,13 +239,20 @@ class NikkeDamageParameter {
       chargeDamageBuff: chargeDamageBuff,
       chargePercent: chargePercent,
       addDamageBuff: addDamageBuff,
-      partDamageBuff: partDamageBuff,
       defIgnoreDamageBuff: defIgnoreDamageBuff,
-      sustainedDamageBuff: sustainedDamageBuff,
+      isPartsDamage: isPartsDamage,
+      partDamageBuff: partDamageBuff,
+      isDurationDamage: isDurationDamage,
+      durationDamageBuff: durationDamageBuff,
+      isPierceDamage: isPierceDamage,
       pierceDamageBuff: pierceDamageBuff,
+      isBreakDamage: isBreakDamage,
       breakDamageBuff: breakDamageBuff,
+      isProjectileDamage: isProjectileDamage,
+      projectileDamageBuff: projectileDamageBuff,
       damageReductionBuff: damageReductionBuff,
-      distributedDamageBuff: distributedDamageBuff,
+      isSharedDamage: isSharedDamage,
+      sharedDamageBuff: sharedDamageBuff,
     );
   }
 
@@ -242,10 +277,7 @@ class NikkeDamageParameter {
   }
 
   int calculateDamage({bool critical = false, bool core = false}) {
-    if (testOnlyAttackBuff != 0) {
-      logger.w('Using testAttackBuff in damage calculation is deprecated.');
-    }
-    final finalAttack = attack + testOnlyAttackBuff - defence - defenceBuff;
+    final finalAttack = attack - (ignoreDefence ? 0 : defence);
     final finalRate = toModifier(damageRate + damageRateBuff) * toModifier(hitRate);
 
     final coreCorrection = core ? correction(coreDamageRate + coreDamageBuff) : 0;
@@ -257,20 +289,21 @@ class NikkeDamageParameter {
     final elementRate = toModifier(isStrongElement ? constData.baseElementRate + elementDamageBuff : 10000);
 
     final fullChargeRate = chargeDamageRate + chargeDamageBuff;
-    final actualCharge = (fullChargeRate - 10000) * toModifier(chargePercent);
+    final actualCharge = chargePercent > 0 ? (fullChargeRate - 10000) * toModifier(chargePercent) : 0;
     final chargeRate = toModifier(10000 + actualCharge.round());
 
     final addDamageRate = toModifier(
       10000 +
           addDamageBuff +
-          partDamageBuff +
-          breakDamageBuff +
-          sustainedDamageBuff +
-          pierceDamageBuff +
-          defIgnoreDamageBuff,
+          (isPartsDamage ? partDamageBuff : 0) +
+          (isBreakDamage ? breakDamageBuff : 0) +
+          (isDurationDamage ? durationDamageBuff : 0) +
+          (isPierceDamage ? pierceDamageBuff : 0) +
+          (ignoreDefence ? defIgnoreDamageBuff : 0) +
+          (isProjectileDamage ? projectileDamageBuff : 0),
     );
 
-    final receiveDamage = toModifier(10000 - damageReductionBuff + distributedDamageBuff);
+    final receiveDamage = toModifier(10000 - damageReductionBuff + (isSharedDamage ? sharedDamageBuff : 0));
 
     final nonAttackMultipliers = finalRate * finalCorrection * elementRate * chargeRate * addDamageRate * receiveDamage;
     final totalDamage = finalAttack * nonAttackMultipliers;

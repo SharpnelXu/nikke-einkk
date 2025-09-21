@@ -422,7 +422,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
         SimplePercentBar(percent: currentCoverHp / maxCoverHp, color: Colors.blue[200]),
         Text(currentCoverHp.decimalPattern),
       ]);
-      final overHealSaveTotal = nikke.getOverHeal(simulation);
+      final overHealSaveTotal = nikke.getOverHealSave(simulation);
       if (overHealSaveTotal > 0) {
         children.addAll([
           SimplePercentBar(percent: nikke.overHealSave / overHealSaveTotal, color: Colors.green[400]),

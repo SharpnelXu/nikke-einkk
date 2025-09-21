@@ -538,6 +538,8 @@ class BattleFunction {
       case FunctionType.overHealSave:
       case FunctionType.plusInstantSkillTargetNum:
       case FunctionType.projectileDamage:
+      case FunctionType.bonusRangeDamageChange:
+      case FunctionType.outBonusRangeDamageChange:
       case FunctionType.none: // misc counters etc.
       case FunctionType.transformation: // animation only
       case FunctionType.focusAttack:
@@ -641,7 +643,7 @@ class BattleFunction {
           final activator = simulation.getEntityById(event.getActivatorId());
           // todo: add or multiply?
           final healVariation =
-              (activator?.getGivingHealVariationBuffValues(simulation) ?? 0) + target.getHealVariation(simulation);
+              (activator?.getGivingHealVariation(simulation) ?? 0) + target.getHealVariation(simulation);
           final isDuration = data.durationType.isTimed && data.durationValue > 0;
 
           int healValue = 0;
@@ -889,8 +891,6 @@ class BattleFunction {
         break;
       case FunctionType.allStepBurstNextStep: // no usage among nikkes
       case FunctionType.atkBuffChange: // no usage among nikkes
-      case FunctionType.bonusRangeDamageChange: // no usage among nikkes
-      case FunctionType.outBonusRangeDamageChange:
       case FunctionType.damageFunctionUnable: // likely a buff that dispels damage function
       case FunctionType.damageShareInstantUnable: // likely a buff that dispels damage share instant
       case FunctionType.damageShareLowestPriority: // likely a buff that changes damage share priority when calculating

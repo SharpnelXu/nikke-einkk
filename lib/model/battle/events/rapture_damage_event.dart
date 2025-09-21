@@ -27,11 +27,10 @@ class RaptureDamageEvent extends BattleEvent {
     );
     final damageParameter = NikkeDamageParameter(
       attack: rapture.getFinalAttack(simulation),
-      defence: nikke.baseDefence,
-      defenceBuff: nikke.getDefenceBuffValues(simulation),
+      defence: nikke.getFinalDefence(simulation),
       damageRate: damageRate,
       isStrongElement: isStrongEle,
-      damageReductionBuff: nikke.getDamageReductionBuffValues(simulation),
+      damageReductionBuff: nikke.getDamageReduction(simulation),
     );
     final invalid = nikke.buffs.any((buff) => buff.data.functionType == FunctionType.immuneDamage);
     return RaptureDamageEvent._(rapture.uniqueId, [nikke.uniqueId], damageParameter, invalid, hitCover);

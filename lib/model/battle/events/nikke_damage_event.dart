@@ -118,33 +118,41 @@ class NikkeDamageEvent extends BattleEvent {
       (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
     );
     final ignoreDef = nikke.hasChangeNormalDefIgnoreDamage(simulation);
+    final isParts = pierce == 0 && partId != null; // pierce won't hit rapture body as parts
+    final isPierce = pierce > 0;
+    final isCharge = chargePercent > 0;
+    final isBreakDamage = partId == null && rapture.hasRedCircle;
     final damageParameter = NikkeDamageParameter(
       attack: nikke.getFinalAttack(simulation),
-      defence: ignoreDef ? 0 : rapture.baseDefence,
-      defenceBuff: ignoreDef ? 0 : rapture.getDefenceBuffValues(simulation),
+      ignoreDefence: ignoreDef,
+      defence: ignoreDef ? 0 : rapture.getFinalDefence(simulation),
       damageRate: weaponData.damage * weaponData.muzzleCount,
-      damageRateBuff: nikke.getNormalDamageRatioChangeBuffValues(simulation),
+      damageRateBuff: nikke.getNormalDamageRatioChange(simulation),
       hitRate: pelletHitRate,
       coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
       coreDamageRate: weaponData.coreDamageRate,
-      coreDamageBuff: nikke.getCoreDamageBuffValues(simulation),
-      criticalRate: nikke.getCriticalRate(simulation) + nikke.getNormalCriticalBuff(simulation),
+      coreDamageBuff: nikke.getCoreShotDamageChange(simulation),
+      criticalRate: nikke.getCriticalRate(simulation) + nikke.getNormalStatCritical(simulation),
       criticalDamageRate: nikke.characterData.criticalDamage,
-      criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
+      criticalDamageBuff: nikke.getStatCriticalDamage(simulation),
       isBonusRange: nikke.isBonusRange(simulation, rapture.distance),
+      bonusRangeDamageBuff: nikke.getBonusRangeDamageChange(simulation),
+      outBonusRangeDamageBuff: nikke.getOutBonusRangeDamageChange(simulation),
       isFullBurst: simulation.burstStage == 4,
       isStrongElement: isStrongEle,
-      elementDamageBuff: isStrongEle ? nikke.getIncreaseElementDamageBuffValues(simulation) : 0,
-      chargeDamageRate: weaponData.fullChargeDamage,
-      chargeDamageBuff: nikke.getChargeDamageBuffValues(simulation),
+      elementDamageBuff: isStrongEle ? nikke.getIncElementDmg(simulation) : 0,
+      chargeDamageRate: isCharge ? weaponData.fullChargeDamage : 0,
+      chargeDamageBuff: isCharge ? nikke.getChargeDamageBuffs(simulation) : 0,
       chargePercent: chargePercent,
-      // pierce won't hit rapture body as parts
-      partDamageBuff: pierce == 0 && partId != null ? nikke.getPartsDamageBuffValues(simulation) : 0,
-      pierceDamageBuff: pierce > 0 ? nikke.getPierceDamageBuffValues(simulation) : 0,
-      addDamageBuff: nikke.getAddDamageBuffValues(simulation),
-      breakDamageBuff: partId == null && rapture.hasRedCircle ? nikke.getBreakDamageBuff(simulation) : 0,
-      defIgnoreDamageBuff: ignoreDef ? nikke.getDefIgnoreDamageBuffValues(simulation) : 0,
-      damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
+      addDamageBuff: nikke.getAddDamage(simulation),
+      defIgnoreDamageBuff: ignoreDef ? nikke.getDefIgnoreDamageRatio(simulation) : 0,
+      isPartsDamage: isParts,
+      partDamageBuff: isParts ? nikke.getPartsDamage(simulation) : 0,
+      isPierceDamage: isPierce,
+      pierceDamageBuff: isPierce ? nikke.getPenetrationDamage(simulation) : 0,
+      isBreakDamage: isBreakDamage,
+      breakDamageBuff: isBreakDamage ? nikke.getBreakDamage(simulation) : 0,
+      damageReductionBuff: rapture.getDamageReduction(simulation),
     );
 
     return NikkeDamageEvent._(
@@ -179,28 +187,30 @@ class NikkeDamageEvent extends BattleEvent {
     final bool isStrongEle = nikke.getEffectiveElements().any(
       (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
     );
+    final isParts = pierce == 0 && partId != null; // pierce won't hit rapture body as parts
+    final isPierce = pierce > 0;
     final damageParameter = NikkeDamageParameter(
       attack: nikke.getFinalAttack(simulation),
-      defence: rapture.baseDefence,
-      defenceBuff: rapture.getDefenceBuffValues(simulation),
+      defence: rapture.getFinalDefence(simulation),
       damageRate: weaponData.damage * weaponData.muzzleCount,
-      damageRateBuff: nikke.getNormalDamageRatioChangeBuffValues(simulation),
+      damageRateBuff: nikke.getNormalDamageRatioChange(simulation),
       hitRate: pelletHitRate,
       coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
       coreDamageRate: weaponData.coreDamageRate,
-      coreDamageBuff: nikke.getCoreDamageBuffValues(simulation),
-      criticalRate: nikke.getCriticalRate(simulation) + nikke.getNormalCriticalBuff(simulation),
+      coreDamageBuff: nikke.getCoreShotDamageChange(simulation),
+      criticalRate: nikke.getCriticalRate(simulation) + nikke.getNormalStatCritical(simulation),
       criticalDamageRate: nikke.characterData.criticalDamage,
-      criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
+      criticalDamageBuff: nikke.getStatCriticalDamage(simulation),
       isBonusRange: false,
       isFullBurst: simulation.burstStage == 4,
       isStrongElement: isStrongEle,
-      elementDamageBuff: isStrongEle ? nikke.getIncreaseElementDamageBuffValues(simulation) : 0,
-      // pierce won't hit rapture body as parts
-      partDamageBuff: pierce == 0 && partId != null ? nikke.getPartsDamageBuffValues(simulation) : 0,
-      pierceDamageBuff: pierce > 0 ? nikke.getPierceDamageBuffValues(simulation) : 0,
-      addDamageBuff: nikke.getAddDamageBuffValues(simulation),
-      damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
+      elementDamageBuff: isStrongEle ? nikke.getIncElementDmg(simulation) : 0,
+      isPartsDamage: isParts,
+      partDamageBuff: isParts ? nikke.getPartsDamage(simulation) : 0,
+      isPierceDamage: isPierce,
+      pierceDamageBuff: isPierce ? nikke.getPenetrationDamage(simulation) : 0,
+      addDamageBuff: nikke.getAddDamage(simulation),
+      damageReductionBuff: rapture.getDamageReduction(simulation),
     );
 
     return NikkeDamageEvent._(
@@ -233,28 +243,32 @@ class NikkeDamageEvent extends BattleEvent {
     final ignoreDef = nikke.hasChangeNormalDefIgnoreDamage(simulation);
     final damageParameter = NikkeDamageParameter(
       attack: nikke.getFinalAttack(simulation),
-      defence: ignoreDef ? 0 : rapture.baseDefence,
-      defenceBuff: ignoreDef ? 0 : rapture.getDefenceBuffValues(simulation),
+      ignoreDefence: ignoreDef,
+      defence: ignoreDef ? 0 : rapture.getFinalDefence(simulation),
       damageRate: weaponData.damage * weaponData.muzzleCount,
-      damageRateBuff: nikke.getNormalDamageRatioChangeBuffValues(simulation),
+      damageRateBuff: nikke.getNormalDamageRatioChange(simulation),
       coreHitRate: part.isCore ? 10000 : 0,
       coreDamageRate: weaponData.coreDamageRate,
-      coreDamageBuff: nikke.getCoreDamageBuffValues(simulation),
+      coreDamageBuff: nikke.getCoreShotDamageChange(simulation),
       criticalRate: nikke.getCriticalRate(simulation),
       criticalDamageRate: nikke.characterData.criticalDamage,
-      criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
+      criticalDamageBuff: nikke.getStatCriticalDamage(simulation),
       isBonusRange: nikke.isBonusRange(simulation, rapture.distance),
+      bonusRangeDamageBuff: nikke.getBonusRangeDamageChange(simulation),
+      outBonusRangeDamageBuff: nikke.getOutBonusRangeDamageChange(simulation),
       isFullBurst: simulation.burstStage == 4,
       isStrongElement: isStrongEle,
-      elementDamageBuff: isStrongEle ? nikke.getIncreaseElementDamageBuffValues(simulation) : 0,
+      elementDamageBuff: isStrongEle ? nikke.getIncElementDmg(simulation) : 0,
       chargeDamageRate: weaponData.fullChargeDamage,
-      chargeDamageBuff: nikke.getChargeDamageBuffValues(simulation),
+      chargeDamageBuff: nikke.getChargeDamageBuffs(simulation),
       chargePercent: chargePercent,
-      partDamageBuff: nikke.getPartsDamageBuffValues(simulation),
-      pierceDamageBuff: nikke.getPierceDamageBuffValues(simulation),
-      addDamageBuff: nikke.getAddDamageBuffValues(simulation),
-      damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
-      defIgnoreDamageBuff: ignoreDef ? nikke.getDefIgnoreDamageBuffValues(simulation) : 0,
+      addDamageBuff: nikke.getAddDamage(simulation),
+      defIgnoreDamageBuff: ignoreDef ? nikke.getDefIgnoreDamageRatio(simulation) : 0,
+      isPartsDamage: true,
+      partDamageBuff: nikke.getPartsDamage(simulation),
+      isPierceDamage: true,
+      pierceDamageBuff: nikke.getPenetrationDamage(simulation),
+      damageReductionBuff: rapture.getDamageReduction(simulation),
     );
 
     return NikkeDamageEvent._(
@@ -275,6 +289,7 @@ class NikkeDamageEvent extends BattleEvent {
     required BattleRapture rapture,
     required int damageRate,
     required Source source,
+    CharacterSkillType? skillType,
     bool isShareDamage = false,
     bool isDurationDamage = false,
     bool isIgnoreDefence = false,
@@ -283,24 +298,34 @@ class NikkeDamageEvent extends BattleEvent {
     final bool isStrongEle = nikke.getEffectiveElements().any(
       (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
     );
+    final rateIncrease =
+        Source.burst == source
+            ? [CharacterSkillType.instantAllParts, CharacterSkillType.instantAll].contains(skillType)
+                ? nikke.getInstantAllBurstDamage(simulation)
+                : nikke.getSingleBurstDamage(simulation)
+            : 0;
     final damageParameter = NikkeDamageParameter(
       attack: nikke.getFinalAttack(simulation),
-      defence: isIgnoreDefence ? 0 : rapture.baseDefence,
-      defenceBuff: isIgnoreDefence ? 0 : rapture.getDefenceBuffValues(simulation),
+      ignoreDefence: isIgnoreDefence,
+      defence: isIgnoreDefence ? 0 : rapture.getFinalDefence(simulation),
       damageRate: damageRate,
+      damageRateBuff: rateIncrease,
       coreHitRate: 0,
       criticalRate: nikke.getCriticalRate(simulation),
       criticalDamageRate: nikke.characterData.criticalDamage,
-      criticalDamageBuff: nikke.getCriticalDamageBuffValues(simulation),
+      criticalDamageBuff: nikke.getStatCriticalDamage(simulation),
       isFullBurst: simulation.burstStage == 4,
       isStrongElement: isStrongEle,
-      elementDamageBuff: isStrongEle ? nikke.getIncreaseElementDamageBuffValues(simulation) : 0,
-      addDamageBuff: nikke.getAddDamageBuffValues(simulation),
-      distributedDamageBuff: isShareDamage ? nikke.getShareDamageBuffValues(simulation) : 0,
-      damageReductionBuff: rapture.getDamageReductionBuffValues(simulation),
-      sustainedDamageBuff: isDurationDamage ? nikke.getDurationDamageRatioBuffValues(simulation) : 0,
-      defIgnoreDamageBuff: isIgnoreDefence ? nikke.getDefIgnoreDamageBuffValues(simulation) : 0,
-      partDamageBuff: partId != null ? nikke.getPartsDamageBuffValues(simulation) : 0,
+      elementDamageBuff: isStrongEle ? nikke.getIncElementDmg(simulation) : 0,
+      addDamageBuff: nikke.getAddDamage(simulation),
+      defIgnoreDamageBuff: isIgnoreDefence ? nikke.getDefIgnoreDamageRatio(simulation) : 0,
+      isPartsDamage: partId != null,
+      partDamageBuff: partId != null ? nikke.getPartsDamage(simulation) : 0,
+      isDurationDamage: isDurationDamage,
+      durationDamageBuff: isDurationDamage ? nikke.getDurationDamageRatio(simulation) : 0,
+      damageReductionBuff: rapture.getDamageReduction(simulation),
+      isSharedDamage: isShareDamage,
+      sharedDamageBuff: isShareDamage ? nikke.getShareDamageIncrease(simulation) : 0,
     );
 
     return NikkeDamageEvent._(

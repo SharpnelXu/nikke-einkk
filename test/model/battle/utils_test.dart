@@ -33,7 +33,7 @@ void main() {
       // liter buff
       final literBurstParam =
           bossParam.copy()
-            ..testOnlyAttackBuff = (param.attack * 0.66).round()
+            ..attack = param.attack + (param.attack * 0.66).round()
             ..isFullBurst = true;
       expect(literBurstParam.calculateDamage(), 327371);
       expect(literBurstParam.calculateDamage(critical: true), 418308);
@@ -133,8 +133,7 @@ void main() {
       final element = 3984;
       final equipAtkTotal = (toModifier(equip1Percent + equip2Percent) * baseAtk).round();
       final param = NikkeDamageParameter(
-        attack: baseAtk,
-        testOnlyAttackBuff: equipAtkTotal.round(),
+        attack: baseAtk + equipAtkTotal.round(),
         defence: defence,
         damageRate: 2708,
         coreDamageRate: 20000,
@@ -147,28 +146,27 @@ void main() {
       expect(param.calculateDamage(), 596736);
       expect(param.calculateDamage(critical: true), 826250);
 
-      final paramSkill1 =
-          param.copy()..testOnlyAttackBuff = equipAtkTotal + (toModifier(skillPercent) * baseAtk).round();
+      final paramSkill1 = param.copy()..attack = baseAtk + equipAtkTotal + (toModifier(skillPercent) * baseAtk).round();
       expect(paramSkill1.calculateDamage(), 707230);
       expect(paramSkill1.calculateDamage(critical: true), 979242);
 
       final paramSkill2 =
-          param.copy()..testOnlyAttackBuff = equipAtkTotal + (toModifier(skillPercent * 2) * baseAtk).round();
+          param.copy()..attack = baseAtk + equipAtkTotal + (toModifier(skillPercent * 2) * baseAtk).round();
       expect(paramSkill2.calculateDamage(), 817724);
       expect(paramSkill2.calculateDamage(critical: true), 1132234);
 
       final paramSkill3 =
-          param.copy()..testOnlyAttackBuff = equipAtkTotal + (toModifier(skillPercent * 3) * baseAtk).round();
+          param.copy()..attack = baseAtk + equipAtkTotal + (toModifier(skillPercent * 3) * baseAtk).round();
       expect(paramSkill3.calculateDamage(), 928218);
       expect(paramSkill3.calculateDamage(critical: true), 1285225);
 
       final paramSkill4 =
-          param.copy()..testOnlyAttackBuff = equipAtkTotal + (toModifier(skillPercent * 4) * baseAtk).round();
+          param.copy()..attack = baseAtk + equipAtkTotal + (toModifier(skillPercent * 4) * baseAtk).round();
       expect(paramSkill4.calculateDamage(), 1038712);
       expect(paramSkill4.calculateDamage(critical: true), 1438217);
 
       final paramSkill5 =
-          param.copy()..testOnlyAttackBuff = equipAtkTotal + (toModifier(skillPercent * 5) * baseAtk).round();
+          param.copy()..attack = baseAtk + equipAtkTotal + (toModifier(skillPercent * 5) * baseAtk).round();
       expect(paramSkill5.calculateDamage(), 1149206);
       expect(paramSkill5.calculateDamage(critical: true), 1591208);
     });
@@ -184,8 +182,7 @@ void main() {
       final element = 3984;
       final equipAtkTotal = (toModifier(equip1Percent + equip2Percent) * baseAtk).round();
       final param = NikkeDamageParameter(
-        attack: baseAtk,
-        testOnlyAttackBuff: equipAtkTotal.round(),
+        attack: baseAtk + equipAtkTotal,
         defence: defence,
         damageRate: 84915,
         coreDamageRate: 20000,
@@ -200,32 +197,32 @@ void main() {
 
       final paramSkill1NonBoss =
           param.copy()
-            ..testOnlyAttackBuff = equipAtkTotal + totalBuffAtk.round()
+            ..attack = baseAtk + equipAtkTotal + totalBuffAtk.round()
             ..defence = 100;
       expect(paramSkill1NonBoss.calculateDamage(), 36899451);
       expect(paramSkill1NonBoss.calculateDamage(critical: true), 55349176 + 1);
 
-      final paramSkill1Boss = param.copy()..testOnlyAttackBuff = equipAtkTotal + totalBuffAtk.round();
+      final paramSkill1Boss = param.copy()..attack = baseAtk + equipAtkTotal + totalBuffAtk.round();
       // if attack differs a little bit this would now vary by a lot since damageRate * elementRate is very high,
       // which proves that Scarlet's Skill 1 buffs & Liter Burst Skill & Dollar Skill 1 are summed first then round.
       expect(paramSkill1Boss.calculateDamage(), moreOrLessEquals(36898941, epsilon: 1));
 
       final paramSkill1BossExtra =
           param.copy()
-            ..testOnlyAttackBuff = equipAtkTotal + totalBuffAtk.round()
+            ..attack = baseAtk + equipAtkTotal + totalBuffAtk.round()
             ..addDamageBuff = 3624;
       expect(paramSkill1BossExtra.calculateDamage(), moreOrLessEquals(50271120, epsilon: 1));
 
       final paramSkill1NonBoss2 =
           param.copy()
-            ..testOnlyAttackBuff = equipAtkTotal + totalBuffAtk.round()
+            ..attack = baseAtk + equipAtkTotal + totalBuffAtk.round()
             ..addDamageBuff = 3624
             ..defence = 100;
       expect(paramSkill1NonBoss2.calculateDamage(), moreOrLessEquals(50271814, epsilon: 1));
 
       final paramSkill1BossExtra2 =
           param.copy()
-            ..testOnlyAttackBuff = equipAtkTotal + totalBuffAtk.round()
+            ..attack = baseAtk + equipAtkTotal + totalBuffAtk.round()
             ..addDamageBuff = 3624
             ..damageReductionBuff = -1256;
       expect(paramSkill1BossExtra2.calculateDamage(), 56585172);
@@ -243,11 +240,9 @@ void main() {
       final crownBuffAtk = toModifier(crownPercent) * 614492;
       final redHoodBuffAtk = toModifier(redHoodPercent) * 906918;
       final maxwellBuffAtk = toModifier(maxwellPercent) * baseAtk;
-      final equipAtkTotal = (toModifier(equipPercents) * baseAtk);
+      final equipAtkTotal = (toModifier(equipPercents) * baseAtk).round();
       final param = NikkeDamageParameter(
-        attack: baseAtk,
-        testOnlyAttackBuff:
-            equipAtkTotal.round() + maxwellBuffAtk.round() + redHoodBuffAtk.round() + crownBuffAtk.round(),
+        attack: baseAtk + equipAtkTotal + maxwellBuffAtk.round() + redHoodBuffAtk.round() + crownBuffAtk.round(),
         defence: defence,
         damageRate: 49950,
         coreDamageRate: 20000,

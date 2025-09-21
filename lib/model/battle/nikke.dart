@@ -736,7 +736,7 @@ class BattleNikke extends BattleEntity {
     return characterData.criticalRatio + getPlainBuffValues(simulation, FunctionType.statCritical);
   }
 
-  int getNormalCriticalBuff(BattleSimulation simulation) {
+  int getNormalStatCritical(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.normalStatCritical);
   }
 
@@ -805,7 +805,7 @@ class BattleNikke extends BattleEntity {
     return max(1, result);
   }
 
-  int getChargeDamageBuffValues(BattleSimulation simulation) {
+  int getChargeDamageBuffs(BattleSimulation simulation) {
     int result = getBuffValue(
       simulation,
       FunctionType.statChargeDamage,
@@ -835,11 +835,19 @@ class BattleNikke extends BattleEntity {
     return result;
   }
 
-  int getCoreDamageBuffValues(BattleSimulation simulation) {
+  int getCoreShotDamageChange(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.coreShotDamageChange);
   }
 
-  int getNormalDamageRatioChangeBuffValues(BattleSimulation simulation) {
+  int getBonusRangeDamageChange(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.bonusRangeDamageChange);
+  }
+
+  int getOutBonusRangeDamageChange(BattleSimulation simulation) {
+    return getPlainBuffValues(simulation, FunctionType.outBonusRangeDamageChange);
+  }
+
+  int getNormalDamageRatioChange(BattleSimulation simulation) {
     return getBuffValue(
       simulation,
       FunctionType.normalDamageRatioChange,
@@ -882,15 +890,15 @@ class BattleNikke extends BattleEntity {
     );
   }
 
-  int getPartsDamageBuffValues(BattleSimulation simulation) {
+  int getPartsDamage(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.partsDamage);
   }
 
-  int getPierceDamageBuffValues(BattleSimulation simulation) {
+  int getPenetrationDamage(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.penetrationDamage);
   }
 
-  int getShareDamageBuffValues(BattleSimulation simulation) {
+  int getShareDamageIncrease(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.shareDamageIncrease);
   }
 
@@ -898,7 +906,7 @@ class BattleNikke extends BattleEntity {
     return currentWeaponData.penetration + getPlainBuffValues(simulation, FunctionType.statPenetration);
   }
 
-  int getBreakDamageBuff(BattleSimulation simulation) {
+  int getBreakDamage(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.breakDamage);
   }
 
@@ -935,11 +943,11 @@ class BattleNikke extends BattleEntity {
     return characterData.burstDuration + getPlainBuffValues(simulation, FunctionType.incBurstDuration);
   }
 
-  int getIncInstantAllBurstDamage(BattleSimulation simulation) {
+  int getInstantAllBurstDamage(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.instantAllBurstDamage);
   }
 
-  int getIncSingleBurstDamage(BattleSimulation simulation) {
+  int getSingleBurstDamage(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.singleBurstDamage);
   }
 }

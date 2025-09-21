@@ -41,7 +41,7 @@ abstract class BattleEntity {
     final overHeal = currentHp + changeValue - maxHp;
     currentHp = (currentHp + changeValue).clamp(1, maxHp);
     if (isHeal && overHeal > 0) {
-      final overHealSaveValue = getOverHeal(simulation);
+      final overHealSaveValue = getOverHealSave(simulation);
       if (overHealSaveValue > 0) {
         overHealSave += overHeal.clamp(0, overHealSaveValue);
       }
@@ -69,10 +69,6 @@ abstract class BattleEntity {
     if (maxHpReplace > 0) {
       return maxHpReplace;
     }
-    return baseAttack + getAttackBuffValues(simulation);
-  }
-
-  int getAttackBuffValues(BattleSimulation simulation) {
     final maxHpConversion = getBuffValue(
       simulation,
       FunctionType.atkChangeMaxHpRate,
@@ -90,14 +86,11 @@ abstract class BattleEntity {
     final copyAttack = toModifier(getPlainBuffValues(simulation, FunctionType.copyAtk)) * highestAllyAttack.baseAttack;
 
     final statAttack = getBuffValue(simulation, FunctionType.statAtk, 0, (entity) => entity.baseAttack);
-    return statAttack + maxHpConversion + hpLossConversion + copyAttack.round();
+
+    return baseAttack + statAttack + maxHpConversion + hpLossConversion + copyAttack.round();
   }
 
   int getFinalDefence(BattleSimulation simulation) {
-    return baseDefence + getDefenceBuffValues(simulation);
-  }
-
-  int getDefenceBuffValues(BattleSimulation simulation) {
     final hpLossConversion = getBuffValue(
       simulation,
       FunctionType.defChangHpRate,
@@ -106,7 +99,7 @@ abstract class BattleEntity {
     );
     final statDef = getBuffValue(simulation, FunctionType.statDef, 0, (entity) => entity.baseDefence);
 
-    return statDef + hpLossConversion;
+    return baseDefence + statDef + hpLossConversion;
   }
 
   int getMaxHp(BattleSimulation simulation) {
@@ -136,7 +129,7 @@ abstract class BattleEntity {
     return getPlainBuffValues(simulation, FunctionType.incBarrierHp);
   }
 
-  int getAddDamageBuffValues(BattleSimulation simulation) {
+  int getAddDamage(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.addDamage);
   }
 
@@ -144,32 +137,32 @@ abstract class BattleEntity {
     return getPlainBuffValues(simulation, FunctionType.drainHpBuff);
   }
 
-  int getIncreaseElementDamageBuffValues(BattleSimulation simulation) {
+  int getIncElementDmg(BattleSimulation simulation) {
     // not sure if function standard does anything here, coule be the base ele rate is 10000 for all in data
     return getPlainBuffValues(simulation, FunctionType.incElementDmg);
   }
 
-  int getCriticalDamageBuffValues(BattleSimulation simulation) {
+  int getStatCriticalDamage(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.statCriticalDamage);
   }
 
-  int getGivingHealVariationBuffValues(BattleSimulation simulation) {
+  int getGivingHealVariation(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.givingHealVariation);
   }
 
-  int getDamageReductionBuffValues(BattleSimulation simulation) {
+  int getDamageReduction(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.damageReduction);
   }
 
-  int getDurationDamageRatioBuffValues(BattleSimulation simulation) {
+  int getDurationDamageRatio(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.durationDamageRatio);
   }
 
-  int getDefIgnoreDamageBuffValues(BattleSimulation simulation) {
+  int getDefIgnoreDamageRatio(BattleSimulation simulation) {
     return getPlainBuffValues(simulation, FunctionType.defIgnoreDamageRatio);
   }
 
-  int getOverHeal(BattleSimulation simulation) {
+  int getOverHealSave(BattleSimulation simulation) {
     return getBuffValue(simulation, FunctionType.overHealSave, baseHp, (entity) => entity.baseHp);
   }
 
@@ -278,8 +271,7 @@ abstract class BattleEntity {
         final activeFrame = data.durationValue > 0 && (buff.fullDuration - buff.duration) % simulation.fps == 0;
         if (activeFrame) {
           final activator = simulation.getEntityById(buff.buffGiverId);
-          final healVariation =
-              (activator?.getGivingHealVariationBuffValues(simulation) ?? 0) + getHealVariation(simulation);
+          final healVariation = (activator?.getGivingHealVariation(simulation) ?? 0) + getHealVariation(simulation);
           int healValue = 0;
           if (data.functionValueType == ValueType.integer) {
             healValue = data.functionValue;
