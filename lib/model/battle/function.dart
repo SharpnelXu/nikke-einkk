@@ -540,6 +540,9 @@ class BattleFunction {
       case FunctionType.projectileDamage:
       case FunctionType.bonusRangeDamageChange:
       case FunctionType.outBonusRangeDamageChange:
+      case FunctionType.projectileExplosionDamage:
+      case FunctionType.stickyProjectileCollisionDamage:
+      case FunctionType.stickyProjectileInstantExplosion:
       case FunctionType.none: // misc counters etc.
       case FunctionType.transformation: // animation only
       case FunctionType.focusAttack:
@@ -866,7 +869,11 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.projectileExplosionDamage:
+      case FunctionType.stickyProjectileExplosion:
+        for (final rapture in simulation.raptures) {
+          rapture.explodeStickyProjectiles(simulation, ownerId);
+        }
+        break;
       case FunctionType.repeatUseBurstStep:
       case FunctionType.resurrection:
       case FunctionType.statBurstSkillCoolTime:
@@ -876,9 +883,6 @@ class BattleFunction {
       case FunctionType.statMaintainFireStance:
       case FunctionType.statShotCount:
       case FunctionType.statSpotRadius:
-      case FunctionType.stickyProjectileCollisionDamage:
-      case FunctionType.stickyProjectileExplosion:
-      case FunctionType.stickyProjectileInstantExplosion:
       case FunctionType.taunt:
       case FunctionType.uncoverable:
       case FunctionType.useSkill2:

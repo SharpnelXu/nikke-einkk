@@ -461,6 +461,7 @@ class BattleRapture extends BattleEntity {
   TargetHitCountGetBuffData? targetHitCountGetBuffData;
   StigmaData? stigmaData;
   ExplosiveCircuitData? explosiveCircuitData;
+  List<StickyProjectileData> stickyProjectiles = [];
 
   BattleRapture(this.options);
 
@@ -477,6 +478,7 @@ class BattleRapture extends BattleEntity {
     targetHitCountGetBuffData = null;
     stigmaData = null;
     explosiveCircuitData = null;
+    stickyProjectiles.clear();
 
     hasRedCircle = false;
 
@@ -561,6 +563,19 @@ class BattleRapture extends BattleEntity {
       if (explosiveCircuitData.duration <= 0) {
         explosiveCircuitData.releaseAccumulationDamage(simulation);
         this.explosiveCircuitData = null;
+      }
+    }
+
+    for (int idx = stickyProjectiles.length - 1; idx >= 0; idx -= 1) {
+      final projectile = stickyProjectiles[idx];
+      final projectileOwner = simulation.getNikkeOnPosition(projectile.attackerId);
+      final shouldExplode =
+          projectileOwner == null ||
+          projectileOwner.currentHp <= 0 ||
+          projectileOwner.hasBuff(simulation, FunctionType.stickyProjectileInstantExplosion);
+      if (shouldExplode) {
+        stickyProjectiles.removeAt(idx);
+        projectile.explode(simulation, this);
       }
     }
 
@@ -784,6 +799,27 @@ class BattleRapture extends BattleEntity {
         if (buff.data.durationType.isShots && simulation.db.onHitFunctionTypes.contains(buff.data.functionType)) {
           buff.duration -= 1;
         }
+      }
+    }
+  }
+
+  void addStickyProjectile(BattleSimulation simulation, BattleNikke nikke, NikkeDamageEvent event) {
+    stickyProjectiles.add(
+      StickyProjectileData(attackerId: nikke.uniqueId, source: event.source, damageRate: event.stickyDamageRate),
+    );
+
+    while (stickyProjectiles.length > constData.stickyProjectileMaxCount) {
+      final earliest = stickyProjectiles.removeAt(0);
+      earliest.explode(simulation, this);
+    }
+  }
+
+  void explodeStickyProjectiles(BattleSimulation simulation, int ownerId) {
+    for (int idx = stickyProjectiles.length - 1; idx >= 0; idx -= 1) {
+      final projectile = stickyProjectiles[idx];
+      if (projectile.attackerId == ownerId) {
+        stickyProjectiles.removeAt(idx);
+        projectile.explode(simulation, this);
       }
     }
   }

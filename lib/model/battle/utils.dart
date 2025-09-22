@@ -125,9 +125,15 @@ class NikkeDamageParameter {
   bool isPierceDamage = false;
   int pierceDamageBuff = 0;
   bool isBreakDamage = false;
-  int breakDamageBuff = 0;
+  int breakDamageBuff = 0; // red circles
   bool isProjectileDamage = false;
-  int projectileDamageBuff = 0;
+  int projectileDamageBuff = 0; // increase against projectile
+  bool isSkillDamage = false;
+  int skillDamageBuff = 0; // TODO: confirm if it's add damage
+  bool isProjectileExplosion = false;
+  int projectileExplosionBuff = 0;
+  bool isStickyCollision = false;
+  int stickyCollisionBuff = 0;
 
   // receive damage, distribute
   int damageReductionBuff = 0;
@@ -168,6 +174,12 @@ class NikkeDamageParameter {
     this.breakDamageBuff = 0,
     this.isProjectileDamage = false,
     this.projectileDamageBuff = 0,
+    this.isSkillDamage = false,
+    this.skillDamageBuff = 0,
+    this.isProjectileExplosion = false,
+    this.projectileExplosionBuff = 0,
+    this.isStickyCollision = false,
+    this.stickyCollisionBuff = 0,
     this.damageReductionBuff = 0,
     this.isSharedDamage = false,
     this.sharedDamageBuff = 0,
@@ -209,6 +221,12 @@ class NikkeDamageParameter {
         'breakDamageBuff: $breakDamageBuff, '
         'isProjectileDamage: $isProjectileDamage, '
         'projectileDamageBuff: $projectileDamageBuff, '
+        'isSkillDamage: $isSkillDamage, '
+        'skillDamageBuff: $skillDamageBuff, '
+        'isProjectileExplosion: $isProjectileExplosion, '
+        'projectileExplosionBuff: $projectileExplosionBuff, '
+        'isStickyCollision: $isStickyCollision, '
+        'stickyCollisionBuff: $stickyCollisionBuff, '
         'damageReductionBuff: $damageReductionBuff, '
         'isSharedDamage: $isSharedDamage, '
         'sharedDamageBuff: $sharedDamageBuff'
@@ -250,6 +268,12 @@ class NikkeDamageParameter {
       breakDamageBuff: breakDamageBuff,
       isProjectileDamage: isProjectileDamage,
       projectileDamageBuff: projectileDamageBuff,
+      isSkillDamage: isSkillDamage,
+      skillDamageBuff: skillDamageBuff,
+      isProjectileExplosion: isProjectileExplosion,
+      projectileExplosionBuff: projectileExplosionBuff,
+      isStickyCollision: isStickyCollision,
+      stickyCollisionBuff: stickyCollisionBuff,
       damageReductionBuff: damageReductionBuff,
       isSharedDamage: isSharedDamage,
       sharedDamageBuff: sharedDamageBuff,
@@ -295,12 +319,15 @@ class NikkeDamageParameter {
     final addDamageRate = toModifier(
       10000 +
           addDamageBuff +
+          (isSkillDamage ? skillDamageBuff : 0) +
           (isPartsDamage ? partDamageBuff : 0) +
           (isBreakDamage ? breakDamageBuff : 0) +
           (isDurationDamage ? durationDamageBuff : 0) +
           (isPierceDamage ? pierceDamageBuff : 0) +
           (ignoreDefence ? defIgnoreDamageBuff : 0) +
-          (isProjectileDamage ? projectileDamageBuff : 0),
+          (isProjectileDamage ? projectileDamageBuff : 0) +
+          (isProjectileExplosion ? projectileExplosionBuff : 0) +
+          (isStickyCollision ? stickyCollisionBuff : 0),
     );
 
     final receiveDamage = toModifier(10000 - damageReductionBuff + (isSharedDamage ? sharedDamageBuff : 0));

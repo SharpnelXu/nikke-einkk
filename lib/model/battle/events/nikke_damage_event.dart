@@ -77,6 +77,9 @@ class NikkeDamageEvent extends BattleEvent {
   final int shotCount;
   final int shareCount;
   final int? partId;
+  // just record these for processing
+  final bool isStickyCollision;
+  final int stickyDamageRate;
 
   int get targetId => targetIds.first;
 
@@ -90,6 +93,8 @@ class NikkeDamageEvent extends BattleEvent {
     this.shotCount = 1,
     this.partId,
     this.shareCount = 0,
+    this.isStickyCollision = false,
+    this.stickyDamageRate = 0,
   });
 
   factory NikkeDamageEvent.bullet({
@@ -122,6 +127,8 @@ class NikkeDamageEvent extends BattleEvent {
     final isPierce = pierce > 0;
     final isCharge = chargePercent > 0;
     final isBreakDamage = partId == null && rapture.hasRedCircle;
+    final isStickyCollision = weaponData.fireType == FireType.stickyProjectileDirect;
+    final isProjectileExplosion = weaponData.weaponType == WeaponType.rl && !isStickyCollision;
     final damageParameter = NikkeDamageParameter(
       attack: nikke.getFinalAttack(simulation),
       ignoreDefence: ignoreDef,
@@ -152,6 +159,10 @@ class NikkeDamageEvent extends BattleEvent {
       pierceDamageBuff: isPierce ? nikke.getPenetrationDamage(simulation) : 0,
       isBreakDamage: isBreakDamage,
       breakDamageBuff: isBreakDamage ? nikke.getBreakDamage(simulation) : 0,
+      isProjectileExplosion: isProjectileExplosion,
+      projectileExplosionBuff: isProjectileExplosion ? nikke.getProjectileExplosionDamage(simulation) : 0,
+      isStickyCollision: isStickyCollision,
+      stickyCollisionBuff: isStickyCollision ? nikke.getStickyProjectileCollisionDamage(simulation) : 0,
       damageReductionBuff: rapture.getDamageReduction(simulation),
     );
 
@@ -164,6 +175,8 @@ class NikkeDamageEvent extends BattleEvent {
       chargePercent: chargePercent,
       shotCount: weaponData.shotCount * weaponData.muzzleCount,
       partId: partId,
+      isStickyCollision: isStickyCollision,
+      stickyDamageRate: isStickyCollision ? weaponData.damage * weaponData.muzzleCount : 0,
     );
   }
 
@@ -293,11 +306,13 @@ class NikkeDamageEvent extends BattleEvent {
     bool isShareDamage = false,
     bool isDurationDamage = false,
     bool isIgnoreDefence = false,
+    bool isProjectileExplosion = false,
     int? partId,
   }) {
     final bool isStrongEle = nikke.getEffectiveElements().any(
       (nEle) => rapture.baseElements.any((rEle) => nEle.strongAgainst(rEle)),
     );
+    // TODO: confirm if this is in addDamage
     final rateIncrease =
         Source.burst == source
             ? [CharacterSkillType.instantAllParts, CharacterSkillType.instantAll].contains(skillType)
@@ -309,7 +324,6 @@ class NikkeDamageEvent extends BattleEvent {
       ignoreDefence: isIgnoreDefence,
       defence: isIgnoreDefence ? 0 : rapture.getFinalDefence(simulation),
       damageRate: damageRate,
-      damageRateBuff: rateIncrease,
       coreHitRate: 0,
       criticalRate: nikke.getCriticalRate(simulation),
       criticalDamageRate: nikke.characterData.criticalDamage,
@@ -323,6 +337,10 @@ class NikkeDamageEvent extends BattleEvent {
       partDamageBuff: partId != null ? nikke.getPartsDamage(simulation) : 0,
       isDurationDamage: isDurationDamage,
       durationDamageBuff: isDurationDamage ? nikke.getDurationDamageRatio(simulation) : 0,
+      isSkillDamage: true,
+      skillDamageBuff: rateIncrease,
+      isProjectileExplosion: isProjectileExplosion,
+      projectileExplosionBuff: isProjectileExplosion ? nikke.getProjectileExplosionDamage(simulation) : 0,
       damageReductionBuff: rapture.getDamageReduction(simulation),
       isSharedDamage: isShareDamage,
       sharedDamageBuff: isShareDamage ? nikke.getShareDamageIncrease(simulation) : 0,
@@ -385,6 +403,10 @@ class NikkeDamageEvent extends BattleEvent {
             NikkeFixDamageEvent.create(nikke, rapture, repeat.source, repeatDamage),
           );
         }
+      }
+
+      if (isStickyCollision) {
+        rapture.addStickyProjectile(simulation, nikke, this);
       }
 
       rapture.hitMonsterGetBuffData?.applyBuff(simulation, this);

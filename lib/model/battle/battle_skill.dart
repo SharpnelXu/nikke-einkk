@@ -892,3 +892,28 @@ class ExplosiveCircuitData {
     currentAccumulation = min(currentAccumulation, maxAccumulation);
   }
 }
+
+class StickyProjectileData {
+  final int attackerId;
+  final Source source;
+  final int damageRate;
+
+  StickyProjectileData({required this.attackerId, required this.source, required this.damageRate});
+
+  void explode(BattleSimulation simulation, BattleRapture rapture) {
+    final attacker = simulation.getNikkeOnPosition(attackerId);
+    if (attacker != null && attacker.currentHp > 0) {
+      simulation.registerEvent(
+        simulation.currentFrame,
+        NikkeDamageEvent.skill(
+          simulation: simulation,
+          nikke: attacker,
+          rapture: rapture,
+          damageRate: damageRate,
+          source: source,
+          isProjectileExplosion: true,
+        ),
+      );
+    }
+  }
+}

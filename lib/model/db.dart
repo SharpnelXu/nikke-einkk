@@ -86,6 +86,7 @@ class GameConstants {
   final fullCountLimit = 999999; // assume all full counter greater than this is a function group
   final damageBurstApplyDelay = 100; // 1 second
   final vestiUltDuration = 1800; // 18 seconds
+  final stickyProjectileMaxCount = 50;
 
   final Map<int, FunctionType> functionTypeId = {
     4: FunctionType.attention,
