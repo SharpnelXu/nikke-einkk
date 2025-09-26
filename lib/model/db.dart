@@ -207,43 +207,45 @@ class NikkeDatabase {
     }
 
     initialized = true;
-    initialized &= loadData(directory('UnionRaidPresetTable.json'), processUnionRaidWaveData);
-    initialized &= loadData(directory('MonsterTable.json'), processRaptureData);
-    initialized &= loadData(directory('MonsterPartsTable.json'), processRapturePartData);
-    initialized &= loadData(directory('MonsterStatEnhanceTable.json'), processMonsterStatEnhanceData);
-    initialized &= loadData(directory('MonsterStageLvChangeTable.json'), processMonsterStageLvChangeData);
-    initialized &= loadData(directory('SoloRaidPresetTable.json'), processSoloRaidWaveData);
-    initialized &= loadData(directory('StateEffectTable.json'), processStateEffectData);
-    initialized &= loadData(directory('FunctionTable.json'), processFunctionData);
-    initialized &= loadData(directory('MonsterSkillTable.json'), processMonsterSkillData);
-    initialized &= loadData(directory('CharacterTable.json'), processCharacterData);
+
+    initialized &= loadData(directory('AttractiveLevelTable.json'), processAttractiveLevelTable);
     initialized &= loadData(directory('CharacterShotTable.json'), processCharacterShotData);
     initialized &= loadData(directory('CharacterSkillTable.json'), processCharacterSkillData);
-    initialized &= loadData(directory('SkillInfoTable.json'), processSkillInfoData);
-    initialized &= loadData(directory('WordTable.json'), processWordGroupData);
-    initialized &= loadData(directory('FavoriteItemTable.json'), processDollData);
-    initialized &= loadData(directory('CharacterStatTable.json'), processCharacterStatData);
-    initialized &= loadData(directory('ItemEquipTable.json'), processEquipData);
-    initialized &= loadData(directory('ItemHarmonyCubeTable.json'), processCubeData);
-    initialized &= loadData(directory('ItemHarmonyCubeLevelTable.json'), processCubeLevelData);
     initialized &= loadData(directory('CharacterStatEnhanceTable.json'), processCharacterStatEnhanceData);
+    initialized &= loadData(directory('CharacterStatTable.json'), processCharacterStatData);
+    initialized &= loadData(directory('CharacterTable.json'), processCharacterData);
     initialized &= loadData(directory('CoverStatEnhanceTable.json'), processCoverStatData);
-    initialized &= loadData(directory('AttractiveLevelTable.json'), processAttractiveLevelTable);
-    initialized &= loadData(directory('FavoriteItemLevelTable.json'), processFavoriteItemLevelData);
-    initialized &= loadData(directory('MultiRaidTable.json'), processCoopRaidData);
-    initialized &= loadData(directory('PackageListTable.json'), processPackageListData);
-    initialized &= loadData(directory('InAppShopManagerTable.json'), processInAppShopData);
-    initialized &= loadData(directory('PackageGroupTable.json'), processPackageGroupData);
     initialized &= loadData(directory('CurrencyTable.json'), processCurrencyData);
+    initialized &= loadData(directory('CustomPackageGroupTable.json'), processCustomPackageSlotData);
+    initialized &= loadData(directory('CustomPackageShopTable.json'), processCustomPackageData);
+    initialized &= loadData(directory('FavoriteItemLevelTable.json'), processFavoriteItemLevelData);
+    initialized &= loadData(directory('FavoriteItemTable.json'), processDollData);
+    initialized &= loadData(directory('FunctionTable.json'), processFunctionData);
+    initialized &= loadData(directory('InAppShopManagerTable.json'), processInAppShopData);
     initialized &= loadData(directory('ItemConsumeTable.json'), processSimplifiedItemData);
+    initialized &= loadData(directory('ItemEquipTable.json'), processEquipData);
     initialized &= loadData(directory('ItemEquipTable.json'), processSimplifiedItemData);
+    initialized &= loadData(directory('ItemHarmonyCubeLevelTable.json'), processCubeLevelData);
+    initialized &= loadData(directory('ItemHarmonyCubeTable.json'), processCubeData);
     initialized &= loadData(directory('ItemHarmonyCubeTable.json'), processSimplifiedItemData);
     initialized &= loadData(directory('ItemMaterialTable.json'), processSimplifiedItemData);
     initialized &= loadData(directory('ItemPieceTable.json'), processSimplifiedItemData);
-    initialized &= loadData(directory('StepUpPackageListTable.json'), processStepUpPackageData);
-    initialized &= loadData(directory('CustomPackageShopTable.json'), processCustomPackageData);
-    initialized &= loadData(directory('CustomPackageGroupTable.json'), processCustomPackageSlotData);
     initialized &= loadData(directory('MidasProductTable.json'), processMidasProductTable);
+    initialized &= loadData(directory('MonsterPartsTable.json'), processRapturePartData);
+    initialized &= loadData(directory('MonsterSkillTable.json'), processMonsterSkillData);
+    initialized &= loadData(directory('MonsterStageLvChangeTable.json'), processMonsterStageLvChangeData);
+    initialized &= loadData(directory('MonsterStatEnhanceTable.json'), processMonsterStatEnhanceData);
+    initialized &= loadData(directory('MonsterTable.json'), processRaptureData);
+    initialized &= loadData(directory('MultiRaidTable.json'), processCoopRaidData);
+    initialized &= loadData(directory('PackageGroupTable.json'), processPackageGroupData);
+    initialized &= loadData(directory('PackageListTable.json'), processPackageListData);
+    initialized &= loadData(directory('SkillInfoTable.json'), processSkillInfoData);
+    initialized &= loadData(directory('SoloRaidPresetTable.json'), processSoloRaidWaveData);
+    initialized &= loadData(directory('StateEffectTable.json'), processStateEffectData);
+    initialized &= loadData(directory('StepUpPackageListTable.json'), processStepUpPackageData);
+    initialized &= loadData(directory('UnionRaidPresetTable.json'), processUnionRaidWaveData);
+    // WaveTables
+    initialized &= loadData(directory('WordTable.json'), processWordGroupData);
 
     initialized &= loadCsv(directory('WaveData.GroupDict.csv'), processWaveDict);
 

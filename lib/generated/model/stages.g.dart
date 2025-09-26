@@ -63,7 +63,7 @@ WaveData _$WaveDataFromJson(Map<String, dynamic> json) => WaveData(
   closeMonsterCount: (json['close_monster_count'] as num?)?.toInt() ?? 0,
   midMonsterCount: (json['mid_monster_count'] as num?)?.toInt() ?? 0,
   farMonsterCount: (json['far_monster_count'] as num?)?.toInt() ?? 0,
-  modValue: (json['mod_value'] as num?)?.toInt(),
+  modValue: (json['mod_value'] as String?),
   uiTheme: json['ui_theme'] as String?,
 );
 

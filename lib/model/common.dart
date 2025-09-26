@@ -173,6 +173,8 @@ class NikkeCharacterData {
   final bool prismIsActive;
   @JsonKey(name: 'is_detail_close')
   final bool isDetailClose;
+  @JsonKey(name: 'surface_category')
+  final int surfaceCategory;
 
   String get limitBreak => gradeCoreId <= 4 ? 'LimitBreak$gradeCoreId' : 'Core+${gradeCoreId - 4}';
 
@@ -217,6 +219,7 @@ class NikkeCharacterData {
     this.isVisible = false,
     this.prismIsActive = false,
     this.isDetailClose = false,
+    this.surfaceCategory = 0,
   });
 
   factory NikkeCharacterData.fromJson(Map<String, dynamic> json) => _$NikkeCharacterDataFromJson(json);
@@ -243,7 +246,8 @@ class NikkeCharacterData {
 @JsonEnum(fieldRename: FieldRename.screamingSnake)
 enum CorporationSubType {
   unknown,
-  overspec;
+  overspec,
+  normal;
 
   static final Map<String, CorporationSubType> _reverseMap = Map.fromIterable(
     CorporationSubType.values,

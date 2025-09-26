@@ -26,7 +26,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
   bool staticDataDownloaded = false;
   ResStaticDataPackInfo? pack;
   GameDataUnpacker? unpacker;
-  static const globalStaticDataUrl = "https://global-lobby.nikke-kr.com/v1/get-static-data-pack-info";
+  static const globalStaticDataUrl = "https://global-lobby.nikke-kr.com/v1/get-static-data-pack-info-mpk";
   static const cnStaticDataUrl = "https://qq.nikkecn.qq.com:12001/v1/staticdatapack";
 
   @override

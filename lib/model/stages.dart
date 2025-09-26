@@ -136,7 +136,7 @@ class WaveData {
   @JsonKey(name: 'far_monster_count')
   final int farMonsterCount;
   @JsonKey(name: 'mod_value')
-  final int? modValue;
+  final String? modValue;
   @JsonKey(name: 'ui_theme')
   final String? uiTheme;
 

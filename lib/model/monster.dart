@@ -331,6 +331,8 @@ class MonsterSkillData {
   final int projectileSpeed;
   @JsonKey(name: 'projectile_hp_ratio')
   final int projectileHpRatio;
+  @JsonKey(name: 'projectile_def_ratio')
+  final int projectileDefRatio;
   @JsonKey(name: 'projectile_radius_object')
   final int projectileRadiusObject;
   @JsonKey(name: 'projectile_radius')
@@ -399,6 +401,7 @@ class MonsterSkillData {
     this.penetration = 0,
     this.projectileSpeed = 0,
     this.projectileHpRatio = 0,
+    this.projectileDefRatio = 0,
     this.projectileRadiusObject = 0,
     this.projectileRadius = 0,
     this.explosionRange = 0,
