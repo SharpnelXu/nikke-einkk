@@ -1317,7 +1317,7 @@ void main() {
 
         final Set<String> extraMonsterKeys = {};
         final Set<String> extraSkillKeys = {};
-        final Set<String> targetType ={};
+        final Set<String> targetType = {};
         final Set<String> spawnType = {};
         final Set<String> grade = {};
 

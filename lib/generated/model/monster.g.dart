@@ -132,6 +132,7 @@ MonsterSkillData _$MonsterSkillDataFromJson(Map<String, dynamic> json) => Monste
   penetration: (json['penetration'] as num?)?.toInt() ?? 0,
   projectileSpeed: (json['projectile_speed'] as num?)?.toInt() ?? 0,
   projectileHpRatio: (json['projectile_hp_ratio'] as num?)?.toInt() ?? 0,
+  projectileDefRatio: (json['projectile_def_ratio'] as num?)?.toInt() ?? 0,
   projectileRadiusObject: (json['projectile_radius_object'] as num?)?.toInt() ?? 0,
   projectileRadius: (json['projectile_radius'] as num?)?.toInt() ?? 0,
   explosionRange: (json['spot_explosion_range'] as num?)?.toInt() ?? 0,

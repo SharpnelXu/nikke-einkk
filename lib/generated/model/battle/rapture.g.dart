@@ -335,6 +335,8 @@ const _$FunctionTypeEnumMap = {
   FunctionType.damageShareLowestPriority: 'DamageShareLowestPriority',
   FunctionType.immuneStunD: 'ImmuneStunD',
   FunctionType.statDefGluttony: 'StatDefGluttony',
+  FunctionType.immediatelyDebuffCheckImmune: 'ImmediatelyDebuffCheckImmune',
+  FunctionType.durationDebuffCheckImmune: 'DurationDebuffCheckImmune',
 };
 
 BattleRaptureParts _$BattleRapturePartsFromJson(Map<String, dynamic> json) => BattleRaptureParts(

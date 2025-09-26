@@ -68,7 +68,7 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
 
       final parts = db.rapturePartData[data.monsterModelId] ?? [];
       for (final part in parts) {
-        if (part.partsNameKey == null && part.hpRatio == 10000) continue;
+        if (part.partsNameKey?.isEmpty == true && part.hpRatio == 10000) continue;
 
         children.add(
           Container(
@@ -361,7 +361,7 @@ class _RaptureDataDisplayPageState extends State<RaptureDataDisplayPage> {
             mainAxisSize: MainAxisSize.min,
             spacing: 3,
             children: [
-              if (partName != null) Text(partName, style: TextStyle(fontSize: 20)),
+              if (partName != null && partName.isNotEmpty) Text(partName, style: TextStyle(fontSize: 20)),
               Container(
                 constraints: BoxConstraints(maxWidth: 700),
                 child: CustomTable(
