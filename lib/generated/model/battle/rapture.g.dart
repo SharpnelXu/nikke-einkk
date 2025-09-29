@@ -333,8 +333,7 @@ const _$FunctionTypeEnumMap = {
   FunctionType.forcedReload: 'ForcedReload',
   FunctionType.statBonusRangeMin: 'StatBonusRangeMin',
   FunctionType.damageShareLowestPriority: 'DamageShareLowestPriority',
-  FunctionType.immuneStunD: 'ImmuneStunD',
-  FunctionType.statDefGluttony: 'StatDefGluttony',
+  FunctionType.statDefNoneBreakCol: 'StatDefNoneBreakCol',
   FunctionType.immediatelyDebuffCheckImmune: 'ImmediatelyDebuffCheckImmune',
   FunctionType.durationDebuffCheckImmune: 'DurationDebuffCheckImmune',
 };

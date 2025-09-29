@@ -472,8 +472,7 @@ enum FunctionType {
   forcedReload,
   statBonusRangeMin,
   damageShareLowestPriority,
-  immuneStunD,
-  statDefGluttony,
+  statDefNoneBreakCol,
   immediatelyDebuffCheckImmune,
   durationDebuffCheckImmune;
 
@@ -602,7 +601,7 @@ enum TimingTriggerType {
   onPelletCriticalHitNum,
   onFunctionDamageCriticalHit,
   onFullChargeBonusRangeHitNum,
-  onDeadV2;
+  onDeadComplete;
 
   static List<TimingTriggerType> sorted = TimingTriggerType.values.toList().sorted((a, b) => a.name.compareTo(b.name));
 
@@ -648,7 +647,6 @@ enum StatusTriggerType {
   isNotBurstMember,
   isNotCheckTeamBurstNextStep,
   isNotHaveBarrier,
-  @JsonValue('isPhase')
   isPhase,
   @JsonValue('IsSameSqaudCount')
   isSameSquadCount,
@@ -663,15 +661,12 @@ enum StatusTriggerType {
   isFunctionCount, // cn only
   isNotHaveCover,
   @JsonValue('IsSameSqaud')
-  isSameSquad,
-  isAliveV2;
+  isSameSquad;
 
   static final Map<String, StatusTriggerType> _reverseMap = Map.fromIterable(
     StatusTriggerType.values,
     key: (v) {
       switch (v as StatusTriggerType) {
-        case isPhase:
-          return 'isPhase';
         case isSameSquadCount:
           return 'IsSameSqaudCount';
         case isSameSquadUp:
@@ -685,6 +680,9 @@ enum StatusTriggerType {
   );
 
   static StatusTriggerType fromName(String? name) {
+    if (name == 'isPhase') {
+      return StatusTriggerType.isPhase;
+    }
     return _reverseMap[name] ?? StatusTriggerType.unknown;
   }
 

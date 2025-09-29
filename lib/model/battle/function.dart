@@ -288,7 +288,7 @@ class BattleFunction {
       case TimingTriggerType.onPelletCriticalHitNum:
       case TimingTriggerType.onFunctionDamageCriticalHit:
       case TimingTriggerType.onFullChargeBonusRangeHitNum:
-      case TimingTriggerType.onDeadV2:
+      case TimingTriggerType.onDeadComplete:
         // logger.i('Unimplemented TimingTriggerType: ${data.timingTriggerType}');
         break;
     }
@@ -916,8 +916,7 @@ class BattleFunction {
       case FunctionType.dmgReductionExcludingBreakCol:
       case FunctionType.durationBuffCheckImmune:
       case FunctionType.immediatelyBuffCheckImmune:
-      case FunctionType.immuneStunD:
-      case FunctionType.statDefGluttony:
+      case FunctionType.statDefNoneBreakCol:
       case FunctionType.immediatelyDebuffCheckImmune:
       case FunctionType.durationDebuffCheckImmune:
       // ^^^ likely monster only skills
@@ -1072,7 +1071,6 @@ class BattleFunction {
         return (target is BattleNikke && target.barriers.isEmpty) ||
             (target is BattleRapture && target.barrier == null);
       case StatusTriggerType.isAlive:
-      case StatusTriggerType.isAliveV2:
         return target != null && target.currentHp > 0;
       case StatusTriggerType.isAmmoCount:
         return target is BattleNikke && target.currentAmmo == value;
