@@ -428,6 +428,7 @@ class BattleSkill {
         }
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.unknown:
+      default:
         break;
     }
 
@@ -510,6 +511,7 @@ class BattleSkill {
         // just target all
         return isThisNikke ? simulation.raptures.toList() : simulation.aliveNikkes.toList();
       case CharacterSkillType.unknown:
+      default:
         return [];
     }
 

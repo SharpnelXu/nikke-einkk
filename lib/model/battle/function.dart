@@ -241,7 +241,7 @@ class BattleFunction {
         break;
       case TimingTriggerType.onFunctionBuffCheck:
         if (event is BuffEvent && event.isAdd && event.targetId == ownerId) {
-          final isExpectedBuff = event.data.functionType == constData.functionTypeId[timingTriggerValue];
+          final isExpectedBuff = event.data.functionType.value == timingTriggerValue;
           if (isExpectedBuff) {
             executeFunction(event, simulation);
           }
@@ -289,6 +289,7 @@ class BattleFunction {
       case TimingTriggerType.onFunctionDamageCriticalHit:
       case TimingTriggerType.onFullChargeBonusRangeHitNum:
       case TimingTriggerType.onDeadComplete:
+      default:
         // logger.i('Unimplemented TimingTriggerType: ${data.timingTriggerType}');
         break;
     }
@@ -931,6 +932,42 @@ class BattleFunction {
       case FunctionType.statBioResist:
       case FunctionType.statEnergyResist:
         // ^^^ likely deprecated
+      case FunctionType.autoTargeting:
+      case FunctionType.skillCooltime:
+      case FunctionType.statUltiGaugeSec:
+      case FunctionType.statUltiGaugeKill:
+      case FunctionType.statUltiGaugeUseSkill:
+      case FunctionType.statUltiGaugeSkillHit:
+      case FunctionType.statUltiGaugeShotHit:
+      case FunctionType.statUltiGaugeHurt:
+      case FunctionType.statUltiGaugeEmptyAmmo:
+      case FunctionType.drainHp:
+      case FunctionType.drainUltiGauge:
+      case FunctionType.ignoreDamage:
+      case FunctionType.damageRatioBio:
+      case FunctionType.gaugeShield:
+      case FunctionType.statProjectileSpeed:
+      case FunctionType.statFirstDelay:
+      case FunctionType.statMetalResist:
+      case FunctionType.damageRecoverHeal:
+      case FunctionType.fullBurstDamage:
+      case FunctionType.damageRatioUp:
+      case FunctionType.incReactTime:
+      case FunctionType.coreShotDamageRateChange:
+      case FunctionType.changeHp:
+      case FunctionType.copyDef:
+      case FunctionType.electronicReduction:
+      case FunctionType.fireReduction:
+      case FunctionType.waterReduction:
+      case FunctionType.ironReduction:
+      case FunctionType.immortalValue:
+      case FunctionType.finalStatHp:
+      case FunctionType.allStepBurstKeepStep:
+      case FunctionType.normalStatCriticalDamage:
+      case FunctionType.minusDebuffCount:
+      case FunctionType.emptyFunction:
+      case FunctionType.changeHealChargeValue:
+        // ^^^ unused ones
         break;
     }
 
@@ -1132,10 +1169,10 @@ class BattleFunction {
       case StatusTriggerType.isSameSquadUp:
         return target is BattleNikke && simulation.countSquad(target) >= value;
       case StatusTriggerType.isFunctionBuffCheck:
-        return target != null && target.buffs.any((buff) => buff.data.functionType == constData.functionTypeId[value]);
+        return target != null && target.buffs.any((buff) => buff.data.functionType.value == value);
       case StatusTriggerType.isFunctionTypeOffCheck:
         return target != null &&
-            target.buffs.every((buff) => buff.data.functionType != constData.functionTypeId[value]);
+            target.buffs.every((buff) => buff.data.functionType.value != value);
       // likely used by raptures
       case StatusTriggerType.isCover:
         return target is BattleCover;
@@ -1144,6 +1181,7 @@ class BattleFunction {
         logger.i('Unimplemented StatusTriggerType: $type');
         return false;
       case StatusTriggerType.unknown:
+      default:
         return false;
     }
   }

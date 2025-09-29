@@ -957,9 +957,6 @@ void main() {
 
         final Set<String> extraKeys = {};
 
-        final functionTypeCheck = {StatusTriggerType.isFunctionBuffCheck, StatusTriggerType.isFunctionTypeOffCheck};
-        final Set<int> unknownFuncTypeIds = {};
-
         final loaded = loadData(getDesignatedDirectory(folder, 'FunctionTable.json'), (record) {
           final recordKeys = (record as Map<String, dynamic>).keys.toSet();
           final data = FunctionData.fromJson(record);
@@ -988,21 +985,6 @@ void main() {
             unknownStandardTypes.add(data.rawStatusTrigger2Standard);
           }
           if (data.keepingType == FunctionStatus.unknown) unknownKeepingTypes.add(data.rawKeepingType);
-
-          if (functionTypeCheck.contains(data.statusTriggerType) &&
-              !constData.functionTypeId.containsKey(data.statusTriggerValue)) {
-            unknownFuncTypeIds.add(data.statusTriggerValue);
-          }
-
-          if (functionTypeCheck.contains(data.statusTrigger2Type) &&
-              !constData.functionTypeId.containsKey(data.statusTrigger2Value)) {
-            unknownFuncTypeIds.add(data.statusTrigger2Value);
-          }
-
-          if (data.timingTriggerType == TimingTriggerType.onFunctionBuffCheck &&
-              !constData.functionTypeId.containsKey(data.timingTriggerValue)) {
-            unknownFuncTypeIds.add(data.timingTriggerValue);
-          }
 
           if (data.functionType == FunctionType.durationValueChange) {
             expect(data.statusTriggerType, StatusTriggerType.isFunctionOn, reason: 'Assumption violated');
@@ -1050,7 +1032,6 @@ void main() {
         expect(unknownTimingTriggers, emptySet, reason: 'Unknown timing triggers: $folder');
         expect(unknownStatusTriggers, emptySet, reason: 'Unknown status triggers: $folder');
         expect(unknownKeepingTypes, emptySet, reason: 'Unknown keeping types: $folder');
-        expect(unknownFuncTypeIds, emptySet, reason: 'Unknown funcTypeIds: $folder');
 
         // Structural validation
         expect(extraKeys, emptySet, reason: 'Extra fields found: $folder');
