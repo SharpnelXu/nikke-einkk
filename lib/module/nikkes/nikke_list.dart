@@ -285,32 +285,46 @@ class _NikkeGridsState extends State<NikkeGrids> {
       ),
     );
 
-    final rarityRow = Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        spacing: 8,
-        children: [
-          Text('Rarity: '),
-          ...List.generate(NikkeFilterData.defaultRarity.length, (index) {
-            final buttonType = NikkeFilterData.defaultRarity[index];
-            final enabled = filterData.rarity.contains(buttonType);
-            return FilledButton(
+    final rarityRow = IntrinsicHeight(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          spacing: 8,
+          children: [
+            Text('Rarity: '),
+            ...List.generate(NikkeFilterData.defaultRarity.length, (index) {
+              final buttonType = NikkeFilterData.defaultRarity[index];
+              final enabled = filterData.rarity.contains(buttonType);
+              return FilledButton(
+                style: FilledButton.styleFrom(
+                  foregroundColor: enabled ? Colors.white : Colors.black,
+                  backgroundColor: enabled ? buttonType.color : Colors.white,
+                ),
+                onPressed: () {
+                  if (enabled) {
+                    filterData.rarity.remove(buttonType);
+                  } else {
+                    filterData.rarity.add(buttonType);
+                  }
+                  if (mounted) setState(() {});
+                },
+                child: Text(buttonType.name.toUpperCase()),
+              );
+            }),
+            const VerticalDivider(width: 5, color: Colors.grey),
+            FilledButton(
               style: FilledButton.styleFrom(
-                foregroundColor: enabled ? Colors.white : Colors.black,
-                backgroundColor: enabled ? buttonType.color : Colors.white,
+                foregroundColor: filterData.favoriteItemsOnly ? Colors.white : Colors.black,
+                backgroundColor: filterData.favoriteItemsOnly ? Rarity.ssr.color : Colors.white,
               ),
               onPressed: () {
-                if (enabled) {
-                  filterData.rarity.remove(buttonType);
-                } else {
-                  filterData.rarity.add(buttonType);
-                }
+                filterData.favoriteItemsOnly = !filterData.favoriteItemsOnly;
                 if (mounted) setState(() {});
               },
-              child: Text(buttonType.name.toUpperCase()),
-            );
-          }),
-        ],
+              child: Text('Favorite Items Only'),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -380,6 +394,7 @@ class NikkeFilterData {
   List<StatusTriggerType> statusTypes = [];
   bool skillOr = true;
   bool funcOr = true;
+  bool favoriteItemsOnly = false;
 
   NikkeDatabase get db => userDb.gameDb;
 
@@ -393,7 +408,8 @@ class NikkeFilterData {
         _skillTypeCheck(characterData) &&
         _funcTypeCheck(characterData) &&
         _timingTypeCheck(characterData) &&
-        _statusTypeCheck(characterData);
+        _statusTypeCheck(characterData) &&
+        (!favoriteItemsOnly || db.nameCodeFavItemTable.containsKey(characterData.nameCode));
   }
 
   bool _elementCheck(NikkeCharacterData characterData) {
@@ -473,5 +489,6 @@ class NikkeFilterData {
     statusTypes.clear();
     skillOr = true;
     funcOr = true;
+    favoriteItemsOnly = false;
   }
 }

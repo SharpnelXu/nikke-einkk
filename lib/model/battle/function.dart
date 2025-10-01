@@ -289,7 +289,28 @@ class BattleFunction {
       case TimingTriggerType.onFunctionDamageCriticalHit:
       case TimingTriggerType.onFullChargeBonusRangeHitNum:
       case TimingTriggerType.onDeadComplete:
-      default:
+      case TimingTriggerType.onFunctionDebuffCheck:
+      case TimingTriggerType.onSquadHurtCount:
+      case TimingTriggerType.onCoverHurtCount:
+      case TimingTriggerType.onAmmoRatioUp:
+      case TimingTriggerType.onShooterCount:
+      case TimingTriggerType.onCoverDestroyRatio:
+      case TimingTriggerType.onAttackRatio:
+      case TimingTriggerType.onFullBurstTimeOverRatio:
+      case TimingTriggerType.onPartsHitNumOnce:
+      case TimingTriggerType.onPartsHitRatioOnce:
+      case TimingTriggerType.onCriticalHitRatio:
+      case TimingTriggerType.onCriticalHitNumOnce:
+      case TimingTriggerType.onCriticalHitRatioOnce:
+      case TimingTriggerType.onMonsterDead:
+      case TimingTriggerType.onCoreHitRatioOnce:
+      case TimingTriggerType.onAfterTimeSec:
+      case TimingTriggerType.onPartsHurtRatio:
+      case TimingTriggerType.onFullChargePartsHitNum:
+      case TimingTriggerType.onHurtDecoyNum:
+      case TimingTriggerType.onKeepFullChargeShotUnder:
+      case TimingTriggerType.onSpawnMonsterExcludeNoneType:
+      case TimingTriggerType.onKeepFullChargeShot:
         // logger.i('Unimplemented TimingTriggerType: ${data.timingTriggerType}');
         break;
     }
@@ -924,6 +945,7 @@ class BattleFunction {
       case FunctionType.damageBio:
       case FunctionType.damageEnergy:
       case FunctionType.damageMetal:
+      case FunctionType.damageRatioBio:
       case FunctionType.damageRatioEnergy:
       case FunctionType.damageRatioMetal:
       case FunctionType.immuneBio:
@@ -931,9 +953,7 @@ class BattleFunction {
       case FunctionType.immuneMetal:
       case FunctionType.statBioResist:
       case FunctionType.statEnergyResist:
-        // ^^^ likely deprecated
-      case FunctionType.autoTargeting:
-      case FunctionType.skillCooltime:
+      case FunctionType.statMetalResist:
       case FunctionType.statUltiGaugeSec:
       case FunctionType.statUltiGaugeKill:
       case FunctionType.statUltiGaugeUseSkill:
@@ -941,14 +961,15 @@ class BattleFunction {
       case FunctionType.statUltiGaugeShotHit:
       case FunctionType.statUltiGaugeHurt:
       case FunctionType.statUltiGaugeEmptyAmmo:
+      // ^^^ likely deprecated
+      case FunctionType.autoTargeting:
+      case FunctionType.skillCooltime:
       case FunctionType.drainHp:
       case FunctionType.drainUltiGauge:
       case FunctionType.ignoreDamage:
-      case FunctionType.damageRatioBio:
       case FunctionType.gaugeShield:
       case FunctionType.statProjectileSpeed:
       case FunctionType.statFirstDelay:
-      case FunctionType.statMetalResist:
       case FunctionType.damageRecoverHeal:
       case FunctionType.fullBurstDamage:
       case FunctionType.damageRatioUp:
@@ -1171,17 +1192,35 @@ class BattleFunction {
       case StatusTriggerType.isFunctionBuffCheck:
         return target != null && target.buffs.any((buff) => buff.data.functionType.value == value);
       case StatusTriggerType.isFunctionTypeOffCheck:
-        return target != null &&
-            target.buffs.every((buff) => buff.data.functionType.value != value);
+        return target != null && target.buffs.every((buff) => buff.data.functionType.value != value);
       // likely used by raptures
       case StatusTriggerType.isCover:
         return target is BattleCover;
       case StatusTriggerType.isPhase:
       case StatusTriggerType.isFunctionCount:
+      case StatusTriggerType.isAmmoRatioUnder:
+      case StatusTriggerType.isAmmoRatioUp:
+      case StatusTriggerType.isAmmoCountUnder:
+      case StatusTriggerType.isAmmoCountUp:
+      case StatusTriggerType.isShooterCount:
+      case StatusTriggerType.isShooterUnder:
+      case StatusTriggerType.isShooterUp:
+      case StatusTriggerType.isSameSquadUnder:
+      case StatusTriggerType.isFunctionDebuffCheck:
+      case StatusTriggerType.isForcedStop:
+      case StatusTriggerType.alwaysRecursive:
+      case StatusTriggerType.isUseAmmo:
+      case StatusTriggerType.isPhaseUp:
+      case StatusTriggerType.isPhaseUnder:
+      case StatusTriggerType.isBurstSkillStep:
+      case StatusTriggerType.isCheckDebuff:
+      case StatusTriggerType.isHighHpValue:
+      case StatusTriggerType.isHighMaxHpValue:
+      case StatusTriggerType.isHaveCover:
+      case StatusTriggerType.isCheckGradeUnder:
         logger.i('Unimplemented StatusTriggerType: $type');
         return false;
       case StatusTriggerType.unknown:
-      default:
         return false;
     }
   }
