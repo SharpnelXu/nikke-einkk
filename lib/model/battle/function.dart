@@ -566,6 +566,7 @@ class BattleFunction {
       case FunctionType.projectileExplosionDamage:
       case FunctionType.stickyProjectileCollisionDamage:
       case FunctionType.stickyProjectileInstantExplosion:
+      case FunctionType.repeatUseBurstStep:
       case FunctionType.none: // misc counters etc.
       case FunctionType.transformation: // animation only
       case FunctionType.focusAttack:
@@ -897,7 +898,6 @@ class BattleFunction {
           rapture.explodeStickyProjectiles(simulation, ownerId);
         }
         break;
-      case FunctionType.repeatUseBurstStep:
       case FunctionType.resurrection:
       case FunctionType.statBurstSkillCoolTime:
       case FunctionType.statChargeTimeImmune:
@@ -1189,38 +1189,50 @@ class BattleFunction {
         return target is BattleNikke && simulation.countSquad(target) == value;
       case StatusTriggerType.isSameSquadUp:
         return target is BattleNikke && simulation.countSquad(target) >= value;
+      case StatusTriggerType.isSameSquadUnder:
+        return target is BattleNikke && simulation.countSquad(target) <= value;
       case StatusTriggerType.isFunctionBuffCheck:
+      case StatusTriggerType.isFunctionDebuffCheck:
         return target != null && target.buffs.any((buff) => buff.data.functionType.value == value);
       case StatusTriggerType.isFunctionTypeOffCheck:
         return target != null && target.buffs.every((buff) => buff.data.functionType.value != value);
       // likely used by raptures
       case StatusTriggerType.isCover:
         return target is BattleCover;
-      case StatusTriggerType.isPhase:
-      case StatusTriggerType.isFunctionCount:
       case StatusTriggerType.isAmmoRatioUnder:
+        if (target is! BattleNikke) return false;
+        final currentAmmo = target.currentAmmo;
+        final maxAmmo = target.getMaxAmmo(simulation);
+        return (currentAmmo / maxAmmo * 10000).round() <= value;
       case StatusTriggerType.isAmmoRatioUp:
+        if (target is! BattleNikke) return false;
+        final currentAmmo = target.currentAmmo;
+        final maxAmmo = target.getMaxAmmo(simulation);
+        return (currentAmmo / maxAmmo * 10000).round() >= value;
       case StatusTriggerType.isAmmoCountUnder:
+        return target is BattleNikke && target.currentAmmo <= value;
       case StatusTriggerType.isAmmoCountUp:
+        return target is BattleNikke && target.currentAmmo >= value;
+      case StatusTriggerType.isForcedStop:
+        return target != null && target.buffs.any((buff) => buff.data.functionType == FunctionType.forcedStop);
+      case StatusTriggerType.isHaveCover:
+        return target is BattleNikke && target.cover.currentHp > 0;
+      case StatusTriggerType.isPhase:
+      case StatusTriggerType.isPhaseUp:
+      case StatusTriggerType.isPhaseUnder:
       case StatusTriggerType.isShooterCount:
       case StatusTriggerType.isShooterUnder:
       case StatusTriggerType.isShooterUp:
-      case StatusTriggerType.isSameSquadUnder:
-      case StatusTriggerType.isFunctionDebuffCheck:
-      case StatusTriggerType.isForcedStop:
       case StatusTriggerType.alwaysRecursive:
       case StatusTriggerType.isUseAmmo:
-      case StatusTriggerType.isPhaseUp:
-      case StatusTriggerType.isPhaseUnder:
       case StatusTriggerType.isBurstSkillStep:
       case StatusTriggerType.isCheckDebuff:
       case StatusTriggerType.isHighHpValue:
       case StatusTriggerType.isHighMaxHpValue:
-      case StatusTriggerType.isHaveCover:
       case StatusTriggerType.isCheckGradeUnder:
-        logger.i('Unimplemented StatusTriggerType: $type');
-        return false;
+      case StatusTriggerType.isFunctionCount:
       case StatusTriggerType.unknown:
+        logger.i('Unknown StatusTriggerType: $type');
         return false;
     }
   }

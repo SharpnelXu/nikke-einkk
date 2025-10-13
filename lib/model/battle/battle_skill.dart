@@ -427,8 +427,19 @@ class BattleSkill {
           }
         }
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
+      case CharacterSkillType.aimingExplosion:
+      case CharacterSkillType.aimingPenetration:
+      case CharacterSkillType.installDrone:
+      case CharacterSkillType.instantSkill:
+      case CharacterSkillType.custom191Ulti:
+      case CharacterSkillType.targetShot:
+      case CharacterSkillType.instantLine:
+      case CharacterSkillType.multiTarget:
+      case CharacterSkillType.maxHPInstantNumber:
+      case CharacterSkillType.reFullChargeHitDamage:
+      case CharacterSkillType.healCharge:
+      case CharacterSkillType.none:
       case CharacterSkillType.unknown:
-      default:
         break;
     }
 
@@ -444,8 +455,8 @@ class BattleSkill {
       }
     }
 
-    final nextStep = owner.getChangeBurstStep(simulation);
     if (source == Source.burst) {
+      final nextStep = owner.getChangeBurstStep(simulation);
       owner.activatedBurstSkillThisCycle = true;
 
       if (validNextStep.contains(nextStep) && simulation.reEnterBurstCd == 0) {

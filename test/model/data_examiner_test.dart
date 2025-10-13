@@ -786,6 +786,7 @@ void main() {
         final Set<String?> unknownSkillType = {};
         final Set<String?> unknownDurationType = {};
         final Set<String> extraKeys = {};
+        final Set<CharacterSkillType> newSkillTypes = {};
 
         final loaded = loadData(getDesignatedDirectory(folder, 'CharacterSkillTable.json'), (record) {
           final recordKeys = (record as Map<String, dynamic>).keys.toSet();
@@ -803,6 +804,23 @@ void main() {
           }
           if (data.skillType == CharacterSkillType.unknown) {
             unknownSkillType.add(data.rawSkillType);
+          }
+          switch (data.skillType) {
+            case CharacterSkillType.aimingExplosion:
+            case CharacterSkillType.aimingPenetration:
+            case CharacterSkillType.installDrone:
+            case CharacterSkillType.instantSkill:
+            case CharacterSkillType.custom191Ulti:
+            case CharacterSkillType.targetShot:
+            case CharacterSkillType.instantLine:
+            case CharacterSkillType.multiTarget:
+            case CharacterSkillType.maxHPInstantNumber:
+            case CharacterSkillType.reFullChargeHitDamage:
+            case CharacterSkillType.healCharge:
+              newSkillTypes.add(data.skillType);
+              break;
+            default:
+              break;
           }
           if (data.durationType == DurationType.unknown) {
             unknownDurationType.add(data.rawDurationType);
@@ -832,6 +850,7 @@ void main() {
         expect(unknownPreferTarget, emptySet, reason: 'unknownPreferTarget: $folder');
         expect(unknownPreferTargetCondition, emptySet, reason: 'unknownPreferTargetCondition: $folder');
         expect(unknownSkillType, emptySet, reason: 'unknownSkillType: $folder');
+        expect(newSkillTypes.isEmpty, isTrue, reason: 'new skill types found: $newSkillTypes in $folder');
         expect(unknownDurationType, emptySet, reason: 'unknownDurationType: $folder');
         expect(extraKeys, emptySet, reason: 'extraKeys: $folder');
 
@@ -951,6 +970,10 @@ void main() {
         final Set<String?> unknownStatusTriggers = {};
         final Set<String?> unknownKeepingTypes = {};
 
+        final Set<FunctionType> newFuncType = {};
+        final Set<TimingTriggerType> newTimingType = {};
+        final Set<StatusTriggerType> newStatusType = {};
+
         final Set<String> sockets = {};
         final Set<String> fxTargets = {};
         final Set<String> shotTypes = {};
@@ -965,12 +988,80 @@ void main() {
           if (data.buff == BuffType.unknown) unknownBuffTypes.add(data.rawBuffType);
           if (data.buffRemove == BuffRemoveType.unknown) unknownBuffRemoveTypes.add(data.rawBuffRemove);
           if (data.functionType == FunctionType.unknown) unknownFunctionTypes.add(data.rawFunctionType);
+          switch (data.functionType) {
+            case FunctionType.statUltiGaugeSec:
+            case FunctionType.statUltiGaugeKill:
+            case FunctionType.statUltiGaugeUseSkill:
+            case FunctionType.statUltiGaugeSkillHit:
+            case FunctionType.statUltiGaugeShotHit:
+            case FunctionType.statUltiGaugeHurt:
+            case FunctionType.statUltiGaugeEmptyAmmo:
+            // ^^^ likely deprecated
+            case FunctionType.autoTargeting:
+            case FunctionType.skillCooltime:
+            case FunctionType.drainHp:
+            case FunctionType.drainUltiGauge:
+            case FunctionType.ignoreDamage:
+            case FunctionType.gaugeShield:
+            case FunctionType.statProjectileSpeed:
+            case FunctionType.statFirstDelay:
+            case FunctionType.damageRecoverHeal:
+            case FunctionType.fullBurstDamage:
+            case FunctionType.damageRatioUp:
+            case FunctionType.incReactTime:
+            case FunctionType.coreShotDamageRateChange:
+            case FunctionType.changeHp:
+            case FunctionType.copyDef:
+            case FunctionType.electronicReduction:
+            case FunctionType.fireReduction:
+            case FunctionType.waterReduction:
+            case FunctionType.ironReduction:
+            case FunctionType.immortalValue:
+            case FunctionType.finalStatHp:
+            case FunctionType.allStepBurstKeepStep:
+            case FunctionType.normalStatCriticalDamage:
+            case FunctionType.minusDebuffCount:
+            case FunctionType.emptyFunction:
+            case FunctionType.changeHealChargeValue:
+              newFuncType.add(data.functionType);
+              break;
+            default:
+              break;
+          }
           if (data.functionValueType == ValueType.unknown) unknownValueTypes.add(data.rawFunctionValueType);
           if (data.functionStandard == StandardType.unknown) unknownStandardTypes.add(data.rawFunctionStandard);
           if (data.delayType == DurationType.unknown) unknownDelayTypes.add(data.rawDelayType);
           if (data.durationType == DurationType.unknown) unknownDurationTypes.add(data.rawDurationType);
           if (data.functionTarget == FunctionTargetType.unknown) unknownFunctionTargets.add(data.rawFunctionTarget);
           if (data.timingTriggerType == TimingTriggerType.unknown) unknownTimingTriggers.add(data.rawTimingTriggerType);
+          switch (data.timingTriggerType) {
+            case TimingTriggerType.onFunctionDebuffCheck:
+            case TimingTriggerType.onSquadHurtCount:
+            case TimingTriggerType.onCoverHurtCount:
+            case TimingTriggerType.onAmmoRatioUp:
+            case TimingTriggerType.onShooterCount:
+            case TimingTriggerType.onCoverDestroyRatio:
+            case TimingTriggerType.onAttackRatio:
+            case TimingTriggerType.onFullBurstTimeOverRatio:
+            case TimingTriggerType.onPartsHitNumOnce:
+            case TimingTriggerType.onPartsHitRatioOnce:
+            case TimingTriggerType.onCriticalHitRatio:
+            case TimingTriggerType.onCriticalHitNumOnce:
+            case TimingTriggerType.onCriticalHitRatioOnce:
+            case TimingTriggerType.onMonsterDead:
+            case TimingTriggerType.onCoreHitRatioOnce:
+            case TimingTriggerType.onAfterTimeSec:
+            case TimingTriggerType.onPartsHurtRatio:
+            case TimingTriggerType.onFullChargePartsHitNum:
+            case TimingTriggerType.onHurtDecoyNum:
+            case TimingTriggerType.onKeepFullChargeShotUnder:
+            case TimingTriggerType.onSpawnMonsterExcludeNoneType:
+            case TimingTriggerType.onKeepFullChargeShot:
+              newTimingType.add(data.timingTriggerType);
+              break;
+            default:
+              break;
+          }
           if (data.timingTriggerStandard == StandardType.unknown) {
             unknownStandardTypes.add(data.rawTimingTriggerStandard);
           }
@@ -984,6 +1075,37 @@ void main() {
           if (data.statusTrigger2Standard == StandardType.unknown) {
             unknownStandardTypes.add(data.rawStatusTrigger2Standard);
           }
+
+          void addNewStatusType(StatusTriggerType type) {
+            switch (type) {
+              case StatusTriggerType.isAmmoRatioUnder:
+              case StatusTriggerType.isAmmoRatioUp:
+              case StatusTriggerType.isAmmoCountUnder:
+              case StatusTriggerType.isAmmoCountUp:
+              case StatusTriggerType.isShooterCount:
+              case StatusTriggerType.isShooterUnder:
+              case StatusTriggerType.isShooterUp:
+              case StatusTriggerType.isSameSquadUnder:
+              case StatusTriggerType.isFunctionDebuffCheck:
+              case StatusTriggerType.isForcedStop:
+              case StatusTriggerType.alwaysRecursive:
+              case StatusTriggerType.isUseAmmo:
+              case StatusTriggerType.isPhaseUp:
+              case StatusTriggerType.isPhaseUnder:
+              case StatusTriggerType.isBurstSkillStep:
+              case StatusTriggerType.isCheckDebuff:
+              case StatusTriggerType.isHighHpValue:
+              case StatusTriggerType.isHighMaxHpValue:
+              case StatusTriggerType.isHaveCover:
+              case StatusTriggerType.isCheckGradeUnder:
+                newStatusType.add(type);
+                break;
+              default:
+                break;
+            }
+          }
+          addNewStatusType(data.statusTriggerType);
+          addNewStatusType(data.statusTriggerType);
           if (data.keepingType == FunctionStatus.unknown) unknownKeepingTypes.add(data.rawKeepingType);
 
           if (data.functionType == FunctionType.durationValueChange) {
@@ -1032,6 +1154,9 @@ void main() {
         expect(unknownTimingTriggers, emptySet, reason: 'Unknown timing triggers: $folder');
         expect(unknownStatusTriggers, emptySet, reason: 'Unknown status triggers: $folder');
         expect(unknownKeepingTypes, emptySet, reason: 'Unknown keeping types: $folder');
+        expect(newFuncType.isEmpty, isTrue, reason: 'New function types found: $newFuncType in $folder');
+        expect(newTimingType.isEmpty, isTrue, reason: 'New timing trigger types found: $newTimingType in $folder');
+        expect(newStatusType.isEmpty, isTrue, reason: 'New status trigger types found: $newStatusType in $folder');
 
         // Structural validation
         expect(extraKeys, emptySet, reason: 'Extra fields found: $folder');

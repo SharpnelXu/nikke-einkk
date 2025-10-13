@@ -926,12 +926,16 @@ class BattleNikke extends BattleEntity {
   }
 
   BurstStep getUseBurstSkill(BattleSimulation simulation) {
-    final changeBuffVal = getFirstPlainBuffValues(simulation, FunctionType.changeUseBurstSkill);
+    final changeBuffVal = getFirstPlainBuffValue(simulation, FunctionType.changeUseBurstSkill);
     return BurstStep.fromStep(changeBuffVal) ?? characterData.useBurstSkill;
   }
 
   BurstStep getChangeBurstStep(BattleSimulation simulation) {
-    final changeBuffVal = getFirstPlainBuffValues(simulation, FunctionType.changeChangeBurstStep);
+    final repeatUseStep = BurstStep.fromStep(getFirstPlainBuffValue(simulation, FunctionType.repeatUseBurstStep));
+    if (repeatUseStep != null) {
+      return repeatUseStep;
+    }
+    final changeBuffVal = getFirstPlainBuffValue(simulation, FunctionType.changeChangeBurstStep);
     return BurstStep.fromStep(changeBuffVal) ?? characterData.changeBurstStep;
   }
 
