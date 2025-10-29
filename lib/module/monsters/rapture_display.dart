@@ -68,7 +68,7 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
 
       final parts = db.rapturePartData[data.monsterModelId] ?? [];
       for (final part in parts) {
-        if (part.partsNameKey?.isEmpty == true && part.hpRatio == 10000) continue;
+        if (part.isMainPart) continue;
 
         children.add(
           Container(
@@ -83,7 +83,7 @@ class RaptureLeveledDataDisplay extends StatelessWidget {
               children: [
                 Tooltip(
                   message: 'NameKey: ${part.partsNameKey}\nType: ${part.partsType}',
-                  child: Text(locale.getTranslation(part.partsNameKey) ?? part.partsNameKey ?? 'Unknown Part'),
+                  child: Text(locale.getTranslation(part.partsNameKey) ?? part.partsNameKey ?? part.partsType),
                 ),
                 Text(
                   'HP: ${(utils.toModifier(part.hpRatio) * statEnhanceData.levelBrokenHp).decimalPattern}'
