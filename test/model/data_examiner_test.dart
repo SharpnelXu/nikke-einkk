@@ -816,7 +816,6 @@ void main() {
             case CharacterSkillType.multiTarget:
             case CharacterSkillType.maxHPInstantNumber:
             case CharacterSkillType.reFullChargeHitDamage:
-            case CharacterSkillType.healCharge:
               newSkillTypes.add(data.skillType);
               break;
             default:
@@ -1022,7 +1021,6 @@ void main() {
             case FunctionType.normalStatCriticalDamage:
             case FunctionType.minusDebuffCount:
             case FunctionType.emptyFunction:
-            case FunctionType.changeHealChargeValue:
               newFuncType.add(data.functionType);
               break;
             default:
@@ -1104,6 +1102,7 @@ void main() {
                 break;
             }
           }
+
           addNewStatusType(data.statusTriggerType);
           addNewStatusType(data.statusTriggerType);
           if (data.keepingType == FunctionStatus.unknown) unknownKeepingTypes.add(data.rawKeepingType);

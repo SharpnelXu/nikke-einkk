@@ -525,6 +525,8 @@ enum FunctionType {
   forcedReload(206),
   statDefNoneBreakCol(207),
   changeHealChargeValue(208),
+  fixStatChargeTime(209),
+  grayScale(210),
   unknown(-1);
 
   const FunctionType(this.value);
@@ -677,6 +679,7 @@ enum TimingTriggerType {
   onFullChargeBonusRangeHitNum(87),
   onKeepFullChargeShot(88),
   onDeadComplete(89),
+  onFullChargeCoreHitNum(90),
   unknown(-1);
 
   const TimingTriggerType(this.value);
@@ -760,6 +763,9 @@ enum StatusTriggerType {
   @JsonValue('IsSameSqaud')
   isSameSquad(59),
   isCheckGradeUnder(60),
+  isCheckCharacter(61),
+  isCheckNotTarget(62),
+  isCheckFunctionOverlap(63),
   unknown(-1);
 
   const StatusTriggerType(this.value);

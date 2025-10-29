@@ -426,6 +426,7 @@ class BattleSkill {
             }
           }
         }
+      case CharacterSkillType.healCharge: // TODO: implement
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.aimingExplosion:
       case CharacterSkillType.aimingPenetration:
@@ -437,7 +438,6 @@ class BattleSkill {
       case CharacterSkillType.multiTarget:
       case CharacterSkillType.maxHPInstantNumber:
       case CharacterSkillType.reFullChargeHitDamage:
-      case CharacterSkillType.healCharge:
       case CharacterSkillType.none:
       case CharacterSkillType.unknown:
         break;
@@ -575,6 +575,18 @@ class BattleSkill {
       case PreferTargetCondition.onlyAR:
         targetList.retainWhere((nikke) => (nikke as BattleNikke).baseWeaponData.weaponType == WeaponType.ar);
         break;
+      case PreferTargetCondition.onlySMG:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseWeaponData.weaponType == WeaponType.smg);
+      case PreferTargetCondition.onlyMG:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseWeaponData.weaponType == WeaponType.mg);
+      case PreferTargetCondition.onlySR:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseWeaponData.weaponType == WeaponType.sr);
+      case PreferTargetCondition.burstStep1:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).characterData.useBurstSkill == BurstStep.step1);
+      case PreferTargetCondition.burstStep2:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).characterData.useBurstSkill == BurstStep.step2);
+      case PreferTargetCondition.burstStep3:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).characterData.useBurstSkill == BurstStep.step3);
     }
 
     if (targetCount == 0) {
@@ -655,6 +667,13 @@ class BattleSkill {
           final maxHpB = b.getMaxHp(simulation);
 
           return maxHpB != maxHpA ? maxHpB - maxHpA : a.uniqueId - b.uniqueId;
+        });
+        break;
+      case PreferTarget.lowAttack:
+        targetList.sort((a, b) {
+          final totalAttackA = a.getFinalAttack(simulation);
+          final totalAttackB = b.getFinalAttack(simulation);
+          return totalAttackB != totalAttackA ? totalAttackA - totalAttackB : a.uniqueId - b.uniqueId;
         });
         break;
       case PreferTarget.lowDefence:

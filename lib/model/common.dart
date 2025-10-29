@@ -173,8 +173,8 @@ class NikkeCharacterData {
   final bool prismIsActive;
   @JsonKey(name: 'is_detail_close')
   final bool isDetailClose;
-  @JsonKey(name: 'surface_category')
-  final int surfaceCategory;
+  // @JsonKey(name: 'surface_category')
+  // final int surfaceCategory;
 
   String get limitBreak => gradeCoreId <= 4 ? 'LimitBreak$gradeCoreId' : 'Core+${gradeCoreId - 4}';
 
@@ -219,7 +219,7 @@ class NikkeCharacterData {
     this.isVisible = false,
     this.prismIsActive = false,
     this.isDetailClose = false,
-    this.surfaceCategory = 0,
+    // this.surfaceCategory = 0,
   });
 
   factory NikkeCharacterData.fromJson(Map<String, dynamic> json) => _$NikkeCharacterDataFromJson(json);
@@ -1029,6 +1029,7 @@ enum PreferTarget {
   highDefence,
   highHP,
   highMaxHP,
+  lowAttack,
   lowDefence,
   lowHP,
   lowHPCover,
@@ -1060,13 +1061,19 @@ enum PreferTarget {
 enum PreferTargetCondition {
   unknown,
   none,
-  includeNoneTargetLast,
-  includeNoneTargetNone,
   excludeSelf,
   destroyCover,
+  includeNoneTargetLast,
+  includeNoneTargetNone,
   onlySG,
+  onlyAR,
+  onlySMG,
+  onlyMG,
+  onlySR,
   onlyRL,
-  onlyAR;
+  burstStep1,
+  burstStep2,
+  burstStep3,;
 
   static final Map<String, PreferTargetCondition> _reverseMap = Map.fromIterable(
     PreferTargetCondition.values,

@@ -311,6 +311,7 @@ class BattleFunction {
       case TimingTriggerType.onKeepFullChargeShotUnder:
       case TimingTriggerType.onSpawnMonsterExcludeNoneType:
       case TimingTriggerType.onKeepFullChargeShot:
+      case TimingTriggerType.onFullChargeCoreHitNum:
         // logger.i('Unimplemented TimingTriggerType: ${data.timingTriggerType}');
         break;
     }
@@ -914,6 +915,9 @@ class BattleFunction {
       case FunctionType.durationDamage:
       case FunctionType.useSkill1:
       case FunctionType.defIgnoreSkillDamageInstant:
+      case FunctionType.fixStatChargeTime:
+      case FunctionType.grayScale:
+      case FunctionType.changeHealChargeValue:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
       case FunctionType.allStepBurstNextStep: // no usage among nikkes
@@ -987,7 +991,6 @@ class BattleFunction {
       case FunctionType.normalStatCriticalDamage:
       case FunctionType.minusDebuffCount:
       case FunctionType.emptyFunction:
-      case FunctionType.changeHealChargeValue:
         // ^^^ unused ones
         break;
     }
@@ -1217,6 +1220,13 @@ class BattleFunction {
         return target != null && target.buffs.any((buff) => buff.data.functionType == FunctionType.forcedStop);
       case StatusTriggerType.isHaveCover:
         return target is BattleNikke && target.cover.currentHp > 0;
+      case StatusTriggerType.isCheckNotTarget:
+        return target is BattleRapture && !target.isStageTarget;
+      case StatusTriggerType.isCheckFunctionOverlap:
+        final buff = target?.buffs.firstWhereOrNull((buff) => buff.data.groupId == otherValue);
+        return buff != null && buff.count == value;
+      case StatusTriggerType.isCheckCharacter: // TODO: implement
+        return target is BattleRapture || target is BattleNikke;
       case StatusTriggerType.isPhase:
       case StatusTriggerType.isPhaseUp:
       case StatusTriggerType.isPhaseUnder:

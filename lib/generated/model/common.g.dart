@@ -47,7 +47,6 @@ NikkeCharacterData _$NikkeCharacterDataFromJson(Map<String, dynamic> json) => Ni
   isVisible: json['is_visible'] as bool? ?? false,
   prismIsActive: json['prism_is_active'] as bool? ?? false,
   isDetailClose: json['is_detail_close'] as bool? ?? false,
-  surfaceCategory: (json['surface_category'] as num?)?.toInt() ?? 0,
 );
 
 WeaponData _$WeaponDataFromJson(Map<String, dynamic> json) => WeaponData(
