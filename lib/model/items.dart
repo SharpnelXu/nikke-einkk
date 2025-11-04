@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:nikke_einkk/model/common.dart';
@@ -234,12 +235,40 @@ enum EquipLineType {
   }
 }
 
+enum LockStatus { notLocked, lockedWithKey, lockedWithRock }
+
 @JsonSerializable()
 class EquipLine {
+  // Constants from Data class
+  static const int commonLinePercentage = 12;
+  static const int rareLinePercentage = 10;
+
+  static const int levelLowPercentage = 12;
+  static const int levelMidPercentage = 7;
+  static const int levelHighPercentage = 1;
+
+  static const int levelLowRange = levelLowPercentage * 5;
+  static const int levelMidRange = levelLowRange + levelMidPercentage * 5;
+
+  // Valid types for rolling (excluding none)
+  static const List<EquipLineType> validTypes = [
+    EquipLineType.statAtk,
+    EquipLineType.statDef,
+    EquipLineType.increaseElementalDamage,
+    EquipLineType.statCriticalDamage,
+    EquipLineType.statCritical,
+    EquipLineType.statChargeDamage,
+    EquipLineType.statChargeTime,
+    EquipLineType.statAmmo,
+    EquipLineType.startAccuracyCircle,
+  ];
+
   EquipLineType type;
   int _level;
   int get level => _level;
   set level(int newLevel) => _level = newLevel.clamp(1, 15);
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  LockStatus lockStatus = LockStatus.notLocked;
 
   EquipLine(this.type, int level) : _level = level;
 
@@ -260,12 +289,83 @@ class EquipLine {
 
   EquipLine.none() : type = EquipLineType.none, _level = 1;
 
+  /// Rolls both type and level for this equip line
+  void roll(Random random, {List<EquipLineType> excludedTypes = const []}) {
+    rollType(random, excludedTypes: excludedTypes);
+    rollLevel(random);
+  }
+
+  /// Rolls the level based on probability distribution
+  void rollLevel(Random random) {
+    final num = random.nextInt(100);
+    if (num < levelLowRange) {
+      _level = num ~/ levelLowPercentage + 1;
+    } else if (num < levelMidRange) {
+      _level = (num - levelLowRange) ~/ levelMidPercentage + 6;
+    } else {
+      _level = (num - levelMidRange) ~/ levelHighPercentage + 11;
+    }
+  }
+
+  /// Rolls the type based on rarity weights and excluded types
+  void rollType(Random random, {List<EquipLineType> excludedTypes = const []}) {
+    final types = List<EquipLineType>.from(validTypes);
+
+    int randomRange = 100;
+    for (final excludedType in excludedTypes) {
+      if (types.contains(excludedType)) {
+        types.remove(excludedType);
+        randomRange -= _getPercentage(excludedType);
+      }
+    }
+
+    final num = random.nextInt(randomRange);
+    int upperBound = 0;
+    for (final curType in types) {
+      upperBound += _getPercentage(curType);
+      if (num < upperBound) {
+        type = curType;
+        break;
+      }
+    }
+  }
+
+  /// Helper method to get the percentage weight for a type
+  static int _getPercentage(EquipLineType type) {
+    return _isRare(type) ? rareLinePercentage : commonLinePercentage;
+  }
+
+  /// Helper method to check if a type is rare
+  static bool _isRare(EquipLineType type) {
+    return type == EquipLineType.increaseElementalDamage ||
+        type == EquipLineType.statAtk ||
+        type == EquipLineType.statCriticalDamage ||
+        type == EquipLineType.statDef;
+  }
+
+  /// Checks if this equip line meet any of the targets
+  bool checkTargets(List<EquipLine> targets) {
+    for (final target in targets) {
+      if (target.type == type && target.level <= level) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool get locked => lockStatus != LockStatus.notLocked;
+
   int getStateEffectId() {
     return type == EquipLineType.none ? 0 : type.stateEffectIdBase + level;
   }
 
   EquipLine copy() {
     return EquipLine(type, level);
+  }
+
+  @override
+  String toString() {
+    return '${type.toString()} Lv.$level($lockStatus)';
   }
 
   factory EquipLine.fromJson(Map<String, dynamic> json) => _$EquipLineFromJson(json);

@@ -370,6 +370,8 @@ const _$FunctionTypeEnumMap = {
   FunctionType.forcedReload: 'ForcedReload',
   FunctionType.statDefNoneBreakCol: 'StatDefNoneBreakCol',
   FunctionType.changeHealChargeValue: 'ChangeHealChargeValue',
+  FunctionType.fixStatChargeTime: 'FixStatChargeTime',
+  FunctionType.grayScale: 'GrayScale',
   FunctionType.unknown: 'Unknown',
 };
 

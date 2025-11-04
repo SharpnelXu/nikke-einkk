@@ -1226,7 +1226,7 @@ class BattleFunction {
         final buff = target?.buffs.firstWhereOrNull((buff) => buff.data.groupId == otherValue);
         return buff != null && buff.count == value;
       case StatusTriggerType.isCheckCharacter: // TODO: implement
-        return target is BattleRapture || target is BattleNikke;
+        return target is BattleNikke && target.characterData.resourceId == value;
       case StatusTriggerType.isPhase:
       case StatusTriggerType.isPhaseUp:
       case StatusTriggerType.isPhaseUnder:
