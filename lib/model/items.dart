@@ -289,6 +289,17 @@ class EquipLine {
 
   EquipLine.none() : type = EquipLineType.none, _level = 1;
 
+  int getValue(NikkeDatabase db) {
+    final stateEffectData = db.stateEffectTable[getStateEffectId()]!;
+    for (final functionId in stateEffectData.functions) {
+      if (functionId.function != 0) {
+        final function = db.functionTable[functionId.function]!;
+        return function.functionValue;
+      }
+    }
+    return 0;
+  }
+
   /// Rolls both type and level for this equip line
   void roll(Random random, {List<EquipLineType> excludedTypes = const []}) {
     rollType(random, excludedTypes: excludedTypes);
