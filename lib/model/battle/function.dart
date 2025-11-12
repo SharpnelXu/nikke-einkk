@@ -636,8 +636,12 @@ class BattleFunction {
                 stack = max(sourceBuff.count, stack);
               }
             }
+            final damageFrame =
+                simulation.currentFrame == simulation.maxFrames + 1
+                    ? simulation.currentFrame - 1
+                    : simulation.currentFrame;
             simulation.registerEvent(
-              simulation.currentFrame,
+              damageFrame,
               NikkeDamageEvent.skill(
                 simulation: simulation,
                 nikke: simulation.getNikkeOnPosition(ownerId)!,

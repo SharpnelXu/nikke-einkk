@@ -130,7 +130,10 @@ class BattleSkill {
         target.buffs.remove(shareDamageBuff);
       }
       final delayFrame = source == Source.burst ? timeDataToFrame(constData.damageBurstApplyDelay, simulation.fps) : 0;
-      final damageFrame = simulation.currentFrame - delayFrame;
+      int damageFrame = simulation.currentFrame - delayFrame;
+      if (damageFrame == simulation.maxFrames + 1) {
+        damageFrame -= 1;
+      }
       simulation.registerEvent(
         damageFrame,
         NikkeDamageEvent.skill(
