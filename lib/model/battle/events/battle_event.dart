@@ -26,3 +26,7 @@ class BattleEvent {
 
   void processNikke(BattleSimulation simulation, BattleNikke nikke) {}
 }
+
+class ConnectedFuncEvent extends BattleEvent {
+  ConnectedFuncEvent([super.activatorId, super.targetIds]);
+}

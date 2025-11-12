@@ -793,12 +793,29 @@ class BattleNikke extends BattleEntity {
   }
 
   int getMaxAmmo(BattleSimulation simulation) {
-    final result = getBuffValueOfTypes(
+    int result = getBuffValueOfTypes(
       simulation,
       [FunctionType.statAmmoLoad, FunctionType.statAmmo],
       currentWeaponData.maxAmmo,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.maxAmmo : 0,
     );
+
+    bool shouldCheckNoOverlapStatAmmo = true;
+    for (final buff in buffs) {
+      if (buff.data.functionType == FunctionType.statAmmo && buff.data.buff.isDeBuff) {
+        shouldCheckNoOverlapStatAmmo = false;
+        break;
+      }
+    }
+    if (shouldCheckNoOverlapStatAmmo) {
+      final noOverlapAmmo = getBuffValue(
+        simulation,
+        FunctionType.noOverlapStatAmmo,
+        0,
+        (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.maxAmmo : 0,
+      );
+      result += noOverlapAmmo;
+    }
 
     return max(1, result);
   }

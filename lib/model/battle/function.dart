@@ -552,6 +552,8 @@ class BattleFunction {
       case FunctionType.damageShare: // TODO: implement
       case FunctionType.immortal: // TODO: implement
       case FunctionType.infection: // TODO: implement
+      case FunctionType.taunt: // TODO: implement
+      case FunctionType.uncoverable: // TODO: implement
       case FunctionType.incBarrierHp:
       case FunctionType.incBurstDuration:
       case FunctionType.instantAllBurstDamage:
@@ -570,12 +572,18 @@ class BattleFunction {
       case FunctionType.repeatUseBurstStep:
       case FunctionType.statMaintainFireStance:
       case FunctionType.statShotCount:
+      case FunctionType.noOverlapStatAmmo:
       case FunctionType.none: // misc counters etc.
       case FunctionType.transformation: // animation only
       case FunctionType.focusAttack:
       case FunctionType.statExplosion: // no functional meaning yet
       case FunctionType.statInstantSkillRange:
       case FunctionType.statSpotRadius:
+      case FunctionType.electronicReduction:
+      case FunctionType.fireReduction:
+      case FunctionType.waterReduction:
+      case FunctionType.ironReduction:
+      case FunctionType.windReduction:
         activated = addBuff(event, simulation);
         break;
       case FunctionType.changeCurrentHpValue:
@@ -918,13 +926,24 @@ class BattleFunction {
           nikke.currentHp = (nikke.getMaxHp(simulation) * toModifier(data.functionValue)).round();
         }
         break;
-      case FunctionType.taunt:
-      case FunctionType.uncoverable:
-      case FunctionType.useSkill2:
-      case FunctionType.windReduction:
-      case FunctionType.noOverlapStatAmmo:
-      case FunctionType.durationDamage:
       case FunctionType.useSkill1:
+      case FunctionType.useSkill2:
+        final skillIndex = data.functionType == FunctionType.useSkill1 ? 0 : 1;
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck || target is! BattleNikke) continue;
+
+          final skill = target.skills[skillIndex];
+          final skillData = skill.skillData;
+          final skillGroupId = skill.skillGroupId;
+          if (skill.skillType == SkillType.characterSkill && skillData != null && skillGroupId != null) {
+            activated = true;
+            BattleSkill.activateSkill(simulation, skillData, target.uniqueId, skillGroupId, skill.source);
+          }
+        }
+        break;
+      case FunctionType.durationDamage:
       case FunctionType.defIgnoreSkillDamageInstant:
       case FunctionType.fixStatChargeTime:
       case FunctionType.grayScale:
@@ -992,10 +1011,6 @@ class BattleFunction {
       case FunctionType.coreShotDamageRateChange:
       case FunctionType.changeHp:
       case FunctionType.copyDef:
-      case FunctionType.electronicReduction:
-      case FunctionType.fireReduction:
-      case FunctionType.waterReduction:
-      case FunctionType.ironReduction:
       case FunctionType.immortalValue:
       case FunctionType.finalStatHp:
       case FunctionType.allStepBurstKeepStep:
@@ -1025,7 +1040,14 @@ class BattleFunction {
           if (functionData != null) {
             final connectedFunction = BattleFunction(functionData, ownerId, source);
             // connected function likely doesn't check trigger target
-            connectedFunction.executeFunction(event, simulation, parentFunctionValue: data.functionValue);
+            connectedFunction.executeFunction(
+              ConnectedFuncEvent(
+                ownerId,
+                getFunctionTargets(event, simulation).map((entity) => entity.uniqueId).toList(),
+              ),
+              simulation,
+              parentFunctionValue: data.functionValue,
+            );
           }
         }
       }
