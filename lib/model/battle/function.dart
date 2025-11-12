@@ -568,9 +568,14 @@ class BattleFunction {
       case FunctionType.stickyProjectileCollisionDamage:
       case FunctionType.stickyProjectileInstantExplosion:
       case FunctionType.repeatUseBurstStep:
+      case FunctionType.statMaintainFireStance:
+      case FunctionType.statShotCount:
       case FunctionType.none: // misc counters etc.
       case FunctionType.transformation: // animation only
       case FunctionType.focusAttack:
+      case FunctionType.statExplosion: // no functional meaning yet
+      case FunctionType.statInstantSkillRange:
+      case FunctionType.statSpotRadius:
         activated = addBuff(event, simulation);
         break;
       case FunctionType.changeCurrentHpValue:
@@ -900,13 +905,19 @@ class BattleFunction {
         }
         break;
       case FunctionType.resurrection:
-      case FunctionType.statBurstSkillCoolTime:
-      case FunctionType.statChargeTimeImmune:
-      case FunctionType.statExplosion:
-      case FunctionType.statInstantSkillRange:
-      case FunctionType.statMaintainFireStance:
-      case FunctionType.statShotCount:
-      case FunctionType.statSpotRadius:
+        // TODO: the skills that use this function actually do not have a prefer condition to target dead nikkes, so
+        // this should not work as function targets will include both alive and dead nikkes
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final nikke in functionTargets) {
+          if (nikke is! BattleNikke || nikke.uniqueId != ownerId) continue;
+
+          final statusCheck = checkTargetStatus(event, simulation, nikke);
+          if (!statusCheck || nikke.currentHp > 0) continue;
+
+          activated = true;
+          nikke.currentHp = (nikke.getMaxHp(simulation) * toModifier(data.functionValue)).round();
+        }
+        break;
       case FunctionType.taunt:
       case FunctionType.uncoverable:
       case FunctionType.useSkill2:
@@ -991,6 +1002,8 @@ class BattleFunction {
       case FunctionType.normalStatCriticalDamage:
       case FunctionType.minusDebuffCount:
       case FunctionType.emptyFunction:
+      case FunctionType.statBurstSkillCoolTime:
+      case FunctionType.statChargeTimeImmune:
         // ^^^ unused ones
         break;
     }

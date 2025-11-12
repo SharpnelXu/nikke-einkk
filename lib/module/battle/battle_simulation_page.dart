@@ -480,7 +480,7 @@ class _BattleSimulationPageState extends State<BattleSimulationPage> {
       if (nikke.currentWeaponType.isCharge) {
         if (nikke.maintainFireStanceFrameCount > 0) {
           max = timeDataToFrame(
-            nikke.currentWeaponData.spotFirstDelay + nikke.currentWeaponData.maintainFireStance,
+            nikke.currentWeaponData.spotFirstDelay + nikke.getMaintainFireStance(simulation),
             nikke.fps,
           );
           cur = nikke.maintainFireStanceFrameCount;

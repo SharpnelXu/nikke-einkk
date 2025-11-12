@@ -471,6 +471,7 @@ class BattleNikke extends BattleEntity {
           return;
         }
 
+        final maintainFireStance = getMaintainFireStance(simulation);
         if (currentWeaponData.fireType == FireType.instant) {
           simulation.registerEvent(
             simulation.currentFrame,
@@ -492,7 +493,7 @@ class BattleNikke extends BattleEntity {
           FireType.stickyProjectileDirect,
         ].contains(currentWeaponData.fireType)) {
           final projectileCreateFrame = timeDataToFrame(
-            currentWeaponData.maintainFireStance * toModifier(currentWeaponData.upTypeFireTiming),
+            maintainFireStance * toModifier(currentWeaponData.upTypeFireTiming),
             fps,
           );
 
@@ -523,12 +524,9 @@ class BattleNikke extends BattleEntity {
 
         // this is essentially shooting frame for SR & RL
         if (currentWeaponData.inputType == InputType.up) {
-          if (currentWeaponData.maintainFireStance > 0) {
+          if (maintainFireStance > 0) {
             // TODO: A2 has 9 extra frames, maybe due to animation but not sure
-            maintainFireStanceFrameCount = timeDataToFrame(
-              currentWeaponData.spotFirstDelay + currentWeaponData.maintainFireStance,
-              fps,
-            );
+            maintainFireStanceFrameCount = timeDataToFrame(currentWeaponData.spotFirstDelay + maintainFireStance, fps);
           } else {
             spotLastDelayFrameCount =
                 option.forceCancelShootDelay ? 0 : timeDataToFrame(currentWeaponData.spotLastDelay, fps);
@@ -904,6 +902,17 @@ class BattleNikke extends BattleEntity {
 
   int getPierce(BattleSimulation simulation) {
     return currentWeaponData.penetration + getPlainBuffValues(simulation, FunctionType.statPenetration);
+  }
+
+  int getMaintainFireStance(BattleSimulation simulation) {
+    return max(
+      1,
+      currentWeaponData.maintainFireStance + getPlainBuffValues(simulation, FunctionType.statMaintainFireStance),
+    );
+  }
+
+  int getShotCount(BattleSimulation simulation) {
+    return max(1, currentWeaponData.shotCount + getPlainBuffValues(simulation, FunctionType.statShotCount));
   }
 
   int getBreakDamage(BattleSimulation simulation) {

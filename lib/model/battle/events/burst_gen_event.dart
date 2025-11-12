@@ -25,7 +25,8 @@ class BurstGenerationEvent extends BattleEvent {
     final positionBurstBonus = bonusBurst ? 10000 + (15000 * toModifier(chargePercent)).round() : 10000;
 
     final baseBurst = nikke.getBurstGen(simulation, rapture.isStageTarget);
-    final burst = (baseBurst * weaponData.shotCount * weaponData.muzzleCount * toModifier(positionBurstBonus)).round();
+    final burst =
+        (baseBurst * nikke.getShotCount(simulation) * weaponData.muzzleCount * toModifier(positionBurstBonus)).round();
 
     return BurstGenerationEvent._(nikke.uniqueId, [rapture.uniqueId], burst, Source.bullet, bonusBurst);
   }

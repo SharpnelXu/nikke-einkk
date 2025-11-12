@@ -173,7 +173,7 @@ class NikkeDamageEvent extends BattleEvent {
       damageParameter: damageParameter,
       invalid: !rapture.validateBulletDamage(nikke),
       chargePercent: chargePercent,
-      shotCount: weaponData.shotCount * weaponData.muzzleCount,
+      shotCount: nikke.getShotCount(simulation) * weaponData.muzzleCount,
       partId: partId,
       isStickyCollision: isStickyCollision,
       stickyDamageRate: isStickyCollision ? weaponData.damage * weaponData.muzzleCount : 0,
@@ -232,7 +232,7 @@ class NikkeDamageEvent extends BattleEvent {
       source: Source.bullet,
       damageParameter: damageParameter,
       invalid: !rapture.validateBulletDamage(nikke),
-      shotCount: weaponData.shotCount * weaponData.muzzleCount,
+      shotCount: nikke.getShotCount(simulation) * weaponData.muzzleCount,
       partId: partId,
     );
   }
@@ -291,7 +291,7 @@ class NikkeDamageEvent extends BattleEvent {
       damageParameter: damageParameter,
       invalid: !rapture.validateBulletDamage(nikke),
       chargePercent: chargePercent,
-      shotCount: weaponData.shotCount * weaponData.muzzleCount,
+      shotCount: nikke.getShotCount(simulation) * weaponData.muzzleCount,
       partId: part.id,
     );
   }
