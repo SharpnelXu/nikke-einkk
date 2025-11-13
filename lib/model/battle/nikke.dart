@@ -723,7 +723,9 @@ class BattleNikke extends BattleEntity {
   int getFramesToFullCharge(BattleSimulation simulation) {
     final result = getBuffValue(
       simulation,
-      FunctionType.statChargeTime,
+      hasBuff(simulation, FunctionType.fixStatChargeTime)
+          ? FunctionType.fixStatChargeTime
+          : FunctionType.statChargeTime,
       currentWeaponData.chargeTime,
       (nikke) => nikke is BattleNikke ? nikke.currentWeaponData.chargeTime : 0,
     );

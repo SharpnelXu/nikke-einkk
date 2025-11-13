@@ -573,6 +573,8 @@ class BattleFunction {
       case FunctionType.statMaintainFireStance:
       case FunctionType.statShotCount:
       case FunctionType.noOverlapStatAmmo:
+      case FunctionType.defIgnoreSkillDamageInstant:
+      case FunctionType.fixStatChargeTime:
       case FunctionType.none: // misc counters etc.
       case FunctionType.transformation: // animation only
       case FunctionType.focusAttack:
@@ -584,6 +586,7 @@ class BattleFunction {
       case FunctionType.waterReduction:
       case FunctionType.ironReduction:
       case FunctionType.windReduction:
+      case FunctionType.grayScale:
         activated = addBuff(event, simulation);
         break;
       case FunctionType.changeCurrentHpValue:
@@ -617,6 +620,7 @@ class BattleFunction {
         }
         break;
       case FunctionType.damage:
+      case FunctionType.durationDamage:
       case FunctionType.defIgnoreDamage:
         final functionTargets = getFunctionTargets(event, simulation);
         for (final target in functionTargets) {
@@ -626,6 +630,7 @@ class BattleFunction {
 
             activated = true;
             final isDurationDamage = data.durationType.isTimed && data.durationValue > 0;
+            final isDefIgnore = data.functionType == FunctionType.defIgnoreDamage;
             final activator = simulation.getEntityById(event.activatorId);
             int baseRate = data.functionValue;
             baseRate += activator?.getDamageValueChange(simulation, baseRate, data.groupId) ?? 0;
@@ -649,6 +654,7 @@ class BattleFunction {
                 damageRate: baseRate * stack,
                 source: source,
                 isDurationDamage: isDurationDamage,
+                isIgnoreDefence: isDefIgnore,
               ),
             );
 
@@ -947,10 +953,6 @@ class BattleFunction {
           }
         }
         break;
-      case FunctionType.durationDamage:
-      case FunctionType.defIgnoreSkillDamageInstant:
-      case FunctionType.fixStatChargeTime:
-      case FunctionType.grayScale:
       case FunctionType.changeHealChargeValue:
         logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;

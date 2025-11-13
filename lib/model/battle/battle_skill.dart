@@ -129,6 +129,7 @@ class BattleSkill {
         shareDamage = true;
         target.buffs.remove(shareDamageBuff);
       }
+      final isDefIgnore = owner.hasBuff(simulation, FunctionType.defIgnoreSkillDamageInstant);
       final delayFrame = source == Source.burst ? timeDataToFrame(constData.damageBurstApplyDelay, simulation.fps) : 0;
       int damageFrame = simulation.currentFrame - delayFrame;
       if (damageFrame == simulation.maxFrames + 1) {
@@ -144,6 +145,7 @@ class BattleSkill {
           damageRate: damageRate,
           skillType: skillData.skillType,
           isShareDamage: shareDamage,
+          isIgnoreDefence: isDefIgnore,
         ),
       );
 
