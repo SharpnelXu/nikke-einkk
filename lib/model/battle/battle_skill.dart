@@ -431,7 +431,19 @@ class BattleSkill {
             }
           }
         }
+        break;
       case CharacterSkillType.healCharge: // TODO: implement
+        for (final target in skillTargets) {
+          if (target is BattleNikke) {
+            target.healChargeData = HealChargeData(
+              atkPercent: skillData.getSkillValue(0),
+              ownerId: ownerId,
+              source: source,
+              duration: timeDataToFrame(skillData.durationValue, simulation.fps),
+            );
+          }
+        }
+        break;
       case CharacterSkillType.setBuff: // this likely does nothing, just used to get function targets
       case CharacterSkillType.aimingExplosion:
       case CharacterSkillType.aimingPenetration:
@@ -751,6 +763,38 @@ class BattleSkill {
     }
 
     return targetList.sublist(0, min(targetList.length, targetCount));
+  }
+}
+
+class HealChargeData {
+  final int ownerId;
+  final Source source;
+  int atkPercent;
+  int currentHeal = 0;
+  int duration;
+
+  HealChargeData({required this.atkPercent, required this.ownerId, required this.source, required this.duration});
+
+  void storeHeal(BattleSimulation simulation, BattleNikke owner, int healAmount) {
+    final maxHeal =
+        (owner.getFinalAttack(simulation) *
+                toModifier(atkPercent) *
+                (1 + toModifier(owner.getPlainBuffValues(simulation, FunctionType.changeHealChargeValue))))
+            .round();
+    currentHeal += healAmount;
+    if (currentHeal > maxHeal) {
+      currentHeal = maxHeal;
+    }
+  }
+
+  void processFrame(BattleSimulation simulation, BattleNikke owner) {
+    duration -= 1;
+    if (duration <= 0) {
+      for (final nikke in simulation.aliveNikkes) {
+        nikke.changeHp(simulation, currentHeal, true);
+      }
+      owner.healChargeData = null;
+    }
   }
 }
 

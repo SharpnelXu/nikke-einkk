@@ -575,6 +575,7 @@ class BattleFunction {
       case FunctionType.noOverlapStatAmmo:
       case FunctionType.defIgnoreSkillDamageInstant:
       case FunctionType.fixStatChargeTime:
+      case FunctionType.changeHealChargeValue:
       case FunctionType.none: // misc counters etc.
       case FunctionType.transformation: // animation only
       case FunctionType.focusAttack:
@@ -952,9 +953,6 @@ class BattleFunction {
             BattleSkill.activateSkill(simulation, skillData, target.uniqueId, skillGroupId, skill.source);
           }
         }
-        break;
-      case FunctionType.changeHealChargeValue:
-        logger.i('Unimplemented FunctionType: ${data.functionType}');
         break;
       case FunctionType.allStepBurstNextStep: // no usage among nikkes
       case FunctionType.atkBuffChange: // no usage among nikkes

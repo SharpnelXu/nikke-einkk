@@ -206,6 +206,7 @@ class BattleNikke extends BattleEntity {
 
   List<BattleSkill> skills = [];
   List<BattleFunction> functions = [];
+  HealChargeData? healChargeData;
 
   final bool useGlobal;
   NikkeDatabase get db => useGlobal ? global : cn;
@@ -234,6 +235,7 @@ class BattleNikke extends BattleEntity {
     cover.init(simulation);
     barriers.clear();
     decoy = null;
+    healChargeData = null;
 
     totalBulletsFired = 0;
     totalFullChargeFired = 0;
@@ -324,6 +326,11 @@ class BattleNikke extends BattleEntity {
       if (barrier.durationType.isTimed) {
         barrier.duration -= 1;
       }
+    }
+
+    final healCharge = healChargeData;
+    if (healCharge != null) {
+      healCharge.processFrame(simulation, this);
     }
 
     //   for (final buff in buffs) {

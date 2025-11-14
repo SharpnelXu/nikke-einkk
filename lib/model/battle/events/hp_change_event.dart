@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:nikke_einkk/model/battle/battle_simulator.dart';
 import 'package:nikke_einkk/model/battle/events/battle_event.dart';
+import 'package:nikke_einkk/model/battle/nikke.dart';
 import 'package:nikke_einkk/module/common/custom_table.dart';
 import 'package:nikke_einkk/module/common/format_helper.dart';
 
@@ -20,6 +21,14 @@ class HpChangeEvent extends BattleEvent {
     this.isHeal = false,
     this.isMaxHpOnly = false,
   });
+
+  @override
+  void processNikke(BattleSimulation simulation, BattleNikke nikke) {
+    final healCharge = nikke.healChargeData;
+    if (nikke.uniqueId == activatorId && isHeal && healCharge != null && !isMaxHpOnly) {
+      healCharge.storeHeal(simulation, nikke, changeAmount);
+    }
+  }
 
   @override
   Widget buildDisplayV2(BattleSimulation simulation) {
