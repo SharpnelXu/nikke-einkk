@@ -200,6 +200,8 @@ class BattleNikke extends BattleEntity {
   int totalFullChargeFired = 0;
   int totalBulletsHit = 0;
   int totalBurstSkillUsed = 0;
+  int coreHitPercentAccumulation = 0;
+  int criticalHitPercentAccumulation = 0;
   bool activatedBurstSkillThisCycle = false;
 
   BattleNikkeStatus status = BattleNikkeStatus.behindCover;
@@ -240,6 +242,8 @@ class BattleNikke extends BattleEntity {
     totalBulletsFired = 0;
     totalFullChargeFired = 0;
     totalBulletsHit = 0;
+    coreHitPercentAccumulation = 0;
+    criticalHitPercentAccumulation = 0;
     activatedBurstSkillThisCycle = false;
     totalBurstSkillUsed = 0;
     functions.clear();

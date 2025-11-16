@@ -247,13 +247,86 @@ class BattleFunction {
           }
         }
         break;
-      case TimingTriggerType.none:
+      case TimingTriggerType.onAmmoRatioUp:
+        if (event is NikkeFireEvent && standard != null && ownerId == standard.uniqueId && standard is BattleNikke) {
+          final ammoRatio = standard.currentAmmo / standard.getMaxAmmo(simulation);
+          if (ammoRatio >= toModifier(timingTriggerValue)) {
+            executeFunction(event, simulation);
+          }
+        }
+        break;
       case TimingTriggerType.onAmmoRatioUnder:
-      case TimingTriggerType.onBurstSkillStep:
+        if (event is NikkeFireEvent && standard != null && ownerId == standard.uniqueId && standard is BattleNikke) {
+          final ammoRatio = standard.currentAmmo / standard.getMaxAmmo(simulation);
+          if (ammoRatio <= toModifier(timingTriggerValue)) {
+            executeFunction(event, simulation);
+          }
+        }
       case TimingTriggerType.onCoreHitNum:
-      case TimingTriggerType.onCoreHitNumOnce:
+      case TimingTriggerType.onCoreHitNumOnce: // difference unclear
+        if (event is! NikkeDamageEvent ||
+            standard?.uniqueId != ownerId ||
+            event.source != Source.bullet ||
+            standard is! BattleNikke) {
+          return;
+        }
+
+        if (standard.coreHitPercentAccumulation > 0 &&
+            (standard.coreHitPercentAccumulation ~/ 10000) % timingTriggerValue == 0) {
+          executeFunction(event, simulation);
+        }
+        break;
       case TimingTriggerType.onCoreHitRatio:
+      case TimingTriggerType.onCoreHitRatioOnce:
+        if (event is! NikkeDamageEvent ||
+            standard?.uniqueId != ownerId ||
+            event.source != Source.bullet ||
+            standard is! BattleNikke) {
+          return;
+        }
+
+        final coreHitCheck =
+            standard.coreHitPercentAccumulation > 0 &&
+            standard.coreHitPercentAccumulation % 10000 - event.damageParameter.coreHitRate < 0;
+        final ratioCheck = standard.checkRatio(data.groupId, timingTriggerValue);
+        if (coreHitCheck && ratioCheck) {
+          executeFunction(event, simulation);
+        }
+        break;
       case TimingTriggerType.onCriticalHitNum:
+      case TimingTriggerType.onCriticalHitNumOnce: // difference unclear
+        if (event is! NikkeDamageEvent ||
+            standard?.uniqueId != ownerId ||
+            event.source != Source.bullet ||
+            standard is! BattleNikke) {
+          return;
+        }
+
+        if (standard.criticalHitPercentAccumulation > 0 &&
+            (standard.criticalHitPercentAccumulation ~/ 10000) % timingTriggerValue == 0) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onCriticalHitRatio:
+      case TimingTriggerType.onCriticalHitRatioOnce:
+        if (event is! NikkeDamageEvent ||
+            standard?.uniqueId != ownerId ||
+            event.source != Source.bullet ||
+            standard is! BattleNikke) {
+          return;
+        }
+
+        final criticalRateCheck =
+            standard.criticalHitPercentAccumulation > 0 &&
+            standard.criticalHitPercentAccumulation % 10000 - min(10000, event.damageParameter.criticalRate) < 0;
+        final ratioCheck = standard.checkRatio(data.groupId, timingTriggerValue);
+        if (criticalRateCheck && ratioCheck) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.none:
+      case TimingTriggerType.onBurstSkillStep:
+      // ^^^ no usage
       case TimingTriggerType.onDead:
       case TimingTriggerType.onEndFullBurst:
       case TimingTriggerType.onHealCover:
@@ -292,18 +365,13 @@ class BattleFunction {
       case TimingTriggerType.onFunctionDebuffCheck:
       case TimingTriggerType.onSquadHurtCount:
       case TimingTriggerType.onCoverHurtCount:
-      case TimingTriggerType.onAmmoRatioUp:
       case TimingTriggerType.onShooterCount:
       case TimingTriggerType.onCoverDestroyRatio:
       case TimingTriggerType.onAttackRatio:
       case TimingTriggerType.onFullBurstTimeOverRatio:
       case TimingTriggerType.onPartsHitNumOnce:
       case TimingTriggerType.onPartsHitRatioOnce:
-      case TimingTriggerType.onCriticalHitRatio:
-      case TimingTriggerType.onCriticalHitNumOnce:
-      case TimingTriggerType.onCriticalHitRatioOnce:
       case TimingTriggerType.onMonsterDead:
-      case TimingTriggerType.onCoreHitRatioOnce:
       case TimingTriggerType.onAfterTimeSec:
       case TimingTriggerType.onPartsHurtRatio:
       case TimingTriggerType.onFullChargePartsHitNum:

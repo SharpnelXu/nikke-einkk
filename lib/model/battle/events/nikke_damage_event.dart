@@ -136,7 +136,7 @@ class NikkeDamageEvent extends BattleEvent {
       damageRate: weaponData.damage * weaponData.muzzleCount,
       damageRateBuff: nikke.getNormalDamageRatioChange(simulation),
       hitRate: pelletHitRate,
-      coreHitRate: calculateCoreHitRate(simulation, nikke, rapture),
+      coreHitRate: min(10000, calculateCoreHitRate(simulation, nikke, rapture)),
       coreDamageRate: weaponData.coreDamageRate,
       coreDamageBuff: nikke.getCoreShotDamageChange(simulation),
       criticalRate: nikke.getCriticalRate(simulation) + nikke.getNormalStatCritical(simulation),
@@ -384,6 +384,8 @@ class NikkeDamageEvent extends BattleEvent {
 
       if (source == Source.bullet) {
         nikke.totalBulletsHit += 1;
+        nikke.coreHitPercentAccumulation += damageParameter.coreHitRate;
+        nikke.criticalHitPercentAccumulation += min(damageParameter.criticalRate, 10000);
       }
 
       final drainHp = nikke.getDrainHpBuff(simulation);
