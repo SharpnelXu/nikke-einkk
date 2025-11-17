@@ -444,6 +444,26 @@ class BattleFunction {
         continue;
       }
 
+      final durationBuffCheckImmune = target.buffs.firstWhereOrNull((buff) {
+        return buff.data.functionType == FunctionType.durationBuffCheckImmune;
+      });
+      if (durationBuffCheckImmune != null &&
+          data.buff.isBuff &&
+          data.buffRemove.canRemove &&
+          data.functionType.value == durationBuffCheckImmune.data.functionValue) {
+        continue;
+      }
+
+      final durationDebuffCheckImmune = target.buffs.firstWhereOrNull((buff) {
+        return buff.data.functionType == FunctionType.durationDebuffCheckImmune;
+      });
+      if (durationDebuffCheckImmune != null &&
+          data.buff.isDeBuff &&
+          data.buffRemove.canRemove &&
+          data.functionType.value == durationDebuffCheckImmune.data.functionValue) {
+        continue;
+      }
+
       result = true;
       final previousMaxAmmo = target is BattleNikke ? target.getMaxAmmo(simulation) : 0;
       final previousMaxHp = target.getMaxHp(simulation);
@@ -1022,6 +1042,29 @@ class BattleFunction {
           }
         }
         break;
+      case FunctionType.durationBuffCheckImmune:
+      case FunctionType.durationDebuffCheckImmune:
+        final functionTargets = getFunctionTargets(event, simulation);
+        for (final target in functionTargets) {
+          final statusCheck = checkTargetStatus(event, simulation, target);
+          if (!statusCheck) continue;
+
+          activated = true;
+          for (final buff in target.buffs) {
+            final typeCheck = buff.data.functionType.value == data.functionType.value;
+            if (!typeCheck) continue;
+
+            final resistCheck = buff.data.buffRemove.canRemove;
+            if (!resistCheck) continue;
+
+            final buffCheck = buff.data.buff.isBuff != (data.functionType == FunctionType.durationDebuffCheckImmune);
+            if (!buffCheck) continue;
+
+            buff.duration = 0;
+          }
+        }
+        addBuff(event, simulation);
+        break;
       case FunctionType.allStepBurstNextStep: // no usage among nikkes
       case FunctionType.atkBuffChange: // no usage among nikkes
       case FunctionType.damageFunctionUnable: // likely a buff that dispels damage function
@@ -1042,11 +1085,9 @@ class BattleFunction {
       case FunctionType.partsImmuneDamage:
       case FunctionType.changeHurtFxExcludingBreakCol:
       case FunctionType.dmgReductionExcludingBreakCol:
-      case FunctionType.durationBuffCheckImmune:
       case FunctionType.immediatelyBuffCheckImmune:
       case FunctionType.statDefNoneBreakCol:
       case FunctionType.immediatelyDebuffCheckImmune:
-      case FunctionType.durationDebuffCheckImmune:
       // ^^^ likely monster only skills
       case FunctionType.damageBio:
       case FunctionType.damageEnergy:
