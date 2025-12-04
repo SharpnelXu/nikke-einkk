@@ -594,16 +594,37 @@ class BattleSkill {
         break;
       case PreferTargetCondition.onlySMG:
         targetList.retainWhere((nikke) => (nikke as BattleNikke).baseWeaponData.weaponType == WeaponType.smg);
+        break;
       case PreferTargetCondition.onlyMG:
         targetList.retainWhere((nikke) => (nikke as BattleNikke).baseWeaponData.weaponType == WeaponType.mg);
+        break;
       case PreferTargetCondition.onlySR:
         targetList.retainWhere((nikke) => (nikke as BattleNikke).baseWeaponData.weaponType == WeaponType.sr);
+        break;
       case PreferTargetCondition.burstStep1:
         targetList.retainWhere((nikke) => (nikke as BattleNikke).characterData.useBurstSkill == BurstStep.step1);
+        break;
       case PreferTargetCondition.burstStep2:
         targetList.retainWhere((nikke) => (nikke as BattleNikke).characterData.useBurstSkill == BurstStep.step2);
+        break;
       case PreferTargetCondition.burstStep3:
         targetList.retainWhere((nikke) => (nikke as BattleNikke).characterData.useBurstSkill == BurstStep.step3);
+        break;
+      case PreferTargetCondition.onlyFire:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseElements.contains(NikkeElement.fire));
+        break;
+      case PreferTargetCondition.onlyWater:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseElements.contains(NikkeElement.water));
+        break;
+      case PreferTargetCondition.onlyWind:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseElements.contains(NikkeElement.wind));
+        break;
+      case PreferTargetCondition.onlyElectronic:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseElements.contains(NikkeElement.electric));
+        break;
+      case PreferTargetCondition.onlyIron:
+        targetList.retainWhere((nikke) => (nikke as BattleNikke).baseElements.contains(NikkeElement.iron));
+        break;
     }
 
     if (targetCount == 0) {

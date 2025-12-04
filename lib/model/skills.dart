@@ -766,6 +766,8 @@ enum StatusTriggerType {
   isCheckCharacter(61),
   isCheckNotTarget(62),
   isCheckFunctionOverlap(63),
+  isFirstBurstMember(64),
+  isNotFirstBurstMember(65),
   unknown(-1);
 
   const StatusTriggerType(this.value);

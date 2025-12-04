@@ -1393,6 +1393,14 @@ class BattleFunction {
         return buff != null && buff.count == value;
       case StatusTriggerType.isCheckCharacter: // TODO: implement
         return target is BattleNikke && target.characterData.resourceId == value;
+      case StatusTriggerType.isFirstBurstMember:
+        return target is BattleNikke &&
+            target.activatedBurstSkillThisCycle &&
+            (simulation.burstCycle < 2 || simulation.burstStage == 4); // burstCycle updates on enter first b4
+      case StatusTriggerType.isNotFirstBurstMember:
+        return target is BattleNikke &&
+            !target.activatedBurstSkillThisCycle &&
+            (simulation.burstCycle < 2 || simulation.burstStage == 4); // burstCycle updates on enter first b4
       case StatusTriggerType.isPhase:
       case StatusTriggerType.isPhaseUp:
       case StatusTriggerType.isPhaseUnder:

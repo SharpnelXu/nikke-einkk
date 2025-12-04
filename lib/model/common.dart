@@ -1073,7 +1073,12 @@ enum PreferTargetCondition {
   onlyRL,
   burstStep1,
   burstStep2,
-  burstStep3;
+  burstStep3,
+  onlyFire,
+  onlyWater,
+  onlyWind,
+  onlyElectronic,
+  onlyIron;
 
   static final Map<String, PreferTargetCondition> _reverseMap = Map.fromIterable(
     PreferTargetCondition.values,
