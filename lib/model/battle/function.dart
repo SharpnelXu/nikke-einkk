@@ -324,12 +324,30 @@ class BattleFunction {
           executeFunction(event, simulation);
         }
         break;
+      case TimingTriggerType.onDead:
+        if (event is HpChangeEvent && standard != null && standard.uniqueId == ownerId) {
+          if (standard.currentHp <= 0 && event.changeAmount < 0) {
+            executeFunction(event, simulation);
+          }
+        }
+        break;
+      case TimingTriggerType.onEndFullBurst:
+        if (event is ChangeBurstStepEvent && event.currentStage == 4 && event.nextStage == 0) {
+          executeFunction(event, simulation);
+        }
+        break;
+      case TimingTriggerType.onHealCover:
+        if (event is HpChangeEvent &&
+            event.isHeal &&
+            standard != null &&
+            standard.uniqueId - 5 == ownerId &&
+            standard is BattleCover) {
+          executeFunction(event, simulation);
+        }
+        break;
       case TimingTriggerType.none:
       case TimingTriggerType.onBurstSkillStep:
       // ^^^ no usage
-      case TimingTriggerType.onDead:
-      case TimingTriggerType.onEndFullBurst:
-      case TimingTriggerType.onHealCover:
       case TimingTriggerType.onHitNumExceptCore:
       case TimingTriggerType.onHitNumberOver:
       case TimingTriggerType.onHitRatio:
@@ -1186,7 +1204,7 @@ class BattleFunction {
         // if used with skills, it's skill's target
         for (final targetUniqueId in event.getTargetIds()) {
           final target = simulation.getEntityById(targetUniqueId);
-          if (target != null) {
+          if (target != null && target.currentHp > 0) {
             result.add(target);
           }
         }
@@ -1194,13 +1212,13 @@ class BattleFunction {
       case FunctionTargetType.targetCover:
         for (final targetUniqueId in event.getTargetIds()) {
           final target = simulation.getEntityById(targetUniqueId);
-          if (target != null && target is BattleNikke) {
+          if (target != null && target is BattleNikke && target.currentHp > 0) {
             result.add(target.cover);
           }
         }
       case FunctionTargetType.userCover:
         final self = simulation.getNikkeOnPosition(ownerId);
-        if (self != null) {
+        if (self != null && self.currentHp > 0) {
           result.add(self.cover);
         }
         break;
