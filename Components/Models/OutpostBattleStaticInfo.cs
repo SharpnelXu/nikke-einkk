@@ -10,7 +10,6 @@ namespace NikkeEinkk.Components.Models
         None = 0,
         Currency = 1,
         ItemRandom = 2,
-        // Add other item types as needed
     }
 
     [MemoryPackable]

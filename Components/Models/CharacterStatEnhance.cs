@@ -41,57 +41,36 @@ namespace NikkeEinkk.Components.Models
         [JsonPropertyOrder(6)]
         public int GradeMetalResist { get; set; }
 
-        /// <summary>
-        /// Grade bio resist enhancement value
-        /// </summary>
         [MemoryPackOrder(7)]
         [JsonPropertyName("grade_bio_resist")]
         [JsonPropertyOrder(7)]
         public int GradeBioResist { get; set; }
 
-        /// <summary>
-        /// Core HP enhancement value
-        /// </summary>
         [MemoryPackOrder(8)]
         [JsonPropertyName("core_hp")]
         [JsonPropertyOrder(8)]
         public long CoreHp { get; set; }
 
-        /// <summary>
-        /// Core attack enhancement value
-        /// </summary>
         [MemoryPackOrder(9)]
         [JsonPropertyName("core_attack")]
         [JsonPropertyOrder(9)]
         public int CoreAttack { get; set; }
 
-        /// <summary>
-        /// Core defence enhancement value
-        /// </summary>
         [MemoryPackOrder(10)]
         [JsonPropertyName("core_defence")]
         [JsonPropertyOrder(10)]
         public int CoreDefence { get; set; }
 
-        /// <summary>
-        /// Core energy resist enhancement value
-        /// </summary>
         [MemoryPackOrder(11)]
         [JsonPropertyName("core_energy_resist")]
         [JsonPropertyOrder(11)]
         public int CoreEnergyResist { get; set; }
 
-        /// <summary>
-        /// Core metal resist enhancement value
-        /// </summary>
         [MemoryPackOrder(12)]
         [JsonPropertyName("core_metal_resist")]
         [JsonPropertyOrder(12)]
         public int CoreMetalResist { get; set; }
 
-        /// <summary>
-        /// Core bio resist enhancement value
-        /// </summary>
         [MemoryPackOrder(13)]
         [JsonPropertyName("core_bio_resist")]
         [JsonPropertyOrder(13)]

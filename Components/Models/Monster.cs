@@ -89,28 +89,6 @@ namespace NikkeEinkk.Components.Models
         Weapon_object_19,
         [JsonStringEnumMemberName("weapon_object_20")]
         Weapon_object_20,
-        // Unknown = -1,
-        // None = 0,
-        // Weapon_object_01,
-        // Weapon_object_02,
-        // Weapon_object_03,
-        // Weapon_object_04,
-        // Weapon_object_05,
-        // Weapon_object_06,
-        // Weapon_object_07,
-        // Weapon_object_08,
-        // Weapon_object_09,
-        // Weapon_object_10,
-        // Weapon_object_11,
-        // Weapon_object_12,
-        // Weapon_object_13,
-        // Weapon_object_14,
-        // Weapon_object_15,
-        // Weapon_object_16,
-        // Weapon_object_17,
-        // Weapon_object_18,
-        // Weapon_object_19,
-        // Weapon_object_20,
     }
 
     [MemoryPackable]
@@ -341,9 +319,6 @@ namespace NikkeEinkk.Components.Models
         public int StatEnhanceId { get; set; }
     }
 
-    /// <summary>
-    /// Monster stat enhancement data from MonsterStatEnhanceTable
-    /// </summary>
     [MemoryPackable]
     public partial class MonsterStatEnhanceData
     {
@@ -408,9 +383,6 @@ namespace NikkeEinkk.Components.Models
         public long LevelBrokenHp { get; set; }
     }
 
-    /// <summary>
-    /// Monster part data from MonsterPartsTable
-    /// </summary>
     [MemoryPackable]
     public partial class MonsterPartData
     {
@@ -544,9 +516,6 @@ namespace NikkeEinkk.Components.Models
         DamageDoneToTargetMonster = 1,
     }
 
-    /// <summary>
-    /// Monster stage level change data from MonsterStageLvChangeTable
-    /// </summary>
     [MemoryPackable]
     public partial class MonsterStageLevelChangeData
     {
@@ -736,9 +705,6 @@ namespace NikkeEinkk.Components.Models
         Integer = 2
     }
 
-    /// <summary>
-    /// Monster skill data from MonsterSkillTable
-    /// </summary>
     [MemoryPackable]
     public partial class MonsterSkillData
     {

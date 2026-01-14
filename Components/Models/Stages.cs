@@ -135,9 +135,6 @@ namespace NikkeEinkk.Components.Models
         Pilgrim = 8
     }
 
-    /// <summary>
-    /// Wave data containing stage and battle information
-    /// </summary>
     [MemoryPackable]
     public partial class WaveData
     {
@@ -260,9 +257,6 @@ namespace NikkeEinkk.Components.Models
         Trial = 2
     }
 
-    /// <summary>
-    /// Solo raid wave data from SoloRaidPresetTable
-    /// </summary>
     [MemoryPackable]
     public partial class SoloRaidWaveData
     {
@@ -362,9 +356,6 @@ namespace NikkeEinkk.Components.Models
         public int RewardId { get; set; }
     }
 
-    /// <summary>
-    /// Multiplayer raid data from MultiRaidTable
-    /// </summary>
     [MemoryPackable]
     public partial class MultiplayerRaidData
     {

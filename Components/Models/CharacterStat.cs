@@ -31,31 +31,21 @@ namespace NikkeEinkk.Components.Models
         [JsonPropertyOrder(4)]
         public int LevelAttack { get; set; }
 
-        /// </summary>
         [MemoryPackOrder(5)]
         [JsonPropertyName("level_defence")]
         [JsonPropertyOrder(5)]
         public int LevelDefence { get; set; }
 
-        /// <summary>
-        /// Level energy resist stat value
-        /// </summary>
         [MemoryPackOrder(6)]
         [JsonPropertyName("level_energy_resist")]
         [JsonPropertyOrder(6)]
         public int LevelEnergyResist { get; set; }
 
-        /// <summary>
-        /// Level metal resist stat value
-        /// </summary>
         [MemoryPackOrder(7)]
         [JsonPropertyName("level_metal_resist")]
         [JsonPropertyOrder(7)]
         public int LevelMetalResist { get; set; }
 
-        /// <summary>
-        /// Level bio resist stat value
-        /// </summary>
         [MemoryPackOrder(8)]
         [JsonPropertyName("level_bio_resist")]
         [JsonPropertyOrder(8)]

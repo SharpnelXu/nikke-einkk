@@ -4,109 +4,109 @@ using System.Text.Json.Serialization;
 namespace NikkeEinkk.Components.Models
 {
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaBiosRecord // TypeDefIndex: 37831
+    public partial class HexaBiosRecord 
     {
     
-        // Properties
+        
         [JsonPropertyName("id")]
         [MemoryPackOrder(0)]
-        public int Id {  get;  set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Id {  get;  set; } 
         [JsonPropertyName("bios_group")]
         [MemoryPackOrder(1)]
-        public int Bios_group {  get;  set; } // 0x00000001808A8B90-0x00000001808A8BA0 0x00000001808A8BB0-0x00000001808A8BC0
+        public int Bios_group {  get;  set; } 
         [JsonPropertyName("name_localkey")]
         [MemoryPackOrder(2)]
-        public string? Name_localkey {  get;  set; } // 0x0000000180809D20-0x0000000180809D30 0x000000018085C270-0x000000018085C280
+        public string? Name_localkey {  get;  set; } 
         [JsonPropertyName("description_localkey")]
         [MemoryPackOrder(3)]
-        public string? Description_localkey {  get;  set; } // 0x000000018082E3C0-0x000000018082E3D0 0x0000000180868490-0x00000001808684A0
+        public string? Description_localkey {  get;  set; } 
         [JsonPropertyName("resource_id")]
         [MemoryPackOrder(4)]
-        public string? Resource_id {  get;  set; } // 0x0000000180809160-0x0000000180809170 0x0000000180809230-0x0000000180809240
+        public string? Resource_id {  get;  set; } 
         [JsonPropertyName("bios_rare")]
         [MemoryPackOrder(5)]
-        public int Bios_rare {  get;  set; } // 0x0000000180869A70-0x0000000180869A80 0x0000000180869AA0-0x0000000180869AB0
+        public int Bios_rare {  get;  set; } 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [JsonPropertyName("element")]
         [MemoryPackOrder(6)]
-        public AttackType Element {  get;  set; } // 0x0000000180908FB0-0x0000000180908FC0 0x00000001809090B0-0x00000001809090C0
+        public AttackType Element {  get;  set; } 
         [JsonPropertyName("main_option")]
         [MemoryPackOrder(7)]
-        public int Main_option {  get;  set; } // 0x000000018147E6C0-0x000000018147E6D0 0x00000001827DCDC0-0x00000001827DCDD0
+        public int Main_option {  get;  set; } 
         [JsonPropertyName("sub_01_option")]
         [MemoryPackOrder(8)]
-        public int Sub_01_option {  get;  set; } // 0x00000001814D7680-0x00000001814D7690 0x00000001827DCD80-0x00000001827DCD90
+        public int Sub_01_option {  get;  set; } 
         [JsonPropertyName("sub_02_option")]
         [MemoryPackOrder(9)]
-        public int Sub_02_option {  get;  set; } // 0x0000000180830920-0x0000000180830930 0x0000000180830930-0x0000000180830940
+        public int Sub_02_option {  get;  set; } 
     }
 
     
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaBiosOptionRecord // TypeDefIndex: 37827
+    public partial class HexaBiosOptionRecord 
     {
-        // Properties
+        
         [JsonPropertyName("id")]
         [MemoryPackOrder(0)]
-        public int Id { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Id { get; set; } 
         [JsonPropertyName("order")]
         [MemoryPackOrder(1)]
-        public int Order { get; set; } // 0x00000001808A8B90-0x00000001808A8BA0 0x00000001808A8BB0-0x00000001808A8BC0
+        public int Order { get; set; } 
         [JsonPropertyName("option_rare")]
         [MemoryPackOrder(2)]
-        public int Option_rare { get; set; } // 0x000000018084E140-0x000000018084E150 0x00000001808A8BD0-0x00000001808A8BE0
+        public int Option_rare { get; set; } 
         [JsonPropertyName("state_effect_localkey")]
         [MemoryPackOrder(3)]
-        public string? State_effect_localkey { get; set; } // 0x000000018082E3C0-0x000000018082E3D0 0x0000000180868490-0x00000001808684A0
+        public string? State_effect_localkey { get; set; } 
         [JsonPropertyName("function_id")]
         [MemoryPackOrder(4)]
-        public int Function_id { get; set; } // 0x00000001808A7B10-0x00000001808A7B20 0x00000001809090C0-0x00000001809090D0
+        public int Function_id { get; set; } 
         [JsonPropertyName("HexaBiosOptionRandomData")]
         [MemoryPackOrder(5)]
-        public List<HexaBiosOptionStateEffectStepData> HexaBiosOptionRandomData { get; set; } = []; // 0x000000018084ED30-0x000000018084ED40 0x000000018084E1A0-0x000000018084E1B0
+        public List<HexaBiosOptionStateEffectStepData> HexaBiosOptionRandomData { get; set; } = []; 
     }
     
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaBiosOptionStateEffectStepData // TypeDefIndex: 37829
+    public partial class HexaBiosOptionStateEffectStepData 
     {
-        // Properties
+        
         [JsonPropertyName("need_point")]
         [MemoryPackOrder(0)]
-        public int Need_point { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Need_point { get; set; } 
         [JsonPropertyName("state_effect_id")]
         [MemoryPackOrder(1)]
-        public int State_effect_id { get; set; } // 0x00000001808A8B90-0x00000001808A8BA0 0x00000001808A8BB0-0x00000001808A8BC0
+        public int State_effect_id { get; set; } 
     }
 
     
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaBiosOptionRandomData // TypeDefIndex: 37825
+    public partial class HexaBiosOptionRandomData 
     {
-        // Properties
+        
         [JsonPropertyName("option_id")]
         [MemoryPackOrder(0)]
-        public int Option_id { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Option_id { get; set; } 
         [JsonPropertyName("ratio")]
         [MemoryPackOrder(1)]
-        public int Ratio { get; set; } // 0x00000001808A8B90-0x00000001808A8BA0 0x00000001808A8BB0-0x00000001808A8BC0
+        public int Ratio { get; set; } 
     }
 
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaBiosOptionRandomRecord // TypeDefIndex: 37823
+    public partial class HexaBiosOptionRandomRecord 
     {
-        // Properties
+        
         [JsonPropertyName("id")]
         [MemoryPackOrder(0)]
-        public int Id { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Id { get; set; } 
         [JsonPropertyName("option_group")]
         [MemoryPackOrder(1)]
-        public int Option_group { get; set; } // 0x00000001808A8B90-0x00000001808A8BA0 0x00000001808A8BB0-0x00000001808A8BC0
+        public int Option_group { get; set; } 
         [JsonPropertyName("HexaBiosOptionRandomData")]
         [MemoryPackOrder(2)]
-        public List<HexaBiosOptionRandomData> HexaBiosOptionRandomData { get; set; } = []; // 0x0000000180809D20-0x0000000180809D30 0x000000018085C270-0x000000018085C280
+        public List<HexaBiosOptionRandomData> HexaBiosOptionRandomData { get; set; } = []; 
     }
 
-    public enum HexaBlockDesignType // TypeDefIndex: 37836
+    public enum HexaBlockDesignType 
     {
         Unknown = -1,
         None = 0,
@@ -116,167 +116,167 @@ namespace NikkeEinkk.Components.Models
     }
 
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaBlockRecord // TypeDefIndex: 37835
+    public partial class HexaBlockRecord 
     {
-        // Properties
+        
         [JsonPropertyName("id")]
         [MemoryPackOrder(0)]
-        public int Id { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Id { get; set; } 
         [JsonPropertyName("block_group")]
         [MemoryPackOrder(1)]
-        public int Block_group { get; set; } // 0x00000001808A8B90-0x00000001808A8BA0 0x00000001808A8BB0-0x00000001808A8BC0
+        public int Block_group { get; set; } 
         [JsonPropertyName("name_localkey")]
         [MemoryPackOrder(2)]
-        public string? Name_localkey { get; set; } // 0x0000000180809D20-0x0000000180809D30 0x000000018085C270-0x000000018085C280
+        public string? Name_localkey { get; set; } 
         [JsonPropertyName("description_localkey")]
         [MemoryPackOrder(3)]
-        public string? Description_localkey { get; set; } // 0x000000018082E3C0-0x000000018082E3D0 0x0000000180868490-0x00000001808684A0
+        public string? Description_localkey { get; set; } 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [JsonPropertyName("block_type")]
         [MemoryPackOrder(4)]
-        public HexaBlockDesignType Block_type { get; set; } // 0x00000001808A7B10-0x00000001808A7B20 0x00000001809090C0-0x00000001809090D0
+        public HexaBlockDesignType Block_type { get; set; } 
         [JsonPropertyName("block_rare")]
         [MemoryPackOrder(5)]
-        public int Block_rare { get; set; } // 0x00000001808A7B00-0x00000001808A7B10 0x00000001826384F0-0x0000000182638500
+        public int Block_rare { get; set; } 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [JsonPropertyName("element")]
         [MemoryPackOrder(6)]
-        public AttackType Element { get; set; } // 0x0000000180869A70-0x0000000180869A80 0x0000000180869AA0-0x0000000180869AB0
+        public AttackType Element { get; set; } 
         [JsonPropertyName("attak")]
         [MemoryPackOrder(7)]
-        public int Attak { get; set; } // 0x0000000180908FB0-0x0000000180908FC0 0x00000001809090B0-0x00000001809090C0
+        public int Attak { get; set; } 
         [JsonPropertyName("hp")]
         [MemoryPackOrder(8)]
-        public int Hp { get; set; } // 0x000000018147E6C0-0x000000018147E6D0 0x00000001827DCDC0-0x00000001827DCDD0
+        public int Hp { get; set; } 
         [JsonPropertyName("defence")]
         [MemoryPackOrder(9)]
-        public int Defence { get; set; } // 0x00000001814D7680-0x00000001814D7690 0x00000001827DCD80-0x00000001827DCD90
+        public int Defence { get; set; } 
         [JsonPropertyName("function_group")]
         [MemoryPackOrder(10)]
-        public int Function_group { get; set; } // 0x0000000180830920-0x0000000180830930 0x0000000180830930-0x0000000180830940
+        public int Function_group { get; set; } 
     }
 
     
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaBlockUndefinedRecord : IMemoryPackable<HexaBlockUndefinedRecord> // TypeDefIndex: 37838
+    public partial class HexaBlockUndefinedRecord : IMemoryPackable<HexaBlockUndefinedRecord> 
     {
-        // Properties
+        
         [JsonPropertyName("id")]
         [MemoryPackOrder(0)]
-        public int Id { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Id { get; set; } 
         [JsonPropertyName("name_localkey")]
         [MemoryPackOrder(1)]
-        public string? Name_localkey { get; set; } // 0x0000000180809D20-0x0000000180809D30 0x000000018085C270-0x000000018085C280
+        public string? Name_localkey { get; set; } 
         [JsonPropertyName("description_localkey")]
         [MemoryPackOrder(2)]
-        public string? Description_localkey { get; set; } // 0x000000018082E3C0-0x000000018082E3D0 0x0000000180868490-0x00000001808684A0
+        public string? Description_localkey { get; set; } 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [JsonPropertyName("block_type")]
         [MemoryPackOrder(3)]
-        public HexaBlockDesignType Block_type { get; set; } // 0x00000001808A7B10-0x00000001808A7B20 0x00000001809090C0-0x00000001809090D0
+        public HexaBlockDesignType Block_type { get; set; } 
         [JsonPropertyName("block_rare")]
         [MemoryPackOrder(4)]
-        public int Block_rare { get; set; } // 0x00000001808A7B00-0x00000001808A7B10 0x00000001826384F0-0x0000000182638500
+        public int Block_rare { get; set; } 
         [JsonPropertyName("block_group")]
         [MemoryPackOrder(5)]
-        public int Block_group { get; set; } // 0x0000000180869A70-0x0000000180869A80 0x0000000180869AA0-0x0000000180869AB0
+        public int Block_group { get; set; } 
     }
 
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaBiosUndefinedRecord : IMemoryPackable<HexaBiosUndefinedRecord> // TypeDefIndex: 37833
+    public partial class HexaBiosUndefinedRecord : IMemoryPackable<HexaBiosUndefinedRecord> 
     {
-        // Properties
+        
         [JsonPropertyName("id")]
         [MemoryPackOrder(0)]
-        public int Id { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Id { get; set; } 
         [JsonPropertyName("name_localkey")]
         [MemoryPackOrder(1)]
-        public string? Name_localkey { get; set; } // 0x0000000180809D20-0x0000000180809D30 0x000000018085C270-0x000000018085C280
+        public string? Name_localkey { get; set; } 
         [JsonPropertyName("description_localkey")]
         [MemoryPackOrder(2)]
-        public string? Description_localkey { get; set; } // 0x000000018082E3C0-0x000000018082E3D0 0x0000000180868490-0x00000001808684A0
+        public string? Description_localkey { get; set; } 
         [JsonPropertyName("resource_id")]
         [MemoryPackOrder(3)]
-        public string? Resource_id { get; set; } // 0x0000000180809160-0x0000000180809170 0x0000000180809230-0x0000000180809240
+        public string? Resource_id { get; set; } 
         [JsonPropertyName("bios_rare")]
         [MemoryPackOrder(4)]
-        public int Bios_rare { get; set; } // 0x0000000180869A70-0x0000000180869A80 0x0000000180869AA0-0x0000000180869AB0
+        public int Bios_rare { get; set; } 
         [JsonPropertyName("bios_group")]
         [MemoryPackOrder(5)]
-        public int Bios_group { get; set; } // 0x0000000180908FB0-0x0000000180908FC0 0x00000001809090B0-0x00000001809090C0
+        public int Bios_group { get; set; } 
     }
 
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaBoardSlotNumberData : IMemoryPackable<HexaBoardSlotNumberData> // TypeDefIndex: 37842
+    public partial class HexaBoardSlotNumberData : IMemoryPackable<HexaBoardSlotNumberData> 
     {
-        // Properties
+        
         [JsonPropertyName("slot_no")]
         [MemoryPackOrder(0)]
-        public int Slot_no { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Slot_no { get; set; } 
     }
 
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaBoardSlotRecord : IMemoryPackable<HexaBoardSlotRecord> // TypeDefIndex: 37840
+    public partial class HexaBoardSlotRecord : IMemoryPackable<HexaBoardSlotRecord> 
     {
-        // Properties
+        
         [JsonPropertyName("id")]
         [MemoryPackOrder(0)]
-        public int Id { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Id { get; set; } 
         [JsonPropertyName("slot_lock")]
         [MemoryPackOrder(1)]
-        public bool Slot_lock { get; set; } // 0x0000000181463760-0x0000000181463770 0x0000000183B7F180-0x0000000183B7F190
+        public bool Slot_lock { get; set; } 
         [JsonPropertyName("lock_group")]
         [MemoryPackOrder(2)]
-        public int Lock_group { get; set; } // 0x000000018084E140-0x000000018084E150 0x00000001808A8BD0-0x00000001808A8BE0
+        public int Lock_group { get; set; } 
         [JsonPropertyName("currency_id")]
         [MemoryPackOrder(3)]
-        public int Currency_id { get; set; } // 0x00000001808A8B80-0x00000001808A8B90 0x00000001808A8BA0-0x00000001808A8BB0
+        public int Currency_id { get; set; } 
         [JsonPropertyName("currency_value")]
         [MemoryPackOrder(4)]
-        public int Currency_value { get; set; } // 0x0000000180829AD0-0x0000000180829FA0 0x000000018084E180-0x000000018084E190
+        public int Currency_value { get; set; } 
         [JsonPropertyName("HexaBoardSlotNumberData")]
         [MemoryPackOrder(5)]
-        public List<HexaBoardSlotNumberData> HexaBoardSlotNumberData { get; set; } = []; // 0x0000000180809160-0x0000000180809170 0x0000000180809230-0x0000000180809240
+        public List<HexaBoardSlotNumberData> HexaBoardSlotNumberData { get; set; } = []; 
     }
 
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaFunctionGroupRecord // TypeDefIndex: 37844
+    public partial class HexaFunctionGroupRecord 
     {
 
-        // Properties
+        
         [JsonPropertyName("id")]
         [MemoryPackOrder(0)]
-        public int Id { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Id { get; set; } 
         [JsonPropertyName("function_group")]
         [MemoryPackOrder(1)]
-        public int Function_group { get; set; } // 0x00000001808A8B90-0x00000001808A8BA0 0x00000001808A8BB0-0x00000001808A8BC0
+        public int Function_group { get; set; } 
         [JsonPropertyName("ratio")]
         [MemoryPackOrder(2)]
-        public int Ratio { get; set; } // 0x000000018084E140-0x000000018084E150 0x00000001808A8BD0-0x00000001808A8BE0
+        public int Ratio { get; set; } 
         [JsonPropertyName("slot_1_function")]
         [MemoryPackOrder(3)]
-        public int Slot_1_function { get; set; } // 0x00000001808A8B80-0x00000001808A8B90 0x00000001808A8BA0-0x00000001808A8BB0
+        public int Slot_1_function { get; set; } 
         [JsonPropertyName("slot_2_function")]
         [MemoryPackOrder(4)]
-        public int Slot_2_function { get; set; } // 0x0000000180829AD0-0x0000000180829FA0 0x000000018084E180-0x000000018084E190
+        public int Slot_2_function { get; set; } 
         [JsonPropertyName("slot_3_function")]
         [MemoryPackOrder(5)]
-        public int Slot_3_function { get; set; } // 0x000000018084DE80-0x000000018084DE90 0x000000018084E190-0x000000018084E1A0
+        public int Slot_3_function { get; set; } 
         [JsonPropertyName("order")]
         [MemoryPackOrder(6)]
-        public int Order { get; set; } // 0x00000001808A7B10-0x00000001808A7B20 0x00000001809090C0-0x00000001809090D0
+        public int Order { get; set; } 
     }
 
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaFunctionPointData // TypeDefIndex: 37849
+    public partial class HexaFunctionPointData 
     {
-        // Properties
+        
         [JsonPropertyName("point_rare")]
         [MemoryPackOrder(0)]
-        public int Point_rare { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Point_rare { get; set; } 
     }
 
-    public enum HexaBiosFilterType // TypeDefIndex: 37847
+    public enum HexaBiosFilterType 
     {
         Unknown = -1,
         None = 0,
@@ -286,21 +286,21 @@ namespace NikkeEinkk.Components.Models
     }
 
     [MemoryPackable(SerializeLayout.Explicit)]
-    public partial class HexaFunctionRecord // TypeDefIndex: 37846
+    public partial class HexaFunctionRecord 
     {
-        // Properties
+        
         [JsonPropertyName("id")]
         [MemoryPackOrder(0)]
-        public int Id { get; set; } // 0x0000000180807250-0x0000000180807260 0x00000001808A8BC0-0x00000001808A8BD0
+        public int Id { get; set; } 
         [JsonPropertyName("resource_id")]
         [MemoryPackOrder(1)]
-        public string? Resource_id { get; set; } // 0x0000000180809D20-0x0000000180809D30 0x000000018085C270-0x000000018085C280
+        public string? Resource_id { get; set; } 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [JsonPropertyName("bios_type")]
         [MemoryPackOrder(2)]
-        public HexaBiosFilterType Bios_type { get; set; } // 0x0000000180829AD0-0x0000000180829FA0 0x000000018084E180-0x000000018084E190
+        public HexaBiosFilterType Bios_type { get; set; } 
         [JsonPropertyName("HexaFunctionPointData")]
         [MemoryPackOrder(3)]
-        public List<HexaFunctionPointData> HexaFunctionPointData { get; set; } = []; // 0x0000000180809160-0x0000000180809170 0x0000000180809230-0x0000000180809240
+        public List<HexaFunctionPointData> HexaFunctionPointData { get; set; } = []; 
     }
 }

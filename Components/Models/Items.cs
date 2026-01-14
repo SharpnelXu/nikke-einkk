@@ -263,9 +263,6 @@ namespace NikkeEinkk.Components.Models
         public int SkillGroupId { get; set; }
     }
 
-    /// <summary>
-    /// Harmony Cube data from ItemHarmonyCubeTable
-    /// </summary>
     [MemoryPackable]
     public partial class HarmonyCubeData
     {
@@ -451,9 +448,6 @@ namespace NikkeEinkk.Components.Models
         public int SkillChangeSlot { get; set; }
     }
 
-    /// <summary>
-    /// Favorite item data from FavoriteItemTable
-    /// </summary>
     [MemoryPackable]
     public partial class FavoriteItemData
     {
@@ -604,9 +598,6 @@ namespace NikkeEinkk.Components.Models
         public CollectionItemSkillLevel[] SkillLevels { get; set; } = [];
     }
 
-    /// <summary>
-    /// Package list data from PackageListTable
-    /// </summary>
     [MemoryPackable]
     public partial class PackageListData
     {
@@ -682,7 +673,7 @@ namespace NikkeEinkk.Components.Models
         PassCostumeShop = 11
     }
 
-    public enum ProductType // RewardType
+    public enum ProductType 
     {
         Unknown = -1,
         None = 0,
@@ -792,9 +783,6 @@ namespace NikkeEinkk.Components.Models
         InAppShop = 0,
     }
 
-    /// <summary>
-    /// In-app shop data from InAppShopManagerTable
-    /// </summary>
     [MemoryPackable]
     public partial class InAppShopData
     {
@@ -918,9 +906,6 @@ namespace NikkeEinkk.Components.Models
         public int ProductValue { get; set; }
     }
 
-    /// <summary>
-    /// Currency data from CurrencyTable
-    /// </summary>
     [MemoryPackable]
     public partial class CurrencyData
     {
@@ -1190,9 +1175,6 @@ namespace NikkeEinkk.Components.Models
         public string Cost { get; set; } = "0";
     }
 
-    /// <summary>
-    /// Consumable item data from ItemConsumeTable
-    /// </summary>
     [MemoryPackable]
     public partial class ConsumeItemData
     {
@@ -1289,9 +1271,6 @@ namespace NikkeEinkk.Components.Models
         public int StackMax { get; set; }
     }
 
-    /// <summary>
-    /// Material item data from ItemMaterialTable
-    /// </summary>
     [MemoryPackable]
     public partial class MaterialItemData
     {
@@ -1355,9 +1334,6 @@ namespace NikkeEinkk.Components.Models
         public int StackMax { get; set; }
     }
 
-    /// <summary>
-    /// Piece item data from ItemPieceTable
-    /// </summary>
     [MemoryPackable]
     public partial class PieceItemData
     {
