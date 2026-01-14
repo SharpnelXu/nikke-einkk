@@ -1,7 +1,7 @@
 using MemoryPack;
 using System.Text.Json.Serialization;
 
-namespace NikkeEinkk.Components.Model
+namespace NikkeEinkk.Components.Models
 {
     public enum Rarity
     {

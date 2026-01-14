@@ -1,7 +1,7 @@
 using MemoryPack;
 using Newtonsoft.Json;
 
-namespace NikkeEinkk.Components.Models
+namespace NikkeEinkk.Components.Modelss
 {
     [MemoryPackable]
     public partial class AttractiveLevelRecord
