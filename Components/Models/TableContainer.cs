@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace NikkeEinkk.Components.Models
 {
     [MemoryPackable]
-    public partial class JsonTableContainer<TItem>
+    public partial class TableContainer<TItem>
     {
         [JsonProperty("version")]
         public string Version { get; set; } = "0.0.1";

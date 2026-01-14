@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace NikkeEinkk.Components.Models
 {
     [MemoryPackable]
-    public partial class CharacterStatEnhance
+    public partial class NikkeCharacterStatEnhanceRecord
     {
         [MemoryPackOrder(0)]
         [JsonProperty("id", Order = 0)]

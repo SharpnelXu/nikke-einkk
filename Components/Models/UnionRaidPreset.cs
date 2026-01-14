@@ -1,17 +1,9 @@
 using MemoryPack;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using NikkeEinkk.Components.Models.Enums;
 
 namespace NikkeEinkk.Components.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum DifficultyType
-    {
-        Unknown = -1,
-        Normal = 1,
-        Hard = 2
-    }
-
     [MemoryPackable]
     public partial class UnionRaidPreset
     {
@@ -25,8 +17,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(2)]
         [JsonProperty("difficulty_type")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public DifficultyType DifficultyType { get; set; }
+        public UnionRaidDifficultyType DifficultyType { get; set; }
 
         [MemoryPackOrder(3)]
         [JsonProperty("wave_order")]
