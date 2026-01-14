@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using NikkeEinkk.Components.Models.Enums;
 using ValueType = NikkeEinkk.Components.Models.Enums.ValueType;
 
-namespace NikkeEinkk.Components.Models;
+namespace NikkeEinkk.Components.Models.Nikke;
 
 [MemoryPackable]
 public partial class FunctionData

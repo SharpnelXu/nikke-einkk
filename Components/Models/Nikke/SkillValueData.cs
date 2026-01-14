@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using ValueType = NikkeEinkk.Components.Models.Enums.ValueType;
 
-namespace NikkeEinkk.Components.Models;
+namespace NikkeEinkk.Components.Models.Nikke;
 
 [MemoryPackable]
 public partial class SkillValueData

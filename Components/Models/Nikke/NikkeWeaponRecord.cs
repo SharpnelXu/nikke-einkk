@@ -2,7 +2,7 @@ using MemoryPack;
 using Newtonsoft.Json;
 using NikkeEinkk.Components.Models.Enums;
 
-namespace NikkeEinkk.Components.Models
+namespace NikkeEinkk.Components.Models.Nikke
 {
     [MemoryPackable]
     public partial class NikkeWeaponRecord

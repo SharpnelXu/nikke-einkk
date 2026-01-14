@@ -2,10 +2,10 @@ using MemoryPack;
 using Newtonsoft.Json;
 using NikkeEinkk.Components.Models.Enums;
 
-namespace NikkeEinkk.Components.Models
+namespace NikkeEinkk.Components.Models.Stage
 {
     [MemoryPackable]
-    public partial class UnionRaidPreset
+    public partial class UnionRaidWaveData
     {
         [MemoryPackOrder(0)]
         [JsonProperty("id")]
