@@ -223,7 +223,7 @@ namespace NikkeEinkk.Components.Models
         StageClear = 1,
         StandardBattlePower = 2
     }
-    
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SoloRaidDifficultyType
     {

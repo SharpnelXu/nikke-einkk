@@ -12,7 +12,7 @@ namespace NikkeEinkk.Components.Models
         SR = 2,
         R = 1
     }
-    
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum NikkeClass
     {
@@ -227,7 +227,7 @@ namespace NikkeEinkk.Components.Models
         [MemoryPackOrder(13)]
         [JsonProperty("class", Order = 11)]
         public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
-        
+
         [MemoryPackOrder(15)]
         [JsonProperty("element_id", Order = 12)]
         public int[] ElementId { get; set; } = [];

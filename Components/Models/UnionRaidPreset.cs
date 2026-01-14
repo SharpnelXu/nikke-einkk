@@ -15,77 +15,77 @@ namespace NikkeEinkk.Components.Models
     [MemoryPackable]
     public partial class UnionRaidPreset
     {
-        [JsonProperty("id")]
         [MemoryPackOrder(0)]
+        [JsonProperty("id")]
         public int Id { get; set; }
 
-        [JsonProperty("preset_group_id")]
         [MemoryPackOrder(1)]
+        [JsonProperty("preset_group_id")]
         public int PresetGroupId { get; set; }
 
-        [JsonProperty("difficulty_type")]
         [MemoryPackOrder(2)]
+        [JsonProperty("difficulty_type")]
         [JsonConverter(typeof(StringEnumConverter))]
         public DifficultyType DifficultyType { get; set; }
 
-        [JsonProperty("wave_order")]
         [MemoryPackOrder(3)]
+        [JsonProperty("wave_order")]
         public int WaveOrder { get; set; }
 
-        [JsonProperty("wave")]
         [MemoryPackOrder(4)]
+        [JsonProperty("wave")]
         public int Wave { get; set; }
 
-        [JsonProperty("wave_change_step")]
         [MemoryPackOrder(5)]
+        [JsonProperty("wave_change_step")]
         public int WaveChangeStep { get; set; }
 
-        [JsonProperty("monster_stage_lv")]
         [MemoryPackOrder(6)]
+        [JsonProperty("monster_stage_lv")]
         public int MonsterStageLv { get; set; }
 
-        [JsonProperty("monster_stage_lv_change_group")]
         [MemoryPackOrder(7)]
+        [JsonProperty("monster_stage_lv_change_group")]
         public int MonsterStageLvChangeGroup { get; set; }
 
-        [JsonProperty("dynamic_object_stage_lv")]
         [MemoryPackOrder(8)]
+        [JsonProperty("dynamic_object_stage_lv")]
         public int DynamicObjectStageLv { get; set; }
 
-        [JsonProperty("cover_stage_lv")]
         [MemoryPackOrder(9)]
+        [JsonProperty("cover_stage_lv")]
         public int CoverStageLv { get; set; }
 
-        [JsonProperty("spot_autocontrol")]
         [MemoryPackOrder(10)]
+        [JsonProperty("spot_autocontrol")]
         public bool SpotAutocontrol { get; set; }
 
-        [JsonProperty("wave_name")]
         [MemoryPackOrder(11)]
+        [JsonProperty("wave_name")]
         public string WaveName { get; set; } = string.Empty;
 
-        [JsonProperty("wave_description")]
         [MemoryPackOrder(12)]
+        [JsonProperty("wave_description")]
         public string WaveDescription { get; set; } = string.Empty;
 
-        [JsonProperty("monster_image_si")]
         [MemoryPackOrder(13)]
+        [JsonProperty("monster_image_si")]
         public string MonsterImageSi { get; set; } = string.Empty;
 
-        [JsonProperty("monster_image")]
         [MemoryPackOrder(14)]
+        [JsonProperty("monster_image")]
         public string MonsterImage { get; set; } = string.Empty;
 
-        [JsonProperty("monster_spine", DefaultValueHandling = DefaultValueHandling.Ignore)]
         [MemoryPackOrder(15)]
+        [JsonProperty("monster_spine", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int MonsterSpine { get; set; } = 0;
 
-        [JsonProperty("monster_spine_scale")]
         [MemoryPackOrder(16)]
+        [JsonProperty("monster_spine_scale")]
         public int MonsterSpineScale { get; set; }
 
-        [JsonProperty("reward_id")]
         [MemoryPackOrder(17)]
+        [JsonProperty("reward_id")]
         public int RewardId { get; set; }
     }
 }

@@ -221,7 +221,7 @@ namespace NikkeEinkk.Components.Models
     {
         [MemoryPackOrder(0)]
         [JsonProperty("stat_type", Order = 0)]
-        
+
         public StatType StatType { get; set; } = StatType.None;
 
         [MemoryPackOrder(1)]
@@ -290,22 +290,22 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(9)]
         [JsonProperty("item_type", Order = 9)]
-        
+
         public ItemType ItemType { get; set; } = ItemType.Unknown;
 
         [MemoryPackOrder(10)]
         [JsonProperty("item_sub_type", Order = 10)]
-        
+
         public ItemSubType ItemSubType { get; set; } = ItemSubType.Unknown;
 
         [MemoryPackOrder(11)]
         [JsonProperty("item_rare", Order = 11)]
-        
+
         public Rarity ItemRare { get; set; } = Rarity.R;
 
         [MemoryPackOrder(12)]
         [JsonProperty("class", Order = 12)]
-        
+
         public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
 
         [MemoryPackOrder(13)]
@@ -330,7 +330,7 @@ namespace NikkeEinkk.Components.Models
     {
         [MemoryPackOrder(0)]
         [JsonProperty("stat_type", Order = 0)]
-        
+
         public StatType StatType { get; set; } = StatType.None;
 
         [MemoryPackOrder(1)]
@@ -395,7 +395,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(1)]
         [JsonProperty("skill_table", Order = 1)]
-        
+
         public SkillType SkillTable { get; set; } = SkillType.None;
 
         [MemoryPackOrder(2)]
@@ -436,17 +436,17 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(7)]
         [JsonProperty("favorite_rare", Order = 7)]
-        
+
         public Rarity FavoriteRare { get; set; } = Rarity.R;
 
         [MemoryPackOrder(8)]
         [JsonProperty("favorite_type", Order = 8)]
-        
+
         public FavoriteItemType FavoriteType { get; set; } = FavoriteItemType.Unknown;
 
         [MemoryPackOrder(9)]
         [JsonProperty("weapon_type", Order = 9)]
-        
+
         public WeaponType WeaponType { get; set; } = WeaponType.None;
 
         [MemoryPackOrder(10)]
@@ -483,7 +483,7 @@ namespace NikkeEinkk.Components.Models
     {
         [MemoryPackOrder(0)]
         [JsonProperty("stat_type", Order = 0)]
-        
+
         public StatType StatType { get; set; } = StatType.None;
 
         [MemoryPackOrder(1)]
@@ -593,7 +593,7 @@ namespace NikkeEinkk.Components.Models
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum ProductType 
+    public enum ProductType
     {
         Unknown = -1,
         None = 0,
@@ -642,7 +642,7 @@ namespace NikkeEinkk.Components.Models
         Currency = 0,
         Item = 1
     }
-    
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum MidasProductType
     {
@@ -663,7 +663,7 @@ namespace NikkeEinkk.Components.Models
         PassCostumeShop = 13
     }
 
-    
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum BuyLimitType
     {
@@ -719,7 +719,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(1)]
         [JsonProperty("main_category_type", Order = 1)]
-        
+
         public MainCategoryType MainCategoryType { get; set; } = MainCategoryType.Unknown;
 
         [MemoryPackOrder(2)]
@@ -756,7 +756,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(10)]
         [JsonProperty("renew_type", Order = 10)]
-        
+
         public RenewType RenewType { get; set; } = RenewType.NoRenew;
 
         [MemoryPackOrder(11)]
@@ -773,12 +773,12 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(14)]
         [JsonProperty("shop_type", Order = 14)]
-        
+
         public ShopType ShopType { get; set; } = ShopType.InAppShop;
 
         [MemoryPackOrder(15)]
         [JsonProperty("shop_category", Order = 15)]
-        
+
         public ShopCategory ShopCategory { get; set; } = ShopCategory.Unknown;
 
         [MemoryPackOrder(16)]
@@ -799,7 +799,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(2)]
         [JsonProperty("product_type", Order = 2)]
-        
+
         public ProductType ProductType { get; set; } = ProductType.Item;
 
         [MemoryPackOrder(3)]
@@ -944,7 +944,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(9)]
         [JsonProperty("buy_limit_type", Order = 9)]
-        
+
         public BuyLimitType BuyLimitType { get; set; } = BuyLimitType.None;
 
         [MemoryPackOrder(10)]
@@ -981,7 +981,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(3)]
         [JsonProperty("product_type", Order = 3)]
-        
+
         public ProductType ProductType { get; set; } = ProductType.Unknown;
 
         [MemoryPackOrder(4)]
@@ -1002,7 +1002,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(1)]
         [JsonProperty("product_type", Order = 1)]
-        
+
         public MidasProductType ProductType { get; set; } = MidasProductType.CashShop;
 
         [MemoryPackOrder(2)]
@@ -1011,7 +1011,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(3)]
         [JsonProperty("item_type", Order = 3)]
-        
+
         public ProductItemType ItemType { get; set; } = ProductItemType.Currency;
 
         [MemoryPackOrder(4)]
@@ -1040,7 +1040,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(1)]
         [JsonProperty("use_condition_type", Order = 1)]
-        
+
         public UseConditionType UseConditionType { get; set; } = UseConditionType.Unknown;
 
         [MemoryPackOrder(2)]
@@ -1061,22 +1061,22 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(6)]
         [JsonProperty("item_type", Order = 6)]
-        
+
         public ItemType ItemType { get; set; } = ItemType.Unknown;
 
         [MemoryPackOrder(7)]
         [JsonProperty("item_sub_type", Order = 7)]
-        
+
         public ItemSubType ItemSubType { get; set; } = ItemSubType.Unknown;
 
         [MemoryPackOrder(8)]
         [JsonProperty("item_rare", Order = 8)]
-        
+
         public Rarity ItemRarity { get; set; } = Rarity.R;
 
         [MemoryPackOrder(9)]
         [JsonProperty("use_type", Order = 9)]
-        
+
         public UseType UseType { get; set; } = UseType.Unknown;
 
         [MemoryPackOrder(10)]
@@ -1085,7 +1085,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(11)]
         [JsonProperty("percent_display_type", Order = 11)]
-        
+
         public PercentDisplayType PercentDisplayType { get; set; } = PercentDisplayType.None;
 
         [MemoryPackOrder(12)]
@@ -1130,17 +1130,17 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(4)]
         [JsonProperty("item_type", Order = 4)]
-        
+
         public ItemType ItemType { get; set; } = ItemType.Unknown;
 
         [MemoryPackOrder(5)]
         [JsonProperty("item_sub_type", Order = 5)]
-        
+
         public ItemSubType ItemSubType { get; set; } = ItemSubType.Unknown;
 
         [MemoryPackOrder(6)]
         [JsonProperty("item_rare", Order = 6)]
-        
+
         public Rarity ItemRarity { get; set; } = Rarity.R;
 
         [MemoryPackOrder(7)]
@@ -1149,7 +1149,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(8)]
         [JsonProperty("material_type", Order = 8)]
-        
+
         public MaterialType MaterialType { get; set; } = MaterialType.Unknown;
 
         [MemoryPackOrder(9)]
@@ -1182,37 +1182,37 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(4)]
         [JsonProperty("item_type", Order = 4)]
-        
+
         public ItemType ItemType { get; set; } = ItemType.Unknown;
 
         [MemoryPackOrder(5)]
         [JsonProperty("item_sub_type", Order = 5)]
-        
+
         public ItemSubType ItemSubType { get; set; } = ItemSubType.Unknown;
 
         [MemoryPackOrder(6)]
         [JsonProperty("item_rare", Order = 6)]
-        
+
         public Rarity ItemRarity { get; set; } = Rarity.R;
 
         [MemoryPackOrder(7)]
         [JsonProperty("corporation", Order = 7)]
-        
+
         public Corporation Corporation { get; set; } = Corporation.None;
 
         [MemoryPackOrder(8)]
         [JsonProperty("corporation_sub_type", Order = 8, DefaultValueHandling = DefaultValueHandling.Ignore)]
-        
+
         public CorporationSubType CorporationSubType { get; set; } = CorporationSubType.NORMAL;
 
         [MemoryPackOrder(9)]
         [JsonProperty("class", Order = 9)]
-        
+
         public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
 
         [MemoryPackOrder(10)]
         [JsonProperty("use_type", Order = 10)]
-        
+
         public UseType UseType { get; set; } = UseType.Unknown;
 
         [MemoryPackOrder(11)]

@@ -19,7 +19,7 @@ namespace NikkeEinkk.Components.Models
         PS = 8,
         SMG = 9
     }
-    
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum AttackType
     {
@@ -46,7 +46,7 @@ namespace NikkeEinkk.Components.Models
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum PreferTarget 
+    public enum PreferTarget
     {
         Unknown = -1,
         None = 0,
@@ -105,9 +105,9 @@ namespace NikkeEinkk.Components.Models
         NearAim = 53,
         LongInitChargeTime = 54
     }
-    
+
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum PreferTargetCondition 
+    public enum PreferTargetCondition
     {
         Unknown = -1,
         None = 0,
@@ -177,7 +177,7 @@ namespace NikkeEinkk.Components.Models
         UP = 2,
         DOWN_Charge = 3
     }
-    
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ShakeType
     {

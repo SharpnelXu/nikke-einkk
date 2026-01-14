@@ -92,7 +92,7 @@ namespace NikkeEinkk.Components.Models
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum FunctionType 
+    public enum FunctionType
     {
         Unknown = -1,
         None = 0,
