@@ -1,176 +1,11 @@
 using MemoryPack;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using NikkeEinkk.Components.Models.Enums;
 
 namespace NikkeEinkk.Components.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum Rarity
-    {
-        Unknown = -1,
-        SSR = 3,
-        SR = 2,
-        R = 1
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum NikkeClass
-    {
-        Unknown = -1,
-        None = 0,
-        Attacker = 1,
-        Defender = 2,
-        Supporter = 3,
-        All = 4
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum BurstStep
-    {
-        Unknown = -1,
-        None = 0,
-        Step1 = 1,
-        Step2 = 2,
-        Step3 = 3,
-        StepFull = 4,
-        AllStep = 5,
-        NextStep = 6,
-        KeepStep = 7
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum Corporation
-    {
-        Unknown = -1,
-        None = 0,
-        ELYSION = 1,
-        MISSILIS = 2,
-        TETRA = 3,
-        PILGRIM = 4,
-        ALL = 5,
-        RANDOM = 6,
-        ABNORMAL = 7
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum CorporationSubType
-    {
-        Unknown = -1,
-        NORMAL = 0,
-        OVERSPEC = 1,
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum SkillType
-    {
-        Unknown = -1,
-        None = 0,
-        StateEffect = 1,
-        CharacterSkill = 2
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum EffCategoryType
-    {
-        Unknown = -1,
-        None = 0,
-        Air_Attacker = 1,
-        Air_Defender = 2,
-        Air_Supporter = 3,
-        Attacker = 4,
-        Defender = 5,
-        Supporter = 6,
-        Walk = 7,
-        Fly = 8
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum CategoryType
-    {
-        Unknown = -1,
-        None = 0,
-        Type1 = 1,
-        Type2 = 2,
-        Type3 = 3
-    }
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum Squad
-    {
-        Unknown = -1,
-        None = 0,
-        Counters = 1,
-        Absolute = 2,
-        Scouting = 3,
-        InfinityRail = 4,
-        External = 5,
-        RecallRelease = 6,
-        Matis = 7,
-        CafeSweety = 8,
-        Triangle = 9,
-        Talentum = 10,
-        LittleCannon = 11,
-        Protocol = 12,
-        Unlimited = 13,
-        ACPU = 14,
-        MightyTools = 15,
-        MasterHand = 16,
-        SiegePerilous = 17,
-        Seraphim = 18,
-        Wardress = 19,
-        MaidForYou = 20,
-        Exotic = 21,
-        LifeTonic = 22,
-        Pioneer = 23,
-        Inherit = 24,
-        TheClown = 25,
-        [JsonProperty("777")]
-        _777 = 26,
-        UnderworldQueen = 27,
-        MMR = 28,
-        Replace = 29,
-        Humanity = 30,
-        Company = 31,
-        EventHero01 = 32,
-        EventHero02 = 33,
-        EventHero03 = 34,
-        Archive = 35,
-        Weissritter = 36,
-        HeavyGram = 37,
-        HappyZoo = 38,
-        RealKindness = 39,
-        Heretic = 40,
-        A_F_F_ = 41,
-        EnikkChild = 42,
-        Aegis = 43,
-        BotanicGarden = 44,
-        PrimaDonna = 45,
-        SchoolCircle = 46,
-        Ce_01 = 47,
-        Overseer = 48,
-        Ce002_01 = 49,
-        Ce002_02 = 50,
-        Akademeia = 51,
-        DazzlingPearl = 52,
-        Goddess = 53,
-        ElectricShock = 54,
-        CE003 = 55,
-        Rewind = 56,
-        CE004 = 57,
-        BestSeller = 58,
-        OldTales = 59,
-        CE005 = 60,
-        CookingOil = 61,
-        Incubator = 62,
-        CE006_01 = 63,
-        CE006_02 = 64,
-        CE006_03 = 65,
-        OverTheHorizon = 66,
-        CE007 = 67
-    }
-
     [MemoryPackable]
-    public partial class NikkeCharacterData
+    public partial class NikkeCharacterRecord
     {
         [MemoryPackOrder(0)]
         [JsonProperty("id", Order = 0)]
@@ -226,7 +61,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(13)]
         [JsonProperty("class", Order = 11)]
-        public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
+        public NikkeCharacterClass NikkeCharacterClass { get; set; } = NikkeCharacterClass.None;
 
         [MemoryPackOrder(15)]
         [JsonProperty("element_id", Order = 12)]
@@ -278,7 +113,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(27)]
         [JsonProperty("skill1_table", Order = 24)]
-        public SkillType Skill1Table { get; set; } = SkillType.None;
+        public SkillTableType Skill1Table { get; set; } = SkillTableType.None;
 
         [MemoryPackOrder(28)]
         [JsonProperty("skill2_id", Order = 25)]
@@ -286,7 +121,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(29)]
         [JsonProperty("skill2_table", Order = 26)]
-        public SkillType Skill2Table { get; set; } = SkillType.None;
+        public SkillTableType Skill2Table { get; set; } = SkillTableType.None;
 
         [MemoryPackOrder(30)]
         [JsonProperty("eff_category_type", Order = 27)]

@@ -1,6 +1,7 @@
 using MemoryPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NikkeEinkk.Components.Models.Enums;
 
 namespace NikkeEinkk.Components.Models
 {
@@ -181,7 +182,7 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(6)]
         [JsonProperty("class", Order = 6)]
-        public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
+        public NikkeCharacterClass NikkeCharacterClass { get; set; } = NikkeCharacterClass.None;
 
         [MemoryPackOrder(7)]
         [JsonProperty("item_rare", Order = 7)]
@@ -306,7 +307,7 @@ namespace NikkeEinkk.Components.Models
         [MemoryPackOrder(12)]
         [JsonProperty("class", Order = 12)]
 
-        public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
+        public NikkeCharacterClass NikkeCharacterClass { get; set; } = NikkeCharacterClass.None;
 
         [MemoryPackOrder(13)]
         [JsonProperty("level_enhance_id", Order = 13)]
@@ -396,7 +397,7 @@ namespace NikkeEinkk.Components.Models
         [MemoryPackOrder(1)]
         [JsonProperty("skill_table", Order = 1)]
 
-        public SkillType SkillTable { get; set; } = SkillType.None;
+        public SkillTableType SkillTableType { get; set; } = SkillTableType.None;
 
         [MemoryPackOrder(2)]
         [JsonProperty("skill_change_slot", Order = 2)]
@@ -1208,7 +1209,7 @@ namespace NikkeEinkk.Components.Models
         [MemoryPackOrder(9)]
         [JsonProperty("class", Order = 9)]
 
-        public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
+        public NikkeCharacterClass NikkeCharacterClass { get; set; } = NikkeCharacterClass.None;
 
         [MemoryPackOrder(10)]
         [JsonProperty("use_type", Order = 10)]

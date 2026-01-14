@@ -1,6 +1,6 @@
 using MemoryPack;
 using Newtonsoft.Json;
-using NikkeEinkk.Components.Modelss.Enums;
+using NikkeEinkk.Components.Models.Enums;
 
 namespace NikkeEinkk.Components.Models
 {
