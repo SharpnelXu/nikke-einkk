@@ -3,9 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace NikkeEinkk.Components.Models
 {
-    /// <summary>
-    /// Wave monster data
-    /// </summary>
     [MemoryPackable]
     public partial class WaveMonster
     {
@@ -20,9 +17,6 @@ namespace NikkeEinkk.Components.Models
         public SpawnType SpawnType { get; set; }
     }
 
-    /// <summary>
-    /// Wave path data containing monster information
-    /// </summary>
     [MemoryPackable]
     public partial class WavePathData
     {

@@ -3,63 +3,39 @@ using System.Text.Json.Serialization;
 
 namespace NikkeEinkk.Components.Models
 {
-    /// <summary>
-    /// Represents a record in the CharacterStatEnhanceTable
-    /// </summary>
     [MemoryPackable]
     public partial class CharacterStatEnhance
     {
-        /// <summary>
-        /// Unique identifier
-        /// </summary>
         [MemoryPackOrder(0)]
         [JsonPropertyName("id")]
         [JsonPropertyOrder(0)]
         public int Id { get; set; }
 
-        /// <summary>
-        /// Grade ratio enhancement value
-        /// </summary>
         [MemoryPackOrder(1)]
         [JsonPropertyName("grade_ratio")]
         [JsonPropertyOrder(1)]
         public int GradeRatio { get; set; }
 
-        /// <summary>
-        /// Grade HP enhancement value
-        /// </summary>
         [MemoryPackOrder(2)]
         [JsonPropertyName("grade_hp")]
         [JsonPropertyOrder(2)]
         public long GradeHp { get; set; }
 
-        /// <summary>
-        /// Grade attack enhancement value
-        /// </summary>
         [MemoryPackOrder(3)]
         [JsonPropertyName("grade_attack")]
         [JsonPropertyOrder(3)]
         public int GradeAttack { get; set; }
 
-        /// <summary>
-        /// Grade defence enhancement value
-        /// </summary>
         [MemoryPackOrder(4)]
         [JsonPropertyName("grade_defence")]
         [JsonPropertyOrder(4)]
         public int GradeDefence { get; set; }
 
-        /// <summary>
-        /// Grade energy resist enhancement value
-        /// </summary>
         [MemoryPackOrder(5)]
         [JsonPropertyName("grade_energy_resist")]
         [JsonPropertyOrder(5)]
         public int GradeEnergyResist { get; set; }
 
-        /// <summary>
-        /// Grade metal resist enhancement value
-        /// </summary>
         [MemoryPackOrder(6)]
         [JsonPropertyName("grade_metal_resist")]
         [JsonPropertyOrder(6)]

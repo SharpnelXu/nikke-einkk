@@ -159,55 +159,34 @@ namespace NikkeEinkk.Components.Models
         CE007 = 67
     }
 
-    /// <summary>
-    /// Represents a NIKKE character data record
-    /// </summary>
     [MemoryPackable]
     public partial class NikkeCharacterData
     {
-        /// <summary>
-        /// Unique character identifier (format: "corporation + resourceId + gradeCoreId")
-        /// </summary>
         [MemoryPackOrder(0)]
         [JsonPropertyOrder(0)]
         [JsonPropertyName("id")]
         public int Id { get; set; }
 
-        /// <summary>
-        /// Name localization key
-        /// </summary>
         [MemoryPackOrder(1)]
         [JsonPropertyOrder(1)]
         [JsonPropertyName("name_localkey")]
         public string NameLocalkey { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Description localization key
-        /// </summary>
         [MemoryPackOrder(2)]
         [JsonPropertyOrder(2)]
         [JsonPropertyName("description_localkey")]
         public string DescriptionLocalkey { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Resource identifier (might be used as character ID)
-        /// </summary>
         [MemoryPackOrder(3)]
         [JsonPropertyOrder(3)]
         [JsonPropertyName("resource_id")]
         public int ResourceId { get; set; }
 
-        /// <summary>
-        /// Additional skin identifiers (values like "acc", "bg")
-        /// </summary>
         [MemoryPackOrder(4)]
         [JsonPropertyOrder(4)]
         [JsonPropertyName("additional_skins")]
         public string[] AdditionalSkins { get; set; } = [];
 
-        /// <summary>
-        /// Name code identifier
-        /// </summary>
         [MemoryPackOrder(5)]
         [JsonPropertyOrder(5)]
         [JsonPropertyName("name_code")]

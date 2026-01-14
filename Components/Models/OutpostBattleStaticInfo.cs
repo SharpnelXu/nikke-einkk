@@ -13,9 +13,6 @@ namespace NikkeEinkk.Components.Models
         // Add other item types as needed
     }
 
-    /// <summary>
-    /// Outpost reward item data
-    /// </summary>
     [MemoryPackable]
     public partial class OutpostRewardItem
     {
@@ -45,9 +42,6 @@ namespace NikkeEinkk.Components.Models
         public int TimeSec { get; set; }
     }
 
-    /// <summary>
-    /// Outpost battle static information data
-    /// </summary>
     [MemoryPackable]
     public partial class OutpostBattleStaticInfo
     {

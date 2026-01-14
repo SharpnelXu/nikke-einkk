@@ -3,54 +3,34 @@ using System.Text.Json.Serialization;
 
 namespace NikkeEinkk.Components.Models
 {
-    /// <summary>
-    /// Represents a record in the CharacterStatTable
-    /// </summary>
     [MemoryPackable]
     public partial class CharacterStat
     {
-        /// <summary>
-        /// Unique identifier
-        /// </summary>
         [MemoryPackOrder(0)]
         [JsonPropertyName("id")]
         [JsonPropertyOrder(0)]
         public int Id { get; set; }
 
-        /// <summary>
-        /// Character group identifier
-        /// </summary>
         [MemoryPackOrder(1)]
         [JsonPropertyName("group")]
         [JsonPropertyOrder(1)]
         public int Group { get; set; }
 
-        /// <summary>
-        /// Character level
-        /// </summary>
         [MemoryPackOrder(2)]
         [JsonPropertyName("level")]
         [JsonPropertyOrder(2)]
         public int Level { get; set; }
 
-        /// <summary>
-        /// Level HP stat value
-        /// </summary>
         [MemoryPackOrder(3)]
         [JsonPropertyName("level_hp")]
         [JsonPropertyOrder(3)]
         public long LevelHp { get; set; }
 
-        /// <summary>
-        /// Level attack stat value
-        /// </summary>
         [MemoryPackOrder(4)]
         [JsonPropertyName("level_attack")]
         [JsonPropertyOrder(4)]
         public int LevelAttack { get; set; }
 
-        /// <summary>
-        /// Level defence stat value
         /// </summary>
         [MemoryPackOrder(5)]
         [JsonPropertyName("level_defence")]

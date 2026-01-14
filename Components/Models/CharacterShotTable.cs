@@ -189,45 +189,28 @@ namespace NikkeEinkk.Components.Models
         Monsterlanding = 13
     }
 
-    /// <summary>
-    /// Represents a record in the CharacterShotTable
-    /// </summary>
     [MemoryPackable]
     public partial class CharacterShotTable
     {
-        /// <summary>
-        /// Unique identifier for the character shot
-        /// </summary>
         [MemoryPackOrder(0)]
         [JsonPropertyOrder(0)]
         [JsonPropertyName("id")]
         public int Id { get; set; }
 
-        /// <summary>
-        /// Localization key for the shot name
-        /// </summary>
         [MemoryPackOrder(1)]
         [JsonPropertyOrder(1)]
         [JsonPropertyName("name_localkey")]
         public string? NameLocalkey { get; set; } = string.Empty;
-        /// <summary>
-        /// Localization key for the shot description
-        /// </summary>
         [MemoryPackOrder(2)]
         [JsonPropertyOrder(2)]
         [JsonPropertyName("description_localkey")]
         public string? DescriptionLocalkey { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Camera work identifier
-        /// </summary>
         [MemoryPackOrder(3)]
         [JsonPropertyOrder(3)]
         [JsonPropertyName("camera_work")]
         public string CameraWork { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Weapon type (AR, SG, RL, SMG, etc.)
         /// </summary>
         [MemoryPackOrder(4)]
         [JsonPropertyOrder(4)]

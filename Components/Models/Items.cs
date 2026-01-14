@@ -142,9 +142,6 @@ namespace NikkeEinkk.Components.Models
         FavoriteItem = 5
     }
 
-    /// <summary>
-    /// Equipment data from ItemEquipTable
-    /// </summary>
     [MemoryPackable]
     public partial class EquipmentData
     {

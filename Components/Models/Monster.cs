@@ -113,9 +113,6 @@ namespace NikkeEinkk.Components.Models
         // Weapon_object_20,
     }
 
-    /// <summary>
-    /// Monster skill information data containing function IDs
-    /// </summary>
     [MemoryPackable]
     public partial class MonsterSkillInfoData
     {
@@ -180,9 +177,6 @@ namespace NikkeEinkk.Components.Models
         Animation = 7
     }
 
-    /// <summary>
-    /// Monster data from MonsterTable
-    /// </summary>
     [MemoryPackable]
     public partial class MonsterData
     {
