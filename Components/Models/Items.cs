@@ -1,8 +1,10 @@
 using MemoryPack;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NikkeEinkk.Components.Models
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ItemType
     {
         Unknown = -1,
@@ -14,6 +16,7 @@ namespace NikkeEinkk.Components.Models
         HarmonyCube = 5
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum EquipItemRarity
     {
         Unknown = -1,
@@ -30,6 +33,7 @@ namespace NikkeEinkk.Components.Models
         T10 = 10
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ItemSubType
     {
         Unknown = -1,
@@ -73,6 +77,7 @@ namespace NikkeEinkk.Components.Models
         ArcadeItem = 37
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum StatType
     {
         Unknown = -1,
@@ -85,6 +90,7 @@ namespace NikkeEinkk.Components.Models
         BioResist = 6
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum FavoriteItemType
     {
         Unknown = -1,
@@ -93,6 +99,7 @@ namespace NikkeEinkk.Components.Models
         Favorite = 2
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum UseConditionType
     {
         Unknown = -1,
@@ -102,6 +109,7 @@ namespace NikkeEinkk.Components.Models
         Time = 3
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum UseType
     {
         Unknown = -1,
@@ -123,6 +131,7 @@ namespace NikkeEinkk.Components.Models
         MVGCollectable = 15
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum PercentDisplayType
     {
         None = 0,
@@ -131,6 +140,7 @@ namespace NikkeEinkk.Components.Models
         Unknown = -1
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MaterialType
     {
         Unknown = -1,
@@ -146,82 +156,63 @@ namespace NikkeEinkk.Components.Models
     public partial class EquipmentData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 1)]
         public string NameLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 2)]
         public string DescriptionLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("resource_id")]
+        [JsonProperty("resource_id", Order = 3)]
         public string ResourceId { get; set; } = string.Empty;
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("item_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_type", Order = 4)]
         public ItemType ItemType { get; set; } = ItemType.Unknown;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("item_sub_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_sub_type", Order = 5)]
         public ItemSubType ItemSubType { get; set; } = ItemSubType.Unknown;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("class")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("class", Order = 6)]
         public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("item_rare")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_rare", Order = 7)]
         public EquipItemRarity EquipItemRarity { get; set; } = EquipItemRarity.Unknown;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("grade_core_id")]
+        [JsonProperty("grade_core_id", Order = 8)]
         public int GradeCoreId { get; set; }
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("grow_grade")]
+        [JsonProperty("grow_grade", Order = 9)]
         public int GrowGrade { get; set; }
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("stat")]
+        [JsonProperty("stat", Order = 10)]
         public EquipmentStat[] Stat { get; set; } = [];
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("option_slot")]
+        [JsonProperty("option_slot", Order = 11)]
         public OptionSlot[] OptionSlots { get; set; } = [];
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("option_cost")]
+        [JsonProperty("option_cost", Order = 12)]
         public int OptionCost { get; set; }
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("option_change_cost")]
+        [JsonProperty("option_change_cost", Order = 13)]
         public int OptionChangeCost { get; set; }
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("option_lock_cost")]
+        [JsonProperty("option_lock_cost", Order = 14)]
         public int OptionLockCost { get; set; }
     }
 
@@ -229,14 +220,12 @@ namespace NikkeEinkk.Components.Models
     public partial class EquipmentStat
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("stat_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("stat_type", Order = 0)]
+        
         public StatType StatType { get; set; } = StatType.None;
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("stat_value")]
+        [JsonProperty("stat_value", Order = 1)]
         public int StatValue { get; set; }
     }
 
@@ -244,13 +233,11 @@ namespace NikkeEinkk.Components.Models
     public partial class OptionSlot
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("option_slot")]
+        [JsonProperty("option_slot", Order = 0)]
         public int OptionSlotValue { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("option_slot_success_ratio")]
+        [JsonProperty("option_slot_success_ratio", Order = 1)]
         public int OptionSlotSuccessRatio { get; set; }
     }
 
@@ -258,8 +245,7 @@ namespace NikkeEinkk.Components.Models
     public partial class HarmonyCubeSkillGroup
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("skill_group_id")]
+        [JsonProperty("skill_group_id", Order = 0)]
         public int SkillGroupId { get; set; }
     }
 
@@ -267,82 +253,67 @@ namespace NikkeEinkk.Components.Models
     public partial class HarmonyCubeData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 1)]
         public string NameLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 2)]
         public string DescriptionLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("location_id")]
+        [JsonProperty("location_id", Order = 3)]
         public int LocationId { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("location_localkey")]
+        [JsonProperty("location_localkey", Order = 4)]
         public string LocationLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("order")]
+        [JsonProperty("order", Order = 5)]
         public int Order { get; set; }
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("resource_id")]
+        [JsonProperty("resource_id", Order = 6)]
         public int ResourceId { get; set; }
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("bg")]
+        [JsonProperty("bg", Order = 7)]
         public string Bg { get; set; } = string.Empty;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("bg_color")]
+        [JsonProperty("bg_color", Order = 8)]
         public string BgColor { get; set; } = string.Empty;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("item_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_type", Order = 9)]
+        
         public ItemType ItemType { get; set; } = ItemType.Unknown;
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("item_sub_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_sub_type", Order = 10)]
+        
         public ItemSubType ItemSubType { get; set; } = ItemSubType.Unknown;
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("item_rare")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_rare", Order = 11)]
+        
         public Rarity ItemRare { get; set; } = Rarity.R;
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("class")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("class", Order = 12)]
+        
         public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("level_enhance_id")]
+        [JsonProperty("level_enhance_id", Order = 13)]
         public int LevelEnhanceId { get; set; }
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("harmonycube_skill_group")]
+        [JsonProperty("harmonycube_skill_group", Order = 14)]
         public HarmonyCubeSkillGroup[] HarmonyCubeSkillGroups { get; set; } = [];
     }
 
@@ -350,8 +321,7 @@ namespace NikkeEinkk.Components.Models
     public partial class HarmonyCubeSkillLevel
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("skill_level")]
+        [JsonProperty("skill_level", Order = 0)]
         public int Level { get; set; }
     }
 
@@ -359,14 +329,12 @@ namespace NikkeEinkk.Components.Models
     public partial class HarmonyCubeStat
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("stat_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("stat_type", Order = 0)]
+        
         public StatType StatType { get; set; } = StatType.None;
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("stat_rate")]
+        [JsonProperty("stat_rate", Order = 1)]
         public int Rate { get; set; }
     }
 
@@ -374,48 +342,39 @@ namespace NikkeEinkk.Components.Models
     public partial class HarmonyCubeLevelData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("level_enhance_id")]
+        [JsonProperty("level_enhance_id", Order = 1)]
         public int LevelEnhanceId { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("level")]
+        [JsonProperty("level", Order = 2)]
         public int Level { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("skill_levels")]
+        [JsonProperty("skill_levels", Order = 3)]
         public HarmonyCubeSkillLevel[] SkillLevels { get; set; } = [];
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("material_id")]
+        [JsonProperty("material_id", Order = 4)]
         public int MaterialId { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("material_value")]
+        [JsonProperty("material_value", Order = 5)]
         public int MaterialValue { get; set; }
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("gold_value")]
+        [JsonProperty("gold_value", Order = 6)]
         public int GoldValue { get; set; }
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("slot")]
+        [JsonProperty("slot", Order = 7)]
         public int Slot { get; set; }
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("harmonycube_stats")]
+        [JsonProperty("harmonycube_stats", Order = 8)]
         public HarmonyCubeStat[] Stats { get; set; } = [];
     }
 
@@ -423,8 +382,7 @@ namespace NikkeEinkk.Components.Models
     public partial class CollectionItemSkillGroup
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("collection_skill_id")]
+        [JsonProperty("collection_skill_id", Order = 0)]
         public int SkillGroupId { get; set; }
     }
 
@@ -432,19 +390,16 @@ namespace NikkeEinkk.Components.Models
     public partial class FavoriteItemSkillGroup
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("favorite_skill_id")]
+        [JsonProperty("favorite_skill_id", Order = 0)]
         public int SkillId { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("skill_table")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("skill_table", Order = 1)]
+        
         public SkillType SkillTable { get; set; } = SkillType.None;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("skill_change_slot")]
+        [JsonProperty("skill_change_slot", Order = 2)]
         public int SkillChangeSlot { get; set; }
     }
 
@@ -452,91 +407,74 @@ namespace NikkeEinkk.Components.Models
     public partial class FavoriteItemData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 1)]
         public string NameLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 2)]
         public string DescriptionLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("icon_resource_id")]
+        [JsonProperty("icon_resource_id", Order = 3)]
         public string IconResourceId { get; set; } = string.Empty;
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("img_resource_id")]
+        [JsonProperty("img_resource_id", Order = 4)]
         public string ImgResourceId { get; set; } = string.Empty;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("prop_resource_id")]
+        [JsonProperty("prop_resource_id", Order = 5)]
         public string PropResourceId { get; set; } = string.Empty;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("order")]
+        [JsonProperty("order", Order = 6)]
         public int Order { get; set; }
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("favorite_rare")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("favorite_rare", Order = 7)]
+        
         public Rarity FavoriteRare { get; set; } = Rarity.R;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("favorite_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("favorite_type", Order = 8)]
+        
         public FavoriteItemType FavoriteType { get; set; } = FavoriteItemType.Unknown;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("weapon_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("weapon_type", Order = 9)]
+        
         public WeaponType WeaponType { get; set; } = WeaponType.None;
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("name_code")]
+        [JsonProperty("name_code", Order = 10)]
         public int NameCode { get; set; }
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("max_level")]
+        [JsonProperty("max_level", Order = 11)]
         public int MaxLevel { get; set; }
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("level_enhance_id")]
+        [JsonProperty("level_enhance_id", Order = 12)]
         public int LevelEnhanceId { get; set; }
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("probability_group")]
+        [JsonProperty("probability_group", Order = 13)]
         public int ProbabilityGroup { get; set; }
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("collection_skill_group_data")]
+        [JsonProperty("collection_skill_group_data", Order = 14)]
         public CollectionItemSkillGroup[] CollectionSkills { get; set; } = [];
 
         [MemoryPackOrder(15)]
-        [JsonPropertyOrder(15)]
-        [JsonPropertyName("favoriteitem_skill_group_data")]
+        [JsonProperty("favoriteitem_skill_group_data", Order = 15)]
         public FavoriteItemSkillGroup[] FavoriteItemSkills { get; set; } = [];
 
         [MemoryPackOrder(16)]
-        [JsonPropertyOrder(16)]
-        [JsonPropertyName("albumcategory_id")]
+        [JsonProperty("albumcategory_id", Order = 16)]
         public int AlbumCategoryId { get; set; }
     }
 
@@ -544,14 +482,12 @@ namespace NikkeEinkk.Components.Models
     public partial class FavoriteItemStat
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("stat_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("stat_type", Order = 0)]
+        
         public StatType StatType { get; set; } = StatType.None;
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("stat_value")]
+        [JsonProperty("stat_value", Order = 1)]
         public int Value { get; set; }
     }
 
@@ -559,8 +495,7 @@ namespace NikkeEinkk.Components.Models
     public partial class CollectionItemSkillLevel
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("collection_skill_level")]
+        [JsonProperty("collection_skill_level", Order = 0)]
         public int Level { get; set; }
     }
 
@@ -568,33 +503,27 @@ namespace NikkeEinkk.Components.Models
     public partial class FavoriteItemLevelData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("level_enhance_id")]
+        [JsonProperty("level_enhance_id", Order = 1)]
         public int LevelEnhanceId { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("grade")]
+        [JsonProperty("grade", Order = 2)]
         public int Grade { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("level")]
+        [JsonProperty("level", Order = 3)]
         public int Level { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("favoriteitem_stat_data")]
+        [JsonProperty("favoriteitem_stat_data", Order = 4)]
         public FavoriteItemStat[] Stats { get; set; } = [];
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("collection_skill_level_data")]
+        [JsonProperty("collection_skill_level_data", Order = 5)]
         public CollectionItemSkillLevel[] SkillLevels { get; set; } = [];
     }
 
@@ -602,61 +531,51 @@ namespace NikkeEinkk.Components.Models
     public partial class PackageListData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("package_shop_id")]
+        [JsonProperty("package_shop_id", Order = 1)]
         public int PackageShopId { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("package_order")]
+        [JsonProperty("package_order", Order = 2)]
         public int PackageOrder { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("product_id")]
+        [JsonProperty("product_id", Order = 3)]
         public int ProductId { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 4)]
         public string NameKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 5)]
         public string DescriptionKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("product_resource_id")]
+        [JsonProperty("product_resource_id", Order = 6)]
         public string ProductResourceId { get; set; } = string.Empty;
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("buy_limit_type")]
+        [JsonProperty("buy_limit_type", Order = 7)]
         public BuyLimitType BuyLimitType { get; set; } = BuyLimitType.Account;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("is_limit")]
+        [JsonProperty("is_limit", Order = 8)]
         public bool IsLimited { get; set; }
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("buy_limit_count")]
+        [JsonProperty("buy_limit_count", Order = 9)]
         public int BuyLimitCount { get; set; }
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("is_active")]
+        [JsonProperty("is_active", Order = 10)]
         public bool IsActive { get; set; }
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ShopCategory
     {
         Unknown = -1,
@@ -673,6 +592,7 @@ namespace NikkeEinkk.Components.Models
         PassCostumeShop = 11
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ProductType 
     {
         Unknown = -1,
@@ -715,12 +635,15 @@ namespace NikkeEinkk.Components.Models
         HexaBlockUndefined = 53
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ProductItemType
     {
         Unknown = -1,
         Currency = 0,
         Item = 1
     }
+    
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MidasProductType
     {
         Unknown = -1,
@@ -740,7 +663,8 @@ namespace NikkeEinkk.Components.Models
         PassCostumeShop = 13
     }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum BuyLimitType
     {
         Unknown = -1,
@@ -752,6 +676,7 @@ namespace NikkeEinkk.Components.Models
         Renew = 5
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MainCategoryType
     {
         Unknown = -1,
@@ -765,6 +690,7 @@ namespace NikkeEinkk.Components.Models
         PassCostumeTab = 7
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum RenewType
     {
         Unknown = -1,
@@ -777,6 +703,7 @@ namespace NikkeEinkk.Components.Models
         NoRenew = 6
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ShopType
     {
         Unknown = -1,
@@ -787,92 +714,75 @@ namespace NikkeEinkk.Components.Models
     public partial class InAppShopData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("main_category_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("main_category_type", Order = 1)]
+        
         public MainCategoryType MainCategoryType { get; set; } = MainCategoryType.Unknown;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("order_group_id")]
+        [JsonProperty("order_group_id", Order = 2)]
         public int OrderGroupId { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 3)]
         public string NameKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 4)]
         public string DescriptionKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("main_category_icon_name")]
+        [JsonProperty("main_category_icon_name", Order = 5)]
         public string IconName { get; set; } = string.Empty;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("sub_category_id")]
+        [JsonProperty("sub_category_id", Order = 6)]
         public int SubCategoryId { get; set; }
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("sub_category_name_localkey")]
+        [JsonProperty("sub_category_name_localkey", Order = 7)]
         public string? SubCategoryNameKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("package_shop_id")]
+        [JsonProperty("package_shop_id", Order = 8)]
         public int PackageShopId { get; set; }
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("is_hide_if_not_valid")]
+        [JsonProperty("is_hide_if_not_valid", Order = 9)]
         public bool HideIfNotValid { get; set; }
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("renew_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("renew_type", Order = 10)]
+        
         public RenewType RenewType { get; set; } = RenewType.NoRenew;
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("start_date")]
+        [JsonProperty("start_date", Order = 11)]
         public DateTime StartDate { get; set; } = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("end_date")]
+        [JsonProperty("end_date", Order = 12)]
         public DateTime EndDate { get; set; } = new DateTime(2099, 12, 31, 0, 0, 0, DateTimeKind.Utc);
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("date_ui_control")]
+        [JsonProperty("date_ui_control", Order = 13)]
         public bool DateUiControl { get; set; }
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("shop_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("shop_type", Order = 14)]
+        
         public ShopType ShopType { get; set; } = ShopType.InAppShop;
 
         [MemoryPackOrder(15)]
-        [JsonPropertyOrder(15)]
-        [JsonPropertyName("shop_category")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("shop_category", Order = 15)]
+        
         public ShopCategory ShopCategory { get; set; } = ShopCategory.Unknown;
 
         [MemoryPackOrder(16)]
-        [JsonPropertyOrder(16)]
-        [JsonPropertyName("shop_prefab_name")]
+        [JsonProperty("shop_prefab_name", Order = 16)]
         public string ShopPrefabName { get; set; } = string.Empty;
     }
 
@@ -880,29 +790,24 @@ namespace NikkeEinkk.Components.Models
     public partial class PackageProductData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("package_group_id")]
+        [JsonProperty("package_group_id", Order = 1)]
         public int PackageGroupId { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("product_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("product_type", Order = 2)]
+        
         public ProductType ProductType { get; set; } = ProductType.Item;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("product_id")]
+        [JsonProperty("product_id", Order = 3)]
         public int ProductId { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("product_value")]
+        [JsonProperty("product_value", Order = 4)]
         public int ProductValue { get; set; }
     }
 
@@ -910,33 +815,27 @@ namespace NikkeEinkk.Components.Models
     public partial class CurrencyData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 1)]
         public string NameKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 2)]
         public string DescriptionKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("resource_id")]
+        [JsonProperty("resource_id", Order = 3)]
         public int ResourceId { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("is_visible_to_inventory")]
+        [JsonProperty("is_visible_to_inventory", Order = 4)]
         public bool IsVisibleInInventory { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("max_value")]
+        [JsonProperty("max_value", Order = 5)]
         public long MaxValue { get; set; }
     }
 
@@ -944,78 +843,63 @@ namespace NikkeEinkk.Components.Models
     public partial class StepUpPackageData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("stepup_group_id")]
+        [JsonProperty("stepup_group_id", Order = 1)]
         public int StepUpGroupId { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("package_group_id")]
+        [JsonProperty("package_group_id", Order = 2)]
         public int PackageGroupId { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("step")]
+        [JsonProperty("step", Order = 3)]
         public int Step { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("previous_package_id")]
+        [JsonProperty("previous_package_id", Order = 4)]
         public int PreviousPackageId { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("is_last_step")]
+        [JsonProperty("is_last_step", Order = 5)]
         public bool IsLastStep { get; set; }
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("product_effieciency")]
+        [JsonProperty("product_effieciency", Order = 6)]
         public int ProductEfficiency { get; set; }
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("buy_limit_type")]
+        [JsonProperty("buy_limit_type", Order = 7)]
         public BuyLimitType BuyLimitType { get; set; } = BuyLimitType.Account;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("is_limit")]
+        [JsonProperty("is_limit", Order = 8)]
         public bool IsLimited { get; set; }
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("buy_limit_count")]
+        [JsonProperty("buy_limit_count", Order = 9)]
         public int BuyLimitCount { get; set; }
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("is_free")]
+        [JsonProperty("is_free", Order = 10)]
         public bool IsFree { get; set; }
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("midas_product_id")]
+        [JsonProperty("midas_product_id", Order = 11)]
         public int MidasProductId { get; set; }
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 12)]
         public string NameKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 13)]
         public string DescriptionKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("product_resource_id")]
+        [JsonProperty("product_resource_id", Order = 14)]
         public string ProductResourceId { get; set; } = string.Empty;
     }
 
@@ -1023,74 +907,60 @@ namespace NikkeEinkk.Components.Models
     public partial class CustomPackageShopData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("custom_shop_id")]
+        [JsonProperty("custom_shop_id", Order = 1)]
         public int CustomShopId { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("custom_order")]
+        [JsonProperty("custom_order", Order = 2)]
         public int CustomOrder { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("package_group_id")]
+        [JsonProperty("package_group_id", Order = 3)]
         public int PackageGroupId { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("custom_group_id")]
+        [JsonProperty("custom_group_id", Order = 4)]
         public int CustomGroupId { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("custom_group_count")]
+        [JsonProperty("custom_group_count", Order = 5)]
         public int CustomGroupCount { get; set; }
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 6)]
         public string NameKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 7)]
         public string DescriptionKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("product_resource_id")]
+        [JsonProperty("product_resource_id", Order = 8)]
         public string ProductResourceId { get; set; } = string.Empty;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("buy_limit_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("buy_limit_type", Order = 9)]
+        
         public BuyLimitType BuyLimitType { get; set; } = BuyLimitType.None;
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("is_limit")]
+        [JsonProperty("is_limit", Order = 10)]
         public bool IsLimited { get; set; }
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("buy_limit_count")]
+        [JsonProperty("buy_limit_count", Order = 11)]
         public int BuyLimitCount { get; set; }
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("is_free")]
+        [JsonProperty("is_free", Order = 12)]
         public bool IsFree { get; set; }
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("midas_product_id")]
+        [JsonProperty("midas_product_id", Order = 13)]
         public int MidasProductId { get; set; }
     }
 
@@ -1098,34 +968,28 @@ namespace NikkeEinkk.Components.Models
     public partial class CustomPackageSlotData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("custom_group_id")]
+        [JsonProperty("custom_group_id", Order = 1)]
         public int CustomGroupId { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("slot_number")]
+        [JsonProperty("slot_number", Order = 2)]
         public int SlotNumber { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("product_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("product_type", Order = 3)]
+        
         public ProductType ProductType { get; set; } = ProductType.Unknown;
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("product_id")]
+        [JsonProperty("product_id", Order = 4)]
         public int ProductId { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("product_value")]
+        [JsonProperty("product_value", Order = 5)]
         public int ProductValue { get; set; }
     }
 
@@ -1133,45 +997,37 @@ namespace NikkeEinkk.Components.Models
     public partial class MidasProductData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("product_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("product_type", Order = 1)]
+        
         public MidasProductType ProductType { get; set; } = MidasProductType.CashShop;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("product_id")]
+        [JsonProperty("product_id", Order = 2)]
         public int ProductId { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("item_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_type", Order = 3)]
+        
         public ProductItemType ItemType { get; set; } = ProductItemType.Currency;
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("midas_product_id_proximabeta")]
+        [JsonProperty("midas_product_id_proximabeta", Order = 4)]
         public string ProximaBetaProductId { get; set; } = string.Empty;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("midas_product_id_gamamobi")]
+        [JsonProperty("midas_product_id_gamamobi", Order = 5)]
         public string GamamobiProductId { get; set; } = string.Empty;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("is_free")]
+        [JsonProperty("is_free", Order = 6)]
         public bool IsFree { get; set; }
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("cost")]
+        [JsonProperty("cost", Order = 7)]
         public string Cost { get; set; } = "0";
     }
 
@@ -1179,95 +1035,77 @@ namespace NikkeEinkk.Components.Models
     public partial class ConsumeItemData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("use_condition_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("use_condition_type", Order = 1)]
+        
         public UseConditionType UseConditionType { get; set; } = UseConditionType.Unknown;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("use_condition_value")]
+        [JsonProperty("use_condition_value", Order = 2)]
         public int UseConditionValue { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 3)]
         public string NameKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 4)]
         public string DescriptionKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("resource_id")]
+        [JsonProperty("resource_id", Order = 5)]
         public string ResourceId { get; set; } = string.Empty;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("item_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_type", Order = 6)]
+        
         public ItemType ItemType { get; set; } = ItemType.Unknown;
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("item_sub_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_sub_type", Order = 7)]
+        
         public ItemSubType ItemSubType { get; set; } = ItemSubType.Unknown;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("item_rare")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_rare", Order = 8)]
+        
         public Rarity ItemRarity { get; set; } = Rarity.R;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("use_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("use_type", Order = 9)]
+        
         public UseType UseType { get; set; } = UseType.Unknown;
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("use_id")]
+        [JsonProperty("use_id", Order = 10)]
         public int UseId { get; set; }
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("percent_display_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("percent_display_type", Order = 11)]
+        
         public PercentDisplayType PercentDisplayType { get; set; } = PercentDisplayType.None;
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("use_value")]
+        [JsonProperty("use_value", Order = 12)]
         public int UseValue { get; set; }
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("use_frag_cost")]
+        [JsonProperty("use_frag_cost", Order = 13)]
         public int UseFragCost { get; set; }
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("use_limit_count")]
+        [JsonProperty("use_limit_count", Order = 14)]
         public bool UseLimitCount { get; set; }
 
         [MemoryPackOrder(15)]
-        [JsonPropertyOrder(15)]
-        [JsonPropertyName("use_limit_count_value")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonProperty("use_limit_count_value", Order = 15, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int UseLimitCountValue { get; set; } = 0;
 
         [MemoryPackOrder(16)]
-        [JsonPropertyOrder(16)]
-        [JsonPropertyName("stack_max")]
+        [JsonProperty("stack_max", Order = 16)]
         public int StackMax { get; set; }
     }
 
@@ -1275,62 +1113,51 @@ namespace NikkeEinkk.Components.Models
     public partial class MaterialItemData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 1)]
         public string NameKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 2)]
         public string DescriptionKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("resource_id")]
+        [JsonProperty("resource_id", Order = 3)]
         public string ResourceId { get; set; } = string.Empty;
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("item_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_type", Order = 4)]
+        
         public ItemType ItemType { get; set; } = ItemType.Unknown;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("item_sub_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_sub_type", Order = 5)]
+        
         public ItemSubType ItemSubType { get; set; } = ItemSubType.Unknown;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("item_rare")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_rare", Order = 6)]
+        
         public Rarity ItemRarity { get; set; } = Rarity.R;
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("item_value")]
+        [JsonProperty("item_value", Order = 7)]
         public int ItemValue { get; set; }
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("material_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("material_type", Order = 8)]
+        
         public MaterialType MaterialType { get; set; } = MaterialType.Unknown;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("material_value")]
+        [JsonProperty("material_value", Order = 9)]
         public int MaterialValue { get; set; }
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("stack_max")]
+        [JsonProperty("stack_max", Order = 10)]
         public int StackMax { get; set; }
     }
 
@@ -1338,92 +1165,74 @@ namespace NikkeEinkk.Components.Models
     public partial class PieceItemData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 1)]
         public string NameKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 2)]
         public string DescriptionKey { get; set; } = string.Empty;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("resource_id")]
+        [JsonProperty("resource_id", Order = 3)]
         public int ResourceId { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("item_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_type", Order = 4)]
+        
         public ItemType ItemType { get; set; } = ItemType.Unknown;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("item_sub_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_sub_type", Order = 5)]
+        
         public ItemSubType ItemSubType { get; set; } = ItemSubType.Unknown;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("item_rare")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("item_rare", Order = 6)]
+        
         public Rarity ItemRarity { get; set; } = Rarity.R;
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("corporation")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("corporation", Order = 7)]
+        
         public Corporation Corporation { get; set; } = Corporation.None;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("corporation_sub_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonProperty("corporation_sub_type", Order = 8, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        
         public CorporationSubType CorporationSubType { get; set; } = CorporationSubType.NORMAL;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("class")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("class", Order = 9)]
+        
         public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("use_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("use_type", Order = 10)]
+        
         public UseType UseType { get; set; } = UseType.Unknown;
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("use_id")]
+        [JsonProperty("use_id", Order = 11)]
         public int UseId { get; set; }
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("use_value")]
+        [JsonProperty("use_value", Order = 12)]
         public int UseValue { get; set; }
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("use_limit_count")]
+        [JsonProperty("use_limit_count", Order = 13)]
         public bool UseLimitCount { get; set; }
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("use_limit_count_value")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonProperty("use_limit_count_value", Order = 14, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int UseLimitCountValue { get; set; } = 0;
 
         [MemoryPackOrder(15)]
-        [JsonPropertyOrder(15)]
-        [JsonPropertyName("stack_max")]
+        [JsonProperty("stack_max", Order = 15)]
         public int StackMax { get; set; }
     }
 }

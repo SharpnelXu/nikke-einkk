@@ -1,5 +1,6 @@
 using MemoryPack;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NikkeEinkk.Components.Models
 {
@@ -7,13 +8,11 @@ namespace NikkeEinkk.Components.Models
     public partial class WaveMonster
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("wave_monster_id")]
+        [JsonProperty("wave_monster_id", Order = 0)]
         public long MonsterId { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("spawn_type")]
+        [JsonProperty("spawn_type", Order = 1)]
         public SpawnType SpawnType { get; set; }
     }
 
@@ -21,22 +20,19 @@ namespace NikkeEinkk.Components.Models
     public partial class WavePathData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("wave_path")]
+        [JsonProperty("wave_path", Order = 0)]
         public string? Path { get; set; } = string.Empty;
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("private_monster_count")]
+        [JsonProperty("private_monster_count", Order = 1)]
         public int PrivateMonsterCount { get; set; } = -1;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("wave_monster_list")]
+        [JsonProperty("wave_monster_list", Order = 2)]
         public WaveMonster[] MonsterList { get; set; } = [];
     }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum SpotMod
     {
         Unknown = -1,
@@ -68,7 +64,7 @@ namespace NikkeEinkk.Components.Models
         SoloRaid_Museum_Nolimit = 25
     }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum UiTheme
     {
         Unknown = -1,
@@ -79,7 +75,7 @@ namespace NikkeEinkk.Components.Models
         CE007 = 4
     }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum Theme
     {
         Unknown = -1,
@@ -121,7 +117,7 @@ namespace NikkeEinkk.Components.Models
         WhiteArkcity = 35
     }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ThemeTime
     {
         Unknown = -1,
@@ -139,107 +135,87 @@ namespace NikkeEinkk.Components.Models
     public partial class WaveData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("stage_id")]
+        [JsonProperty("stage_id", Order = 0)]
         public int StageId { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("group_id")]
+        [JsonProperty("group_id", Order = 1)]
         public string GroupId { get; set; } = string.Empty;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("spot_mod")]
+        [JsonProperty("spot_mod", Order = 2)]
         public SpotMod SpotMod { get; set; } = SpotMod.None;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("ui_theme")]
+        [JsonProperty("ui_theme", Order = 2)]
         public UiTheme UiTheme { get; set; } = UiTheme.None;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("battle_time")]
+        [JsonProperty("battle_time", Order = 3)]
         public int BattleTime { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("mod_value")]
+        [JsonProperty("mod_value", Order = 3)]
         public string ModValue { get; set; } = "0";
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("monster_count")]
+        [JsonProperty("monster_count", Order = 4)]
         public int MonsterCount { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("use_intro_scene")]
+        [JsonProperty("use_intro_scene", Order = 5)]
         public bool UseIntroScene { get; set; }
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("wave_repeat")]
+        [JsonProperty("wave_repeat", Order = 6)]
         public bool WaveRepeat { get; set; }
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("point_data")]
+        [JsonProperty("point_data", Order = 7)]
         public string PointData { get; set; } = string.Empty;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("point_data_fly")]
+        [JsonProperty("point_data_fly", Order = 8)]
         public string PointDataFly { get; set; } = string.Empty;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("background_name")]
+        [JsonProperty("background_name", Order = 9)]
         public string BackgroundName { get; set; } = string.Empty;
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("theme")]
+        [JsonProperty("theme", Order = 10)]
         public Theme Theme { get; set; } = Theme.None;
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("theme_time")]
+        [JsonProperty("theme_time", Order = 11)]
         public ThemeTime ThemeTime { get; set; } = ThemeTime.Day;
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("stage_info_bg")]
+        [JsonProperty("stage_info_bg", Order = 12)]
         public string StageInfoBg { get; set; } = string.Empty;
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("target_list")]
+        [JsonProperty("target_list", Order = 13)]
         public long[] TargetList { get; set; } = [];
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("wave_data")]
+        [JsonProperty("wave_data", Order = 14)]
         public WavePathData[] WavePathData { get; set; } = [];
 
         [MemoryPackOrder(15)]
-        [JsonPropertyOrder(15)]
-        [JsonPropertyName("close_monster_count")]
+        [JsonProperty("close_monster_count", Order = 15)]
         public int CloseMonsterCount { get; set; }
 
         [MemoryPackOrder(16)]
-        [JsonPropertyOrder(16)]
-        [JsonPropertyName("mid_monster_count")]
+        [JsonProperty("mid_monster_count", Order = 16)]
         public int MidMonsterCount { get; set; }
 
         [MemoryPackOrder(17)]
-        [JsonPropertyOrder(17)]
-        [JsonPropertyName("far_monster_count")]
+        [JsonProperty("far_monster_count", Order = 17)]
         public int FarMonsterCount { get; set; }
     }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum QuickBattleType
     {
         Unknown = -1,
@@ -248,7 +224,7 @@ namespace NikkeEinkk.Components.Models
         StandardBattlePower = 2
     }
     
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum SoloRaidDifficultyType
     {
         Unknown = -1,
@@ -261,98 +237,79 @@ namespace NikkeEinkk.Components.Models
     public partial class SoloRaidWaveData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("preset_group_id")]
+        [JsonProperty("preset_group_id", Order = 1)]
         public int PresetGroupId { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("difficulty_type")]
+        [JsonProperty("difficulty_type", Order = 2)]
         public SoloRaidDifficultyType DifficultyType { get; set; } = SoloRaidDifficultyType.Common;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("quick_battle_type")]
+        [JsonProperty("quick_battle_type", Order = 3)]
         public QuickBattleType QuickBattleType { get; set; } = QuickBattleType.None;
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("character_lv")]
+        [JsonProperty("character_lv", Order = 4)]
         public int CharacterLevel { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("wave_open_condition")]
+        [JsonProperty("wave_open_condition", Order = 5)]
         public int WaveOpenCondition { get; set; }
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("wave_order")]
+        [JsonProperty("wave_order", Order = 6)]
         public int WaveOrder { get; set; }
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("wave")]
+        [JsonProperty("wave", Order = 7)]
         public int Wave { get; set; }
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("monster_stage_lv")]
+        [JsonProperty("monster_stage_lv", Order = 8)]
         public int MonsterStageLevel { get; set; }
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("monster_stage_lv_change_group")]
+        [JsonProperty("monster_stage_lv_change_group", Order = 9)]
         public int MonsterStageLevelChangeGroup { get; set; }
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("dynamic_object_stage_lv")]
+        [JsonProperty("dynamic_object_stage_lv", Order = 10)]
         public int DynamicObjectStageLevel { get; set; }
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("cover_stage_lv")]
+        [JsonProperty("cover_stage_lv", Order = 11)]
         public int CoverStageLevel { get; set; }
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("spot_autocontrol")]
+        [JsonProperty("spot_autocontrol", Order = 12)]
         public bool SpotAutocontrol { get; set; }
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("wave_name")]
+        [JsonProperty("wave_name", Order = 13)]
         public string WaveName { get; set; } = string.Empty;
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("wave_description")]
+        [JsonProperty("wave_description", Order = 14)]
         public string WaveDescription { get; set; } = string.Empty;
 
         [MemoryPackOrder(15)]
-        [JsonPropertyOrder(15)]
-        [JsonPropertyName("monster_image_si")]
+        [JsonProperty("monster_image_si", Order = 15)]
         public string MonsterImageSi { get; set; } = string.Empty;
 
         [MemoryPackOrder(16)]
-        [JsonPropertyOrder(16)]
-        [JsonPropertyName("monster_image")]
+        [JsonProperty("monster_image", Order = 16)]
         public string MonsterImage { get; set; } = string.Empty;
 
         [MemoryPackOrder(17)]
-        [JsonPropertyOrder(17)]
-        [JsonPropertyName("first_clear_reward_id")]
+        [JsonProperty("first_clear_reward_id", Order = 17)]
         public int FirstClearRewardId { get; set; }
 
         [MemoryPackOrder(18)]
-        [JsonPropertyOrder(18)]
-        [JsonPropertyName("reward_id")]
+        [JsonProperty("reward_id", Order = 18)]
         public int RewardId { get; set; }
     }
 
@@ -360,83 +317,67 @@ namespace NikkeEinkk.Components.Models
     public partial class MultiplayerRaidData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("name")]
+        [JsonProperty("name", Order = 1)]
         public string Name { get; set; } = string.Empty;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("player_count")]
+        [JsonProperty("player_count", Order = 2)]
         public int PlayerCount { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("character_select_time_limit")]
+        [JsonProperty("character_select_time_limit", Order = 3)]
         public int CharacterSelectTimeLimit { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("character_lv")]
+        [JsonProperty("character_lv", Order = 4)]
         public int CharacterLevel { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("stage_level")]
+        [JsonProperty("stage_level", Order = 5)]
         public int StageLevel { get; set; }
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("monster_stage_lv")]
+        [JsonProperty("monster_stage_lv", Order = 6)]
         public int MonsterStageLevel { get; set; }
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("dynamic_object_stage_lv")]
+        [JsonProperty("dynamic_object_stage_lv", Order = 7)]
         public int DynamicObjectStageLevel { get; set; }
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("cover_stage_lv")]
+        [JsonProperty("cover_stage_lv", Order = 8)]
         public int CoverStageLevel { get; set; }
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("monster_stage_lv_change_group")]
+        [JsonProperty("monster_stage_lv_change_group", Order = 9)]
         public int MonsterStageLevelChangeGroup { get; set; }
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("spot_id")]
+        [JsonProperty("spot_id", Order = 10)]
         public int SpotId { get; set; }
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("monster_stage_lv_change_group_easy")]
+        [JsonProperty("monster_stage_lv_change_group_easy", Order = 11)]
         public int MonsterStageLvChangeGroupEasy { get; set; }
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("spot_id_easy")]
+        [JsonProperty("spot_id_easy", Order = 12)]
         public int SpotIdEasy { get; set; }
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("condition_reward_group")]
+        [JsonProperty("condition_reward_group", Order = 13)]
         public int ConditionRewardGroup { get; set; }
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("reward_limit_count")]
+        [JsonProperty("reward_limit_count", Order = 14)]
         public int RewardLimitCount { get; set; }
 
         [MemoryPackOrder(15)]
-        [JsonPropertyOrder(15)]
-        [JsonPropertyName("rank_condition_reward_group")]
+        [JsonProperty("rank_condition_reward_group", Order = 15)]
         public int RankConditionRewardGroup { get; set; }
     }
 }

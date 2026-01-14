@@ -1,9 +1,10 @@
 using MemoryPack;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NikkeEinkk.Components.Models
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum WeaponType
     {
         Unknown = -1,
@@ -18,7 +19,8 @@ namespace NikkeEinkk.Components.Models
         PS = 8,
         SMG = 9
     }
-
+    
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum AttackType
     {
         Unknown = -1,
@@ -33,6 +35,7 @@ namespace NikkeEinkk.Components.Models
         Electronic = 8
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum CounterType
     {
         Unknown = -1,
@@ -42,6 +45,7 @@ namespace NikkeEinkk.Components.Models
         Bio_Type = 3,
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum PreferTarget 
     {
         Unknown = -1,
@@ -102,6 +106,7 @@ namespace NikkeEinkk.Components.Models
         LongInitChargeTime = 54
     }
     
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum PreferTargetCondition 
     {
         Unknown = -1,
@@ -126,6 +131,7 @@ namespace NikkeEinkk.Components.Models
         OnlyIron = 18
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ShotTiming
     {
         Unknown = -1,
@@ -135,6 +141,7 @@ namespace NikkeEinkk.Components.Models
         ConcurrenceGroup = 3,
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum FireType
     {
         Unknown = -1,
@@ -161,6 +168,7 @@ namespace NikkeEinkk.Components.Models
         ProjectileCurveV2 = 20
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum InputType
     {
         Unknown = -1,
@@ -169,7 +177,8 @@ namespace NikkeEinkk.Components.Models
         UP = 2,
         DOWN_Charge = 3
     }
-
+    
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ShakeType
     {
         Unknown = -1,
@@ -193,303 +202,234 @@ namespace NikkeEinkk.Components.Models
     public partial class CharacterShotTable
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 1)]
         public string? NameLocalkey { get; set; } = string.Empty;
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 2)]
         public string? DescriptionLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("camera_work")]
+        [JsonProperty("camera_work", Order = 3)]
         public string CameraWork { get; set; } = string.Empty;
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("weapon_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("weapon_type", Order = 4)]
         public WeaponType WeaponType { get; set; }
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("attack_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("attack_type", Order = 5)]
         public AttackType AttackType { get; set; } = AttackType.None;
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("counter_enermy")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("counter_enermy", Order = 6)]
         public CounterType CounterEnermy { get; set; } = CounterType.None;
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("prefer_target")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("prefer_target", Order = 7)]
         public PreferTarget PreferTarget { get; set; } = PreferTarget.None;
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("prefer_target_condition")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("prefer_target_condition", Order = 8)]
         public PreferTargetCondition PreferTargetCondition { get; set; } = PreferTargetCondition.None;
 
         [MemoryPackOrder(17)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("shot_timing")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("shot_timing", Order = 9)]
         public ShotTiming ShotTiming { get; set; } = ShotTiming.None;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("fire_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fire_type", Order = 10)]
         public FireType FireType { get; set; } = FireType.None;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("input_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("input_type", Order = 11)]
         public InputType InputType { get; set; } = InputType.NONE;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("is_targeting")]
+        [JsonProperty("is_targeting", Order = 12)]
         public bool IsTargeting { get; set; }
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("damage")]
+        [JsonProperty("damage", Order = 13)]
         public int Damage { get; set; }
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("shot_count")]
+        [JsonProperty("shot_count", Order = 14)]
         public int ShotCount { get; set; }
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(15)]
-        [JsonPropertyName("muzzle_count")]
+        [JsonProperty("muzzle_count", Order = 15)]
         public int MuzzleCount { get; set; }
 
         [MemoryPackOrder(15)]
-        [JsonPropertyOrder(16)]
-        [JsonPropertyName("multi_target_count")]
+        [JsonProperty("multi_target_count", Order = 16)]
         public int MultiTargetCount { get; set; }
 
         [MemoryPackOrder(16)]
-        [JsonPropertyOrder(17)]
-        [JsonPropertyName("center_shot_count")]
+        [JsonProperty("center_shot_count", Order = 17)]
         public int CenterShotCount { get; set; }
 
         [MemoryPackOrder(18)]
-        [JsonPropertyOrder(18)]
-        [JsonPropertyName("max_ammo")]
+        [JsonProperty("max_ammo", Order = 18)]
         public int MaxAmmo { get; set; }
 
         [MemoryPackOrder(19)]
-        [JsonPropertyOrder(19)]
-        [JsonPropertyName("maintain_fire_stance")]
+        [JsonProperty("maintain_fire_stance", Order = 19)]
         public int MaintainFireStance { get; set; }
 
         [MemoryPackOrder(20)]
-        [JsonPropertyOrder(20)]
-        [JsonPropertyName("uptype_fire_timing")]
+        [JsonProperty("uptype_fire_timing", Order = 20)]
         public int UptypeFireTiming { get; set; }
 
         [MemoryPackOrder(21)]
-        [JsonPropertyOrder(21)]
-        [JsonPropertyName("reload_time")]
+        [JsonProperty("reload_time", Order = 21)]
         public int ReloadTime { get; set; }
 
         [MemoryPackOrder(22)]
-        [JsonPropertyOrder(22)]
-        [JsonPropertyName("reload_bullet")]
+        [JsonProperty("reload_bullet", Order = 22)]
         public int ReloadBullet { get; set; }
 
         [MemoryPackOrder(23)]
-        [JsonPropertyOrder(23)]
-        [JsonPropertyName("reload_start_ammo")]
+        [JsonProperty("reload_start_ammo", Order = 23)]
         public int ReloadStartAmmo { get; set; }
 
         [MemoryPackOrder(24)]
-        [JsonPropertyOrder(24)]
-        [JsonPropertyName("rate_of_fire_reset_time")]
+        [JsonProperty("rate_of_fire_reset_time", Order = 24)]
         public int RateOfFireResetTime { get; set; }
 
         [MemoryPackOrder(25)]
-        [JsonPropertyOrder(25)]
-        [JsonPropertyName("rate_of_fire")]
+        [JsonProperty("rate_of_fire", Order = 25)]
         public int RateOfFire { get; set; }
 
         [MemoryPackOrder(26)]
-        [JsonPropertyOrder(26)]
-        [JsonPropertyName("end_rate_of_fire")]
+        [JsonProperty("end_rate_of_fire", Order = 26)]
         public int EndRateOfFire { get; set; }
 
         [MemoryPackOrder(27)]
-        [JsonPropertyOrder(27)]
-        [JsonPropertyName("rate_of_fire_change_pershot")]
+        [JsonProperty("rate_of_fire_change_pershot", Order = 27)]
         public int RateOfFireChangePershot { get; set; }
 
         [MemoryPackOrder(28)]
-        [JsonPropertyOrder(28)]
-        [JsonPropertyName("burst_energy_pershot")]
+        [JsonProperty("burst_energy_pershot", Order = 28)]
         public int BurstEnergyPershot { get; set; }
 
         [MemoryPackOrder(29)]
-        [JsonPropertyOrder(29)]
-        [JsonPropertyName("target_burst_energy_pershot")]
+        [JsonProperty("target_burst_energy_pershot", Order = 29)]
         public int TargetBurstEnergyPershot { get; set; }
 
         [MemoryPackOrder(31)]
-        [JsonPropertyOrder(30)]
-        [JsonPropertyName("spot_first_delay")]
+        [JsonProperty("spot_first_delay", Order = 30)]
         public int SpotFirstDelay { get; set; }
 
         [MemoryPackOrder(32)]
-        [JsonPropertyOrder(31)]
-        [JsonPropertyName("spot_last_delay")]
+        [JsonProperty("spot_last_delay", Order = 31)]
         public int SpotLastDelay { get; set; }
 
         [MemoryPackOrder(33)]
-        [JsonPropertyOrder(32)]
-        [JsonPropertyName("start_accuracy_circle_scale")]
+        [JsonProperty("start_accuracy_circle_scale", Order = 32)]
         public int StartAccuracyCircleScale { get; set; }
 
         [MemoryPackOrder(34)]
-        [JsonPropertyOrder(33)]
-        [JsonPropertyName("end_accuracy_circle_scale")]
+        [JsonProperty("end_accuracy_circle_scale", Order = 33)]
         public int EndAccuracyCircleScale { get; set; }
 
         [MemoryPackOrder(35)]
-        [JsonPropertyOrder(34)]
-        [JsonPropertyName("accuracy_change_pershot")]
+        [JsonProperty("accuracy_change_pershot", Order = 34)]
         public int AccuracyChangePershot { get; set; }
 
         [MemoryPackOrder(36)]
-        [JsonPropertyOrder(35)]
-        [JsonPropertyName("accuracy_change_speed")]
+        [JsonProperty("accuracy_change_speed", Order = 35)]
         public int AccuracyChangeSpeed { get; set; }
 
         [MemoryPackOrder(37)]
-        [JsonPropertyOrder(36)]
-        [JsonPropertyName("auto_start_accuracy_circle_scale")]
+        [JsonProperty("auto_start_accuracy_circle_scale", Order = 36)]
         public int AutoStartAccuracyCircleScale { get; set; }
 
         [MemoryPackOrder(38)]
-        [JsonPropertyOrder(37)]
-        [JsonPropertyName("auto_end_accuracy_circle_scale")]
+        [JsonProperty("auto_end_accuracy_circle_scale", Order = 37)]
         public int AutoEndAccuracyCircleScale { get; set; }
 
         [MemoryPackOrder(39)]
-        [JsonPropertyOrder(38)]
-        [JsonPropertyName("auto_accuracy_change_pershot")]
+        [JsonProperty("auto_accuracy_change_pershot", Order = 38)]
         public int AutoAccuracyChangePershot { get; set; }
 
         [MemoryPackOrder(40)]
-        [JsonPropertyOrder(39)]
-        [JsonPropertyName("auto_accuracy_change_speed")]
+        [JsonProperty("auto_accuracy_change_speed", Order = 39)]
         public int AutoAccuracyChangeSpeed { get; set; }
 
         [MemoryPackOrder(41)]
-        [JsonPropertyOrder(40)]
-        [JsonPropertyName("zoom_rate")]
+        [JsonProperty("zoom_rate", Order = 40)]
         public int ZoomRate { get; set; }
 
         [MemoryPackOrder(42)]
-        [JsonPropertyOrder(41)]
-        [JsonPropertyName("multi_aim_range")]
+        [JsonProperty("multi_aim_range", Order = 41)]
         public int MultiAimRange { get; set; }
 
         [MemoryPackOrder(43)]
-        [JsonPropertyOrder(42)]
-        [JsonPropertyName("spot_projectile_speed")]
+        [JsonProperty("spot_projectile_speed", Order = 42)]
         public int SpotProjectileSpeed { get; set; }
 
         [MemoryPackOrder(44)]
-        [JsonPropertyOrder(43)]
-        [JsonPropertyName("charge_time")]
+        [JsonProperty("charge_time", Order = 43)]
         public int ChargeTime { get; set; }
 
         [MemoryPackOrder(45)]
-        [JsonPropertyOrder(44)]
-        [JsonPropertyName("full_charge_damage")]
+        [JsonProperty("full_charge_damage", Order = 44)]
         public int FullChargeDamage { get; set; }
 
         [MemoryPackOrder(46)]
-        [JsonPropertyOrder(45)]
-        [JsonPropertyName("full_charge_burst_energy")]
+        [JsonProperty("full_charge_burst_energy", Order = 45)]
         public int FullChargeBurstEnergy { get; set; }
 
         [MemoryPackOrder(47)]
-        [JsonPropertyOrder(46)]
-        [JsonPropertyName("spot_radius_object")]
+        [JsonProperty("spot_radius_object", Order = 46)]
         public int SpotRadiusObject { get; set; }
 
         [MemoryPackOrder(48)]
-        [JsonPropertyOrder(47)]
-        [JsonPropertyName("spot_radius")]
+        [JsonProperty("spot_radius", Order = 47)]
         public int SpotRadius { get; set; }
 
         [MemoryPackOrder(49)]
-        [JsonPropertyOrder(48)]
-        [JsonPropertyName("spot_explosion_range")]
+        [JsonProperty("spot_explosion_range", Order = 48)]
         public int SpotExplosionRange { get; set; }
 
         [MemoryPackOrder(50)]
-        [JsonPropertyOrder(49)]
-        [JsonPropertyName("homing_script")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull | JsonIgnoreCondition.WhenWritingDefault)]
-        public string? HomingScript { get; set; } = string.Empty;
+        [JsonProperty("homing_script", Order = 49, NullValueHandling = NullValueHandling.Ignore)]
+        public string? HomingScript { get; set; }
 
         [MemoryPackOrder(51)]
-        [JsonPropertyOrder(50)]
-        [JsonPropertyName("core_damage_rate")]
+        [JsonProperty("core_damage_rate", Order = 50)]
         public int CoreDamageRate { get; set; }
 
         [MemoryPackOrder(30)]
-        [JsonPropertyOrder(51)]
-        [JsonPropertyName("penetration")]
+        [JsonProperty("penetration", Order = 51)]
         public int Penetration { get; set; }
 
         [MemoryPackOrder(52)]
-        [JsonPropertyOrder(52)]
-        [JsonPropertyName("use_function_id_list")]
+        [JsonProperty("use_function_id_list", Order = 52)]
         public int[] UseFunctionIdList { get; set; } = [];
 
         [MemoryPackOrder(53)]
-        [JsonPropertyOrder(53)]
-        [JsonPropertyName("hurt_function_id_list")]
+        [JsonProperty("hurt_function_id_list", Order = 53)]
         public int[] HurtFunctionIdList { get; set; } = [];
 
         [MemoryPackOrder(54)]
-        [JsonPropertyOrder(54)]
-        [JsonPropertyName("shake_id")]
+        [JsonProperty("shake_id", Order = 54)]
         public int ShakeId { get; set; }
 
         [MemoryPackOrder(55)]
-        [JsonPropertyOrder(55)]
-        [JsonPropertyName("ShakeType")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("ShakeType", Order = 55)]
         public ShakeType ShakeType { get; set; } = ShakeType.Fire_AR;
 
         [MemoryPackOrder(56)]
-        [JsonPropertyOrder(56)]
-        [JsonPropertyName("ShakeWeight")]
+        [JsonProperty("ShakeWeight", Order = 56)]
         public int ShakeWeight { get; set; }
 
         [MemoryPackOrder(57)]
-        [JsonPropertyOrder(57)]
-        [JsonPropertyName("aim_prefab")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull | JsonIgnoreCondition.WhenWritingDefault)]
-        public string? AimPrefab { get; set; } = string.Empty;
+        [JsonProperty("aim_prefab", Order = 57, NullValueHandling = NullValueHandling.Ignore)]
+        public string? AimPrefab { get; set; }
     }
 }

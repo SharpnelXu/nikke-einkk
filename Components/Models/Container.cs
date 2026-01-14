@@ -1,13 +1,15 @@
-using System.Text.Json.Serialization;
+using MemoryPack;
+using Newtonsoft.Json;
 
 namespace NikkeEinkk.Components.Models
 {
+    [MemoryPackable]
     public partial class JsonTableContainer<TItem>
     {
-        [JsonPropertyName("version")]
+        [JsonProperty("version")]
         public string Version { get; set; } = "0.0.1";
 
-        [JsonPropertyName("records")]
+        [JsonProperty("records")]
         public TItem[] Records { get; set; } = Array.Empty<TItem>();
     }
 }

@@ -4,6 +4,7 @@ using Newtonsoft.Json.Converters;
 
 namespace NikkeEinkk.Components.Models
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum Rarity
     {
         Unknown = -1,
@@ -11,7 +12,8 @@ namespace NikkeEinkk.Components.Models
         SR = 2,
         R = 1
     }
-
+    
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum NikkeClass
     {
         Unknown = -1,
@@ -22,6 +24,7 @@ namespace NikkeEinkk.Components.Models
         All = 4
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum BurstStep
     {
         Unknown = -1,
@@ -35,6 +38,7 @@ namespace NikkeEinkk.Components.Models
         KeepStep = 7
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum Corporation
     {
         Unknown = -1,
@@ -48,6 +52,7 @@ namespace NikkeEinkk.Components.Models
         ABNORMAL = 7
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum CorporationSubType
     {
         Unknown = -1,
@@ -55,6 +60,7 @@ namespace NikkeEinkk.Components.Models
         OVERSPEC = 1,
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum SkillType
     {
         Unknown = -1,
@@ -63,6 +69,7 @@ namespace NikkeEinkk.Components.Models
         CharacterSkill = 2
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum EffCategoryType
     {
         Unknown = -1,
@@ -77,6 +84,7 @@ namespace NikkeEinkk.Components.Models
         Fly = 8
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum CategoryType
     {
         Unknown = -1,
@@ -86,6 +94,7 @@ namespace NikkeEinkk.Components.Models
         Type3 = 3
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum Squad
     {
         Unknown = -1,
@@ -193,7 +202,6 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(7)]
         [JsonProperty("original_rare", Order = 7)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public Rarity OriginalRare { get; set; } = Rarity.R;
 
         [MemoryPackOrder(8)]
@@ -210,17 +218,14 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(11)]
         [JsonProperty("corporation", Order = 32)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public Corporation Corporation { get; set; } = Corporation.None;
 
         [MemoryPackOrder(12)]
         [JsonProperty("corporation_sub_type", Order = 33, DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public CorporationSubType CorporationSubType { get; set; } = CorporationSubType.NORMAL;
 
         [MemoryPackOrder(13)]
         [JsonProperty("class", Order = 11)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public NikkeClass CharacterClass { get; set; } = NikkeClass.None;
         
         [MemoryPackOrder(15)]
@@ -249,12 +254,10 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(21)]
         [JsonProperty("use_burst_skill", Order = 18)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public BurstStep UseBurstSkill { get; set; } = BurstStep.None;
 
         [MemoryPackOrder(22)]
         [JsonProperty("change_burst_step", Order = 19)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public BurstStep ChangeBurstStep { get; set; } = BurstStep.None;
 
         [MemoryPackOrder(23)]
@@ -275,7 +278,6 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(27)]
         [JsonProperty("skill1_table", Order = 24)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public SkillType Skill1Table { get; set; } = SkillType.None;
 
         [MemoryPackOrder(28)]
@@ -284,12 +286,10 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(29)]
         [JsonProperty("skill2_table", Order = 26)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public SkillType Skill2Table { get; set; } = SkillType.None;
 
         [MemoryPackOrder(30)]
         [JsonProperty("eff_category_type", Order = 27)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public EffCategoryType EffCategoryType { get; set; } = EffCategoryType.None;
 
         [MemoryPackOrder(31)]
@@ -298,17 +298,14 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(32)]
         [JsonProperty("category_type_1", Order = 29)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public EffCategoryType CategoryType1 { get; set; } = EffCategoryType.None;
 
         [MemoryPackOrder(33)]
         [JsonProperty("category_type_2", Order = 30)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public EffCategoryType CategoryType2 { get; set; } = EffCategoryType.None;
 
         [MemoryPackOrder(34)]
         [JsonProperty("category_type_3", Order = 31)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public EffCategoryType CategoryType3 { get; set; } = EffCategoryType.None;
 
         [MemoryPackOrder(35)]
@@ -317,7 +314,6 @@ namespace NikkeEinkk.Components.Models
 
         [MemoryPackOrder(36)]
         [JsonProperty("squad", Order = 35)]
-        [JsonConverter(typeof(StringEnumConverter))]
         public Squad Squad { get; set; } = Squad.None;
 
         [MemoryPackOrder(37)]

@@ -1,9 +1,10 @@
 using MemoryPack;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NikkeEinkk.Components.Models
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum PrepareRewardType
     {
         Unknown = -1,
@@ -16,28 +17,23 @@ namespace NikkeEinkk.Components.Models
     public partial class OutpostRewardItem
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("view_item_id")]
+        [JsonProperty("view_item_id", Order = 0)]
         public int ViewItemId { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("item_type")]
+        [JsonProperty("item_type", Order = 1)]
         public PrepareRewardType ItemType { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("item_id")]
+        [JsonProperty("item_id", Order = 2)]
         public int ItemId { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("item_value")]
+        [JsonProperty("item_value", Order = 3)]
         public int ItemValue { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("time_sec")]
+        [JsonProperty("time_sec", Order = 4)]
         public int TimeSec { get; set; }
     }
 
@@ -45,68 +41,55 @@ namespace NikkeEinkk.Components.Models
     public partial class OutpostBattleStaticInfo
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("battle_box_level")]
+        [JsonProperty("battle_box_level", Order = 1)]
         public int BattleBoxLevel { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("main_stage_clear_count")]
+        [JsonProperty("main_stage_clear_count", Order = 2)]
         public int MainStageClearCount { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("reward_id")]
+        [JsonProperty("reward_id", Order = 3)]
         public int RewardId { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("credit")]
+        [JsonProperty("credit", Order = 4)]
         public int Credit { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("time_credit")]
+        [JsonProperty("time_credit", Order = 5)]
         public int TimeCredit { get; set; }
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("character_exp1")]
+        [JsonProperty("character_exp1", Order = 6)]
         public int CharacterExp1 { get; set; }
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("time_charexp1")]
+        [JsonProperty("time_charexp1", Order = 7)]
         public int TimeCharExp1 { get; set; }
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("user_exp")]
+        [JsonProperty("user_exp", Order = 8)]
         public int UserExp { get; set; }
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("time_user_exp")]
+        [JsonProperty("time_user_exp", Order = 9)]
         public int TimeUserExp { get; set; }
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("character_exp2")]
+        [JsonProperty("character_exp2", Order = 10)]
         public int CharacterExp2 { get; set; }
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("time_charexp2")]
+        [JsonProperty("time_charexp2", Order = 11)]
         public int TimeCharExp2 { get; set; }
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("outpost_reward_list")]
+        [JsonProperty("outpost_reward_list", Order = 12)]
         public OutpostRewardItem[] OutpostRewardList { get; set; } = [];
     }
 }

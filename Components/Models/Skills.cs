@@ -1,8 +1,10 @@
 using MemoryPack;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NikkeEinkk.Components.Models
 {
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum CharacterSkillType
     {
         Unknown = -1,
@@ -39,6 +41,7 @@ namespace NikkeEinkk.Components.Models
         InstantAllProjectile = 30
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum DurationType
     {
         Unknown = -1,
@@ -59,6 +62,7 @@ namespace NikkeEinkk.Components.Models
         None = 0
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ValueType
     {
         None = 0,
@@ -67,6 +71,7 @@ namespace NikkeEinkk.Components.Models
         Unknown = -1
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum BuffType
     {
         Etc = 2,
@@ -77,6 +82,7 @@ namespace NikkeEinkk.Components.Models
         Unknown = -1
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum BuffRemoveType
     {
         Resist = 0,
@@ -85,7 +91,7 @@ namespace NikkeEinkk.Components.Models
         Unknown = -1
     }
 
-
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum FunctionType 
     {
         Unknown = -1,
@@ -305,6 +311,7 @@ namespace NikkeEinkk.Components.Models
         BarrierImmuneDamage = 213
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum StandardType
     {
         Unknown = -1,
@@ -314,6 +321,7 @@ namespace NikkeEinkk.Components.Models
         TriggerTarget = 3
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum FunctionTargetType
     {
         Unknown = -1,
@@ -327,6 +335,7 @@ namespace NikkeEinkk.Components.Models
         AllCharacterCover = 7
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum TimingTriggerType
     {
         Unknown = -1,
@@ -423,6 +432,7 @@ namespace NikkeEinkk.Components.Models
         OnFullChargeCoreHitNum = 90
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum StatusTriggerType
     {
         Unknown = -1,
@@ -495,6 +505,7 @@ namespace NikkeEinkk.Components.Models
         IsCharging = 66
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum FunctionStatus
     {
         None = 0,
@@ -503,6 +514,7 @@ namespace NikkeEinkk.Components.Models
         Unknown = -1
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum ShotFx
     {
         Unknown = -1,
@@ -512,6 +524,7 @@ namespace NikkeEinkk.Components.Models
         Gear3 = 3,
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum SocketPoint
     {
         Unknown = -1,
@@ -525,6 +538,7 @@ namespace NikkeEinkk.Components.Models
         Core = 5
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum FxTarget
     {
         Unknown = -1,
@@ -538,14 +552,11 @@ namespace NikkeEinkk.Components.Models
     public partial class SkillValueData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("skill_value_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("skill_value_type", Order = 0)]
         public ValueType SkillValueType { get; set; } = ValueType.Unknown;
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("skill_value")]
+        [JsonProperty("skill_value", Order = 1)]
         public long SkillValue { get; set; }
     }
 
@@ -553,95 +564,71 @@ namespace NikkeEinkk.Components.Models
     public partial class SkillData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("skill_cooltime")]
+        [JsonProperty("skill_cooltime", Order = 1)]
         public int SkillCooltime { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("attack_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("attack_type", Order = 2)]
         public AttackType AttackType { get; set; } = AttackType.None;
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("counter_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("counter_type", Order = 3)]
         public CounterType CounterType { get; set; } = CounterType.None;
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("prefer_target")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("prefer_target", Order = 4)]
         public PreferTarget PreferTarget { get; set; } = PreferTarget.None;
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("prefer_target_condition")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("prefer_target_condition", Order = 5)]
         public PreferTargetCondition PreferTargetCondition { get; set; } = PreferTargetCondition.None;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("skill_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("skill_type", Order = 6)]
         public CharacterSkillType SkillType { get; set; } = CharacterSkillType.None;
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("skill_value_data")]
+        [JsonProperty("skill_value_data", Order = 7)]
         public SkillValueData[] SkillValueData { get; set; } = [];
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("duration_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("duration_type", Order = 8)]
         public DurationType DurationType { get; set; } = DurationType.None;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("duration_value")]
+        [JsonProperty("duration_value", Order = 9)]
         public int DurationValue { get; set; }
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("before_use_function_id_list")]
+        [JsonProperty("before_use_function_id_list", Order = 10)]
         public int[] BeforeUseFunctionIdList { get; set; } = [];
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("before_hurt_function_id_list")]
+        [JsonProperty("before_hurt_function_id_list", Order = 11)]
         public int[] BeforeHurtFunctionIdList { get; set; } = [];
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("after_use_function_id_list")]
+        [JsonProperty("after_use_function_id_list", Order = 12)]
         public int[] AfterUseFunctionIdList { get; set; } = [];
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("after_hurt_function_id_list")]
+        [JsonProperty("after_hurt_function_id_list", Order = 13)]
         public int[] AfterHurtFunctionIdList { get; set; } = [];
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("resource_name")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull | JsonIgnoreCondition.WhenWritingDefault)]
-        public string? ResourceName { get; set; } = string.Empty;
+        [JsonProperty("resource_name", Order = 14, NullValueHandling = NullValueHandling.Ignore)]
+        public string? ResourceName { get; set; }
 
         [MemoryPackOrder(16)]
-        [JsonPropertyOrder(15)]
-        [JsonPropertyName("icon")]
+        [JsonProperty("icon", Order = 15)]
         public string Icon { get; set; } = string.Empty;
 
         [MemoryPackOrder(15)]
-        [JsonPropertyOrder(16)]
-        [JsonPropertyName("shake_id")]
+        [JsonProperty("shake_id", Order = 16)]
         public int ShakeId { get; set; }
     }
 
@@ -649,8 +636,7 @@ namespace NikkeEinkk.Components.Models
     public partial class SkillFunction
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("function")]
+        [JsonProperty("function", Order = 0)]
         public int Function { get; set; }
     }
 
@@ -658,28 +644,23 @@ namespace NikkeEinkk.Components.Models
     public partial class StateEffectData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("use_function_id_list")]
+        [JsonProperty("use_function_id_list", Order = 1)]
         public int[] UseFunctionIdList { get; set; } = [];
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("hurt_function_id_list")]
+        [JsonProperty("hurt_function_id_list", Order = 2)]
         public int[] HurtFunctionIdList { get; set; } = [];
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("functions")]
+        [JsonProperty("functions", Order = 3)]
         public SkillFunction[] Functions { get; set; } = [];
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("icon")]
+        [JsonProperty("icon", Order = 4)]
         public string Icon { get; set; } = string.Empty;
     }
 
@@ -687,308 +668,223 @@ namespace NikkeEinkk.Components.Models
     public partial class FunctionData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("group_id")]
+        [JsonProperty("group_id", Order = 1)]
         public int GroupId { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("level")]
+        [JsonProperty("level", Order = 2)]
         public int Level { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("function_battlepower")]
+        [JsonProperty("function_battlepower", Order = 3)]
         public int FunctionBattlepower { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 4)]
         public string? NameLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 5)]
         public string? DescriptionLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("buff")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("buff", Order = 6)]
         public BuffType BuffType { get; set; } = BuffType.Unknown;
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("buff_remove")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("buff_remove", Order = 7)]
         public BuffRemoveType BuffRemoveType { get; set; } = BuffRemoveType.Clear;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("function_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("function_type", Order = 8)]
         public FunctionType FunctionType { get; set; } = FunctionType.None;
 
         [MemoryPackOrder(10)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("function_value_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("function_value_type", Order = 9)]
         public ValueType FunctionValueType { get; set; } = ValueType.None;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(10)]
-        [JsonPropertyName("function_standard")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("function_standard", Order = 10)]
         public StandardType FunctionStandard { get; set; } = StandardType.None;
 
         [MemoryPackOrder(11)]
-        [JsonPropertyOrder(11)]
-        [JsonPropertyName("function_value")]
+        [JsonProperty("function_value", Order = 11)]
         public long FunctionValue { get; set; }
 
         [MemoryPackOrder(12)]
-        [JsonPropertyOrder(12)]
-        [JsonPropertyName("full_count")]
+        [JsonProperty("full_count", Order = 12)]
         public int FullCount { get; set; }
 
         [MemoryPackOrder(13)]
-        [JsonPropertyOrder(13)]
-        [JsonPropertyName("is_cancel")]
+        [JsonProperty("is_cancel", Order = 13)]
         public bool IsCancel { get; set; }
 
         [MemoryPackOrder(14)]
-        [JsonPropertyOrder(14)]
-        [JsonPropertyName("delay_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("delay_type", Order = 14)]
         public DurationType DelayType { get; set; } = DurationType.None;
 
         [MemoryPackOrder(15)]
-        [JsonPropertyOrder(15)]
-        [JsonPropertyName("delay_value")]
+        [JsonProperty("delay_value", Order = 15)]
         public int DelayValue { get; set; }
 
         [MemoryPackOrder(16)]
-        [JsonPropertyOrder(16)]
-        [JsonPropertyName("duration_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("duration_type", Order = 16)]
         public DurationType DurationType { get; set; } = DurationType.None;
 
         [MemoryPackOrder(17)]
-        [JsonPropertyOrder(17)]
-        [JsonPropertyName("duration_value")]
+        [JsonProperty("duration_value", Order = 17)]
         public int DurationValue { get; set; }
 
         [MemoryPackOrder(18)]
-        [JsonPropertyOrder(18)]
-        [JsonPropertyName("limit_value")]
+        [JsonProperty("limit_value", Order = 18)]
         public int LimitValue { get; set; }
 
         [MemoryPackOrder(19)]
-        [JsonPropertyOrder(19)]
-        [JsonPropertyName("function_target")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("function_target", Order = 19)]
         public FunctionTargetType FunctionTarget { get; set; } = FunctionTargetType.None;
 
         [MemoryPackOrder(20)]
-        [JsonPropertyOrder(20)]
-        [JsonPropertyName("timing_trigger_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("timing_trigger_type", Order = 20)]
         public TimingTriggerType TimingTriggerType { get; set; } = TimingTriggerType.None;
 
         [MemoryPackOrder(21)]
-        [JsonPropertyOrder(21)]
-        [JsonPropertyName("timing_trigger_standard")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("timing_trigger_standard", Order = 21)]
         public StandardType TimingTriggerStandard { get; set; } = StandardType.None;
 
         [MemoryPackOrder(22)]
-        [JsonPropertyOrder(22)]
-        [JsonPropertyName("timing_trigger_value")]
+        [JsonProperty("timing_trigger_value", Order = 22)]
         public int TimingTriggerValue { get; set; }
 
         [MemoryPackOrder(23)]
-        [JsonPropertyOrder(23)]
-        [JsonPropertyName("status_trigger_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("status_trigger_type", Order = 23)]
         public StatusTriggerType StatusTriggerType { get; set; } = StatusTriggerType.None;
 
         [MemoryPackOrder(24)]
-        [JsonPropertyOrder(24)]
-        [JsonPropertyName("status_trigger_standard")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("status_trigger_standard", Order = 24)]
         public StandardType StatusTriggerStandard { get; set; } = StandardType.None;
 
         [MemoryPackOrder(25)]
-        [JsonPropertyOrder(25)]
-        [JsonPropertyName("status_trigger_value")]
+        [JsonProperty("status_trigger_value", Order = 25)]
         public long StatusTriggerValue { get; set; }
 
         [MemoryPackOrder(26)]
-        [JsonPropertyOrder(26)]
-        [JsonPropertyName("status_trigger2_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("status_trigger2_type", Order = 26)]
         public StatusTriggerType StatusTrigger2Type { get; set; } = StatusTriggerType.None;
 
         [MemoryPackOrder(27)]
-        [JsonPropertyOrder(27)]
-        [JsonPropertyName("status_trigger2_standard")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("status_trigger2_standard", Order = 27)]
         public StandardType StatusTrigger2Standard { get; set; } = StandardType.None;
 
         [MemoryPackOrder(28)]
-        [JsonPropertyOrder(28)]
-        [JsonPropertyName("status_trigger2_value")]
+        [JsonProperty("status_trigger2_value", Order = 28)]
         public long StatusTrigger2Value { get; set; }
 
         [MemoryPackOrder(29)]
-        [JsonPropertyOrder(29)]
-        [JsonPropertyName("keeping_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("keeping_type", Order = 29)]
         public FunctionStatus KeepingType { get; set; } = FunctionStatus.Off;
 
         [MemoryPackOrder(30)]
-        [JsonPropertyOrder(30)]
-        [JsonPropertyName("buff_icon")]
+        [JsonProperty("buff_icon", Order = 30)]
         public string BuffIcon { get; set; } = string.Empty;
 
         [MemoryPackOrder(31)]
-        [JsonPropertyOrder(31)]
-        [JsonPropertyName("element_reaction_icon")]
+        [JsonProperty("element_reaction_icon", Order = 31)]
         public string? ElementReactionIcon { get; set; } = string.Empty;
 
         [MemoryPackOrder(32)]
-        [JsonPropertyOrder(32)]
-        [JsonPropertyName("shot_fx_list_type")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("shot_fx_list_type", Order = 32)]
         public ShotFx ShotFxListType { get; set; } = ShotFx.None;
 
         [MemoryPackOrder(33)]
-        [JsonPropertyOrder(33)]
-        [JsonPropertyName("fx_prefab_01")]
+        [JsonProperty("fx_prefab_01", Order = 33)]
         public string? FxPrefab01 { get; set; } = string.Empty;
 
         [MemoryPackOrder(34)]
-        [JsonPropertyOrder(34)]
-        [JsonPropertyName("fx_target_01")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_target_01", Order = 34)]
         public FxTarget FxTarget01 { get; set; } = FxTarget.None;
 
         [MemoryPackOrder(35)]
-        [JsonPropertyOrder(35)]
-        [JsonPropertyName("fx_socket_point_01")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_socket_point_01", Order = 35)]
         public SocketPoint FxSocketPoint01 { get; set; } = SocketPoint.None;
 
         [MemoryPackOrder(36)]
-        [JsonPropertyOrder(36)]
-        [JsonPropertyName("fx_prefab_02")]
+        [JsonProperty("fx_prefab_02", Order = 36)]
         public string? FxPrefab02 { get; set; } = string.Empty;
 
         [MemoryPackOrder(37)]
-        [JsonPropertyOrder(37)]
-        [JsonPropertyName("fx_target_02")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_target_02", Order = 37)]
         public FxTarget FxTarget02 { get; set; } = FxTarget.None;
 
         [MemoryPackOrder(38)]
-        [JsonPropertyOrder(38)]
-        [JsonPropertyName("fx_socket_point_02")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_socket_point_02", Order = 38)]
         public SocketPoint FxSocketPoint02 { get; set; } = SocketPoint.None;
 
         [MemoryPackOrder(39)]
-        [JsonPropertyOrder(39)]
-        [JsonPropertyName("fx_prefab_03")]
+        [JsonProperty("fx_prefab_03", Order = 39)]
         public string? FxPrefab03 { get; set; } = string.Empty;
 
         [MemoryPackOrder(40)]
-        [JsonPropertyOrder(40)]
-        [JsonPropertyName("fx_target_03")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_target_03", Order = 40)]
         public FxTarget FxTarget03 { get; set; } = FxTarget.None;
 
         [MemoryPackOrder(41)]
-        [JsonPropertyOrder(41)]
-        [JsonPropertyName("fx_socket_point_03")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_socket_point_03", Order = 41)]
         public SocketPoint FxSocketPoint03 { get; set; } = SocketPoint.None;
 
         [MemoryPackOrder(42)]
-        [JsonPropertyOrder(42)]
-        [JsonPropertyName("fx_prefab_full")]
+        [JsonProperty("fx_prefab_full", Order = 42)]
         public string? FxPrefabFull { get; set; } = string.Empty;
 
         [MemoryPackOrder(43)]
-        [JsonPropertyOrder(43)]
-        [JsonPropertyName("fx_target_full")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_target_full", Order = 43)]
         public FxTarget FxTargetFull { get; set; } = FxTarget.None;
 
         [MemoryPackOrder(44)]
-        [JsonPropertyOrder(44)]
-        [JsonPropertyName("fx_socket_point_full")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_socket_point_full", Order = 44)]
         public SocketPoint FxSocketPointFull { get; set; } = SocketPoint.None;
 
         [MemoryPackOrder(45)]
-        [JsonPropertyOrder(45)]
-        [JsonPropertyName("fx_prefab_01_arena")]
+        [JsonProperty("fx_prefab_01_arena", Order = 45)]
         public string? FxPrefab01Arena { get; set; } = string.Empty;
 
         [MemoryPackOrder(46)]
-        [JsonPropertyOrder(46)]
-        [JsonPropertyName("fx_target_01_arena")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_target_01_arena", Order = 46)]
         public FxTarget FxTarget01Arena { get; set; } = FxTarget.None;
 
         [MemoryPackOrder(47)]
-        [JsonPropertyOrder(47)]
-        [JsonPropertyName("fx_socket_point_01_arena")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_socket_point_01_arena", Order = 47)]
         public SocketPoint FxSocketPoint01Arena { get; set; } = SocketPoint.None;
 
         [MemoryPackOrder(48)]
-        [JsonPropertyOrder(48)]
-        [JsonPropertyName("fx_prefab_02_arena")]
+        [JsonProperty("fx_prefab_02_arena", Order = 48)]
         public string? FxPrefab02Arena { get; set; } = string.Empty;
 
         [MemoryPackOrder(49)]
-        [JsonPropertyOrder(49)]
-        [JsonPropertyName("fx_target_02_arena")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_target_02_arena", Order = 49)]
         public FxTarget FxTarget02Arena { get; set; } = FxTarget.None;
 
         [MemoryPackOrder(50)]
-        [JsonPropertyOrder(50)]
-        [JsonPropertyName("fx_socket_point_02_arena")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_socket_point_02_arena", Order = 50)]
         public SocketPoint FxSocketPoint02Arena { get; set; } = SocketPoint.None;
 
         [MemoryPackOrder(51)]
-        [JsonPropertyOrder(51)]
-        [JsonPropertyName("fx_prefab_03_arena")]
+        [JsonProperty("fx_prefab_03_arena", Order = 51)]
         public string? FxPrefab03Arena { get; set; } = string.Empty;
 
         [MemoryPackOrder(52)]
-        [JsonPropertyOrder(52)]
-        [JsonPropertyName("fx_target_03_arena")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_target_03_arena", Order = 52)]
         public FxTarget FxTarget03Arena { get; set; } = FxTarget.None;
 
         [MemoryPackOrder(53)]
-        [JsonPropertyOrder(53)]
-        [JsonPropertyName("fx_socket_point_03_arena")]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [JsonProperty("fx_socket_point_03_arena", Order = 53)]
         public SocketPoint FxSocketPoint03Arena { get; set; } = SocketPoint.None;
 
         [MemoryPackOrder(54)]
-        [JsonPropertyOrder(54)]
-        [JsonPropertyName("connected_function")]
+        [JsonProperty("connected_function", Order = 54)]
         public int[] ConnectedFunction { get; set; } = [];
     }
 
@@ -996,8 +892,7 @@ namespace NikkeEinkk.Components.Models
     public partial class SkillDescriptionValue
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("description_value")]
+        [JsonProperty("description_value", Order = 0)]
         public string? Value { get; set; } = string.Empty;
     }
 
@@ -1005,53 +900,43 @@ namespace NikkeEinkk.Components.Models
     public partial class SkillInfoData
     {
         [MemoryPackOrder(0)]
-        [JsonPropertyOrder(0)]
-        [JsonPropertyName("id")]
+        [JsonProperty("id", Order = 0)]
         public int Id { get; set; }
 
         [MemoryPackOrder(1)]
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("group_id")]
+        [JsonProperty("group_id", Order = 1)]
         public int GroupId { get; set; }
 
         [MemoryPackOrder(2)]
-        [JsonPropertyOrder(2)]
-        [JsonPropertyName("skill_level")]
+        [JsonProperty("skill_level", Order = 2)]
         public int SkillLevel { get; set; }
 
         [MemoryPackOrder(3)]
-        [JsonPropertyOrder(3)]
-        [JsonPropertyName("next_level_id")]
+        [JsonProperty("next_level_id", Order = 3)]
         public int NextLevelId { get; set; }
 
         [MemoryPackOrder(4)]
-        [JsonPropertyOrder(4)]
-        [JsonPropertyName("level_up_cost_id")]
+        [JsonProperty("level_up_cost_id", Order = 4)]
         public int LevelUpCostId { get; set; }
 
         [MemoryPackOrder(5)]
-        [JsonPropertyOrder(5)]
-        [JsonPropertyName("icon")]
+        [JsonProperty("icon", Order = 5)]
         public string Icon { get; set; } = string.Empty;
 
         [MemoryPackOrder(6)]
-        [JsonPropertyOrder(6)]
-        [JsonPropertyName("name_localkey")]
+        [JsonProperty("name_localkey", Order = 6)]
         public string NameLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(7)]
-        [JsonPropertyOrder(7)]
-        [JsonPropertyName("description_localkey")]
+        [JsonProperty("description_localkey", Order = 7)]
         public string DescriptionLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(8)]
-        [JsonPropertyOrder(8)]
-        [JsonPropertyName("info_description_localkey")]
+        [JsonProperty("info_description_localkey", Order = 8)]
         public string InfoDescriptionLocalkey { get; set; } = string.Empty;
 
         [MemoryPackOrder(9)]
-        [JsonPropertyOrder(9)]
-        [JsonPropertyName("description_value_list")]
+        [JsonProperty("description_value_list", Order = 9)]
         public SkillDescriptionValue[] DescriptionValues { get; set; } = [];
     }
 }
