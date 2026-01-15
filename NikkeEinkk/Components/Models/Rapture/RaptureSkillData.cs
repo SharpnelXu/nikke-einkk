@@ -2,6 +2,7 @@ using MemoryPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NikkeEinkk.Components.Models.Enums;
+using NikkeEinkk.Components.Models.Enums.Converters;
 
 namespace NikkeEinkk.Components.Models.Rapture;
 
@@ -175,6 +176,7 @@ public partial class RaptureSkillData
 
     [MemoryPackOrder(38)]
     [JsonProperty("object_position", Order = 36)]
+    [JsonConverter(typeof(DoubleArrayConverter))]
     public double[] ObjectPosition { get; set; } = [0.0, 0.0, 0.0];
 
     [MemoryPackOrder(39)]
