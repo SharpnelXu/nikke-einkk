@@ -1,6 +1,7 @@
 using NikkeEinkk.Components.Converter;
 using NikkeEinkk.Components.Models.Enums;
 using NikkeEinkk.Components.Models.Nikke;
+using NikkeEinkk.Components.Models.Stage;
 
 namespace MpkConverter;
 
@@ -33,6 +34,7 @@ public class Program
         const string outputExtension = ".json";
         var result = true;
         HashSet<string> unknownEnums = [];
+
         result &= await DeserializeFile<WordRecord>(
             inputPath + "WordTable" + inputExtension,
             outputPath + "WordTable" + outputExtension,
@@ -41,6 +43,86 @@ public class Program
                 if (Enum.IsDefined(typeof(ResourceType), (int)item.ResourceType)) return;
                 unknownEnums.Add($"New ResourceType enum value: {(int)item.ResourceType}");
                 item.ResourceType = ResourceType.Unknown;
+            }
+        );
+
+        result &= await DeserializeFile<UnionRaidWaveData>(
+            inputPath + "UnionRaidPresetTable" + inputExtension,
+            outputPath + "UnionRaidPresetTable" + outputExtension,
+            processItem: (item) =>
+            {
+                if (!Enum.IsDefined(typeof(UnionRaidDifficultyType), (int)item.DifficultyType))
+                {
+                    unknownEnums.Add($"New UnionRaidDifficultyType enum value: {(int)item.DifficultyType}");
+                    item.DifficultyType = UnionRaidDifficultyType.Unknown;
+                }
+            }
+        );
+
+        result &= await DeserializeFile<AttractiveLevelRecord>(
+            inputPath + "AttractiveLevelTable" + inputExtension,
+            outputPath + "AttractiveLevelTable" + outputExtension
+        );
+
+        result &= await DeserializeFile<NikkeCharacterStatEnhanceRecord>(
+            inputPath + "CharacterStatEnhanceTable" + inputExtension,
+            outputPath + "CharacterStatEnhanceTable" + outputExtension
+        );
+
+        result &= await DeserializeFile<NikkeWeaponRecord>(
+            inputPath + "CharacterShotTable" + inputExtension,
+            outputPath + "CharacterShotTable" + outputExtension,
+            processItem: (item) =>
+            {
+                // Ensure optional fields are null if empty
+                if (string.IsNullOrWhiteSpace(item.HomingScript))
+                {
+                    item.HomingScript = null;
+                }
+                if (string.IsNullOrWhiteSpace(item.AimPrefab))
+                {
+                    item.AimPrefab = null;
+                }
+                if (!Enum.IsDefined(typeof(WeaponType), (int)item.WeaponType))
+                {
+                    unknownEnums.Add($"New WeaponType enum value: {(int)item.WeaponType}");
+                    item.WeaponType = WeaponType.Unknown;
+                }
+                if (!Enum.IsDefined(typeof(AttackType), (int)item.AttackType))
+                {
+                    unknownEnums.Add($"New AttackType enum value: {(int)item.AttackType}");
+                    item.AttackType = AttackType.Unknown;
+                }
+                if (!Enum.IsDefined(typeof(CounterType), (int)item.CounterEnermy))
+                {
+                    unknownEnums.Add($"New CounterType enum value: {(int)item.CounterEnermy}");
+                    item.CounterEnermy = CounterType.Unknown;
+                }
+                if (!Enum.IsDefined(typeof(PreferTarget), (int)item.PreferTarget))
+                {
+                    unknownEnums.Add($"New PreferTarget enum value: {(int)item.PreferTarget}");
+                    item.PreferTarget = PreferTarget.Unknown;
+                }
+                if (!Enum.IsDefined(typeof(PreferTargetCondition), (int)item.PreferTargetCondition))
+                {
+                    unknownEnums.Add($"New PreferTargetCondition enum value: {(int)item.PreferTargetCondition}");
+                    item.PreferTargetCondition = PreferTargetCondition.Unknown;
+                }
+                if (!Enum.IsDefined(typeof(FireType), (int)item.FireType))
+                {
+                    unknownEnums.Add($"New FireType enum value: {(int)item.FireType}");
+                    item.FireType = FireType.Unknown;
+                }
+                if (!Enum.IsDefined(typeof(InputType), (int)item.InputType))
+                {
+                    unknownEnums.Add($"New InputType enum value: {(int)item.InputType}");
+                    item.InputType = InputType.Unknown;
+                }
+                if (!Enum.IsDefined(typeof(ShakeType), (int)item.ShakeType))
+                {
+                    unknownEnums.Add($"New ShakeType enum value: {(int)item.ShakeType}");
+                    item.ShakeType = ShakeType.Unknown;
+                }
             }
         );
 
