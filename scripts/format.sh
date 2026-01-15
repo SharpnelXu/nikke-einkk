@@ -2,13 +2,8 @@
 
 echo "Formatting Components..."
 
-if [ ! -d "../Components" ]; then
-    echo "Error：Folder Components does not exist."
-    exit 1
-fi
-
-dotnet format --include "./Components/**/*.cs" --verbosity diagnostic
-dotnet format --include "./Tools/**/*.cs" --verbosity diagnostic
+dotnet format NikkeEinkk.sln --include "Tools/**"
+dotnet format NikkeEinkk.sln --include "Components/**"
 
 if [ $? -eq 0 ]; then
     echo "Components formatted."
