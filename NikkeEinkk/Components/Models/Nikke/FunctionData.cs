@@ -1,7 +1,6 @@
 using MemoryPack;
 using Newtonsoft.Json;
 using NikkeEinkk.Components.Models.Enums;
-using ValueType = NikkeEinkk.Components.Models.Enums.ValueType;
 
 namespace NikkeEinkk.Components.Models.Nikke;
 
@@ -46,7 +45,7 @@ public partial class FunctionData
 
     [MemoryPackOrder(10)]
     [JsonProperty("function_value_type", Order = 9)]
-    public ValueType FunctionValueType { get; set; } = ValueType.None;
+    public DataValueType FunctionValueType { get; set; } = DataValueType.None;
 
     [MemoryPackOrder(9)]
     [JsonProperty("function_standard", Order = 10)]

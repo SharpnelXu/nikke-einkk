@@ -7,7 +7,6 @@ using NikkeEinkk.Components.Models.Nikke;
 using NikkeEinkk.Components.Models.Rapture;
 using NikkeEinkk.Components.Models.Shop;
 using NikkeEinkk.Components.Models.Stage;
-using ValueType = NikkeEinkk.Components.Models.Enums.ValueType;
 
 namespace MpkConverter;
 
@@ -322,10 +321,10 @@ public class Program
                     unknownEnums.Add($"New FunctionType enum value: {(int)item.FunctionType}");
                     item.FunctionType = FunctionType.Unknown;
                 }
-                if (!Enum.IsDefined(typeof(ValueType), (int)item.FunctionValueType))
+                if (!Enum.IsDefined(typeof(DataValueType), (int)item.FunctionValueType))
                 {
-                    unknownEnums.Add($"New ValueType enum value: {(int)item.FunctionValueType}");
-                    item.FunctionValueType = ValueType.Unknown;
+                    unknownEnums.Add($"New DataValueType enum value: {(int)item.FunctionValueType}");
+                    item.FunctionValueType = DataValueType.Unknown;
                 }
                 if (!Enum.IsDefined(typeof(StandardType), (int)item.FunctionStandard))
                 {
@@ -988,7 +987,8 @@ public class Program
             "wave_tower_pilgrim_011",
             "wave_tower_pilgrim_012"
         ];
-        foreach (string table in waveDataFiles) {
+        foreach (string table in waveDataFiles)
+        {
             result &= await DeserializeFile<WaveData>(
                 inputPath + "WaveDataTable." + table + inputExtension,
                 outputPath + "WaveDataTable." + table + outputExtension,

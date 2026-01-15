@@ -4,7 +4,7 @@ using Newtonsoft.Json.Converters;
 namespace NikkeEinkk.Components.Models.Enums;
 
 [JsonConverter(typeof(StringEnumConverter))]
-public enum ValueType
+public enum DataValueType
 {
     None = 0,
     Integer = 1,
