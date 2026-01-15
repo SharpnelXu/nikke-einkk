@@ -126,6 +126,117 @@ public class Program
             }
         );
 
+        result &= await DeserializeFile<NikkeCharacterSkillData>(
+                inputPath + "CharacterSkillTable" + inputExtension,
+                outputPath + "CharacterSkillTable" + outputExtension,
+                processItem: (item) =>
+                {
+                    // Ensure optional fields are null if empty
+                    if (string.IsNullOrWhiteSpace(item.ResourceName))
+                    {
+                        item.ResourceName = null;
+                    }
+                    if (!Enum.IsDefined(typeof(AttackType), (int)item.AttackType))
+                    {
+                        unknownEnums.Add($"New AttackType enum value: {(int)item.AttackType}");
+                        item.AttackType = AttackType.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(CounterType), (int)item.CounterType))
+                    {
+                        unknownEnums.Add($"New CounterType enum value: {(int)item.CounterType}");
+                        item.CounterType = CounterType.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(PreferTarget), (int)item.PreferTarget))
+                    {
+                        unknownEnums.Add($"New PreferTarget enum value: {(int)item.PreferTarget}");
+                        item.PreferTarget = PreferTarget.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(PreferTargetCondition), (int)item.PreferTargetCondition))
+                    {
+                        unknownEnums.Add($"New PreferTargetCondition enum value: {(int)item.PreferTargetCondition}");
+                        item.PreferTargetCondition = PreferTargetCondition.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(CharacterSkillType), (int)item.SkillType))
+                    {
+                        unknownEnums.Add($"New CharacterSkillType enum value: {(int)item.SkillType}");
+                        item.SkillType = CharacterSkillType.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(DurationType), (int)item.DurationType))
+                    {
+                        unknownEnums.Add($"New DurationType enum value: {(int)item.DurationType}");
+                        item.DurationType = DurationType.Unknown;
+                    }
+                }
+            );
+
+            result &= await DeserializeFile<NikkeCharacterStatRecord>(
+                inputPath + "CharacterStatTable" + inputExtension,
+                outputPath + "CharacterStatTable" + outputExtension
+            );
+
+            result &= await DeserializeFile<NikkeCharacterRecord>(
+                inputPath + "CharacterTable" + inputExtension,
+                outputPath + "CharacterTable" + outputExtension,
+                processItem: (item) =>
+                {
+                    if (!Enum.IsDefined(typeof(Rarity), (int)item.OriginalRare))
+                    {
+                        unknownEnums.Add($"New Rarity enum value: {(int)item.OriginalRare}");
+                        item.OriginalRare = Rarity.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(NikkeCharacterClass), (int)item.NikkeCharacterClass))
+                    {
+                        unknownEnums.Add($"New NikkeCharacterClass enum value: {(int)item.NikkeCharacterClass}");
+                        item.NikkeCharacterClass = NikkeCharacterClass.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(BurstStep), (int)item.UseBurstSkill))
+                    {
+                        unknownEnums.Add($"New BurstStep enum value: {(int)item.UseBurstSkill}");
+                        item.UseBurstSkill = BurstStep.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(BurstStep), (int)item.ChangeBurstStep))
+                    {
+                        unknownEnums.Add($"New BurstStep enum value: {(int)item.ChangeBurstStep}");
+                        item.ChangeBurstStep = BurstStep.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(EffCategoryType), (int)item.EffCategoryType))
+                    {
+                        unknownEnums.Add($"New EffCategoryType enum value: {(int)item.EffCategoryType}");
+                        item.EffCategoryType = EffCategoryType.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(EffCategoryType), (int)item.CategoryType1))
+                    {
+                        unknownEnums.Add($"New EffCategoryType enum value: {(int)item.CategoryType1}");
+                        item.CategoryType1 = EffCategoryType.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(EffCategoryType), (int)item.CategoryType2))
+                    {
+                        unknownEnums.Add($"New EffCategoryType enum value: {(int)item.CategoryType2}");
+                        item.CategoryType2 = EffCategoryType.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(EffCategoryType), (int)item.CategoryType3))
+                    {
+                        unknownEnums.Add($"New EffCategoryType enum value: {(int)item.CategoryType3}");
+                        item.CategoryType3 = EffCategoryType.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(Corporation), (int)item.Corporation))
+                    {
+                        unknownEnums.Add($"New Corporation enum value: {(int)item.Corporation}");
+                        item.Corporation = Corporation.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(CorporationSubType), (int)item.CorporationSubType))
+                    {
+                        unknownEnums.Add($"New CorporationSubType enum value: {(int)item.CorporationSubType}");
+                        item.CorporationSubType = CorporationSubType.Unknown;
+                    }
+                    if (!Enum.IsDefined(typeof(Squad), (int)item.Squad))
+                    {
+                        unknownEnums.Add($"New Squad enum value: {(int)item.Squad}");
+                        item.Squad = Squad.Unknown;
+                    }
+                }
+            );
+
         if (unknownEnums.Count > 0)
         {
             Console.WriteLine();

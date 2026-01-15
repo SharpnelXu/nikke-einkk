@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Runtime.Serialization;
 
 namespace NikkeEinkk.Components.Models.Enums
 {
@@ -33,7 +34,7 @@ namespace NikkeEinkk.Components.Models.Enums
         Pioneer = 23,
         Inherit = 24,
         TheClown = 25,
-        [JsonProperty("777")]
+        [EnumMember(Value = "777")]
         _777 = 26,
         UnderworldQueen = 27,
         MMR = 28,

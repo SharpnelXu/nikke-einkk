@@ -1,5 +1,6 @@
 using MemoryPack;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NikkeEinkk.Components.Models;
 
 namespace NikkeEinkk.Components.Converter;
