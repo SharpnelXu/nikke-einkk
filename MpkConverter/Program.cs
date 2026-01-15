@@ -22,6 +22,7 @@ public class Program
 
         Console.WriteLine($"Input path: {inputPath}");
         Console.WriteLine($"Output path: {outputPath}");
+        Console.WriteLine();
 
         await DeserializeFiles(inputPath, outputPath);
     }
@@ -68,6 +69,7 @@ public class Program
         Action<TItem>? processItem = null
     )
     {
+        var fileName = inputPath.Substring(inputPath.LastIndexOf('\\') + 1);
         try
         {
             var records = await MpkToJsonConverter.ConvertMpkToJsonAsync(
@@ -75,7 +77,11 @@ public class Program
                 outputPath,
                 processItem
             );
-            return records.Records.Length > 0;
+            var result = records.Records.Length > 0;
+            Console.WriteLine(result
+                ? $"✓ Successfully converted {fileName} with {records.Records.Length} records."
+                : $"✗ Failed to convert {fileName}.");
+            return result;
         }
         catch (Exception ex)
         {
