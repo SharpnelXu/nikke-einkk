@@ -902,6 +902,8 @@ public class Program
             "wave_eventdungeon_021",
             "wave_eventdungeon_022",
             "wave_eventdungeon_023",
+            "wave_eventdungeon_024",
+            "wave_eventdungeon_025",
             "wave_eventquest_001",
             "wave_favoriteitem_001",
             "wave_Intercept_001",
