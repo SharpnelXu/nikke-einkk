@@ -2,11 +2,11 @@ using NikkeEinkk.Components.Converter;
 using NikkeEinkk.Components.Models.Enums;
 using NikkeEinkk.Components.Models.Nikke;
 
-namespace NikkeEinkk.Tools.MpkConverter;
+namespace MpkConverter;
 
 public class Program
 {
-    static async void Main(string[] args)
+    static async Task Main(string[] args)
     {
         var inputPath = ".\\";
         var outputPath = ".\\";
@@ -23,7 +23,7 @@ public class Program
         Console.WriteLine($"Input path: {inputPath}");
         Console.WriteLine($"Output path: {outputPath}");
 
-
+        await DeserializeFiles(inputPath, outputPath);
     }
 
     private static async Task DeserializeFiles(string inputPath, string outputPath)

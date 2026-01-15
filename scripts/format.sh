@@ -2,8 +2,7 @@
 
 echo "Formatting Components..."
 
-dotnet format NikkeEinkk.sln --include "Tools/**"
-dotnet format NikkeEinkk.sln --include "Components/**"
+dotnet format NikkeEinkk.sln
 
 if [ $? -eq 0 ]; then
     echo "Components formatted."
