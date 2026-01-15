@@ -7,7 +7,8 @@ if [ ! -d "../Components" ]; then
     exit 1
 fi
 
-dotnet format --include "../Components/**/*.cs" --verbosity diagnostic
+dotnet format --include "./Components/**/*.cs" --verbosity diagnostic
+dotnet format --include "./Tools/**/*.cs" --verbosity diagnostic
 
 if [ $? -eq 0 ]; then
     echo "Components formatted."

@@ -1,4 +1,4 @@
-﻿using MemoryPack;
+using MemoryPack;
 using Newtonsoft.Json;
 using NikkeEinkk.Components.Models.Enums;
 

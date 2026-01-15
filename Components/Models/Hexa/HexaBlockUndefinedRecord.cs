@@ -1,11 +1,11 @@
-﻿using MemoryPack;
+using MemoryPack;
 using Newtonsoft.Json;
 using NikkeEinkk.Components.Models.Enums;
 
 namespace NikkeEinkk.Components.Models.Hexa;
 
 [MemoryPackable(SerializeLayout.Explicit)]
-public partial class HexaBlockUndefinedRecord 
+public partial class HexaBlockUndefinedRecord
 {
     [JsonProperty("id")]
     [MemoryPackOrder(0)]

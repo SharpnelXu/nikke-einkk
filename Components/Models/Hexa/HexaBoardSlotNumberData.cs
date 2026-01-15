@@ -1,10 +1,10 @@
-﻿using MemoryPack;
+using MemoryPack;
 using Newtonsoft.Json;
 
 namespace NikkeEinkk.Components.Models.Hexa;
 
 [MemoryPackable(SerializeLayout.Explicit)]
-public partial class HexaBoardSlotNumberData 
+public partial class HexaBoardSlotNumberData
 {
 
     [JsonProperty("slot_no")]

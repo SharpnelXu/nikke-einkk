@@ -10,6 +10,6 @@ namespace NikkeEinkk.Components.Models
         public string Version { get; set; } = "0.0.1";
 
         [JsonProperty("records")]
-        public TItem[] Records { get; set; } = Array.Empty<TItem>();
+        public TItem[] Records { get; set; } = [];
     }
 }
