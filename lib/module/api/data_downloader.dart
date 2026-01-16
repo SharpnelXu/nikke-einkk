@@ -99,7 +99,7 @@ class _StaticDataDownloadPageState extends State<StaticDataDownloadPage> {
                       return;
                     }
 
-                    final extractSuccess = unpacker!.extractFiles(getExtractDataFolderPath(downloadedGlobal));
+                    final extractSuccess = unpacker!.extractFiles(getDataFolderPath(downloadedGlobal));
                     if (!extractSuccess) {
                       errorText = 'Error extracting static data';
                       await EasyLoading.dismiss();

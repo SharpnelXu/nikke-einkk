@@ -15,6 +15,11 @@ String getStaticDataPath(bool global, [String? version]) {
   );
 }
 
+String getDataFolderPath(bool global) {
+  final server = global ? 'global' : 'cn';
+  return path.join(appPath, 'data', server);
+}
+
 String getExtractDataFolderPath(bool global) {
   final server = global ? 'global' : 'cn';
   return path.join(appPath, 'data', server, 'extract');

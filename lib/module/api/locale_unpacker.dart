@@ -62,6 +62,7 @@ class LocaleUnpackerPage extends StatelessWidget {
                 }
 
                 final allFilePaths = dir.listSync(recursive: true);
+                final archive = Archive();
                 for (final (i, filePath) in dir.listSync(recursive: true).indexed) {
                   EasyLoading.showProgress(
                     (i + 1) / allFilePaths.length,
@@ -89,12 +90,25 @@ class LocaleUnpackerPage extends StatelessWidget {
                     if (table['type'] == 'table') {
                       final tableName = table['tbl_name']! as String;
                       final result = await db.query(tableName);
+
                       final jsonFile = File(join(outputPath, fileName, '$tableName.json'));
                       final jsonEncoder = JsonEncoder.withIndent('  ');
-                      await jsonFile.writeAsString(jsonEncoder.convert(result));
+                      final json = jsonEncoder.convert(result);
+                      await jsonFile.writeAsString(json);
+
+                      final bytes = utf8.encode(json);
+                      archive.addFile(ArchiveFile('$fileName/$tableName.json', bytes.length, bytes));
                     }
                   }
                   await db.close();
+                  await outputFile.delete();
+                }
+                final zipData = ZipEncoder().encode(archive);
+                final zipPath = join(appPath, 'data', 'global', 'Locale.zip');
+                final zipFile = File(zipPath);
+                if (zipFile.existsSync()) zipFile.deleteSync();
+                if (zipData != null) {
+                  zipFile.writeAsBytesSync(zipData);
                 }
 
                 await EasyLoading.dismiss();

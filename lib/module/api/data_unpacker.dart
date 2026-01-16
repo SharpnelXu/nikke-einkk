@@ -488,7 +488,11 @@ class GameDataUnpacker {
     }
 
     final zip = _mainZip!;
-    final dir = Directory(outputDir);
+    final zipFile = File(path.join(outputDir, 'StaticData.zip'));
+    zipFile.writeAsBytesSync(ZipEncoder().encode(zip)!);
+
+    final extractDir = path.join(outputDir, 'extract');
+    final dir = Directory(extractDir);
     if (!dir.existsSync()) {
       dir.createSync(recursive: true);
     }
@@ -497,7 +501,7 @@ class GameDataUnpacker {
       final file = zip.files[i];
 
       // Create directory structure if needed
-      final filePath = data.getDesignatedDirectory(outputDir, file.name);
+      final filePath = data.getDesignatedDirectory(extractDir, file.name);
       final directory = path.dirname(filePath);
       if (directory.isNotEmpty) {
         Directory(directory).createSync(recursive: true);
