@@ -1,6 +1,14 @@
 using NikkeEinkk.Components;
+using NikkeEinkk.Components.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure NikkeDatabase options from appsettings.json
+builder.Services.Configure<NikkeDatabaseOptions>(
+    builder.Configuration.GetSection(NikkeDatabaseOptions.SectionName));
+
+// Register NikkeDatabase as a singleton service
+builder.Services.AddSingleton<NikkeDatabase>();
 
 // Add Blazor services
 builder.Services.AddRazorComponents()
