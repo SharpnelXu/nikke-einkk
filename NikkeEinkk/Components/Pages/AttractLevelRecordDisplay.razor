@@ -1,4 +1,5 @@
 ﻿@page "/misc/attract-level-record"
+@rendermode RenderMode.InteractiveServer
 @using NikkeEinkk.Components.Models
 @using NikkeEinkk.Components.Models.Nikke
 @inject NikkeDatabaseProvider DbProvider
@@ -7,7 +8,23 @@
 
 <h1>Attractive Level Table</h1>
 
+<button class="toggle-btn" @onclick="ToggleExtraColumns">
+    @(ShowExtraColumns ? "Hide Extra Columns" : "Show All Columns")
+</button>
+
 <style>
+    .toggle-btn {
+        margin-bottom: 1rem;
+        padding: 8px 16px;
+        background-color: #4a4a4a;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .toggle-btn:hover {
+        background-color: #5a5a5a;
+    }
     .attract-table {
         border-collapse: collapse;
         width: 100%;
@@ -37,59 +54,85 @@
 <table class="attract-table">
     <thead>
         <tr>
-            <th rowspan="2">ID</th>
+            @if (ShowExtraColumns)
+            {
+                <th rowspan="2">ID</th>
+            }
             <th rowspan="2">Level</th>
-            <th rowspan="2">Point</th>
-            <th colspan="6" class="group-header">Attacker</th>
-            <th colspan="6" class="group-header">Defender</th>
-            <th colspan="6" class="group-header">Supporter</th>
+            <th rowspan="2">Total</th>
+            <th rowspan="2">Next</th>
+            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">Attacker</th>
+            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">Defender</th>
+            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">Supporter</th>
         </tr>
         <tr>
             <th>HP</th>
             <th>ATK</th>
             <th>DEF</th>
-            <th>Energy Resist</th>
-            <th>Metal Resist</th>
-            <th>Bio Resist</th>
+            @if (ShowExtraColumns)
+            {
+                <th>Energy Resist</th>
+                <th>Metal Resist</th>
+                <th>Bio Resist</th>
+            }
             <th>HP</th>
             <th>ATK</th>
             <th>DEF</th>
-            <th>Energy Resist</th>
-            <th>Metal Resist</th>
-            <th>Bio Resist</th>
+            @if (ShowExtraColumns)
+            {
+                <th>Energy Resist</th>
+                <th>Metal Resist</th>
+                <th>Bio Resist</th>
+            }
             <th>HP</th>
             <th>ATK</th>
             <th>DEF</th>
-            <th>Energy Resist</th>
-            <th>Metal Resist</th>
-            <th>Bio Resist</th>
+            @if (ShowExtraColumns)
+            {
+                <th>Energy Resist</th>
+                <th>Metal Resist</th>
+                <th>Bio Resist</th>
+            }
         </tr>
     </thead>
     <tbody>
         @foreach (var record in Records)
         {
             <tr>
-                <td>@record.Id</td>
+                @if (ShowExtraColumns)
+                {
+                    <td>@record.Id</td>
+                }
                 <td>@record.AttractiveLevel</td>
+                <td>@GetAccumulatedPoints(record.AttractiveLevel)</td>
                 <td>@record.AttractivePoint</td>
                 <td>@record.AttackerHpRate</td>
                 <td>@record.AttackerAttackRate</td>
                 <td>@record.AttackerDefenceRate</td>
-                <td>@record.AttackerEnergyResistRate</td>
-                <td>@record.AttackerMetalResistRate</td>
-                <td>@record.AttackerBioResistRate</td>
+                @if (ShowExtraColumns)
+                {
+                    <td>@record.AttackerEnergyResistRate</td>
+                    <td>@record.AttackerMetalResistRate</td>
+                    <td>@record.AttackerBioResistRate</td>
+                }
                 <td>@record.DefenderHpRate</td>
                 <td>@record.DefenderAttackRate</td>
                 <td>@record.DefenderDefenceRate</td>
-                <td>@record.DefenderEnergyResistRate</td>
-                <td>@record.DefenderMetalResistRate</td>
-                <td>@record.DefenderBioResistRate</td>
+                @if (ShowExtraColumns)
+                {
+                    <td>@record.DefenderEnergyResistRate</td>
+                    <td>@record.DefenderMetalResistRate</td>
+                    <td>@record.DefenderBioResistRate</td>
+                }
                 <td>@record.SupporterHpRate</td>
                 <td>@record.SupporterAttackRate</td>
                 <td>@record.SupporterDefenceRate</td>
-                <td>@record.SupporterEnergyResistRate</td>
-                <td>@record.SupporterMetalResistRate</td>
-                <td>@record.SupporterBioResistRate</td>
+                @if (ShowExtraColumns)
+                {
+                    <td>@record.SupporterEnergyResistRate</td>
+                    <td>@record.SupporterMetalResistRate</td>
+                    <td>@record.SupporterBioResistRate</td>
+                }
             </tr>
         }
     </tbody>
@@ -97,10 +140,30 @@
 
 @code {
     private IEnumerable<AttractiveLevelRecord> Records { get; set; } = [];
+    private Dictionary<int, int> AccumulatedPoints { get; set; } = new();
+    private bool ShowExtraColumns { get; set; }
 
     protected override void OnInitialized()
     {
         Records = DbProvider.GetDatabase(true).AttractiveLevelTable.Values;
+
+        // Calculate accumulated points for each level
+        int total = 0;
+        foreach (var record in Records)
+        {
+            AccumulatedPoints[record.AttractiveLevel] = total;
+            total += record.AttractivePoint;
+        }
+    }
+
+    private void ToggleExtraColumns()
+    {
+        ShowExtraColumns = !ShowExtraColumns;
+    }
+
+    private int GetAccumulatedPoints(int level)
+    {
+        return AccumulatedPoints.GetValueOrDefault(level, 0);
     }
 }
 
