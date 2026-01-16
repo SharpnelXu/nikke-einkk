@@ -7,8 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<NikkeDatabaseOptions>(
     builder.Configuration.GetSection(NikkeDatabaseOptions.SectionName));
 
-// Register NikkeDatabase as a singleton service
-builder.Services.AddSingleton<NikkeDatabase>();
+// Register NikkeDatabaseProvider as a singleton service
+builder.Services.AddSingleton<NikkeDatabaseProvider>();
 
 // Add Blazor services
 builder.Services.AddRazorComponents()

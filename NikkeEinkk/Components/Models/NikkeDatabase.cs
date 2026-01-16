@@ -1,48 +1,55 @@
-﻿using System.IO.Compression;
+using System.IO.Compression;
 using MemoryPack;
-using Microsoft.Extensions.Options;
 using NikkeEinkk.Components.Models.Nikke;
 
 namespace NikkeEinkk.Components.Models;
 
-public class NikkeDatabase
+public class NikkeDatabase(string dataPath, bool isGlobal)
 {
-    private readonly string _dataPath;
+    public bool IsGlobal { get; } = isGlobal;
+    public bool Initialized { get; set; }
 
-    public bool IsGlobal { get; set; } = true;
-    public bool Initialized { get; set; } = false;
-
-    public Dictionary<String, List<WordRecord>> WordRecordTable = [];
-
-    public NikkeDatabase(IOptions<NikkeDatabaseOptions> options)
-    {
-        _dataPath = options.Value.DataPath;
-    }
+    public Dictionary<int, AttractiveLevelRecord> AttractiveLevelTable = [];
+    public Dictionary<string, List<WordRecord>> WordTable = [];
 
     public bool LoadDatabase()
     {
-        var staticDataZipPath = Path.Combine(_dataPath, "StaticData.zip");
+        var staticDataZipPath = Path.Combine(dataPath, "StaticData.zip");
         using (var archive = ZipFile.OpenRead(staticDataZipPath))
         {
-            var wordRecordEntry = archive.GetEntry("WordTable.mpk");
-            if (wordRecordEntry == null) return false;
-
-            using (var entryStream = wordRecordEntry.Open())
-            using (var memoryStream = new MemoryStream())
-            {
-                entryStream.CopyTo(memoryStream);
-                var data = memoryStream.ToArray();
-                var items = MemoryPackSerializer.Deserialize<WordRecord[]>(data);
-                if (items == null) return false;
-
-                WordRecordTable = items
-                    .GroupBy(w => w.Group)
-                    .ToDictionary(g => g.Key, g => g.ToList());
-
-                Initialized = true;
-            }
+            Initialized = LoadTable<AttractiveLevelRecord>(archive, "AttractiveLevelTable.mpk", ProcessAttractiveLevelRecords);
+            Initialized &= LoadTable<WordRecord>(archive, "WordTable.mpk", ProcessWordRecords);
         }
 
         return Initialized;
+    }
+
+    private static bool LoadTable<T>(ZipArchive archive, string entryName, Action<T[]> processItems)
+    {
+        var entry = archive.GetEntry(entryName);
+        if (entry == null) return false;
+
+        using var entryStream = entry.Open();
+        using var memoryStream = new MemoryStream();
+        entryStream.CopyTo(memoryStream);
+        var data = memoryStream.ToArray();
+        var items = MemoryPackSerializer.Deserialize<T[]>(data);
+        if (items == null) return false;
+
+        processItems(items);
+
+        return true;
+    }
+
+    private void ProcessWordRecords(WordRecord[] items)
+    {
+        WordTable = items
+            .GroupBy(record => record.Group)
+            .ToDictionary(group => group.Key, group => group.OrderBy(record => record.Order).ToList());
+    }
+
+    private void ProcessAttractiveLevelRecords(AttractiveLevelRecord[] items)
+    {
+        AttractiveLevelTable = items.ToDictionary(record => record.AttractiveLevel, record => record);
     }
 }

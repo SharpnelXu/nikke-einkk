@@ -1,9 +1,10 @@
-﻿namespace NikkeEinkk.Components.Models;
+namespace NikkeEinkk.Components.Models;
 
 public class NikkeDatabaseOptions
 {
     public const string SectionName = "NikkeDatabase";
 
-    public string DataPath { get; set; } = string.Empty;
+    public string GlobalDataPath { get; set; } = string.Empty;
+    public string CnDataPath { get; set; } = string.Empty;
 }
 
