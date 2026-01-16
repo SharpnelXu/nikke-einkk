@@ -1,0 +1,106 @@
+﻿@page "/misc/attract-level-record"
+@using NikkeEinkk.Components.Models
+@using NikkeEinkk.Components.Models.Nikke
+@inject NikkeDatabaseProvider DbProvider
+
+<PageTitle>Attract Level Record</PageTitle>
+
+<h1>Attractive Level Table</h1>
+
+<style>
+    .attract-table {
+        border-collapse: collapse;
+        width: 100%;
+        font-family: Arial, sans-serif;
+    }
+    .attract-table th, .attract-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    .attract-table th {
+        background-color: #2b2b2b;
+        color: white;
+    }
+    .attract-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    .attract-table tr:hover {
+        background-color: #ddd;
+    }
+    .group-header {
+        background-color: #333 !important;
+        color: white;
+    }
+</style>
+
+<table class="attract-table">
+    <thead>
+        <tr>
+            <th rowspan="2">ID</th>
+            <th rowspan="2">Level</th>
+            <th rowspan="2">Point</th>
+            <th colspan="6" class="group-header">Attacker</th>
+            <th colspan="6" class="group-header">Defender</th>
+            <th colspan="6" class="group-header">Supporter</th>
+        </tr>
+        <tr>
+            <th>HP</th>
+            <th>ATK</th>
+            <th>DEF</th>
+            <th>Energy Resist</th>
+            <th>Metal Resist</th>
+            <th>Bio Resist</th>
+            <th>HP</th>
+            <th>ATK</th>
+            <th>DEF</th>
+            <th>Energy Resist</th>
+            <th>Metal Resist</th>
+            <th>Bio Resist</th>
+            <th>HP</th>
+            <th>ATK</th>
+            <th>DEF</th>
+            <th>Energy Resist</th>
+            <th>Metal Resist</th>
+            <th>Bio Resist</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var record in Records)
+        {
+            <tr>
+                <td>@record.Id</td>
+                <td>@record.AttractiveLevel</td>
+                <td>@record.AttractivePoint</td>
+                <td>@record.AttackerHpRate</td>
+                <td>@record.AttackerAttackRate</td>
+                <td>@record.AttackerDefenceRate</td>
+                <td>@record.AttackerEnergyResistRate</td>
+                <td>@record.AttackerMetalResistRate</td>
+                <td>@record.AttackerBioResistRate</td>
+                <td>@record.DefenderHpRate</td>
+                <td>@record.DefenderAttackRate</td>
+                <td>@record.DefenderDefenceRate</td>
+                <td>@record.DefenderEnergyResistRate</td>
+                <td>@record.DefenderMetalResistRate</td>
+                <td>@record.DefenderBioResistRate</td>
+                <td>@record.SupporterHpRate</td>
+                <td>@record.SupporterAttackRate</td>
+                <td>@record.SupporterDefenceRate</td>
+                <td>@record.SupporterEnergyResistRate</td>
+                <td>@record.SupporterMetalResistRate</td>
+                <td>@record.SupporterBioResistRate</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private IEnumerable<AttractiveLevelRecord> Records { get; set; } = [];
+
+    protected override void OnInitialized()
+    {
+        Records = DbProvider.GetDatabase(true).AttractiveLevelTable.Values;
+    }
+}
+

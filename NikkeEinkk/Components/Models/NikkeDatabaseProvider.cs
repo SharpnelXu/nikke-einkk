@@ -16,7 +16,7 @@ public class NikkeDatabaseProvider
     public void LoadAll()
     {
         Global.LoadDatabase();
-        Cn.LoadDatabase();
+        // Cn.LoadDatabase();
     }
 
     public NikkeDatabase GetDatabase(bool isGlobal) => isGlobal ? Global : Cn;

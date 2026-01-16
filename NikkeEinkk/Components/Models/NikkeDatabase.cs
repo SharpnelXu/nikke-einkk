@@ -9,7 +9,7 @@ public class NikkeDatabase(string dataPath, bool isGlobal)
     public bool IsGlobal { get; } = isGlobal;
     public bool Initialized { get; set; }
 
-    public Dictionary<int, AttractiveLevelRecord> AttractiveLevelTable = [];
+    public SortedDictionary<int, AttractiveLevelRecord> AttractiveLevelTable = [];
     public Dictionary<string, List<WordRecord>> WordTable = [];
 
     public bool LoadDatabase()
@@ -50,6 +50,7 @@ public class NikkeDatabase(string dataPath, bool isGlobal)
 
     private void ProcessAttractiveLevelRecords(AttractiveLevelRecord[] items)
     {
-        AttractiveLevelTable = items.ToDictionary(record => record.AttractiveLevel, record => record);
+        AttractiveLevelTable = new SortedDictionary<int, AttractiveLevelRecord>(
+            items.ToDictionary(record => record.AttractiveLevel, record => record));
     }
 }

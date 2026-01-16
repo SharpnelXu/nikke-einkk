@@ -16,6 +16,10 @@ builder.Services.AddRazorComponents()
 
 var app = builder.Build();
 
+// Load the Nikke databases at startup
+var dbProvider = app.Services.GetRequiredService<NikkeDatabaseProvider>();
+dbProvider.LoadAll();
+
 // Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
