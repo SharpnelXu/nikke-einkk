@@ -2,14 +2,16 @@
 @rendermode RenderMode.InteractiveServer
 @using NikkeEinkk.Components.Models
 @using NikkeEinkk.Components.Models.Nikke
+@using Microsoft.Extensions.Localization
 @inject NikkeDatabaseProvider DbProvider
+@inject IStringLocalizer<AttractLevelRecordDisplay> L
 
-<PageTitle>Attract Level Record</PageTitle>
+<PageTitle>@L["PageTitle"]</PageTitle>
 
-<h1>Attractive Level Table</h1>
+<h1>@L["Title"]</h1>
 
 <button class="toggle-btn" @onclick="ToggleExtraColumns">
-    @(ShowExtraColumns ? "Hide Extra Columns" : "Show All Columns")
+    @(ShowExtraColumns ? L["HideExtraColumns"] : L["ShowAllColumns"])
 </button>
 
 <style>
@@ -56,42 +58,42 @@
         <tr>
             @if (ShowExtraColumns)
             {
-                <th rowspan="2">ID</th>
+                <th rowspan="2">@L["ID"]</th>
             }
-            <th rowspan="2">Level</th>
-            <th rowspan="2">Total</th>
-            <th rowspan="2">Next</th>
-            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">Attacker</th>
-            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">Defender</th>
-            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">Supporter</th>
+            <th rowspan="2">@L["Level"]</th>
+            <th rowspan="2">@L["Total"]</th>
+            <th rowspan="2">@L["Next"]</th>
+            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">@L["Attacker"]</th>
+            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">@L["Defender"]</th>
+            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">@L["Supporter"]</th>
         </tr>
         <tr>
-            <th>HP</th>
-            <th>ATK</th>
-            <th>DEF</th>
+            <th>@L["HP"]</th>
+            <th>@L["ATK"]</th>
+            <th>@L["DEF"]</th>
             @if (ShowExtraColumns)
             {
-                <th>Energy Resist</th>
-                <th>Metal Resist</th>
-                <th>Bio Resist</th>
+                <th>@L["EnergyResist"]</th>
+                <th>@L["MetalResist"]</th>
+                <th>@L["BioResist"]</th>
             }
-            <th>HP</th>
-            <th>ATK</th>
-            <th>DEF</th>
+            <th>@L["HP"]</th>
+            <th>@L["ATK"]</th>
+            <th>@L["DEF"]</th>
             @if (ShowExtraColumns)
             {
-                <th>Energy Resist</th>
-                <th>Metal Resist</th>
-                <th>Bio Resist</th>
+                <th>@L["EnergyResist"]</th>
+                <th>@L["MetalResist"]</th>
+                <th>@L["BioResist"]</th>
             }
-            <th>HP</th>
-            <th>ATK</th>
-            <th>DEF</th>
+            <th>@L["HP"]</th>
+            <th>@L["ATK"]</th>
+            <th>@L["DEF"]</th>
             @if (ShowExtraColumns)
             {
-                <th>Energy Resist</th>
-                <th>Metal Resist</th>
-                <th>Bio Resist</th>
+                <th>@L["EnergyResist"]</th>
+                <th>@L["MetalResist"]</th>
+                <th>@L["BioResist"]</th>
             }
         </tr>
     </thead>
