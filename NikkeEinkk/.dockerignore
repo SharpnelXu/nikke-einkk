@@ -1,0 +1,10 @@
+﻿**/*.md
+**/.git
+**/.gitignore
+**/.vs
+**/bin
+**/obj
+**/Dockerfile*
+**/*.user
+**/*.DotSettings*
+
