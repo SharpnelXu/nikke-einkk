@@ -22,7 +22,7 @@
 
 <style>
     .settings-section {
-        background-color: #2b2b2b;
+        background-color: var(--header-color);
         border-radius: 8px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
@@ -31,8 +31,7 @@
     .settings-section h3 {
         margin-top: 0;
         margin-bottom: 1rem;
-        color: #fff;
-        border-bottom: 1px solid #444;
+        border-bottom: 1px solid var(--border-color);
         padding-bottom: 0.5rem;
     }
     .setting-item {
@@ -41,26 +40,23 @@
         gap: 0.5rem;
     }
     .setting-item label {
-        color: #ccc;
         font-size: 14px;
     }
     .locale-select {
         width: 100%;
         max-width: 200px;
         padding: 8px 12px;
-        background-color: #4a4a4a;
-        color: white;
         border: none;
+        background-color: var(--button-color);
         border-radius: 4px;
         cursor: pointer;
         font-size: 14px;
     }
     .locale-select:hover {
-        background-color: #5a5a5a;
+        background-color: var(--button-hover-color);
     }
     .locale-select option {
-        background-color: #3a3a3a;
-        color: white;
+        background-color: var(--button-color);
     }
 </style>
 

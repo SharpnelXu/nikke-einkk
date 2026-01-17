@@ -18,14 +18,16 @@
     .toggle-btn {
         margin-bottom: 1rem;
         padding: 8px 16px;
-        background-color: #4a4a4a;
-        color: white;
+        background-color: var(--primary-color);
+        color: var(--on-primary-text);
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        font-size: medium;
     }
     .toggle-btn:hover {
-        background-color: #5a5a5a;
+        background-color: var(--primary-hover-color);
+        color: var(--on-primary-text);
     }
     .attract-table {
         border-collapse: collapse;
@@ -33,23 +35,19 @@
         font-family: Arial, sans-serif;
     }
     .attract-table th, .attract-table td {
-        border: 1px solid #ddd;
+        border: 1px solid var(--table-border);
         padding: 8px;
         text-align: center;
     }
     .attract-table th {
-        background-color: #2b2b2b;
-        color: white;
+        background-color: var(--primary-color);
+        color: var(--on-primary-text);
     }
     .attract-table tr:nth-child(even) {
-        background-color: #f2f2f2;
+        background-color: var(--table-row-bg2);
     }
     .attract-table tr:hover {
-        background-color: #ddd;
-    }
-    .group-header {
-        background-color: #333 !important;
-        color: white;
+        background-color: var(--table-hover-bg);
     }
 </style>
 
@@ -63,9 +61,9 @@
             <th rowspan="2">@L["Level"]</th>
             <th rowspan="2">@L["Total"]</th>
             <th rowspan="2">@L["Next"]</th>
-            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">@L["Attacker"]</th>
-            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">@L["Defender"]</th>
-            <th colspan="@(ShowExtraColumns ? 6 : 3)" class="group-header">@L["Supporter"]</th>
+            <th colspan="@(ShowExtraColumns ? 6 : 3)">@L["Attacker"]</th>
+            <th colspan="@(ShowExtraColumns ? 6 : 3)">@L["Defender"]</th>
+            <th colspan="@(ShowExtraColumns ? 6 : 3)">@L["Supporter"]</th>
         </tr>
         <tr>
             <th>@L["HP"]</th>
