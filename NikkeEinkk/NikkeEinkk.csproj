@@ -13,5 +13,17 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="System.Text.Json" Version="10.0.2" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Components\Pages\AttractLevelRecordDisplay.zh.resx">
+      <DependentUpon>AttractLevelRecordDisplay.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Components\Pages\Settings.zh.resx">
+      <DependentUpon>Settings.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Components\Layout\NavMenu.zh.resx">
+      <DependentUpon>NavMenu.resx</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>
 

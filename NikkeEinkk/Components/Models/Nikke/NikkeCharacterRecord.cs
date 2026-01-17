@@ -1,12 +1,21 @@
 using MemoryPack;
 using Newtonsoft.Json;
 using NikkeEinkk.Components.Models.Enums;
+using NikkeEinkk.Components.Models.Locale;
 
 namespace NikkeEinkk.Components.Models.Nikke
 {
     [MemoryPackable]
     public partial class NikkeCharacterRecord
     {
+        [JsonIgnore]
+        [MemoryPackIgnore]
+        public Translation? NameTranslation { get; set; }
+
+        [JsonIgnore]
+        [MemoryPackIgnore]
+        public Translation? DescriptionTranslation { get; set; }
+
         [MemoryPackOrder(0)]
         [JsonProperty("id", Order = 0)]
         public int Id { get; set; }

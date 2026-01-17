@@ -1,0 +1,43 @@
+﻿@page "/nikkes"
+@rendermode RenderMode.InteractiveServer
+@using NikkeEinkk.Components.Models
+@using NikkeEinkk.Components.Models.Nikke
+@using Microsoft.Extensions.Localization
+@inject NikkeDatabaseProvider DbProvider
+@inject IStringLocalizer<NikkeCharacterListPage> L
+
+<PageTitle>@L["NikkeCharacterPage"]</PageTitle>
+
+<h1>@L["NikkeCharacterPage"]</h1>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>@L["ID"]</th>
+            <th>@L["Name"]</th>
+            <th>@L["Rarity"]</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var nikke in Nikkes)
+    {
+        <tr>
+            <td>@nikke.Id</td>
+            <td>@(nikke.NameTranslation?.GetTranslation() ?? nikke.NameLocalkey)</td>
+            <td>@nikke.OriginalRare</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code {
+    private List<NikkeCharacterRecord> Nikkes { get; set; } = [];
+
+    protected override void OnInitialized()
+    {
+        foreach (var nikkeCharacterRecordse in DbProvider.GetDatabase(true).NikkeCharacterTable.Values)
+        {
+            Nikkes.Add(nikkeCharacterRecordse.Values.Last());
+        }
+    }
+}

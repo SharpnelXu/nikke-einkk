@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace NikkeEinkk.Components.Models.Locale;
 
@@ -33,4 +34,31 @@ public class Translation
 
     [JsonProperty("IsSmart")]
     public bool IsSmart { get; set; } = false;
+
+    public string GetTranslation(string locale)
+    {
+        return locale switch
+        {
+            "ko" => ko,
+            "en" => en,
+            "ja" => ja,
+            "zh-TW" => zhTW,
+            "zh-CN" => zhCN,
+            "th" => th,
+            "de" => de,
+            "fr" => fr,
+            "debug" => Key,
+            _ => en,
+        };
+    }
+
+    public String GetTranslation()
+    {
+        var currentLocale = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        return currentLocale switch
+        {
+            "zh" => GetTranslation("zh-CN"),
+            _ => GetTranslation("en"),
+        };
+    }
 }

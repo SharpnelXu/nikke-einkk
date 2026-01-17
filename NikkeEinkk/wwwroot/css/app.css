@@ -148,6 +148,28 @@ h1 {
     margin-bottom: 0.5rem;
 }
 
+/* Tables */
+.data-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: Arial, sans-serif;
+}
+.data-table th, .data-table td {
+    border: 1px solid var(--table-border);
+    padding: 8px;
+    text-align: center;
+}
+.data-table th {
+    background-color: var(--primary-color);
+    color: var(--on-primary-text);
+}
+.data-table tr:nth-child(even) {
+    background-color: var(--table-row-bg2);
+}
+.data-table tr:hover {
+    background-color: var(--table-hover-bg);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .page {

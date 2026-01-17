@@ -11,26 +11,25 @@ public class NikkeDatabase(string dataPath, bool isGlobal)
     public bool Initialized { get; set; }
 
     public SortedDictionary<int, AttractiveLevelRecord> AttractiveLevelTable = [];
-    public SortedDictionary<int, SortedDictionary<int, NikkeCharacterRecord>> NikkeCharacterTable = [];
+    public Dictionary<int, SortedDictionary<int, NikkeCharacterRecord>> NikkeCharacterTable = [];
     public Dictionary<string, List<WordRecord>> WordTable = [];
-
 
     public Dictionary<string, Dictionary<string, Translation>> TranslationTable = [];
 
     public bool LoadDatabase()
     {
+        var localeZipPath = Path.Combine(dataPath, "Locale.zip");
+        using (var archive = ZipFile.OpenRead(localeZipPath))
+        {
+            Initialized &= LoadLocale(archive, "Locale_Character");
+        }
+
         var staticDataZipPath = Path.Combine(dataPath, "StaticData.zip");
         using (var archive = ZipFile.OpenRead(staticDataZipPath))
         {
             Initialized = LoadTable<AttractiveLevelRecord>(archive, "AttractiveLevelTable.mpk", ProcessAttractiveLevelRecords);
             Initialized &= LoadTable<WordRecord>(archive, "WordTable.mpk", ProcessWordRecords);
             Initialized &= LoadTable<NikkeCharacterRecord>(archive, "CharacterTable.mpk", ProcessNikkeCharacterRecords);
-        }
-
-        var localeZipPath = Path.Combine(dataPath, "Locale.zip");
-        using (var archive = ZipFile.OpenRead(localeZipPath))
-        {
-            Initialized &= LoadLocale(archive, "Locale_Character");
         }
 
         return Initialized;
@@ -97,6 +96,18 @@ public class NikkeDatabase(string dataPath, bool isGlobal)
             }
 
             value[record.GradeCoreId] = record;
+            record.NameTranslation = GetTranslation(record.NameLocalkey);
+            record.DescriptionTranslation = GetTranslation(record.DescriptionLocalkey);
         }
+    }
+
+    private Translation? GetTranslation(string key)
+    {
+        var keySplit = key.Split(':');
+        if (keySplit.Length != 2) return null;
+
+        var localeName = keySplit[0];
+        var localKey = keySplit[1];
+        return !TranslationTable.TryGetValue(localeName, out var translations) ? null : translations.GetValueOrDefault(localKey);
     }
 }
