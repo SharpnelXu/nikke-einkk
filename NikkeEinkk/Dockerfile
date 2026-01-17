@@ -27,9 +27,9 @@ COPY --from=build /app/publish .
 RUN mkdir -p /app/data/global /app/data/cn && \
     chown -R appuser:appuser /app
 
-# Copy startup script
+# Copy startup script and fix line endings (Windows CRLF -> Unix LF) and remove BOM
 COPY startup.sh /app/startup.sh
-RUN chmod +x /app/startup.sh && chown appuser:appuser /app/startup.sh
+RUN sed -i -e 's/\r$//' -e '1s/^\xEF\xBB\xBF//' /app/startup.sh && chmod +x /app/startup.sh && chown appuser:appuser /app/startup.sh
 
 USER appuser
 
@@ -41,5 +41,5 @@ ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 # Use startup script to download data then start app
-ENTRYPOINT ["/app/startup.sh"]
+ENTRYPOINT ["/bin/bash", "/app/startup.sh"]
 
