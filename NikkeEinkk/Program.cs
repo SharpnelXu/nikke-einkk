@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Localization;
 using NikkeEinkk.Components;
 using NikkeEinkk.Components.Models;
-using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
